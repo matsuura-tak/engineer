@@ -12,3 +12,4 @@
 - 組織を導入した。最初の機能は Takuma が /feature で始める。
 - 2026-10-29 組織 main のルールセット ai-org（id 26122949）を変更した（承認1件・コードオーナーの承認が必須、管理者は PR 経由でだけ例外）。Takuma が自分で実行した
 - 2026-10-29 001-daily-learning 開始 着手 依頼「診断と今日の学習」（最初に今のスキルと目標を聞き、その人向けに今日やることを1つ出す）
+- 2026-10-29 001-daily-learning G0 Takuma待ち Takuma が「アプリではなくブラウザ」に方針を変えた。キット 0.2.0 に Web のスタックはないため、組織の形を決めてもらう。verifier r1 は PASS（docs/reviews/001-daily-learning-G0-verifier-r1.md）、tech-lead r1 は途中で止めた
