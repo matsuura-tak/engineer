@@ -1,4 +1,4 @@
-# プロダクト全体：（名前は未定。ブラウザだけで動く Web アプリ）
+# プロダクト全体：今日の一手（ブラウザだけで動く Web アプリ。URL：https://matsuura-tak.github.io/engineer/ ）
 
 - 書いた役：pdm　日付：2026-10-29（r3。r2 で Takuma の決定により iOS アプリから Web アプリに直し、r3 で 001 の G0 の指摘（E-7 の訂正、IP の記録の書き分け、E-5 の件数）を反映した）　状態：下書き（001-daily-learning の G0 と一緒に Takuma が確認する）
 - 元の着想（.claude/org/app.json の idea）：最強のエンジニアとして成長するための人間育成アプリ。他で学んだことも反映でき、その人に合わせたパーソナルな学習をさせる。続ければ圧倒的なプロフェッショナルになれる。トレンドも敏感に取り入れる。
@@ -54,7 +54,7 @@
 - 測り方：サーバーがないので、v1 はアプリが自分の統計（上の 4 指標と1対1の値。001 の AC-24）を設定の画面に表示し、利用者が判定日にスクリーンショットで報告する（001 の 13）。匿名計測（GoatCounter など）は利用者を区別できないので、1 と 4 は件数からは出せない（001 の E-11）。匿名計測を入れるかは 001 の 18 の Q1。iOS 版を出すときは App Store Connect の同業比較（https://developer.apple.com/help/app-store-connect-analytics/benchmarks/peer-group-benchmarks/ ［公開情報 URL］）を参考値にする。
 - 見かけの指標（ページビュー、訪問者数、登録数、DAU）は主にしない。
 
-## 名前とタグラインの案（各30字以内。確定は Takuma：001 の 18 の Q7）
+## 名前とタグラインの案（各30字以内。名前は A「今日の一手」に確定：001 の 18 の Q7、2026-10-30 Takuma 承認。URL は GitHub Pages の既定 https://matsuura-tak.github.io/engineer/ ）
 | 案 | 名前（サイトの title） | タグライン（meta description の先頭） |
 |---|---|---|
 | A | 今日の一手 | エンジニアの毎日15分学習。登録なし |
