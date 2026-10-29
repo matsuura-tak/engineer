@@ -11,3 +11,4 @@
 ## 記録
 - 組織を導入した。最初の機能は Takuma が /feature で始める。
 - 2026-10-29 組織 main のルールセット ai-org（id 26122949）を変更した（承認1件・コードオーナーの承認が必須、管理者は PR 経由でだけ例外）。Takuma が自分で実行した
+- 2026-10-29 001-personal-learning-loop 開始 G0着手 docs/prd/001-personal-learning-loop.md
