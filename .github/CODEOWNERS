@@ -1,0 +1,10 @@
+# 組織の仕組み（.claude/、.github/、docs/org/、docs/templates/）と、エージェントへの指示のファイル
+# （CLAUDE.md など）を変えるには、@matsuura-tak の承認が必要です。
+/.claude/ @matsuura-tak
+/.github/ @matsuura-tak
+**/.claude/ @matsuura-tak
+/docs/org/ @matsuura-tak
+/docs/templates/ @matsuura-tak
+CLAUDE.md @matsuura-tak
+CLAUDE.local.md @matsuura-tak
+AGENTS.md @matsuura-tak

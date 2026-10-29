@@ -1,0 +1,72 @@
+# iOS のビルドとテスト。コマンドは .claude/org/app.json の commands.ios_build と commands.ios_test。
+# コマンドはリポジトリの直下で実行する（例: cd ios && xcodebuild ...）。
+# paths.ios のフォルダがまだないときだけ、macOS を使わずに飛ばす。
+# フォルダがあるのに commands.ios_test が空なら失敗にする（飛ばした CI は G2 の「緑」に数えない）。
+name: ios
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      run: ${{ steps.read.outputs.run }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: app.json を読む
+        id: read
+        run: |
+          python3 - <<'PY'
+          import json, os
+          with open(".claude/org/app.json", encoding="utf-8") as f:
+              app = json.load(f)
+          ios_dir = ((app.get("paths") or {}).get("ios") or "ios/").strip()
+          cmds = app.get("commands") or {}
+          has_test = bool((cmds.get("ios_test") or "").strip())
+          run = os.path.isdir(ios_dir)
+          if not run:
+              print("::notice::%s がまだないので、iOS のビルドとテストを飛ばしました" % ios_dir)
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as f:
+              f.write("run=%s\n" % ("true" if run else "false"))
+          if run and not has_test:
+              print("::error::.claude/org/app.json の commands.ios_test が空です。Takuma が書くまで、この CI は失敗し、G2 は通りません")
+              raise SystemExit(1)
+          PY
+
+  ios:
+    needs: plan
+    if: needs.plan.outputs.run == 'true'
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v6
+      - name: ビルドとテスト
+        run: |
+          python3 - <<'PY'
+          import json, subprocess, sys
+          with open(".claude/org/app.json", encoding="utf-8") as f:
+              cmds = json.load(f).get("commands") or {}
+          for key in ("ios_build", "ios_test"):
+              cmd = (cmds.get(key) or "").strip()
+              if not cmd:
+                  print("::notice::commands.%s が空なので飛ばしました" % key)
+                  continue
+              print("::group::%s: %s" % (key, cmd), flush=True)
+              code = subprocess.call(["bash", "-eo", "pipefail", "-c", cmd])
+              print("::endgroup::", flush=True)
+              if code != 0:
+                  print("::error::commands.%s が失敗しました（終了コード %d）" % (key, code))
+                  sys.exit(code)
+          PY

@@ -1,0 +1,50 @@
+# PR が組織の仕組み（.claude、.github、docs/org、docs/templates、エージェントへの指示のファイル）を変えていないか確かめる。
+# pull_request_target で動くので、このワークフロー、checker、lock.json はベースのブランチのものを使う。
+# PR のコードは取り出さず、実行もしない（変わったファイルの名前だけを API で読む）。
+# 失敗したら、Takuma が中身を確かめてからマージする。/ai-org:update の PR では失敗するのが正しい。
+name: org-guard
+
+on:
+  pull_request_target:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  org-guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: PR で変わったファイルの名前を読む
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import json, os, urllib.request
+          with open(os.environ["GITHUB_EVENT_PATH"], encoding="utf-8") as f:
+              number = json.load(f)["pull_request"]["number"]
+          api = os.environ.get("GITHUB_API_URL", "https://api.github.com")
+          url = "%s/repos/%s/pulls/%d/files?per_page=100" % (api, os.environ["GITHUB_REPOSITORY"], number)
+          names, page = [], 1
+          while True:
+              req = urllib.request.Request(url + "&page=%d" % page, headers={
+                  "Authorization": "Bearer " + os.environ["GH_TOKEN"], "Accept": "application/vnd.github+json"})
+              with urllib.request.urlopen(req, timeout=30) as r:
+                  batch = json.load(r)
+              for item in batch:
+                  names.append(item["filename"])
+                  if item.get("previous_filename"):
+                      names.append(item["previous_filename"])
+              if len(batch) < 100:
+                  break
+              page += 1
+          with open(os.path.join(os.environ["RUNNER_TEMP"], "changed.txt"), "w", encoding="utf-8") as f:
+              f.write("\n".join(names) + "\n")
+          print("変わったファイル: %d 個" % len(names))
+          PY
+      - name: 組織の変更がないか確かめる
+        run: python3 .claude/org/bin/org guard-pr . --changed "$RUNNER_TEMP/changed.txt"

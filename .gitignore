@@ -1,0 +1,32 @@
+# ai-org が最初に置いた .gitignore です。置いた後はこのアプリのもので、tech-lead が手入れします。
+
+# 秘密情報（コミットしない。入れてしまったら鍵を作り直す）
+.env
+.env.*
+!.env.example
+.envrc
+*.p8
+*.p12
+*.pem
+*.key
+*.mobileprovision
+*.provisionprofile
+*.keystore
+*.jks
+credentials.json
+service-account*.json
+
+# Claude Code の個人の設定
+.claude/settings.local.json
+.claude/worktrees/
+CLAUDE.local.md
+
+# ビルドの生成物
+xcuserdata/
+DerivedData/
+.build/
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+.DS_Store

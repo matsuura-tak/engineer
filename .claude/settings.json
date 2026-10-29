@@ -1,0 +1,166 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "autoMemoryEnabled": false,
+  "skillOverrides": {
+    "craft-pdm": "name-only",
+    "craft-designer": "name-only",
+    "craft-design-reviewer": "name-only",
+    "craft-tech-lead": "name-only",
+    "craft-ios-engineer": "name-only",
+    "craft-backend-engineer": "name-only",
+    "craft-verifier": "name-only",
+    "craft-reviewer": "name-only"
+  },
+  "permissions": {
+    "deny": [
+      "Edit(/.claude/**)",
+      "Edit(**/.claude/**)",
+      "Edit(/.github/**)",
+      "Edit(**/CLAUDE.local.md)",
+      "Read(.env)",
+      "Read(.env.*)",
+      "Edit(.env)",
+      "Edit(.env.*)",
+      "Read(.envrc)",
+      "Read(*.p8)",
+      "Edit(*.p8)",
+      "Read(*.p12)",
+      "Edit(*.p12)",
+      "Read(*.pem)",
+      "Edit(*.pem)",
+      "Read(*.key)",
+      "Edit(*.key)",
+      "Read(*.mobileprovision)",
+      "Edit(*.mobileprovision)",
+      "Read(*.provisionprofile)",
+      "Edit(*.provisionprofile)",
+      "Read(*.keystore)",
+      "Edit(*.keystore)",
+      "Read(*.jks)",
+      "Edit(*.jks)",
+      "Read(**/service-account*.json)",
+      "Read(**/credentials.json)",
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/**)",
+      "Read(~/.appstoreconnect/**)",
+      "Read(~/.config/gh/**)",
+      "Read(~/.config/gcloud/**)",
+      "Read(~/.docker/**)",
+      "Read(~/.netrc)",
+      "Read(~/.npmrc)",
+      "Agent(general-purpose)",
+      "Agent(claude)",
+      "Agent(fork)",
+      "Bash(git push --force*)",
+      "Bash(git push * --force*)",
+      "Bash(git push -f)",
+      "Bash(git push -f *)",
+      "Bash(git push * -f)",
+      "Bash(git push * -f *)",
+      "Bash(git push * +*)",
+      "Bash(git push --delete*)",
+      "Bash(git push * --delete*)",
+      "Bash(git push * -d *)",
+      "Bash(git push * main)",
+      "Bash(git push * main *)",
+      "Bash(git push * master)",
+      "Bash(git push * master *)",
+      "Bash(git push *:main*)",
+      "Bash(git push *:master*)",
+      "Bash(git push *refs/heads/main*)",
+      "Bash(git push *refs/heads/master*)",
+      "Bash(git * --no-verify*)",
+      "Bash(gh pr merge*)",
+      "Bash(gh repo edit*)",
+      "Bash(gh repo delete*)",
+      "Bash(gh release delete*)",
+      "Bash(gh secret *)",
+      "Bash(gh auth token*)",
+      "Bash(gh auth status --show-token*)",
+      "Bash(gh auth status -t*)",
+      "Bash(gh api -X DELETE*)",
+      "Bash(gh api --method DELETE*)",
+      "Bash(gh api *protection*)",
+      "Bash(gh api *rulesets*)",
+      "Bash(security find-*)",
+      "Bash(printenv*)",
+      "Bash(env)",
+      "Bash(rm -rf /)",
+      "Bash(rm -rf / *)",
+      "Bash(rm -rf ~)",
+      "Bash(rm -rf ~/)",
+      "Bash(rm -rf $HOME)",
+      "Bash(rm -rf $HOME/)",
+      "Bash(sudo *)",
+      "Bash(fastlane deliver*)",
+      "Bash(bundle exec fastlane deliver*)",
+      "mcp__github__create_or_update_file",
+      "mcp__github__push_files",
+      "mcp__github__delete_file",
+      "mcp__github__merge_pull_request",
+      "mcp__github__enable_pr_auto_merge",
+      "mcp__github__update_pull_request_branch",
+      "mcp__github__create_repository",
+      "mcp__github__fork_repository"
+    ]
+  },
+  "env": {
+    "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/session_start.py\"",
+            "timeout": 40
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit|NotebookEdit|Bash|Skill|SendMessage|PowerShell|mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard.sh\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard.sh\"",
+            "timeout": 40
+          }
+        ]
+      },
+      {
+        "matcher": "SubagentHandback",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/evidence.py\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/evidence.py\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
