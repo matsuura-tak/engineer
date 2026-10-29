@@ -17,3 +17,4 @@
 - 2026-10-29 001-daily-learning G0 FAIL tech-lead r1（重大2件：ホーム画面の Web アプリは Safari と保存を共有しない、freeCodeCamp の引用がページにない）。verifier r2 は PASS（要修正6件）。pdm に直させて r2 へ（docs/reviews/001-daily-learning-G0-tech-lead-r1.md）
 - 2026-10-29 001-daily-learning G0 判定PASS tech-lead r2 PASS（要修正4）、verifier r3 PASS（要修正2）。要修正は pdm が直す。Takuma に Q1〜Q9 と承認を聞く（docs/reviews/001-daily-learning-G0-tech-lead-r2.md、docs/reviews/001-daily-learning-G0-verifier-r3.md）
 - 2026-10-30 001-daily-learning G0 PASS Takuma が承認「承認します」。Q1〜Q9 はすべて推奨どおり（docs/approvals/001-daily-learning-G0.md）。要修正6件と決定の反映を pdm に任せる
+- 2026-10-30 001-daily-learning G0 再承認待ち Takuma の追加2点（ブラウザの中で完結、楽に継続）を PRD r5 に反映（AC 28→32、原則 P-1/P-2、Q10 追加）。範囲を変えた箇所と Q10 を Takuma に見せて承認を取り直す（docs/prd/001-daily-learning.md）
