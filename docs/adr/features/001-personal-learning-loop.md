@@ -91,6 +91,24 @@ flowchart TD
    - **Seam #4（Offline / Base URL Seam）**：`GET /?api_base_url=<URL>` クエリパラメータでフロントエンドの通信先を切り替え可能にし、すべての主要DOM要素に一意の `data-testid`（`learning-form`, `title-input`, `url-input`, `memo-input`, `category-select`, `submit-learning-btn`, `offline-error-banner`, `retry-submit-btn`, `validation-error-banner`, `empty-state-guide`, `empty-state-cta-btn`, `today-session-panel`, `challenge-submit-form`, `review-card-panel`, `skills-summary-panel`）を付与する。
    - **Seam #5（Deterministic Generator Seam）**：外部APIキー不要のルール・ヒューリスティック生成エンジンを既定とし、入力された `title` と `memo` から 5ms 未満で決定論的に `question` と3観点の `rubric_items` を返す。
 
+### 契約の不足を補った決定（2026-10-30 追補：verifier の未解決 1〜8、G1 reviewer の提案 1・2）
+受け入れテストを書く中で verifier が返した「契約で決まっていない点」と、G1 reviewer の提案を決めた。契約には足すだけで、既存の項目・状態コード・型は変えていない（4章の検査を参照）。行番号は `contracts/openapi.yaml` の行。
+
+| 番号 | 決めたこと | 理由 | 契約の場所 |
+|---|---|---|---|
+| D-1 画面の識別子 | `GET /` が返す HTML に `app-root`、`learning-form`、`title-input`、`url-input`、`memo-input`、`submit-learning-btn`、`offline-error-banner`、`retry-submit-btn`、`empty-state-guide`、`empty-state-cta-btn` の10個の `data-testid="…"` を文字どおり書く（JS で後から付けない）。クエリの有無に関係なく10個すべて入れる。初めは見えない要素は `hidden` で隠してよい。ほかの識別子（Seam #4 の残り）は JS で描いてよい | 外部パッケージ0件のため受け入れテストはブラウザを動かせず、返った HTML の文字列で確かめるしかない（test-plan 4章） | L68-L86（説明）、L117-L119（例 `requiredTestIds`） |
+| D-2 待ち受けと保存先 | 既定 `127.0.0.1:8000`。`DEVFORGE_HOST`（ループバックだけ受け付ける）と `DEVFORGE_PORT`（1〜65535）で変える。保存先は `DEVFORGE_DB_PATH`（未指定は `~/.devforge/devforge.sqlite3`、親フォルダがなければ作る。指定したパスの親フォルダがなければ起動しない）。どの誤りも 0 でない終了コードと、変数名を含む理由を標準エラーに出す。`APP_ENV=production` で `/api/v1/test/*` は 403、テスト用ヘッダは無視 | 認証がないため、ループバック以外で待ち受けると LAN の誰でも学習データを読み書きできる（7章）。既定の保存先をリポジトリの外にして、メモ本文をうっかりコミットしないようにする | L23-L33（`info.description`）、L1116、L1134 |
+| D-3 SSRF の順序と DNS | ①スキーム ②`localhost` ③IP の文字（`inet_aton` の別表記と IPv4 を埋め込んだ IPv6 を含む）は、いつもスタブより先に URL の文字列だけで調べる。④結果は、`stub_*` ヘッダ → 予約テストドメイン → 本当の取得の順で決める。⑤DNS を引くのは「ヘッダなしか `live`」で「ふつうのホスト名」のときだけ。名前解決に失敗したら `fallback_used`。テストで使う URL はどれも DNS を引かずに結果が決まる | 受け入れテストを、ネットワークのない CI でも同じ結果で動かすため。スタブと予約ドメインはどこにも接続しないので、DNS で内部 IP を調べなくても SSRF にならない | L145-L164、L1132-L1134 |
+| D-4 予約テストドメイン | `ok.example.test` → `fetched`、`timeout.example.test` → `fallback_used`（タイムアウト扱い）、`error.example.test` → `fallback_used`（接続失敗 / HTTP 500 扱い）、ほかの `*.example.test` → `fallback_used`（名前解決できない扱い）。パス・クエリ・ポートは関係しない。どれも外部へ接続せず、実際には2秒待たない。`stub_*` ヘッダはこの表より優先する | `.test` は RFC 6761 6.2 のテスト用の予約名で、DNS のキャッシュサーバーは既定で否定の応答を返す（同 4）ため、ふつうの環境の本物の動き（名前解決の失敗 → `fallback_used`）とも食い違わない。同 2 は「アプリは test の名前を特別に扱わない」ことを勧めるが、テストの結果をネットワークに左右させないため、あえて特別に扱う（どこにも接続しないので危険は増えない）。待たないのはテストを速く、同じ結果にするため（2.0秒の本当のタイムアウトは `live` で守る） | L166-L174 |
+| D-5 送り直し | verifier の期待どおりにする：同じ `Idempotency-Key` で、メソッド・パス・本文が同じなら、1回目と同じ状態コード（`createLearning` は 201、ほかは 200）と同じ本文を返し、`Idempotent-Replayed: true` を付ける。XP・問題・カード・SM-2・連続日数は1回分だけ。同じキーで内容が違えば 422（`IDEMPOTENCY_KEY_MISMATCH`）。覚えるのは 2xx だけで24時間。同じキーの同時の要求は1つずつ処理する | Stripe の冪等キーと同じ形で、オフラインからの再試行で二重作成しない（6章のオフライン）。2回目も成功を返すので、アプリは1回目の応答を受け取れなかったときも同じ処理で済む。4xx を覚えないのは、入力を直して同じキーで送り直せるようにするため | L176-L184、L218-L220・L512-L514・L689-L691（ヘッダ）、L341-L358・L594-L612・L784-L802（422）、L1089-L1097、L1723 |
+| D-6 連続日数 | 「日」は基準時刻の UTC の暦日。完了したとき、`last_study_date` が今日か今日より後なら変えない、昨日なら `+1`、2日以上前か `null` なら `1` に戻す。`getSkillsSummary` は、`last_study_date` が2日以上前か `null` なら `0` を返す（保存値は変えない） | 切れた連続を表示し続けない。UTC にしたのは `X-Test-Now` だけで結果が決まるため（日本時間にするかは未解決に Takuma への質問として書いた） | L481-L485、L658、L821-L829、L1571 |
+| D-7 `overall_level` | `floor(total_xp / 100) + 1`（`total_xp` は6領域の合計） | 既存の契約の例（`total_xp: 285` → `overall_level: 3`、0 → 1）と合う式はこれだけ（6領域のレベルの平均では 285 の例が 1 になる）。例を変えずに済む | L822、L1567 |
+| D-8 端の扱いなど | `weekly_mastered_count` は `now - 168時間 <= t <= now`（両端を含む。暦日で区切らない）。数えるのは完了した問題（`completed_at`）と、最後の評価が3以上のカード（`graded_at`）。文字数は Unicode のコードポイント（`len(str)`、正規化なし）。`memo` と `answer` は 2,000 以下かつ前後の空白を除いて10以上（空白だけは 400）。保存は送られたまま。解答済みの問題への送り直し（キーなしか別のキー）は 409（`CHALLENGE_ALREADY_COMPLETED`）、期限前のカードへの評価は 409（`REVIEW_CARD_NOT_DUE`） | 168時間なら日付の区切りとタイムゾーンに左右されない。両端を含むのは、期限の判定（`next_review_at <= 現在時刻`）と同じ向きにそろえるため。409 は、キーのない送り直しで XP や SM-2 が二重にかかるのを防ぐため | L186-L190、L474-L479、L575-L593、L651-L657、L765-L783、L821-L829、L1721-L1722 |
+| D-9 G1 reviewer の提案 | 提案1：`seedTestState` に 403（`TEST_SEAM_DISABLED`）を足した。提案2：DNS Rebinding 対策（調べた IP に接続を固定、リダイレクトごとに調べ直す、プロキシを使わない）を契約の順序と 7章に書いた | reset と seed で本番の扱いをそろえる。名前解決と接続の間に IP が変わる攻撃（TOCTOU）を防ぐ | L1069-L1086、L156-L159 |
+
+- 送り直しの比べ方の実装（backend-engineer へ）：`request_hash = sha256(method + " " + path + "\n" + json.dumps(本文を読んだ値, sort_keys=True, separators=(",", ":"), ensure_ascii=False))`。キーの検索・処理・保存は1つの `BEGIN IMMEDIATE` のトランザクションで行い、同じキーの同時の要求を1つずつにする。
+- 調べる順序（`submitChallenge`、`gradeReviewCard`）：キーの形（400）→ 同じキーの送り直し（再生 / 422）→ 対象があるか（404）→ 本文の検査（400）→ 状態（409）。AC-7 のテストは期限内・未回答の対象に不正な本文を送るので、400 が先に返る。
+
 ## 4. 契約の変更と互換性
 | operationId | 足す / 変える | AC | 認証 | 作る POST の Idempotency-Key |
 |---|---|---|---|---|
@@ -122,6 +140,43 @@ flowchart TD
   '
   OpenAPI 3.1.0 validation OK: operationIds = ['getWebAppUi', 'createLearning', 'getTodaySession', 'submitChallenge', 'gradeReviewCard', 'getSkillsSummary', 'resetTestState', 'seedTestState']
   ```
+- 2026-10-30 追補の再検査（spectral と oasdiff は今も未インストールのため未検査。代わりに上と同じ python3 の検証を流し直し、YAML として読めるかを macOS の ruby 2.6 の Psych で、HEAD との互換を差分と値の突き合わせで調べた）：
+  - 再検査で、HEAD の契約が YAML として読めないこと（`UrlFetchStatus` の `description` に引用符のない `: ` があった）が分かった。前回の python3 の検証は正規表現だけで、YAML として読んでいなかったため見逃していた。文字は変えずに二重引用符で囲んだ（`contracts/openapi.yaml` L1160。差分で唯一の削除行）。
+  ```
+  $ python3 -c '（上と同じ検証）'
+  OpenAPI 3.1.0 validation OK: operationIds = ['getWebAppUi', 'createLearning', 'getTodaySession', 'submitChallenge', 'gradeReviewCard', 'getSkillsSummary', 'resetTestState', 'seedTestState']
+
+  $ git show HEAD:contracts/openapi.yaml > /tmp/openapi-head.yaml && ruby -ryaml -e 'YAML.load_file("/tmp/openapi-head.yaml")'
+  psych.rb:456:in `parse': (/tmp/openapi-head.yaml): mapping values are not allowed in this context at line 916 column 42 (Psych::SyntaxError)
+
+  $ ruby check_openapi.rb contracts/openapi.yaml   # YAML として読み、$ref の行き先、data-testid、予約ドメインを調べる（スクリプトはリポジトリの外）
+  YAML parse OK: openapi=3.1.0 paths=8
+  getWebAppUi GET / => responses 200
+  createLearning POST /api/v1/learnings => responses 201,400,422
+  getTodaySession GET /api/v1/sessions/today => responses 200,500
+  submitChallenge POST /api/v1/challenges/{challenge_id}/submit => responses 200,400,404,409,422
+  gradeReviewCard POST /api/v1/reviews/{card_id}/grade => responses 200,400,404,409,422
+  getSkillsSummary GET /api/v1/skills/summary => responses 200,500
+  resetTestState POST /api/v1/test/reset => responses 200,403
+  seedTestState POST /api/v1/test/seed => responses 200,400,403
+  components.headers=["IdempotentReplayed"]
+  ErrorDetailObject.code=["VALIDATION_ERROR", "INVALID_URL_SCHEME_OR_HOST", "RESOURCE_NOT_FOUND", "TEST_SEAM_DISABLED", "INTERNAL_ERROR", "CHALLENGE_ALREADY_COMPLETED", "REVIEW_CARD_NOT_DUE", "IDEMPOTENCY_KEY_MISMATCH"]
+  refs=26 unresolved=[]
+  testids missing in description=[] missing in example html=[]
+  reserved domains in createLearning description: OK
+
+  $ git diff --stat contracts/openapi.yaml
+   contracts/openapi.yaml | 251 ++++++++++++++++++++++++++++++++++++++++++++++++-
+   1 file changed, 250 insertions(+), 1 deletion(-)
+
+  $ git diff -U0 contracts/openapi.yaml | grep -E '^-' | grep -vE '^---'
+  -      description: 外部URL取得の結果状態（`fetched`: 取得成功, `not_provided`: URL未指定, `fallback_used`: 失敗/タイムアウトによりメモ本文のみで生成）
+
+  $ ruby additive_check.rb /tmp/openapi-head.yaml contracts/openapi.yaml   # HEAD の全部の値が同じ場所に同じ値で残るか（description は後ろに足しただけを許す）
+  変わった・消えた: 0
+  足したもの: 22
+  ```
+- oasdiff breaking の出力（2026-10-30 追補）：未検査（未インストール）。代わりに上の差分と値の突き合わせで、消した項目・変えた型・変えた状態コード・足した必須項目が0件であることを確かめた。足したのは、説明文、例1つ、応答（`createLearning` の 422、`submitChallenge` と `gradeReviewCard` の 409 と 422、`seedTestState` の 403）、応答ヘッダ `Idempotent-Replayed`、`ErrorDetailObject.code` の enum の値3つ。
 - oasdiff breaking の出力（main に契約がなければ「新規」）：
   - 新規（`origin/main` に `contracts/openapi.yaml` が存在しない初回契約のため互換性破壊なし。また環境に `oasdiff` は未インストール）。
   ```
@@ -132,6 +187,7 @@ flowchart TD
 - 返す enum に足した値と、古いアプリが unknown として扱えることを確かめるテスト：
   - 新設した enum は `SkillCategory`（`architecture`, `backend`, `data`, `reliability`, `security`, `trend`）、`UrlFetchStatus`（`fetched`, `not_provided`, `fallback_used`）、`RubricPerspective`（`premise_constraints`, `tradeoff_comparison`, `failure_edge_cases`）の3つ。
   - ブラウザUIおよびクライアントのデコーダが将来追加された未知の `SkillCategory` や `UrlFetchStatus` を受け取った際にクラッシュせず `unknown`（表示名：日本語「その他」／英語「Other」）として安全に表示できることを確かめるデコードテストを `verifier` / `backend-engineer` のテスト項目に含める。
+  - 2026-10-30 追補：返す enum `ErrorDetailObject.code` に `CHALLENGE_ALREADY_COMPLETED`、`REVIEW_CARD_NOT_DUE`、`IDEMPOTENCY_KEY_MISMATCH` を足した。まだ公開していない（古いアプリがない）が、ブラウザUIは知らない `error.code` を受け取ったら落ちずに、応答の `title` を一般のエラーとして出す。その確かめ（知らない `error.code` の problem+json を受けても画面が落ちない）を backend-engineer の単体テストと verifier の探索の項目に頼む。
 - エラーの type と、アプリに出す文言（design/ の文言表の項目）：
 
 | RFC 9457 `type` | `error.code` | HTTP ステータス | アプリに出す文言（日本語 `ja`） | アプリに出す文言（英語 `en`） |
@@ -142,6 +198,9 @@ flowchart TD
 | `https://devforge.local/problems/test-seam-disabled` | `TEST_SEAM_DISABLED` | 403 | 本番モードではテスト用エンドポイントは利用できません | Test endpoints are disabled in production mode. |
 | `https://devforge.local/problems/internal-error` | `INTERNAL_ERROR` | 500 | サーバーエラーが発生しました。時間をおいて再試行してください | A server error occurred. Please try again later. |
 | （ブラウザ通信切断・ネットワーク到達不可時） | `NETWORK_OFFLINE`（クライアント検知） | なし（通信失敗） | 通信に失敗しました。入力内容は保持されています（「再試行」ボタンを表示） | Connection failed. Your input has been preserved (with "Retry" button). |
+| `https://devforge.local/problems/challenge-already-completed`（2026-10-30 追補） | `CHALLENGE_ALREADY_COMPLETED` | 409 | この問題はすでに回答済みです。画面を再読み込みしてください | This challenge has already been answered. Please reload the page. |
+| `https://devforge.local/problems/review-card-not-due`（2026-10-30 追補） | `REVIEW_CARD_NOT_DUE` | 409 | このカードはまだ復習の期限が来ていません。画面を再読み込みしてください | This card is not due for review yet. Please reload the page. |
+| `https://devforge.local/problems/idempotency-key-mismatch`（2026-10-30 追補） | `IDEMPOTENCY_KEY_MISMATCH` | 422 | 送信内容が前回と違います。画面を再読み込みしてからやり直してください | The request differs from the previous one. Please reload the page and try again. |
 
 ## 5. データモデルと移行
 | エンティティ | 正しいデータの置き場所（端末 / サーバー） | 個人情報か | 保存期間 | 消し方 |
@@ -168,6 +227,7 @@ flowchart TD
     - `skill_progress (category TEXT PRIMARY KEY, total_xp INTEGER NOT NULL DEFAULT 0, updated_at TEXT NOT NULL)`（起動時に固定6領域を `total_xp = 0` で初期シード）
     - `user_stats (id INTEGER PRIMARY KEY CHECK (id = 1), streak_days INTEGER NOT NULL DEFAULT 0, last_study_date TEXT)`
     - `idempotency_keys (idempotency_key TEXT PRIMARY KEY, endpoint TEXT NOT NULL, status_code INTEGER NOT NULL, response_json TEXT NOT NULL, created_at TEXT NOT NULL)`
+      - 2026-10-30 追補：送り直しの比べ方（3章 D-5）のため、`request_hash TEXT NOT NULL`（メソッド・パス・正規化した本文の SHA-256）を足す。まだ実装していないので、v1 の `CREATE TABLE` に最初から入れる（移行は要らない）。覚えるのは 2xx の応答だけ。
     - `telemetry_events (event_id TEXT PRIMARY KEY, event_name TEXT NOT NULL, properties_json TEXT NOT NULL, created_at TEXT NOT NULL)`
 
 ## 6. 非機能の目標
@@ -200,6 +260,18 @@ flowchart TD
 | サービスの妨害（D） | 外部URLが非常に遅い、または数GBの巨大レスポンスを返してバックエンドがハング・メモリ枯渇する | **減らす**：外部URL取得のタイムアウトを `2.0` 秒、最大読込サイズを `512KB`（`524,288` バイト）、リクエストボディ上限を `64KB` に制限し、超過・タイムアウト時は即座に切断して `url_fetch_status: "fallback_used"` でメモ本文から生成する | AC-8 のタイムアウト・フォールバック受け入れテスト（`test_ac8_fallback_and_offline.py`、G2 / G3） |
 | 権限の格上げ（E） | 本番環境でテスト専用エンドポイント（`/api/v1/test/reset`, `/api/v1/test/seed`）が悪用されデータが消去される | **なくす**：環境変数 `APP_ENV=production` の場合は `/api/v1/test/*` をすべて HTTP 403（`TEST_SEAM_DISABLED`）で拒否する | `APP_ENV=production` 時の 403 拒否単体テスト（G2） |
 
+### 7.1 追補（2026-10-30：G1 reviewer の提案2、契約の不足を補った決定 D-2・D-3）
+| STRIDE | 起きうること | 対応（減らす / なくす / 移す / 受け入れる） | 確かめるテストか確認 |
+|---|---|---|---|
+| 情報の漏れ（I）DNS Rebinding | 名前解決で公開 IP を返して検査を通し、`urlopen` がホスト名で解決し直したときに内部 IP（`127.0.0.1`、`169.254.169.254`）を返させる（検査と接続の間の TOCTOU） | **なくす**：名前解決は1回だけ。検査したすべての IP のうち1つに `socket.create_connection((検査した IP, ポート), timeout)` で直接つなぎ、ホスト名で解決し直さない。HTTPS は `ssl.SSLContext.wrap_socket(sock, server_hostname=元のホスト名)` で証明書の確認と SNI に元のホスト名を使い、`Host` ヘッダも元のホスト名にする（`http.client` の接続を継ぎ、`connect()` だけを差し替える形で標準ライブラリだけで作れる） | backend-engineer の単体テスト：名前解決の関数を差し替え、1回目は公開 IP、2回目は `127.0.0.1` を返すようにして、2回目が呼ばれず、つないだ先が1回目の IP であることを確かめる（G2） |
+| 情報の漏れ（I）リダイレクト | 公開 URL が `302 Location: http://169.254.169.254/` を返し、追いかけた先で内部へ接続する | **なくす**：`urllib` の自動のリダイレクトを使わず、自分で3回まで追う。行き先ごとにスキーム・`localhost`・IP の文字・名前解決の検査と IP の固定をやり直す。拒否に当たったらそこへは接続せず `fallback_used`（201）にし、構造化ログに `ssrf_redirect_blocked` を出す | backend-engineer の単体テスト：リダイレクトを返す偽の応答で、内部の行き先に接続しないことを確かめる（G2） |
+| 情報の漏れ（I）別表記とプロキシ | `http://2130706433/`、`http://0x7f.1/`、`http://[::ffff:127.0.0.1]/` でループバックを指す。環境変数 `HTTP_PROXY` があると、プロキシが名前解決をして検査を素通りする | **なくす**：ホストを `socket.inet_aton` でも解釈して IPv4 の別表記を IP として調べ、IPv4 を埋め込んだ IPv6 は中の IPv4 でも調べる。拒否する IP に `100.64.0.0/10` を足す。プロキシは使わない（`urllib.request.ProxyHandler({})` 相当） | 単体テスト（G2）。Python 3.9.6 で `inet_aton("2130706433")`、`inet_aton("0x7f.1")`、`inet_aton("0177.0.0.1")` がすべて `127.0.0.1` になり、`100.64.0.1` は `is_private` が偽であることを確かめた（10章） |
+| なりすまし（S）・情報の漏れ（I）待ち受け | `DEVFORGE_HOST=0.0.0.0` で起動し、同じ LAN の第三者が認証のない API で学習データを読み書きする | **なくす**：`DEVFORGE_HOST` はループバック（`127.0.0.0/8`、`::1`、`localhost`）だけを受け付け、それ以外は起動しない（契約 `info.description`） | backend-engineer の単体テスト：`DEVFORGE_HOST=0.0.0.0` で 0 でない終了コードと、変数名を含む標準エラー（G2） |
+| 権限の格上げ（E）テスト用ヘッダ | 本番で `X-Test-Now` を送って期限を先取りしたり、`X-Test-Url-Fetch-Mode` で取得の動きを変えたりする | **なくす**：`APP_ENV=production` のときは `X-Test-Now` と `X-Test-Url-Fetch-Mode` を無視する | `APP_ENV=production` で `X-Test-Now` を送っても、応答の日時がサーバーの現在時刻になる単体テスト（G2） |
+| 改ざん（T）冪等キーの使い回し | 同じ `Idempotency-Key` で違う本文を送り、前の応答を受け取ったと思わせる、または前の結果を上書きする | **なくす**：メソッド・パス・本文の `request_hash` を比べ、違えば 422（`IDEMPOTENCY_KEY_MISMATCH`）で何も変えない | backend-engineer の単体テスト（G2）。受け入れテストは同じ本文の送り直しだけを確かめる |
+
+- 受け入れた危険（2026-10-30 追補）：本番でないとき、`stub_*` ヘッダ付きの要求は名前解決をしないため、内部 IP に解決されるホスト名（例 `http://internal.corp/`）が 400 にならず 201 になる。スタブはどこにも接続しないので SSRF は起きず、本番ではヘッダを無視するため受け入れる。
+
 ## 8. 観測と KPI イベント
 - iOS：ログは Logger（個人情報は既定の非公開のまま）。.public にする箇所と理由：
   - 対象外（`stacks: ["backend"]` のため iOS ターゲットなし。ブラウザ側コンソールにもユーザーのメモ本文は出力しない）。
@@ -231,6 +303,19 @@ flowchart TD
   - `docs/adr/001-python-stdlib-sqlite-architecture.md`（ADR 001：Python 3 標準ライブラリ＋SQLite＋決定論的ルールベース生成エンジンの採用）
 - 未確認の項目、確かめる方法、確かめる役：
   - **なし**（すべての技術要素について Python 3.9.6 標準ライブラリでの spike 実行と公式ドキュメント URL の確認を完了している）。
+  - 2026-10-30 追補：7.1 の前提を Python 3.9.6 で確かめた（リポジトリの外で実行）。
+    ```
+    $ python3 -（ipaddress と socket.inet_aton の確認）
+    3.9.6
+    127.0.0.1 / 10.0.0.1 / 172.16.0.1 / 172.31.255.255 / 192.168.1.1 / 169.254.169.254 / ::1 / ::ffff:127.0.0.1 / 0.0.0.0 → is_private=True blocked=True
+    100.64.0.1 is_private=False blocked=True（100.64.0.0/10 を足して拒否）
+    93.184.216.34 / 8.8.8.8 → blocked=False
+    2130706433 / 0x7f.1 / 0177.0.0.1 / 127.1 → inet_aton -> 127.0.0.1
+    example.com / ok.example.test → inet_aton -> not IPv4 literal
+    len("👨‍👩‍👧") = 5（結合した絵文字は5コードポイント）、len("キャッシュ設計の要点") = 10、"\u3000 \t".strip() = ''（全角空白も strip で消える）
+    ```
+  - 未確認：IP を固定した HTTPS 接続（`http.client` の `connect()` の差し替え）は、まだ動かしていない。G2 で backend-engineer が単体テストで確かめる。
+  - 参考：RFC 6761 6.2 https://www.rfc-editor.org/rfc/rfc6761.html#section-6.2 （2026-10-30 に開いた。引用：「Caching DNS servers SHOULD recognize test names as special and SHOULD NOT, by default, attempt to look up NS records for them ... caching DNS servers SHOULD, by default, generate immediate negative responses for all such queries.」「Application software SHOULD NOT recognize test names as special」）。Python `ipaddress` https://docs.python.org/3/library/ipaddress.html と Stripe の冪等リクエスト https://docs.stripe.com/api/idempotent_requests は、今回の追補では開き直していない（上の Python の出力が `ipaddress` の証拠）
 
 ## 確かめ（A）
 - [x] 2 の表に PRD の全 AC があり、空の欄がない

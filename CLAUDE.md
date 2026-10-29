@@ -20,6 +20,13 @@
   - 受け入れテスト（`backend/tests/acceptance` 単体で完結）：`python3 -m unittest discover -s backend/tests/acceptance -t backend/tests/acceptance -p "test_*.py"`
   - 一括実行（`commands.backend_test`）：`python3 -m unittest discover -s backend/tests/unit -p "test_*.py" && python3 -m unittest discover -s backend/tests/acceptance -t backend/tests/acceptance -p "test_*.py"`
 - ローカルサーバー起動（実装後）：`python3 -m backend.app`（既定 `http://127.0.0.1:8000`）
+  - 未確認（backend/ の実装前のため動かしていない）。作業フォルダはリポジトリの根。受け入れテストもこのコマンドで起動し、`127.0.0.1:8000` に接続する。
+  - 環境変数（`contracts/openapi.yaml` の `info.description`、設計メモ 3章 D-2）：
+    - `DEVFORGE_HOST`：待ち受けるホスト（既定 `127.0.0.1`）。認証がないため、ループバック（`127.0.0.0/8`、`::1`、`localhost`）以外は起動しない。
+    - `DEVFORGE_PORT`：待ち受けるポート（既定 `8000`、1〜65535）。
+    - `DEVFORGE_DB_PATH`：SQLite のファイル（既定 `~/.devforge/devforge.sqlite3`。`:memory:` も可だが止めると消える）。指定したパスの親フォルダがなければ起動しない。
+    - `APP_ENV=production`：`/api/v1/test/*` は 403、`X-Test-Now` と `X-Test-Url-Fetch-Mode` は無視する。
+    - 誤った値のときは、0 でない終了コードと、変数名を含む理由を標準エラーに出す。
 
 ## 構成
 既定の場所です。app.json の paths を変えたら、この表も同じに直します。

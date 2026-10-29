@@ -20,6 +20,17 @@ info:
     ## エラー形式（RFC 9457 Problem Details + PRD AC-7/AC-9 互換）
     - すべてのエラー応答は RFC 9457（`application/problem+json`）の標準フィールド（`type`, `title`, `status`, `detail`, `instance`）に加え、
       PRD AC-7 / AC-9 で定義された `error.code` および `error.message` オブジェクトを同梱して返す。
+
+    ## サーバーの待ち受け・保存先・本番モード（2026-10-30 追補）
+    - 起動コマンドは `python3 -m backend.app`（作業フォルダはリポジトリの根）。待ち受けの既定は `127.0.0.1:8000`（`servers` の URL と同じ）。
+    - 環境変数 `DEVFORGE_HOST`（既定 `127.0.0.1`）と `DEVFORGE_PORT`（既定 `8000`、1〜65535 の整数）で変えられる。
+      認証がないため `DEVFORGE_HOST` はループバック（`127.0.0.0/8` の IPv4、`::1`、`localhost`）だけを受け付ける。
+      それ以外のホストや不正なポートのときは待ち受けを始めず、0 でない終了コードで終わり、標準エラーに変数名を含む理由を出す。
+    - 保存先は環境変数 `DEVFORGE_DB_PATH`（SQLite のファイルのパス。`:memory:` も可だが、プロセスを止めると消える）。
+      未指定のときは `~/.devforge/devforge.sqlite3`（親フォルダがなければ作る）。
+      指定したパスの親フォルダがないときは待ち受けを始めず、0 でない終了コードで終わり、標準エラーに `DEVFORGE_DB_PATH` を含む理由を出す。
+    - 環境変数 `APP_ENV=production` のとき、`/api/v1/test/*` は 403（`TEST_SEAM_DISABLED`）を返し、
+      テスト用ヘッダ（`X-Test-Now`、`X-Test-Url-Fetch-Mode`）は無視する（サーバーの現在時刻と `live` を使う）。
 servers:
   - url: http://127.0.0.1:8000
     description: ローカル開発・受け入れテスト用バックエンドサーバー
@@ -53,6 +64,26 @@ paths:
         単一ページで完結するブラウザUI（HTML/CSS/JS）を返す。
         - 通知権限やクリップボード権限などのOS/ブラウザ権限APIを一切要求せず、標準DOM操作のみでAC-1〜AC-9が完結する（AC-9）。
         - テスト用のつなぎ口（Test Seam #4）として、クエリパラメータ `api_base_url`（通信先URLの切り替え・通信切断シミュレーション用）および `lang`（`ja` / `en`）を受け付ける。
+
+        ### 画面の識別子 data-testid（Test Seam #4、AC-1 / AC-6 / AC-8 / AC-9、2026-10-30 追補）
+        - `GET /` が返す HTML の中に、次の10個の `data-testid="…"` 属性を文字どおり書く。
+          サーバーが返す HTML に最初から入れ、JS で後から付けない（受け入れテストは JS を動かさず、返った HTML の文字列を調べる）。
+        - クエリ（`api_base_url`、`lang`）の有無や値に関係なく、10個すべてが入る。
+        - 初めは見えない要素（エラーバナー、再試行ボタン、空状態の案内）は `hidden` 属性などで隠してよいが、要素と属性は HTML に残す。
+        - 属性の値は二重引用符で囲む（例：`data-testid="app-root"`）。
+          | data-testid | 要素 | AC |
+          |---|---|---|
+          | `app-root` | 画面全体の根の要素 | AC-6, AC-9 |
+          | `learning-form` | 学習登録のフォーム | AC-1, AC-6, AC-8 |
+          | `title-input` | タイトルの入力欄 | AC-1, AC-8 |
+          | `url-input` | URL の入力欄 | AC-1, AC-8 |
+          | `memo-input` | 学習メモ本文の入力欄 | AC-1, AC-8 |
+          | `submit-learning-btn` | 登録の送信ボタン | AC-1, AC-8 |
+          | `offline-error-banner` | 通信に失敗したときのエラーバナー | AC-8 |
+          | `retry-submit-btn` | 再試行ボタン | AC-8 |
+          | `empty-state-guide` | 空状態の案内 | AC-6 |
+          | `empty-state-cta-btn` | 空状態から登録フォームへ移るボタン | AC-6 |
+        - 上の10個以外の識別子（設計メモ 3章 Seam #4 の `today-session-panel` など）は JS で後から描いてもよい。
       security: []
       parameters:
         - name: api_base_url
@@ -83,6 +114,9 @@ paths:
                 defaultUi:
                   summary: 初期画面HTML
                   value: "<!DOCTYPE html><html lang=\"ja\"><head><meta charset=\"utf-8\"><title>DevForge</title></head><body><main data-testid=\"app-root\"></main></body></html>"
+                requiredTestIds:
+                  summary: 必須の data-testid 10個を含む HTML の抜粋（2026-10-30 追補）
+                  value: '<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><title>DevForge</title></head><body><main data-testid="app-root"><section data-testid="empty-state-guide" hidden><p>本日の復習はすべて完了しています。新しい記事URLや学びのメモを1件追加して3分ループを始めましょう</p><button type="button" data-testid="empty-state-cta-btn">学びを追加する</button></section><form data-testid="learning-form"><input data-testid="title-input" name="title"><input data-testid="url-input" name="url"><textarea data-testid="memo-input" name="memo"></textarea><button type="submit" data-testid="submit-learning-btn">登録</button></form><div data-testid="offline-error-banner" role="alert" hidden>通信に失敗しました。入力内容は保持されています<button type="button" data-testid="retry-submit-btn">再試行</button></div></main></body></html>'
 
   /api/v1/learnings:
     post:
@@ -107,6 +141,53 @@ paths:
           HTTP 400（`error.code: "INVALID_URL_SCHEME_OR_HOST"`）を返す（AC-9）。
         - 公開URLへのGETがタイムアウト（上限2.0秒）またはHTTPエラー/接続失敗となった場合は、エラーにせず入力された `title` と `memo` 本文のみから
           問題と復習カードを生成し、`url_fetch_status: "fallback_used"` として HTTP 201 を返す（AC-8）。
+
+        ### SSRF の検査の順序と、DNS・テスト用スタブとの関係（AC-8 / AC-9、2026-10-30 追補）
+        `url` があるとき、次の順に調べる。1〜4 は URL の文字列だけで決まり、名前解決（DNS）も外部への接続もしない。
+        1. スキームが `http` か `https` でなければ 400（`INVALID_URL_SCHEME_OR_HOST`）。
+        2. ホストがない、またはホストが `localhost` か `*.localhost`（大文字小文字を区別しない）なら 400。
+        3. ホストが IP の文字（IPv4、`[...]` で囲んだ IPv6、`socket.inet_aton` が受け付ける IPv4 の別表記 `2130706433`・`0x7f.1`・`0177.0.0.1` など）なら、
+           その IP を下の「拒否する IP」で調べ、当たれば 400。IPv4 を埋め込んだ IPv6（`::ffff:127.0.0.1`）は中の IPv4 でも調べる。
+        4. 1〜3 は `X-Test-Url-Fetch-Mode` の値に関係なく、いつも結果の決め方（5）より先に行う。スタブのヘッダがあっても 400 になる。
+        5. 結果の決め方：
+           - `X-Test-Url-Fetch-Mode` が `stub_ok` / `stub_timeout` / `stub_error` なら、ヘッダの値で結果を決める（予約テストドメインの決まりより優先する）。DNS は引かず、外部へ接続しない。
+           - ヘッダがないか `live` で、ホストが予約テストドメイン（`*.example.test`）なら、下の「予約テストドメイン」の表で結果を決める。DNS は引かず、外部へ接続しない。
+           - それ以外（ヘッダがないか `live` で、ふつうのホスト名）のときだけ 6 に進む。
+        6. 本当に取得するとき：ホスト名を1回だけ名前解決し、返ったすべての IP を「拒否する IP」で調べる。1つでも当たれば外部へ接続せずに 400。
+           名前解決に失敗したら、どこにも接続していないので取得失敗として `fallback_used`（201）。
+           接続は、調べた IP に直接つなぐ（ホスト名で解決し直さない。DNS Rebinding 対策）。HTTPS の証明書の確認と SNI、`Host` ヘッダには元のホスト名を使う。環境変数のプロキシは使わない。
+        7. リダイレクトは3回まで追い、行き先ごとに 1〜3 と 6 をやり直す。行き先が拒否に当たったら、そこへは接続せず `fallback_used`（201）にする（利用者が入れた URL は正しいため 400 にしない）。4回目のリダイレクトも `fallback_used`。
+        - 名前解決・接続・読み込み・リダイレクトをすべて合わせて 2.0 秒を上限とし、超えたら `fallback_used`。
+        - 拒否する IP：`ipaddress` の `is_private`、`is_loopback`、`is_link_local`、`is_multicast`、`is_reserved`、`is_unspecified` のどれかが真のもの、および `100.64.0.0/10`。
+          上に書いた `127.0.0.0/8`、`::1`、`10.0.0.0/8`、`172.16.0.0/12`、`192.168.0.0/16`、`169.254.0.0/16` はすべてこれに含まれる。
+        - 受け入れテストで使う URL（IP の文字、`localhost`、予約テストドメイン、スタブのヘッダ付き）は、どれも DNS を引かずに結果が決まる。
+        - `APP_ENV=production` のときは `X-Test-Url-Fetch-Mode` を無視して `live` として扱う。予約テストドメインの決まりは残る（予約テストドメインはどこにも接続しない決まりのため、本番でも外部へ接続しない）。
+
+        ### 予約テストドメイン（Test Seam #3、2026-10-30 追補）
+        | ホスト（`http` / `https`） | ヘッダがないか `live` のときの結果 | 外部への接続 |
+        |---|---|---|
+        | `ok.example.test` | 取得成功として扱う（`url_fetch_status: "fetched"`。取得した本文は空として扱い、`title` と `memo` から作る） | なし |
+        | `timeout.example.test` | 2秒のタイムアウトとして扱う（`url_fetch_status: "fallback_used"`） | なし |
+        | `error.example.test` | 接続失敗 / HTTP 500 として扱う（`url_fetch_status: "fallback_used"`） | なし |
+        | 上の3つ以外の `*.example.test` | 名前解決できないホストとして扱う（`url_fetch_status: "fallback_used"`） | なし |
+        - パス・クエリ・ポートは結果に関係しない（`https://timeout.example.test/slow` と `https://timeout.example.test/article` は同じ結果）。
+        - `timeout.example.test` とヘッダ `stub_timeout` は、実際には2秒待たない（すぐに `fallback_used` で作る）。
+
+        ### Idempotency-Key で送り直したとき（AC-8、2026-10-30 追補。submitChallenge と gradeReviewCard も同じ決まり）
+        - 同じ `Idempotency-Key` で、同じメソッド・同じパス・同じ本文（JSON を正規化して比べる）の要求がもう一度来たら、2回目は処理をやり直さない。
+          1回目の応答と同じ状態コード（ここでは 201）と同じ本文（`learning_id`、`processing_ms`、`created_at` も同じ）を返し、応答ヘッダ `Idempotent-Replayed: true` を付ける。XP・問題・カードは1回分だけ。
+        - 同じキーで、メソッド・パス・本文のどれかが違う要求は、何も変えずに 422（`IDEMPOTENCY_KEY_MISMATCH`、`field: "Idempotency-Key"`）を返す。
+        - 覚えるのは成功（2xx）の応答だけ。4xx や 5xx で終わった要求のキーは覚えないので、同じキーのまま直して送り直せる。
+        - キーは1回目の成功から24時間覚える。過ぎたら新しいキーとして扱う。`POST /api/v1/test/reset` で全部消える。
+        - 同じキーの要求が同時に来たときは1つずつ処理し、2つ目は1つ目が終わってから上の決まりで返す。
+        - 本文の比べ方にヘッダ（`X-Test-Now`、`X-Test-Url-Fetch-Mode` など）は含めない。
+        - キーが1〜128文字でないときは 400（`VALIDATION_ERROR`、`field: "Idempotency-Key"`）。キーがない要求は毎回新しく処理する。
+
+        ### 文字数の数え方と空白だけの入力（AC-7、2026-10-30 追補）
+        - 文字数は Unicode のコードポイントの数で数える（Python の `len(str)`。正規化はしない。結合した絵文字は複数のコードポイントとして数える）。`title`（200まで）と `url`（2,048まで）も同じ。
+        - `memo` は、送られた文字列が 2,000 コードポイント以下で、かつ前後の空白（Python の `str.strip()` が取り除く文字）を除いた長さが 10 以上のときだけ受け付ける。
+          空白だけ、または前後の空白を除くと9以下なら 400（`VALIDATION_ERROR`、`field: "memo"`）。
+        - 保存と応答の `memo` は、送られた文字列のまま（空白を取り除かない）。
       security: []
       parameters:
         - $ref: "#/components/parameters/IdempotencyKeyHeader"
@@ -134,6 +215,9 @@ paths:
       responses:
         "201":
           description: 外部学習の登録と実践思考問題・復習カードの生成成功（AC-1, AC-8）
+          headers:
+            Idempotent-Replayed:
+              $ref: "#/components/headers/IdempotentReplayed"
           content:
             application/json:
               schema:
@@ -254,6 +338,25 @@ paths:
                       code: INVALID_URL_SCHEME_OR_HOST
                       message: url には公開 http/https URL のみ指定できます（ローカルホストやプライベートIPは指定できません）
                       field: url
+        "422":
+          description: 同じ Idempotency-Key で、メソッド・パス・本文のどれかが違う要求（AC-8、2026-10-30 追補）
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              examples:
+                idempotencyKeyMismatch:
+                  summary: 冪等キーの使い回しエラー
+                  value:
+                    type: https://devforge.local/problems/idempotency-key-mismatch
+                    title: 同じ冪等キーで違う内容が送られました
+                    status: 422
+                    detail: Idempotency-Key は前回と違う内容の要求には使えません
+                    instance: /api/v1/learnings
+                    error:
+                      code: IDEMPOTENCY_KEY_MISMATCH
+                      message: Idempotency-Key は前回と違う内容の要求には使えません
+                      field: Idempotency-Key
 
   /api/v1/sessions/today:
     get:
@@ -367,6 +470,18 @@ paths:
         - 更新後の領域 `total_xp` と `level`（`floor(total_xp / 100) + 1`）を算出
         - 当日初回の学習完了（思考問題回答またはカード復習）である場合、`streak_days` を `+1` 更新
         - 3つの評価観点に対応する模範解説 `model_points`（3件の配列）を返却
+
+        ### 送り直しと解答済みの問題（AC-3 / AC-7、2026-10-30 追補）
+        - 同じ `Idempotency-Key` で同じ要求を送り直したときは、`createLearning` の「Idempotency-Key で送り直したとき」と同じ決まりで、
+          1回目と同じ 200 と同じ本文を返し、`Idempotent-Replayed: true` を付ける。XP と連続日数は1回分だけ。本文が違えば 422（`IDEMPOTENCY_KEY_MISMATCH`）。
+        - キーなし、または別のキーで、すでに `completed` の問題に送ったときは、何も変えずに 409（`CHALLENGE_ALREADY_COMPLETED`、`field: "challenge_id"`）。
+        - 調べる順序：キーの形（400）→ 同じキーの送り直し（200 の再生 / 422）→ 問題があるか（404）→ 本文の検査（400）→ 解答済みか（409）。
+        - `answer` の数え方は `createLearning` の `memo` と同じ（コードポイントで数え、2,000 以下、かつ前後の空白を除いて10以上。空白だけは 400、`field: "answer"`）。
+
+        ### 連続日数 streak_days の更新（AC-3 / AC-4、2026-10-30 追補。gradeReviewCard も同じ）
+        - 「日」は基準時刻（`X-Test-Now` か、サーバーの現在時刻）の UTC の暦日。`last_study_date` も UTC の日付。
+        - 完了したとき：`last_study_date` が今日か今日より後なら変えない。昨日なら `+1`。2日以上前か `null`（まだ学習していない）なら `1` に戻す。
+        - `last_study_date` が今日より前だったときは、今日に更新する。
       security: []
       parameters:
         - name: challenge_id
@@ -394,6 +509,9 @@ paths:
       responses:
         "200":
           description: 実践思考問題の回答完了とXP加算結果（AC-3）
+          headers:
+            Idempotent-Replayed:
+              $ref: "#/components/headers/IdempotentReplayed"
           content:
             application/json:
               schema:
@@ -454,6 +572,44 @@ paths:
                       code: RESOURCE_NOT_FOUND
                       message: 指定された challenge_id は存在しません
                       field: challenge_id
+        "409":
+          description: すでに回答済み（completed）の問題に、キーなしか別のキーで送った（AC-3、2026-10-30 追補）
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              examples:
+                alreadyCompleted:
+                  summary: 回答済みの問題への再送
+                  value:
+                    type: https://devforge.local/problems/challenge-already-completed
+                    title: この問題はすでに回答済みです
+                    status: 409
+                    detail: 指定された challenge_id はすでに回答済みです
+                    instance: /api/v1/challenges/chl_01J8X001/submit
+                    error:
+                      code: CHALLENGE_ALREADY_COMPLETED
+                      message: 指定された challenge_id はすでに回答済みです
+                      field: challenge_id
+        "422":
+          description: 同じ Idempotency-Key で、メソッド・パス・本文のどれかが違う要求（2026-10-30 追補）
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              examples:
+                idempotencyKeyMismatch:
+                  summary: 冪等キーの使い回しエラー
+                  value:
+                    type: https://devforge.local/problems/idempotency-key-mismatch
+                    title: 同じ冪等キーで違う内容が送られました
+                    status: 422
+                    detail: Idempotency-Key は前回と違う内容の要求には使えません
+                    instance: /api/v1/challenges/chl_01J8X001/submit
+                    error:
+                      code: IDEMPOTENCY_KEY_MISMATCH
+                      message: Idempotency-Key は前回と違う内容の要求には使えません
+                      field: Idempotency-Key
 
   /api/v1/reviews/{card_id}/grade:
     post:
@@ -491,6 +647,14 @@ paths:
             `new_ivl = max(1, round_half_up(sm2_base_ivl * 1.3))`（例：評価前 `rep == 1` のとき `round_half_up(6 * 1.3) = 8`）
           - `new_ef = max(1.3, round(ef + 0.10, 2))`
         - **次回予定日時 `next_review_at`**：基準時刻（`X-Test-Now` または現在UTC時刻）＋ `new_ivl` 日（`new_ivl * 86400` 秒）の ISO8601 日時。
+
+        ### 送り直しと期限前のカード（AC-4 / AC-7、2026-10-30 追補）
+        - 同じ `Idempotency-Key` で同じ要求を送り直したときは、`createLearning` の「Idempotency-Key で送り直したとき」と同じ決まりで、
+          1回目と同じ 200 と同じ本文を返し、`Idempotent-Replayed: true` を付ける。SM-2 の更新・XP・連続日数は1回分だけ。本文が違えば 422（`IDEMPOTENCY_KEY_MISMATCH`）。
+        - キーなし、または別のキーで、まだ期限が来ていないカード（`next_review_at` > 基準時刻）に送ったときは、何も変えずに 409（`REVIEW_CARD_NOT_DUE`、`field: "card_id"`）。
+          評価するとカードの期限は1日以上先に移るため、評価したばかりのカードへの送り直しもこれになる。
+        - 調べる順序：キーの形（400）→ 同じキーの送り直し（200 の再生 / 422）→ カードがあるか（404）→ 本文の検査（400）→ 期限が来ているか（409）。
+        - `streak_days` は `submitChallenge` の「連続日数 streak_days の更新」と同じ決まりで更新する。
       security: []
       parameters:
         - name: card_id
@@ -522,6 +686,9 @@ paths:
       responses:
         "200":
           description: 復習カードの評価更新成功（AC-4）
+          headers:
+            Idempotent-Replayed:
+              $ref: "#/components/headers/IdempotentReplayed"
           content:
             application/json:
               schema:
@@ -595,6 +762,44 @@ paths:
                       code: RESOURCE_NOT_FOUND
                       message: 指定された card_id は存在しません
                       field: card_id
+        "409":
+          description: まだ期限が来ていないカード（評価したばかりのカードを含む）に、キーなしか別のキーで送った（AC-4、2026-10-30 追補）
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              examples:
+                cardNotDue:
+                  summary: 期限前のカードへの評価
+                  value:
+                    type: https://devforge.local/problems/review-card-not-due
+                    title: このカードはまだ復習の期限が来ていません
+                    status: 409
+                    detail: 指定された card_id はまだ復習の期限が来ていません
+                    instance: /api/v1/reviews/crd_01J8X001/grade
+                    error:
+                      code: REVIEW_CARD_NOT_DUE
+                      message: 指定された card_id はまだ復習の期限が来ていません
+                      field: card_id
+        "422":
+          description: 同じ Idempotency-Key で、メソッド・パス・本文のどれかが違う要求（2026-10-30 追補）
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              examples:
+                idempotencyKeyMismatch:
+                  summary: 冪等キーの使い回しエラー
+                  value:
+                    type: https://devforge.local/problems/idempotency-key-mismatch
+                    title: 同じ冪等キーで違う内容が送られました
+                    status: 422
+                    detail: Idempotency-Key は前回と違う内容の要求には使えません
+                    instance: /api/v1/reviews/crd_01J8X001/grade
+                    error:
+                      code: IDEMPOTENCY_KEY_MISMATCH
+                      message: Idempotency-Key は前回と違う内容の要求には使えません
+                      field: Idempotency-Key
 
   /api/v1/skills/summary:
     get:
@@ -612,6 +817,14 @@ paths:
         全体の `total_xp`、`overall_level`、`streak_days`、`weekly_mastered_count` を 1秒（1,000ms）以内に返す。
         - データ0件時（AC-6）は6領域すべて `total_xp: 0`, `level: 1`, `xp_to_next_level: 100`、全体 `total_xp: 0`, `overall_level: 1`, `streak_days: 0`, `weekly_mastered_count: 0` を返す。
         - 注記：PRD AC-5 本文の誤記（`` `weekly_ mastered_count` ``）を修正し、正式フィールド名はスペースなしの `weekly_mastered_count` とする。
+
+        ### 式と集計の決まり（AC-5 / AC-6、2026-10-30 追補）
+        - 全体の `total_xp` は6領域の `total_xp` の合計。`overall_level = floor(total_xp / 100) + 1`（全体の `total_xp` に領域と同じ式を使う。例：285 → 3、0 → 1）。
+        - `streak_days`：保存している連続日数を、`last_study_date` が今日・昨日・今日より後（基準時刻の UTC の暦日で比べる）のときだけそのまま返す。
+          2日以上前か `null` なら `0` を返す（連続が切れているため。保存している値は変えず、次に完了したときに `submitChallenge` の決まりで `1` になる）。
+        - `weekly_mastered_count`：基準時刻を `now` として、`now - 604,800秒（168時間）<= t <= now` に入るものを数える（両端を含む。暦日では区切らない）。
+          数えるのは「`status: completed` で `completed_at` が範囲に入る問題の数」と「最後の評価 `last_grade >= 3` で `graded_at` が範囲に入るカードの数」の合計。
+          カードは最後の評価だけを持つため、同じカードは1回まで数え、範囲の中で後から 1 か 2 を付けたカードは数えない。
       security: []
       parameters:
         - $ref: "#/components/parameters/TestNowHeader"
@@ -853,8 +1066,35 @@ paths:
                     error:
                       code: VALIDATION_ERROR
                       message: シードデータの形式が不正です
+        "403":
+          description: 本番環境等でテスト用エンドポイントが無効化されている場合（APP_ENV=production。2026-10-30 追補）
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              examples:
+                forbiddenInProd:
+                  summary: テストAPI無効エラー
+                  value:
+                    type: https://devforge.local/problems/test-seam-disabled
+                    title: テスト用エンドポイントは利用できません
+                    status: 403
+                    detail: 本番モードでは /api/v1/test/* は無効化されています
+                    instance: /api/v1/test/seed
+                    error:
+                      code: TEST_SEAM_DISABLED
+                      message: 本番モードでは /api/v1/test/* は無効化されています
 
 components:
+  headers:
+    IdempotentReplayed:
+      description: |
+        同じ Idempotency-Key の送り直しに、保存していた1回目の応答を返したときだけ `true` を付ける（2026-10-30 追補）。
+        1回目の処理の応答と、キーのない要求の応答には付けない。
+      schema:
+        type: string
+        enum:
+          - "true"
   parameters:
     IdempotencyKeyHeader:
       name: Idempotency-Key
@@ -873,6 +1113,7 @@ components:
       description: |
         テスト用現在時刻注入ヘッダ（Test Seam #2：Clock Injection）。
         ISO 8601 日時（例：`2026-10-30T09:00:00Z`）を指定すると、サーバー内の期限到来判定・次回予定日算出・連続日数・直近7日間集計の基準時刻として使用する。
+        `APP_ENV=production` のときはこのヘッダを無視し、サーバーの現在時刻を使う（2026-10-30 追補）。
       schema:
         type: string
         format: date-time
@@ -888,6 +1129,9 @@ components:
         - `stub_ok`：外部通信を行わず即座に正常取得（`url_fetch_status: "fetched"`）として処理
         - `stub_timeout`：2秒タイムアウト発生をシミュレートし `url_fetch_status: "fallback_used"` でフォールバック生成（AC-8）
         - `stub_error`：接続失敗/HTTP 500 をシミュレートし `url_fetch_status: "fallback_used"` でフォールバック生成（AC-8）
+        - 2026-10-30 追補：SSRF の検査の順序、予約テストドメイン（`ok.example.test`、`timeout.example.test`、`error.example.test`）との関係、
+          DNS を引かない条件は `createLearning` の説明に書く。`stub_*` は予約テストドメインの決まりより優先し、DNS を引かず外部へ接続しない。
+          `stub_timeout` は実際には2秒待たない。`APP_ENV=production` のときはこのヘッダを無視して `live` として扱う。
       schema:
         type: string
         enum:
@@ -913,7 +1157,7 @@ components:
 
     UrlFetchStatus:
       type: string
-      description: 外部URL取得の結果状態（`fetched`: 取得成功, `not_provided`: URL未指定, `fallback_used`: 失敗/タイムアウトによりメモ本文のみで生成）
+      description: "外部URL取得の結果状態（`fetched`: 取得成功, `not_provided`: URL未指定, `fallback_used`: 失敗/タイムアウトによりメモ本文のみで生成）"
       enum:
         - fetched
         - not_provided
@@ -1320,9 +1564,11 @@ components:
         overall_level:
           type: integer
           minimum: 1
+          description: floor(total_xp / 100) + 1（total_xp は6領域の合計。2026-10-30 追補）
         streak_days:
           type: integer
           minimum: 0
+          description: 連続学習日数。last_study_date が基準時刻の UTC の暦日で2日以上前か null なら 0（2026-10-30 追補）
         weekly_mastered_count:
           type: integer
           minimum: 0
@@ -1472,6 +1718,9 @@ components:
             - RESOURCE_NOT_FOUND
             - TEST_SEAM_DISABLED
             - INTERNAL_ERROR
+            - CHALLENGE_ALREADY_COMPLETED
+            - REVIEW_CARD_NOT_DUE
+            - IDEMPOTENCY_KEY_MISMATCH
         message:
           type: string
         field:
