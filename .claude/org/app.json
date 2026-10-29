@@ -1,0 +1,24 @@
+{
+  "org_version": "0.2.0",
+  "app_name": "未定",
+  "idea": "最強のエンジニアとして成長するための人間育成アプリ。他で学んだことも反映でき、その人に合わせたパーソナルな学習をさせる。続ければ圧倒的なプロフェッショナルになれる。トレンドも敏感に取り入れる",
+  "owner": "matsuura-tak",
+  "stacks": [
+    "ios"
+  ],
+  "paths": {
+    "ios": "ios/",
+    "backend": "backend/",
+    "design": "design/",
+    "contracts": "contracts/",
+    "acceptance_tests": [
+      "ios/AcceptanceTests/",
+      "backend/tests/acceptance/"
+    ]
+  },
+  "commands": {
+    "ios_build": "",
+    "ios_test": "",
+    "backend_test": ""
+  }
+}

@@ -1,0 +1,24 @@
+# 組織のファイル（ai-org が入れたもの）がアプリ側で書き換えられていないか確かめる。
+# lock.json との違い、組織のフォルダにあるキットにないファイル、git に入った秘密情報、app.json の受け入れテストの場所を見る。
+# 違いがあれば失敗する。直すときはキット（matsuura-tak/ai-）を直して /ai-org:update で取り込む。
+# ブランチのルールで必須チェック「org-check」にする。
+# PR の中の lock.json と checker を使うので、うっかりの書き換えを見つけるためのもの。わざとの書き換えは org-guard.yml が見る。
+name: org-check
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  org-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - name: 組織のファイルを lock.json と比べる
+        run: python3 .claude/org/bin/org check .

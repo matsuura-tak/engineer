@@ -1,0 +1,624 @@
+#!/usr/bin/env python3
+"""ai-org: AI 開発組織をアプリのリポジトリに入れる、そろえる、確かめる。
+
+  org install <dir> --name NAME --idea IDEA --stacks ios,backend [--owner LOGIN] [--force]
+  org sync <dir>     組織のファイルをキットの版にそろえる（手で直されたファイルは上書きしない）
+  org check <dir>    組織のファイルが lock.json と同じか確かめる（違えば終了コード 1）
+  org guard-pr <dir> --changed FILE
+                     PR で変わったファイルの一覧（1行に1つ）に、組織の変更があれば終了コード 1
+  org --version
+
+python3 の標準ライブラリだけを使う。macOS の Python 3.9 でも動く書き方にする。
+キットの場所は環境変数 ORG_KIT_ROOT、なければこのファイルの 2 つ上のフォルダ。
+"""
+import argparse
+import copy
+import fnmatch
+import hashlib
+import json
+import os
+import shutil
+import subprocess
+import sys
+
+KIT_REPO = "matsuura-tak/ai-"
+LOCK_REL = ".claude/org/lock.json"
+APP_JSON_REL = ".claude/org/app.json"
+SELF_REL = ".claude/org/bin/org"
+CODEOWNERS_REL = ".github/CODEOWNERS"
+SKIP_NAMES = {".DS_Store", "__pycache__"}
+# この中のファイルは、キットにないものがあれば check で知らせる（ここに足すと全役の指示や手順が変わるため）
+ORG_DIRS = (".claude/agents", ".claude/hooks", ".claude/rules", ".claude/skills", "docs/org", "docs/templates")
+SECRET_PATTERNS = (".env", ".env.*", "*.p8", "*.p12", "*.pem", "*.key",
+                   "*.mobileprovision", "*.provisionprofile", "*.keystore", "*.jks")
+SECRET_OK = (".env.example", ".env.sample", ".env.template")
+INSTRUCTION_NAMES = ("claude.md", "claude.local.md", "agents.md")
+DEFAULT_APP = {
+    "org_version": "",
+    "app_name": "",
+    "idea": "",
+    "owner": "matsuura-tak",
+    "stacks": ["ios", "backend"],
+    "paths": {
+        "ios": "ios/",
+        "backend": "backend/",
+        "design": "design/",
+        "contracts": "contracts/",
+        "acceptance_tests": ["ios/AcceptanceTests/", "backend/tests/acceptance/"],
+    },
+    "commands": {"ios_build": "", "ios_test": "", "backend_test": ""},
+}
+
+
+class OrgError(Exception):
+    pass
+
+
+# ---------- 小さな道具 ----------
+
+def sha256(path):
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(65536), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def read_json(path):
+    with open(path, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def write_text_atomic(path, text):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    tmp = path + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        f.write(text)
+    os.replace(tmp, path)
+
+
+def write_json(path, data):
+    write_text_atomic(path, json.dumps(data, ensure_ascii=False, indent=2) + "\n")
+
+
+def copy_file(src, dst):
+    os.makedirs(os.path.dirname(dst), exist_ok=True)
+    shutil.copyfile(src, dst)
+    shutil.copymode(src, dst)
+
+
+def walk_files(root):
+    """root の下のファイルを {相対パス(/区切り): 絶対パス} で返す。"""
+    out = {}
+    if not os.path.isdir(root):
+        return out
+    for dirpath, dirnames, filenames in os.walk(root):
+        dirnames[:] = sorted(d for d in dirnames if d not in SKIP_NAMES)
+        for name in sorted(filenames):
+            if name in SKIP_NAMES or name.endswith(".pyc"):
+                continue
+            full = os.path.join(dirpath, name)
+            rel = os.path.relpath(full, root).replace(os.sep, "/")
+            out[rel] = full
+    return out
+
+
+def prune_empty_dirs(path, stop):
+    d = os.path.dirname(path)
+    stop = os.path.realpath(stop)
+    while os.path.realpath(d).startswith(stop + os.sep) and os.path.isdir(d) and not os.listdir(d):
+        os.rmdir(d)
+        d = os.path.dirname(d)
+
+
+def tpath(target, rel):
+    return os.path.join(target, *rel.split("/"))
+
+
+# ---------- キット ----------
+
+def kit_root():
+    env = os.environ.get("ORG_KIT_ROOT")
+    root = os.path.realpath(env) if env else os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+    if not os.path.isdir(os.path.join(root, "template", "core")):
+        return None
+    return root
+
+
+def require_kit():
+    root = kit_root()
+    if root is None:
+        raise OrgError(
+            "キット（template/core のある ai-org）が見つかりません。"
+            "キットの scripts/org から実行するか、環境変数 ORG_KIT_ROOT にキットの場所を入れてください。"
+        )
+    return root
+
+
+def kit_version(root):
+    with open(os.path.join(root, "VERSION"), encoding="utf-8") as f:
+        return f.read().strip()
+
+
+def available_profiles(root):
+    pdir = os.path.join(root, "template", "profiles")
+    if not os.path.isdir(pdir):
+        return []
+    return sorted(d for d in os.listdir(pdir) if os.path.isdir(os.path.join(pdir, d)) and d not in SKIP_NAMES)
+
+
+def managed_sources(root, profiles):
+    """組織が管理するファイル {相対パス: キット側の絶対パス}。"""
+    files = dict(walk_files(os.path.join(root, "template", "core")))
+    for p in profiles:
+        for rel, src in walk_files(os.path.join(root, "template", "profiles", p)).items():
+            if rel in files:
+                raise OrgError("キットの不具合: %s が core とプロファイル %s の両方にあります。" % (rel, p))
+            files[rel] = src
+    if SELF_REL in files:
+        raise OrgError("キットの不具合: template に %s を置かないでください。" % SELF_REL)
+    own = os.path.join(root, "scripts", "org")
+    files[SELF_REL] = own if os.path.isfile(own) else os.path.realpath(__file__)
+    return files
+
+
+def check_not_kit(target, root):
+    if root and os.path.realpath(target) == root:
+        raise OrgError("ここはキット自身です。アプリのリポジトリで実行してください。")
+    if os.path.isdir(os.path.join(target, "template", "core")) and os.path.isfile(
+        os.path.join(target, ".claude-plugin", "plugin.json")
+    ):
+        raise OrgError("ここは ai-org のキットのようです。アプリのリポジトリで実行してください。")
+
+
+def require_dir(target):
+    if not os.path.isdir(target):
+        raise OrgError("フォルダがありません: %s" % target)
+    return os.path.realpath(target)
+
+
+def load_lock(target):
+    path = tpath(target, LOCK_REL)
+    if not os.path.isfile(path):
+        raise OrgError("%s がありません。先に install してください。" % LOCK_REL)
+    try:
+        lock = read_json(path)
+        files = lock["files"]
+        if not isinstance(files, dict):
+            raise ValueError
+    except (ValueError, KeyError, TypeError):
+        raise OrgError("%s が読めません（JSON が壊れています）。" % LOCK_REL)
+    return lock
+
+
+def chmod_self(target):
+    path = tpath(target, SELF_REL)
+    if os.path.isfile(path):
+        os.chmod(path, 0o755)
+
+
+# ---------- install ----------
+
+def parse_stacks(text):
+    out = []
+    for s in (text or "").split(","):
+        s = s.strip()
+        if s and s not in out:
+            out.append(s)
+    return out
+
+
+def cmd_install(args):
+    root = require_kit()
+    target = require_dir(args.target)
+    check_not_kit(target, root)
+    version = kit_version(root)
+    stacks = parse_stacks(args.stacks)
+    known = available_profiles(root)
+    unknown = [s for s in stacks if s not in known]
+    if unknown:
+        raise OrgError("知らないスタックです: %s（使えるもの: %s）" % (", ".join(unknown), ", ".join(known) or "なし"))
+    owner = args.owner.lstrip("@").strip()
+    if not owner:
+        raise OrgError("--owner が空です。")
+
+    if os.path.exists(tpath(target, LOCK_REL)) and not args.force:
+        raise OrgError("すでに入っています（%s があります）。更新は sync で行います。入れ直すなら --force を付けます。" % LOCK_REL)
+
+    sources = managed_sources(root, stacks)
+    conflicts = []
+    for rel, src in sorted(sources.items()):
+        dst = tpath(target, rel)
+        if os.path.isdir(dst):
+            raise OrgError("%s がフォルダになっています。消してからやり直してください。" % rel)
+        if os.path.isfile(dst) and sha256(dst) != sha256(src):
+            conflicts.append(rel)
+    if conflicts and not args.force:
+        lines = "\n".join("  " + c for c in conflicts)
+        raise OrgError(
+            "次のファイルがすでにあり、キットの中身と違います。何も書き込まずに止めました。\n%s\n"
+            "上書きしてよいときだけ --force を付けて実行してください。" % lines
+        )
+
+    # app.json の元: アプリにあればそれ、なければキットの初期ファイル（書き込む前に読めるか確かめる）
+    app_path = tpath(target, APP_JSON_REL)
+    seed_app = tpath(os.path.join(root, "template", "app"), APP_JSON_REL)
+    app = {}
+    for path in (app_path, seed_app):
+        if os.path.isfile(path):
+            try:
+                app = read_json(path)
+            except ValueError:
+                raise OrgError("%s が JSON として読めません。直してからやり直してください。" % path)
+            break
+
+    # 1. 組織のファイル（そのままコピー）
+    lock_files = {}
+    for rel, src in sorted(sources.items()):
+        dst = tpath(target, rel)
+        copy_file(src, dst)
+        lock_files[rel] = sha256(dst)
+    chmod_self(target)
+
+    # 2. アプリが持つ初期ファイル（ないときだけ）
+    seeded, kept = [], []
+    for rel, src in walk_files(os.path.join(root, "template", "app")).items():
+        dst = tpath(target, rel)
+        if os.path.exists(dst):
+            kept.append(rel)
+        else:
+            copy_file(src, dst)
+            seeded.append(rel)
+
+    # 3. app.json に値を入れる
+    for key, value in DEFAULT_APP.items():
+        if key not in app:
+            app[key] = copy.deepcopy(value)
+    app["org_version"] = version
+    app["app_name"] = args.name
+    app["idea"] = args.idea
+    app["owner"] = owner
+    app["stacks"] = stacks
+    write_json(app_path, app)
+
+    # 4. CODEOWNERS（ないときだけ）
+    co_path = tpath(target, CODEOWNERS_REL)
+    co_created = not os.path.exists(co_path)
+    if co_created:
+        write_text_atomic(
+            co_path,
+            "# 組織の仕組み（.claude/、.github/、docs/org/、docs/templates/）と、エージェントへの指示のファイル\n"
+            "# （CLAUDE.md など）を変えるには、@{o} の承認が必要です。\n"
+            "/.claude/ @{o}\n/.github/ @{o}\n**/.claude/ @{o}\n/docs/org/ @{o}\n/docs/templates/ @{o}\n"
+            "CLAUDE.md @{o}\nCLAUDE.local.md @{o}\nAGENTS.md @{o}\n".format(o=owner),
+        )
+
+    # 5. 版の記録
+    write_json(tpath(target, LOCK_REL), {"org_version": version, "profiles": stacks, "files": dict(sorted(lock_files.items()))})
+
+    print("ai-org %s を %s に入れました。" % (version, target))
+    print("- 組織のファイル: %d 個（core%s）。アプリ側では直しません。" % (len(lock_files), "".join(" + " + s for s in stacks)))
+    if conflicts:
+        print("- --force で上書きしたファイル: %s" % ", ".join(conflicts))
+    print("- アプリが持つ初期ファイル: %d 個を追加、%d 個はすでにあったので残しました。" % (len(seeded), len(kept)))
+    print("- %s: %s" % (CODEOWNERS_REL, "作りました（オーナー @%s）" % owner if co_created else "すでにあったので残しました"))
+    print("- 版の記録: %s" % LOCK_REL)
+    if not os.path.isdir(os.path.join(target, ".git")):
+        print("注意: ここは git リポジトリの直下ではありません。")
+    print("")
+    print("次にやること:")
+    print("1. 変更をブランチにコミットして PR を開き、Takuma が確認してマージする。")
+    print("2. マージしたら Claude Code を開き直す（hook と役割を読み込むため）。")
+    print("3. 「/feature やりたいこと」で最初の機能（PRD から）を始める。")
+    print("4. ビルドとテストのコマンドは、実装の前に指揮役が聞くので、Takuma が %s の commands に書く。" % APP_JSON_REL)
+    return 0
+
+
+# ---------- sync ----------
+
+def version_key(text):
+    """「1.2.10」を (1, 2, 10) にする。読めない版は () にして、比べない。"""
+    try:
+        return tuple(int(x) for x in str(text).split("."))
+    except ValueError:
+        return ()
+
+
+def cmd_sync(args):
+    root = require_kit()
+    target = require_dir(args.target)
+    check_not_kit(target, root)
+    version = kit_version(root)
+    lock = load_lock(target)
+    old_version = lock.get("org_version", "?")
+    new_key, old_key = version_key(version), version_key(old_version)
+    if new_key and old_key and new_key < old_key:
+        raise OrgError(
+            "キットの版（%s）が、このアプリの版（%s）より古いです。"
+            "先にプラグインを更新してください: claude plugin marketplace update ai-org、"
+            "claude plugin update ai-org@ai-org、Claude Code を開き直す。" % (version, old_version)
+        )
+    old_files = lock.get("files", {})
+    known = available_profiles(root)
+    profiles = []
+    for p in lock.get("profiles", []):
+        if p in known:
+            profiles.append(p)
+        else:
+            print("注意: キットにプロファイル %s がなくなりました。そのファイルは削除の対象にします。" % p)
+    # app.json の stacks に後から足したスタックの CI も入れる
+    new_profiles = []
+    try:
+        app_stacks = read_json(tpath(target, APP_JSON_REL)).get("stacks") or []
+    except (OSError, ValueError, AttributeError):
+        app_stacks = []
+    for s in app_stacks if isinstance(app_stacks, list) else []:
+        if s in known and s not in profiles:
+            profiles.append(s)
+            new_profiles.append(s)
+        elif s not in known:
+            print("注意: app.json の stacks にある %s は、キットにないスタックなので飛ばします。" % s)
+    sources = managed_sources(root, profiles)
+
+    added, updated, removed, same = [], [], [], []
+    kept = []  # (相対パス, 理由)
+    new_lock = {}
+    for rel, src in sorted(sources.items()):
+        dst = tpath(target, rel)
+        new_hash = sha256(src)
+        if os.path.isdir(dst):
+            kept.append((rel, "フォルダになっている"))
+            new_lock[rel] = old_files.get(rel, new_hash)
+            continue
+        if not os.path.exists(dst):
+            copy_file(src, dst)
+            added.append(rel)
+            new_lock[rel] = new_hash
+            continue
+        cur = sha256(dst)
+        if cur == new_hash:
+            same.append(rel)
+            new_lock[rel] = new_hash
+        elif rel in old_files and cur == old_files[rel]:
+            copy_file(src, dst)
+            updated.append(rel)
+            new_lock[rel] = new_hash
+        elif rel in old_files:
+            kept.append((rel, "アプリ側で直されている"))
+            new_lock[rel] = old_files[rel]
+        else:
+            kept.append((rel, "キットに新しく入ったが、同じ名前のファイルがアプリにある"))
+            new_lock[rel] = new_hash
+    chmod_self(target)
+
+    for rel in sorted(set(old_files) - set(sources)):
+        dst = tpath(target, rel)
+        if not os.path.isfile(dst):
+            continue
+        if sha256(dst) == old_files[rel]:
+            os.remove(dst)
+            prune_empty_dirs(dst, target)
+            removed.append(rel)
+        else:
+            kept.append((rel, "キットからなくなったが、アプリ側で直されている"))
+            new_lock[rel] = old_files[rel]
+
+    write_json(tpath(target, LOCK_REL), {"org_version": version, "profiles": profiles, "files": dict(sorted(new_lock.items()))})
+    app_path = tpath(target, APP_JSON_REL)
+    app_note = ""
+    try:
+        app = read_json(app_path)
+        app["org_version"] = version
+        write_json(app_path, app)
+    except (OSError, ValueError):
+        app_note = "注意: %s が読めなかったので org_version を書き換えていません。" % APP_JSON_REL
+
+    print("ai-org %s → %s にそろえました（%s）。" % (old_version, version, target))
+    if new_profiles:
+        print("- 新しく入れたスタックの CI: %s（app.json の stacks から）" % ", ".join(new_profiles))
+    for label, items in (("追加", added), ("更新", updated), ("削除", removed)):
+        print("- %s: %d 個%s" % (label, len(items), "".join("\n    " + r for r in items)))
+    print("- 変更なし: %d 個" % len(same))
+    if app_note:
+        print(app_note)
+    if kept:
+        print("")
+        print("上書きしなかったファイル: %d 個" % len(kept))
+        for rel, why in kept:
+            print("  %s（%s）" % (rel, why))
+        print("キットの版にするには、そのファイルを消してからもう一度 sync します。")
+        print("アプリでの直しを残したいなら、キット（%s）に issue を立ててキット側を直します。" % KIT_REPO)
+        print("このままでは org check が失敗します。")
+    else:
+        print("上書きしなかったファイル: なし")
+    return 0
+
+
+# ---------- check ----------
+
+def extra_files(target, files):
+    """組織のフォルダにある、lock.json にないファイル。"""
+    out = []
+    for d in ORG_DIRS:
+        for rel in walk_files(tpath(target, d)):
+            full = d + "/" + rel
+            if full not in files:
+                out.append(full)
+    return out
+
+
+def norm_dir(value):
+    if not isinstance(value, str) or not value.strip():
+        return None
+    v = os.path.normpath(value.strip().replace("\\", "/")).replace("\\", "/")
+    return None if v in (".", "..") or v.startswith(("../", "/")) else v + "/"
+
+
+def app_problems(app):
+    """書ける場所を決める app.json の値が、受け入れテストを守れる形か。"""
+    if not isinstance(app, dict):
+        return ["オブジェクトではない"]
+    paths = app.get("paths") if isinstance(app.get("paths"), dict) else {}
+    raw = paths.get("acceptance_tests")
+    acc = [a for a in (norm_dir(x) for x in (raw if isinstance(raw, list) else [raw])) if a]
+    if not acc:
+        return ["paths.acceptance_tests が空（受け入れテストをだれでも書けてしまう）"]
+    out = []
+    stacks = app.get("stacks") if isinstance(app.get("stacks"), list) else []
+    for stack in ("ios", "backend"):
+        base = norm_dir(paths.get(stack))
+        if stack in stacks and base and not any(a.startswith(base) for a in acc):
+            out.append("paths.acceptance_tests に paths.%s（%s）の中の場所がない" % (stack, base))
+    return out
+
+
+def is_secret_path(rel):
+    name = rel.rsplit("/", 1)[-1]
+    if name in SECRET_OK:
+        return False
+    return any(fnmatch.fnmatchcase(name, pat) for pat in SECRET_PATTERNS)
+
+
+def tracked_files(target):
+    """git に入っているファイルの一覧。git のリポジトリでないか、git が使えなければ None。"""
+    if not os.path.exists(os.path.join(target, ".git")):
+        return None
+    try:
+        r = subprocess.run(["git", "-C", target, "ls-files", "-z"], stdout=subprocess.PIPE,
+                           stderr=subprocess.PIPE, timeout=60)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if r.returncode != 0:
+        return None
+    return [p for p in r.stdout.decode("utf-8", "replace").split("\0") if p]
+
+
+def cmd_check(args):
+    target = require_dir(args.target)
+    lock = load_lock(target)
+    files = lock.get("files", {})
+    problems = []
+    for rel, want in sorted(files.items()):
+        path = tpath(target, rel)
+        if not os.path.isfile(path):
+            problems.append((rel, "なくなっている"))
+        elif sha256(path) != want:
+            problems.append((rel, "lock.json と中身が違う"))
+    for rel in extra_files(target, files):
+        problems.append((rel, "キットにないファイル"))
+    app_path = tpath(target, APP_JSON_REL)
+    try:
+        for why in app_problems(read_json(app_path)):
+            problems.append((APP_JSON_REL, why))
+    except (OSError, ValueError):
+        problems.append((APP_JSON_REL, "ない、または JSON として読めない"))
+    for rel in tracked_files(target) or []:
+        if is_secret_path(rel):
+            problems.append((rel, "秘密情報のファイルが git に入っている。git rm --cached で外し、鍵は作り直す"))
+
+    gha = os.environ.get("GITHUB_ACTIONS") == "true"
+    if not problems:
+        print("org check: OK。組織のファイル %d 個が lock.json と一致しています（ai-org %s）。"
+              % (len(files), lock.get("org_version", "?")))
+        return 0
+    print("org check: NG。次のファイルが問題です。")
+    for rel, why in problems:
+        print("  %s（%s）" % (rel, why))
+        if gha:
+            print("::error file=%s::%s。組織のファイルはアプリ側で直さず、キットを直して /ai-org:update で取り込みます。" % (rel, why))
+    print("組織のファイルはアプリ側で直しません。キット（%s）を直して版を上げ、/ai-org:update で取り込みます。" % KIT_REPO)
+    return 1
+
+
+# ---------- guard-pr ----------
+
+def org_change_reason(rel, managed):
+    cf = rel.casefold()
+    parts = cf.split("/")
+    if rel in managed:
+        return "組織のファイル"
+    if any(p in (".claude", ".github", ".git") for p in parts) or cf == ".mcp.json":
+        return "組織の設定（.claude、.github）"
+    if parts[-1] in INSTRUCTION_NAMES and cf != "claude.md":
+        return "エージェントへの指示として読み込まれるファイル"
+    return None
+
+
+def cmd_guard_pr(args):
+    """PR の変更に組織の変更が入っていないか。ベースのブランチの lock.json と、この版の決まりで判定する。"""
+    target = require_dir(args.target)
+    managed = set(load_lock(target).get("files", {}))
+    try:
+        with open(args.changed, encoding="utf-8") as f:
+            changed = [ln.strip() for ln in f if ln.strip()]
+    except OSError:
+        raise OrgError("変わったファイルの一覧（%s）が読めません。" % args.changed)
+    hits = [(rel, org_change_reason(rel, managed)) for rel in changed]
+    hits = [(rel, why) for rel, why in hits if why]
+    if not hits:
+        print("org guard: OK。この PR は組織のファイルを変えていません（変わったファイル %d 個）。" % len(changed))
+        return 0
+    gha = os.environ.get("GITHUB_ACTIONS") == "true"
+    print("org guard: この PR は組織の仕組みを変えます。Takuma が中身を確かめてからマージします。")
+    for rel, why in hits:
+        print("  %s（%s）" % (rel, why))
+        if gha:
+            print("::error file=%s::組織の変更です（%s）。Takuma が中身を確かめてからマージします。" % (rel, why))
+    print("ai-org の更新の PR（/ai-org:update）なら、この失敗は予定どおりです。")
+    return 1
+
+
+# ---------- 入口 ----------
+
+def print_version():
+    root = kit_root()
+    if root and os.path.isfile(os.path.join(root, "VERSION")):
+        print(kit_version(root))
+        return 0
+    # アプリに置かれたコピー（.claude/org/bin/org）なら lock.json の版を出す
+    lock_path = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "lock.json")
+    try:
+        print(read_json(lock_path).get("org_version", "unknown"))
+    except (OSError, ValueError):
+        print("unknown")
+    return 0
+
+
+def main(argv=None):
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(errors="backslashreplace")
+        sys.stderr.reconfigure(errors="backslashreplace")
+    parser = argparse.ArgumentParser(prog="org", description="AI 開発組織をアプリのリポジトリに入れる、そろえる、確かめる")
+    parser.add_argument("--version", action="store_true", help="キットの版を表示する")
+    sub = parser.add_subparsers(dest="command")
+    p = sub.add_parser("install", help="組織をアプリのリポジトリに入れる")
+    p.add_argument("target")
+    p.add_argument("--name", required=True, help="アプリ名")
+    p.add_argument("--idea", required=True, help="一言アイデア")
+    p.add_argument("--stacks", default="ios,backend", help="カンマ区切り（既定: ios,backend）")
+    p.add_argument("--owner", default="matsuura-tak", help="CODEOWNERS に書く GitHub のログイン名")
+    p.add_argument("--force", action="store_true", help="中身の違う既存ファイルを上書きする")
+    p = sub.add_parser("sync", help="組織のファイルをキットの版にそろえる")
+    p.add_argument("target")
+    p = sub.add_parser("check", help="組織のファイルが lock.json と同じか確かめる")
+    p.add_argument("target")
+    p = sub.add_parser("guard-pr", help="PR で変わったファイルに組織の変更があるか確かめる")
+    p.add_argument("target")
+    p.add_argument("--changed", required=True, help="変わったファイルの一覧（1行に1つ）")
+    args = parser.parse_args(argv)
+
+    if args.version:
+        return print_version()
+    handlers = {"install": cmd_install, "sync": cmd_sync, "check": cmd_check, "guard-pr": cmd_guard_pr}
+    if args.command not in handlers:
+        parser.print_help()
+        return 2
+    try:
+        return handlers[args.command](args)
+    except OrgError as e:
+        print("org: %s" % e, file=sys.stderr)
+        return 2
+
+
+if __name__ == "__main__":
+    sys.exit(main())
