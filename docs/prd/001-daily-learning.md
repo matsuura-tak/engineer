@@ -1,8 +1,8 @@
 # PRD 001-daily-learning：診断と今日の学習
 
-- 状態：下書き（r2。2026-10-29 の Takuma の決定で、iOS アプリから「ブラウザだけで動く Web アプリ（サーバーなし）」に直した）
+- 状態：下書き（r3。G0 の tech-lead r1（FAIL）と verifier r2（PASS、要修正あり）の指摘を直した。r2 は 2026-10-29 の Takuma の決定で、iOS アプリから「ブラウザだけで動く Web アプリ（サーバーなし）」に直したもの）
 - 書いた役：pdm　日付：2026-10-29
-- 時間の枠：3週（うち学習タスク集の下書きに1週。超えるなら 9 の「性能」「魅力」から、書き出し・読み込み → ホーム画面の案内の順に削る）
+- 時間の枠：3週（うち学習タスク集の下書きに1週）。超えるなら 9 の「性能」「魅力」から、ホーム画面の案内（AC-21、AC-22）→ 英語の画面文言（AC-26）→ 統計の画面の見た目（AC-24 の値は 13 の計測に要るので減らさない）の順に削る。書き出し・読み込み（AC-19、AC-20、AC-25）は Safari の7日消去への唯一の手当てなので削らない。252件を1週で書く枠は危ない（1日約50件。Takuma の全件確認は1件2分で約8時間）。件数を減らす案は 18 の Q2
 - 動かす入力指標：出した学習に対する完了率（docs/prd/product.md の入力指標 2）
 
 根拠にはすべて印を付ける：［実データ］［公開情報 URL］［推測］。印のない文は根拠に数えない。自分の想像と擬似ユーザーの意見は［推測］。
@@ -11,7 +11,7 @@
 # 第1部 発見（何を、なぜ作るか）
 
 ## 1. 紹介文
-すでにコードを書いているエンジニアが、URL を開いて3問（1分以内）の自己診断に答えると、その日から毎日「今日やる学習」が1つだけ、15分で終わる形で出ます。インストール、アカウント登録、料金はなく、ブラウザを開いてから最初の課題が出るまで2分以内です。96本の地図が並ぶ roadmap.sh や、積んだままの教材から「どれをやるか」を選ぶ時間が、毎日0分になります。英語の壁、ハート、広告はありません。難しすぎ・簡単すぎの申告が2回続けば次の日から段階が変わるので、同じ段階の課題を繰り返されることがありません。データはあなたのブラウザの中だけに保存され、どこにも送りません。
+すでにコードを書いているエンジニアが、URL を開いて3問（1分以内）の自己診断に答えると、その日から毎日「今日やる学習」が1つだけ、15分で終わる形で出ます。インストール、アカウント登録、料金はなく、ブラウザを開いてから最初の課題が出るまで2分以内です。96本の地図が並ぶ roadmap.sh や、積んだままの教材から「どれをやるか」を選ぶ時間が、毎日0分になります。英語の壁、ハート、広告はありません。難しすぎ・簡単すぎの申告が2回続けば次の日から段階が変わるので、同じ段階の課題を繰り返されることがありません。入力したデータ（診断の回答と履歴）はあなたのブラウザの中だけに保存され、ブラウザの外には送りません（ページを配る GitHub Pages が、接続の記録として IP アドレスを保存するだけです）。
 
 ## 2. 中心の Job
 - Job ストーリー（1つだけ）：平日の朝や通勤中に15分空いたとき、自分の今の段階と目標に合った学習を1つだけ選んで始めたい。そうすれば何をやるか迷う時間をなくし、毎日続けられる。
@@ -19,27 +19,29 @@
 
 | # | わかったこと | 印 | 出典（URL かファイル） |
 |---|---|---|---|
-| E-1 | 学習の地図は「100+ technologies」が並び、「trying to learn everything at once will slow you down」と批判されている。roadmap.sh のトップには「All 96 roadmaps」が並ぶ（2026-10-29 確認） | ［公開情報 URL］ | https://dev.to/matemiller/finding-the-right-path-as-a-developer-roadmaps-vs-reality-5c6b 、https://roadmap.sh/ |
-| E-2 | 「パーソナル」を掲げる Enki でも、興味の設定が保存されず（"I'm not interested in React (we use Angular)"）、教材が古い（"class components"）と不満が出る | ［公開情報 URL］ | https://apps.apple.com/us/app/enki-learn-coding-programming/id993753145 |
+| E-1 | 学習の地図は「100+ technologies」が並び、「trying to learn everything at once will slow you down」と批判されている（2025-03-07）。roadmap.sh のトップには「All 96 roadmaps」が並ぶ（2026-10-29 確認） | ［公開情報 URL］ | https://dev.to/matemiller/finding-the-right-path-as-a-developer-roadmaps-vs-reality-5c6b 、https://roadmap.sh/ |
+| E-2 | 「パーソナル」を掲げる Enki でも、興味の設定が保存されず（"I'm not interested in React (we use Angular)"、2019-03-07）、教材が古い（"class components"、2024-02-13）と不満が出る（Apple のレビュー RSS で確認） | ［公開情報 URL］ | https://apps.apple.com/us/app/enki-learn-coding-programming/id993753145 |
 | E-3 | Sololearn の対戦は「まだ学習してないことが出題される」と、段階に合わないことへの不満がある | ［公開情報 URL］ | https://apps.apple.com/jp/app/sololearn-learn-to-code/id1210079064 |
-| E-4 | Mimo は「no way to review…practice continuously on weak points」、ハートが0になると待つか課金かの二択、と不満がある | ［公開情報 URL］ | https://apps.apple.com/jp/app/mimo-learn-programming-coding/id1133960732 |
-| E-5 | JP の上位アプリ（Mimo、Sololearn、Codecademy Go）に「日本語に対応してほしい」が繰り返し出る | ［公開情報 URL］ | 上の3つの URL |
-| E-6 | ブラウザで使える無料の学習サイトでも、Exercism は「mentoring request…8 days ago, and there seem to be no takers」（人に依存して待たされる）、freeCodeCamp は「Most lessons are outdated」「Write this code…without explaining」（古い、理由の説明がない）と不満がある | ［公開情報 URL］ | https://forum.exercism.org/t/what-happens-if-no-mentor-takes-my-request/7271 、https://se.trustpilot.com/review/freecodecamp.org |
-| E-7 | Safari は、利用者が7日間そのサイトを操作しないと localStorage と IndexedDB を消す。ホーム画面に追加した Web アプリは対象外 | ［公開情報 URL］ | https://webkit.org/blog/10218/full-third-party-cookie-blocking-and-more/ |
+| E-4 | Mimo は「no way to review…practice continuously on weak points」（2023-07-07）、ハートが0になると待つか課金かの二択（「ハートにストレスが溜まる」2024-08-06）、と不満がある | ［公開情報 URL］ | https://apps.apple.com/jp/app/mimo-learn-programming-coding/id1133960732 |
+| E-5 | JP の上位アプリ3件に「日本語に対応してほしい」の趣旨のレビューがある。Sololearn は RSS 5ページ（57件）のうち 7件（2018-01-02〜2026-04-01。「日本語に対応してほしい」2018-01-24、「日本語版をリリース希望」2018-11-16 など）、Mimo は「日本語ないんか」（2024-11-04）の 1件、Codecademy Go は RSS 8件のうち「日本語で翻訳出来る様にして欲しい」（2025-04-30）の 1件 | ［公開情報 URL］ | https://apps.apple.com/jp/app/sololearn-learn-to-code/id1210079064 、https://apps.apple.com/jp/app/mimo-learn-programming-coding/id1133960732 、https://apps.apple.com/jp/app/codecademy-go/id1376029326 |
+| E-6 | ブラウザで使える無料の学習サイトでも、Exercism は「mentoring request…8 days ago, and there seem to be no takers」（人に依存して待たされる）、freeCodeCamp は「Most lessons are outdated and useless for 2026 tech」（TJ、2026-03-17）、「they just say "Write this code" but there's not nearly enough explanation」（Jeffrey Bortolin、2024-09-05、2ページ目）と不満がある（古い、理由の説明が足りない） | ［公開情報 URL］ | https://forum.exercism.org/t/what-happens-if-no-mentor-takes-my-request/7271 、https://se.trustpilot.com/review/freecodecamp.org 、https://se.trustpilot.com/review/freecodecamp.org?page=2 |
+| E-7 | Safari は、利用者が7日間そのサイトを操作しないと localStorage と IndexedDB を消す。ホーム画面に追加した Web アプリはこの消去の対象外だが、Safari と保存を共有しない（"Home Screen apps are created as isolated entities without shared state with the browser"、WebKit Bug 181849 Comment 3、2022-02-01、状態 NEW）。iOS 26 からは、ホーム画面に追加したサイトは既定で Web アプリとして開く（"every website added to the Home Screen via Safari opens as a web app"。追加時に切れる）。つまり、Safari で診断した後にホーム画面に追加しても、回答と履歴は引き継がれない | ［公開情報 URL］ | https://webkit.org/blog/10218/full-third-party-cookie-blocking-and-more/ 、https://bugs.webkit.org/show_bug.cgi?id=181849 、https://www.macrumors.com/2025/06/18/safari-changes-on-ios-26/ |
 | E-8 | iOS の Web Push は iOS 16.4 以降で、ホーム画面に追加した Web アプリだけが使える | ［公開情報 URL］ | https://webkit.org/blog/13878/web-push-for-web-apps-on-ios-and-ipados/ |
 | E-9 | 「今日1つ」を処方する形なら、教材を抱えずに済み、サーバーなしで1人で3週で作れる | ［推測］ | — |
+| E-10 | GitHub Pages は訪問者の IP アドレスを記録する（"the visitor's IP address is logged and stored for security purposes…regardless of whether the visitor has signed into GitHub or not"）。「どこにも送らない」とは言えない | ［公開情報 URL］ | https://docs.github.com/en/pages/getting-started-with-github-pages/about-github-pages |
+| E-11 | GoatCounter（匿名計測の候補）は、セッションを「site、User-Agent、IP」から作って 8 時間だけ記憶し、「The IP address and User-Agent are never stored to the database or disk」。利用者ごとの継続は追えない | ［公開情報 URL］ | https://www.goatcounter.com/help/sessions |
 
 ## 3. 競合と代替
-詳しい引用は docs/prd/product.md の表にある。ここでは同じ Job に近い順に要点だけ引く。
+詳しい引用は docs/prd/product.md の表にある。ここでは同じ Job に近い順に要点だけ引く。引用の日付は Apple のレビュー RSS か各ページで確認した（2026-10-29）。
 
 | 名前 | URL | 評価の数 | 価格と課金の形 | 強み | 繰り返し出る不満（引用と URL） |
 |---|---|---|---|---|---|
-| Enki（アプリ） | https://apps.apple.com/us/app/enki-learn-coding-programming/id993753145 | US 1,113 ［公開情報 URL］ | 無料（読むだけ）＋年額 | 「毎日5分」「パーソナル」を掲げ、領域が広い | 「you actually save my curriculum preferences when I click "Save"」「React material out of date」「You never actually code」（同 URL） |
-| Mimo（アプリ） | https://apps.apple.com/jp/app/mimo-learn-programming-coding/id1133960732 | JP 1,033 / US 110,885 ［公開情報 URL］ | 無料＋Pro（年 ¥8,600〜） | 短いレッスンと連続記録 | 「日本語ないんか」「ハートにストレスが溜まる」「no way to review…weak points」（同 URL） |
-| Sololearn（アプリ） | https://apps.apple.com/jp/app/sololearn-learn-to-code/id1210079064 | JP 2,591 / US 82,126 ［公開情報 URL］ | 無料＋Pro（広告、ハート） | コース数、対戦 | 「日本語に対応してほしい」「まだ学習してないことが出題される」「too many advertisements」（同 URL） |
+| Enki（アプリ） | https://apps.apple.com/us/app/enki-learn-coding-programming/id993753145 | US 1,113 ［公開情報 URL］ | 無料（読むだけ）＋年額 | 「毎日5分」「パーソナル」を掲げ、領域が広い | 「you actually save my curriculum preferences when I click "Save"」（2019-03-07）「React material out of date」（2024-02-13）「You never actually code」（2019-04-03）（同 URL） |
+| Mimo（アプリ） | https://apps.apple.com/jp/app/mimo-learn-programming-coding/id1133960732 | JP 1,033 / US 110,885 ［公開情報 URL］ | 無料＋Pro（年 ¥8,600〜） | 短いレッスンと連続記録 | 「日本語ないんか」（2024-11-04）「ハートにストレスが溜まる」（2024-08-06）「no way to review…weak points」（2023-07-07）（同 URL） |
+| Sololearn（アプリ） | https://apps.apple.com/jp/app/sololearn-learn-to-code/id1210079064 | JP 2,591 / US 82,126 ［公開情報 URL］ | 無料＋Pro（広告、ハート） | コース数、対戦 | 「日本語に対応してほしい」（2018-01-24 ほか同趣旨 7件）「まだ学習してないことが出題される」「too many advertisements」（同 URL） |
 | Progate（アプリと Web） | https://apps.apple.com/jp/app/progate/id1335868128 | JP 1,179 ［公開情報 URL］ | 無料＋月額 | 日本発 | 「アプリは全部英語」「内容が古すぎ」「解約したのに請求」（同 URL） |
-| Exercism（Web） | https://exercism.org/ | Trustpilot 18 件、2.3 ［公開情報 URL］ | 無料 | 言語ごとの練習問題と人のメンター | 「mentoring request (Ruby track) 8 days ago, and there seem to be no takers」（https://forum.exercism.org/t/what-happens-if-no-mentor-takes-my-request/7271 ）「It's more like solving riddles than teaching you anything」（https://ie.trustpilot.com/review/exercism.org ） |
-| freeCodeCamp（Web） | https://www.freecodecamp.org/ | Trustpilot 41 件、3.5 ［公開情報 URL］ | 無料（寄付） | 無料で網羅的、ブラウザで完結 | 「Most lessons are outdated and useless for 2026 tech」「Many steps and explanations are skipped」（https://se.trustpilot.com/review/freecodecamp.org ） |
+| Exercism（Web） | https://exercism.org/ | Trustpilot 18 件、2.3 ［公開情報 URL］ | 無料 | 言語ごとの練習問題と人のメンター | 「mentoring request (Ruby track) 8 days ago, and there seem to be no takers」（https://forum.exercism.org/t/what-happens-if-no-mentor-takes-my-request/7271 2023-09-13）「It's more like solving riddles than teaching you anything」（https://ie.trustpilot.com/review/exercism.org 2026-07-13） |
+| freeCodeCamp（Web） | https://www.freecodecamp.org/ | Trustpilot 41 件、3.5 ［公開情報 URL］ | 無料（寄付） | 無料で網羅的、ブラウザで完結 | 「Most lessons are outdated and useless for 2026 tech」（2026-03-17）「Many steps and explanations are skipped」（2024-08-19）（https://se.trustpilot.com/review/freecodecamp.org ） |
 | roadmap.sh（Web、地図） | https://roadmap.sh/ | 登録 3.2M と表示 ［公開情報 URL］ | 無料 | 網羅的な地図（96本） | 「100+ technologies」「learn everything at once will slow you down」（E-1 の URL）［公開情報 URL］ |
 | ChatGPT に聞く、先輩に聞く、何もしない（アプリ以外） | — | — | 0円〜 | その場で答えが出る、信頼できる | 毎回自分の段階を説明し直す。翌日に続かない。先輩の時間に依存する。［推測］（レビューの記録なし） |
 
@@ -54,7 +56,7 @@
 |---|---|---|---|
 | 学ぶべきことが多すぎて、どれから手を付けるか決まらないまま日が過ぎる（E-1）。コースは段階に合わない（E-3、E-4）。Web の学習サイトは古い、待たされる（E-6） | 診断3問、毎日1つ、15分で終わる。段階に合わせて変わる。URL を開くだけ、登録なし、日本語、無料 | 「自己申告の診断で本当に合う課題が出るのか」「課題が尽きたら終わりでは」「ブラウザのデータが消えたら履歴も消えるのでは」「また続かないのでは」 | 気が向いたときに記事を読む、Udemy を積む、ChatGPT に聞く、何もしない |
 
-- 不安と習慣を下げる手当て（9 か 11 に入れる）：診断の直後に1件目を出して「合うか」をその場で確かめられる（AC-2）。難しすぎ・簡単すぎの申告で段階が動く（AC-8）。課題が尽きたら隠さず知らせ、診断のやり直しへ案内する（AC-10）。履歴はファイルに書き出して別の端末に読み込める（AC-19、AC-20）。ホーム画面への追加を1回だけ案内し、Safari の7日消去（E-7）を避ける（AC-21）。
+- 不安と習慣を下げる手当て（9 か 11 に入れる）：診断の直後に1件目を出して「合うか」をその場で確かめられる（AC-2）。難しすぎ・簡単すぎの申告で段階が動く（AC-8）。課題が尽きたら隠さず知らせ、診断のやり直しへ案内する（AC-10）。履歴はファイルに書き出して別のブラウザや端末に読み込める（AC-19、AC-20、AC-25）。iOS の Safari では、診断を始める前にホーム画面への追加を1回だけ案内し、Safari の7日消去（E-7）を避ける。ホーム画面の Web アプリは Safari と保存を共有しないので、案内には書き出し・読み込みで引き継ぐ手順を入れ、ホーム画面から初めて開いたときに読み込みへ案内する（AC-21、AC-22）。一度読み込んだ後はオフラインで再読み込みしても動く（AC-23）。
 
 ## 5. 機会と解決
 - 根（成果）：出した学習に対する完了率
@@ -77,24 +79,24 @@
 | リスク | いちばん危ない前提 | 外れたら失敗するか | 今ある証拠（印） | 確かめ方と合格の線 | 担当 |
 |---|---|---|---|---|---|
 | 価値 | 「今日1つ処方される」だけで、学習を自分で選ぶより続く | する | 競合の不満（E-1〜E-4、E-6）は裏付けになるが、処方で続く証拠はない［推測］ | 公開28日後に完了率 40% 以上、「役に立った」率 60% 以上（13）。その前に Takuma の過去の行動を聞く（18 の Q8） | pdm |
-| 使いやすさ | 3問の自己診断を1分以内に終え、離脱しない | する | SmartyMe の「super long onboarding」への不満（https://apps.apple.com/jp/app/smartyme-%E6%AF%8E%E6%97%A5%E3%81%AE%E3%83%9E%E3%82%A4%E3%82%AF%E3%83%AD%E3%83%A9%E3%83%BC%E3%83%8B%E3%83%B3%E3%82%B0/id6736654449 ［公開情報 URL］） | designer の画面案を Takuma が5分で通す。URL を渡した人のうち診断を終えた人が 80% 以上（聞き取り） | designer |
-| 実現性（課題） | 同梱 JSON と規則だけで、段階に合う課題を28日分出せる | する | 要確認（タスク集の量：9） | tech-lead が G0 で判定。タスク集の件数 ≥ 領域 × 3段階 × 14件（AC-4） | tech-lead |
-| 実現性（保存） | ブラウザの保存（localStorage か IndexedDB）が、28日間ふつうの使い方で消えない | する | Safari は7日操作がないと消す（E-7）［公開情報 URL］。ホーム画面に追加すれば対象外 | tech-lead が G1 で保存の方式（IndexedDB、`navigator.storage.persist()`、ホーム画面の案内）を決める。公開28日後に「データが消えた」の報告が利用者の 30% 未満（14） | tech-lead |
-| 事業性 | 費用ほぼ0で始め、North Star が動いてから課金を考えられる | しない（v1） | 静的ホスティングは無料で置ける（https://docs.github.com/en/pages ［公開情報 URL］）。競合は課金への不満が多い（product.md） | v1 では測らない。North Star が動いてから 16 を決める | pdm |
+| 使いやすさ | 3問の自己診断を1分以内に終え、離脱しない | する | SmartyMe の「super long onboarding」への不満（2026-05-11、https://apps.apple.com/jp/app/smartyme-%E6%AF%8E%E6%97%A5%E3%81%AE%E3%83%9E%E3%82%A4%E3%82%AF%E3%83%AD%E3%83%A9%E3%83%BC%E3%83%8B%E3%83%B3%E3%82%B0/id6736654449 ［公開情報 URL］） | designer の画面案を Takuma が5分で通す。URL を渡した人のうち診断を終えた人が 80% 以上（聞き取り） | designer |
+| 実現性（課題） | 同梱 JSON と規則だけで、段階に合う課題を28日分出せる | する | tech-lead r1：技術の面では作れる。252件を3週で書けるかは枠の危険（18 の Q2） | タスク集の件数 ≥ 領域 × 3段階 × 14件（AC-4）。Q2 で件数を減らすなら AC-4 の数字を同時に変える | tech-lead |
+| 実現性（保存） | ブラウザの保存（localStorage）が、28日間ふつうの使い方で消えない | する | Safari は7日操作がないと消す（E-7）［公開情報 URL］。ホーム画面に追加すれば対象外だが、Safari と保存を共有しない（E-7）。`navigator.storage.persist()` が7日消去を免除するかは公式の記述がなく未確認（tech-lead r1）。設計はこれに頼らない | tech-lead が G1 で保存の方式を ADR に決める（案：localStorage のキー1つ、書き出しファイルと同じ JSON、版番号つき）。公開28日後に「データが消えた」の報告が利用者の 30% 未満（14） | tech-lead |
+| 事業性 | 費用ほぼ0で始め、North Star が動いてから課金を考えられる | しない（v1） | 静的ホスティングは無料で置ける（https://docs.github.com/en/pages ［公開情報 URL］）。tech-lead r1：利用者1,000人あたり月 0 円。競合は課金への不満が多い（product.md） | v1 では測らない。North Star が動いてから 16 を決める | pdm |
 | 害 | 自己診断と自己申告の段階が実力とずれ、誤った自信や挫折を生む | 一部 | Sololearn の「レベルオーバー」（E-3）［公開情報 URL］ | 「難しすぎ」の申告率を測り、28日後に出した課題の 30% を超えたら段階の規則を見直す（14） | pdm |
 
 ## 7. 事前の検死
 | # | 失敗の理由 | 結び付けた先 |
 |---|---|---|
-| 1 | 課題の中身が薄く、「役に立った」が付かない | 13 の「役に立った」率、14 の行2、18 の Q2（誰が書くか） |
-| 2 | ブラウザのデータが消え（Safari の7日、キャッシュ削除、端末変更）、履歴が飛んだ人が去る | AC-13（永続化を断っても動く）、AC-19、AC-20（書き出し・読み込み）、AC-21（ホーム画面の案内）、13 のガードレール「データが消えた」、14 の行4 |
+| 1 | 課題の中身が薄く、「役に立った」が付かない | 13 の「役に立った」率、14 の行2、18 の Q2（誰が、何件書くか） |
+| 2 | ブラウザのデータが消え（Safari の7日、キャッシュ削除、端末変更、Safari からホーム画面への移行）、履歴が飛んだ人が去る | AC-13（永続化を断っても動く）、AC-19、AC-20、AC-25（書き出し・読み込み）、AC-21、AC-22（診断の前のホーム画面の案内と、ホーム画面で初めて開いたときの読み込みの案内）、13 のガードレール「データが消えた」、14 の行4 |
 | 3 | 課題が2週間で尽きて、同じものが出る | AC-6（過去に出した ID と異なる）、AC-10（尽きたら知らせる）、AC-4（件数） |
 | 4 | リマインダーがなく、翌日戻って来ない | AC-21（ホーム画面の案内）、13 の「週3日以上」の割合、18 の Q6（Web Push を 002 に） |
-| 5 | スマホで読み込みが遅い、または文字を大きくすると崩れて、通勤中に使われない | AC-15（2秒）、AC-17（200%）、AC-18（キーボード）、12 |
+| 5 | スマホで読み込みが遅い、オフラインで開けない、または文字を大きくすると崩れて、通勤中に使われない | AC-15（遅い回線で2秒）、AC-23（オフラインの再読み込み）、AC-17（200%）、AC-18（キーボード）、AC-27（監査）、12 |
 
 ## 8. 推奨
-- 形を変えて作る：依頼どおり「診断と今日の学習」を、ブラウザだけで動く Web アプリとして作る。形を3つ変える。(1) 教材を抱えず、同梱した「15分の課題」を1つ処方する。(2) 生成 AI、トレンド取り込み、Web Push は v1 に入れず、002 以降でサーバーの要否と一緒に決める。(3) データはブラウザの中だけに置き、消える不安には書き出し・読み込みとホーム画面の案内で手当てする。
-- いちばん強い反論：ブラウザだけでは「続ける」仕組みが弱い。通知は v1 にない（iOS の Web Push はホーム画面に追加した場合だけ：E-8）ので翌日戻る動機は本人の習慣だけに頼る。さらに Safari は7日操作がないとデータを消し（E-7）、端末を変えれば履歴は消える。この2つが重なると、「続いた人の履歴だけ消える」最悪の形になり、完了率より先に継続が崩れる。これに加えて、課題の品質と量（6領域 × 3段階 × 14件）を人が3週で書き切れない可能性は iOS 版と変わらない。
+- 形を変えて作る：依頼どおり「診断と今日の学習」を、ブラウザだけで動く Web アプリとして作る。形を3つ変える。(1) 教材を抱えず、同梱した「15分の課題」を1つ処方する。(2) 生成 AI、トレンド取り込み、Web Push は v1 に入れず、002 以降でサーバーの要否と一緒に決める。(3) データはブラウザの中だけに置き、消える不安には書き出し・読み込みで手当てする。iOS の Safari では診断の前にホーム画面への追加を案内するが、ホーム画面の Web アプリは Safari と保存を共有しない（E-7）ので、引き継ぎは書き出し・読み込みの手作業になる。
+- いちばん強い反論：ブラウザだけでは「続ける」仕組みが弱い。通知は v1 にない（iOS の Web Push はホーム画面に追加した場合だけ：E-8）ので翌日戻る動機は本人の習慣だけに頼る。さらに Safari は7日操作がないとデータを消し（E-7）、ホーム画面に移すにも、端末を変えるにも、本人がファイルを書き出して読み込む手間が要る。この2つが重なると、「続いた人の履歴だけ消える」最悪の形になり、完了率より先に継続が崩れる。これに加えて、課題の品質と量（6領域 × 3段階 × 14件）を人が3週で書き切れない可能性（1日約50件）は iOS 版と変わらない。
 - 作らない場合に起きること：対象の人は roadmap.sh や ChatGPT で毎回自分で選び続け、「決められない日」が残る。このアプリの以降の機能（他で学んだことの反映、トレンド）は土台がなく始められない。
 
 # 第2部 定義（どう作り、どう測るか）
@@ -107,19 +109,21 @@ Kano の分類は［推測］。候補の RICE：S-1 の診断＋処方（Reach 
 | 自己診断：3問（目標の領域を6領域から1つ、その領域の自己評価を3段階から1つ、経験年数を4区分から1つ）。1画面1問。経験年数は記録だけで、段階の規則には使わない | 当たり前 | O-2 |
 | 今日の課題を1日1つ出す。題名、なぜ今これか、やり方、完了の目安（所要時間は整数の分）の4要素 | 当たり前 | O-1 |
 | 完了、難しすぎ、簡単すぎ、今日はできない、の4つの申告。申告後はその日はもう課題が出ない | 当たり前 | O-1、O-2 |
-| 同じ種類の申告が2回連続で段階を上下させる規則 | 性能 | O-2 |
+| 同じ種類の申告が2回連続で段階を上下させる規則。段階は領域ごとに持つ | 性能 | O-2 |
 | 完了の直後に「役に立った / 立たなかった」を1回だけ聞く | 性能 | O-1（計測） |
-| 同梱の学習タスク集：6領域 × 3段階 × 14件 = 252件（領域は Takuma が決める：18 の Q3） | 当たり前 | O-1 |
-| 完了と申告の履歴（日付つき）と、自分の統計（出した件数、完了した件数、役に立った件数） | 魅力 | O-3、計測（13） |
+| 同梱の学習タスク集：6領域 × 3段階 × 14件 = 252件（領域は Takuma が決める：18 の Q3。件数を減らす案は Q2） | 当たり前 | O-1 |
+| 完了と申告の履歴（日付つき）と、自分の統計。統計の値は 13 の指標と1対1（出した件数、完了した件数、「役に立った」の件数と回答した件数、初めて開いた日に完了したか、直近7日の完了日数、「難しすぎ」の申告件数、初めて開いた日付）。判定日に利用者がこの画面を Takuma に送る（AC-24） | 当たり前（13 の計測に要る） | O-3、計測（13） |
 | 診断のやり直しと、データの全削除 | 当たり前 | 当たり前 |
-| ホーム画面への追加（ブックマーク）の案内を1回だけ出す | 性能 | O-3、当たり前（E-7） |
-| データの書き出しと読み込み（JSON ファイル）。枠を超えたら最初に削る | 性能 | O-3（端末を変えても続く） |
+| Service Worker で、一度読み込んだ後はオフラインで再読み込み（ホーム画面からの起動を含む）しても動く。tech-lead r1：約10行、依存なし | 当たり前 | 当たり前（オフライン）、O-3 |
+| データの書き出しと読み込み（JSON ファイル、版番号つき）。Safari の7日消去と、ホーム画面・別端末への引き継ぎの手当て | 性能 | O-3（端末やブラウザを変えても続く） |
+| iOS の Safari でスタンドアロン表示でないときだけ、診断の前にホーム画面への追加を1回だけ案内する。手順に書き出し・読み込みでの引き継ぎを含める。ホーム画面から初めて開いたときは読み込みへ案内する。枠を超えたら最初に削る | 性能 | O-3、当たり前（E-7） |
+| 画面の文言の英語（副）。課題集は日本語のみ | 魅力 | O-1（英語圏の利用者。Q4） |
 
 ## 10. やらないこと（非目標）と、はまりやすい所
 - やらないこと（理由を1行ずつ）：
   - サーバー、アカウント、ログイン、端末間の自動同期：Takuma の決定（2026-10-29）。費用ほぼ0を保つ。端末間はファイルの書き出し・読み込みで代える。
   - Web Push と定時のリマインダー：iOS ではホーム画面に追加した場合だけ届き（E-8）、サーバーなしでは予約配信ができない。002 で決める（18 の Q6）。
-  - オフラインでの再読み込み（Service Worker によるキャッシュ）：一度読み込んだ後は AC-12 で動く。再読み込みまで保証するかは tech-lead が G1 で決める（要確認）。
+  - Service Worker による課題集の自動更新、バックグラウンド同期、更新の通知：v1 の Service Worker は配布物のキャッシュだけ（AC-23）。更新の配り方は 002 以降で静的な JSON の配信と一緒に決める。
   - ブラウザの中でコードを書く・実行する：教材を抱える形になり、Mimo や freeCodeCamp と同じ土俵になる。
   - 生成 AI による課題の生成：端末内 LLM は入れない（決定済み）。外部 API はサーバーが要る（S-3）。
   - トレンドの取り込みや課題のネット経由の更新：v1 は同梱の JSON だけ。002 以降で静的な JSON の配信を検討する。
@@ -127,31 +131,39 @@ Kano の分類は［推測］。候補の RICE：S-1 の診断＋処方（Reach 
   - 6領域すべての自己評価：v1 は目標の領域だけ。診断を1分以内に収めるため（18 の Q5）。
   - 連続記録（ストリーク）、ハート、広告、課金：競合の不満の中心（E-4、product.md）。
   - 課題の中身の自動採点：自己申告にする。実力テストは v1 で扱わない。
+  - 英語の課題集：252件を2言語で書く時間がない（18 の Q4）。画面の文言だけ英語を持つ（AC-26）。
   - iOS アプリと App Store への提出：Takuma の決定。出すときは product.md の「iOS 版を出すときに書く」を埋める。
 - はまりやすい所と避け方：
   - 診断の質問を増やしたくなる：3問の上限を AC-1 に固定し、足すなら他を削る。
   - 課題集の件数が足りないまま出す：AC-4 で件数を数え、AC-10 で尽きたときの表示を用意する。
   - 「段階」の規則を複雑にしたくなる：2回連続の規則だけにし（AC-8）、変えるなら公開後の数字で決める。
-  - 保存の方式を後から変えてデータを失う：保存の形式に版番号を付け、書き出しファイルと同じ形にする（tech-lead に要確認）。
+  - 保存の方式を後から変えてデータを失う：保存の形式に版番号を付け、書き出しファイルと同じ形にする。読み込みは「今の版以下は移して読み、新しい版は拒む」（AC-20、AC-25）。
+  - テストのつなぎ口（データの初期化、差し替え）を本番の配布物に残す：リンクを踏ませるだけで他人のデータを消せる。11 の冒頭の決まりに従い、reviewer が G2 で確かめる。
+  - ホーム画面の案内を「データが守られる」と読ませる：案内の手順に「Safari のデータは引き継がれないので書き出して読み込む」を必ず入れる（AC-21）。
 
 ## 11. 受け入れ条件
 画面名と文言キーは designer が design/001-daily-learning.md で確定する。ここでは状態の名前と文言キーを仮に置く（`diagnosis.*`、`task.*`、`history.*`、`settings.*`、`error.*`、`home.*`）。
 
-状態の名前と遷移（verifier r1 の要修正3、4、5 への答え）：
-- `diagnosis.start` → `diagnosis.question`（n / 3）→ `task.today`（課題が1件出ている）
-- `task.today` で「完了」→ `task.rate`（役に立ったかを聞く）→ 答えるか、答えずに閉じる・再読み込みする → `task.done`（その日はもう課題が出ない）
+状態の名前と遷移（verifier r1 の要修正3、4、5、verifier r2 の要修正と提案への答え）：
+- 初めて開く → `diagnosis.start` → `diagnosis.question`（n / 3）→ `task.today`（課題が1件出ている）。iOS の Safari でスタンドアロン表示でないときは、`diagnosis.start` の画面に案内 `home.addToHomeScreen` を重ねて出す（AC-21）
+- `task.today` で「完了」→ `task.rate`（役に立ったかを聞く）→ 答えるか、答えずにページを離れる（再読み込み、タブを閉じる）→ `task.done`（その日はもう課題が出ない）。`task.rate` に閉じる操作を置くかは designer が決める。置くなら `task.rate.close` で、再読み込みと同じく「未回答」で `task.done` にする
 - `task.today` で「難しすぎ」「簡単すぎ」「今日はできない」→ `task.skipped`（その日はもう課題が出ない）
 - 翌日（ブラウザの端末の日付が変わった後の最初の読み込みか操作）→ `task.today`。出す課題がなければ `task.exhausted`
 - 「連続」の定義：同じ種類の申告（難しすぎ、または簡単すぎ）が、申告の履歴の新しい方から2件並ぶこと。間に「完了」か「今日はできない」が入れば途切れる。申告は1日1回だけなので、同じ日に2回目は起きない
 - 一度出した課題の ID は、申告の種類にかかわらず、再び出さない
+- 段階は領域ごとに持つ（例：`levels: { backend: "中" }`）。診断は目標の領域の段階だけを設定し、他の領域の段階は保つ
+- 診断のやり直し：その日にまだ課題を出していなければ、やり直しの直後に新しい診断に合う課題を出す。その日にすでに課題を出していれば（`task.today`、`task.done`、`task.skipped` のどれか）、やり直しても新しい課題は出さず、新しい診断は翌日の課題から効く（AC-5 の例外は作らない。Task Issued を同日に増やさない）。`task.exhausted` からやり直して同じ領域と段階を選ぶと、その日のうちに再び `task.exhausted` になる
+- 読み込み：保存データがあるブラウザに正しいファイルを読み込むときは確認 `settings.import.confirm` を出し、確定すると既存のデータをファイルの中身で置き換える（結合しない）。版番号が今の版以下のファイルは今の形に移して読み、今より新しい版は拒む（AC-25）
+- スタンドアロン表示（ホーム画面の Web アプリ）の判定は `navigator.standalone === true` か `display-mode: standalone`。iOS の Safari の判定は User-Agent による（tech-lead が G1 で確定）
+- `navigator.storage.persist()` は、診断を終えて `task.today` を初めて表示した後に1回だけ求める（15 の Storage Persist Answered はこのとき）
 
-テストのつなぎ口（verifier r1 の H-1〜H-11 の Web 版の読み替え。名前は tech-lead が G1 で contracts/ に確定する）：状態の初期化（例：`?reset=1`）、時刻の固定（例：`?now=2026-11-02T08:00:00+09:00`）、課題の素性の読み出し（`task.today` の要素に `data-task-id`、`data-task-area`、`data-task-level`）、タスク集の JSON スキーマと置き場所、テスト用タスク集への差し替え（例：`?taskset=test2`）、通信の遮断と送信の件数、データの投入（seed）、保存の失敗の注入、読み込み時間の露出（例：`data-debug-load-ms`）、画面の識別子（`data-testid`）、対応ブラウザと実行環境。
+テストのつなぎ口（verifier r2 の W-1〜W-12 と tech-lead r1 の (e)。名前は tech-lead が G1 で contracts/ に確定する）：つなぎ口は本番の配布物に入れない。テスト用のビルドだけで有効にするか、テストのコード側（Playwright の addInitScript、setOffline、timezoneId、device による UA の偽装など）から差し込む。アプリの側に置くのは、画面の識別子（ルートの `data-state`、要素の `data-testid`）、課題の素性（`task.today` の要素の `data-task-id`、`data-task-area`、`data-task-level`）、履歴の行（`data-task-id`、`data-date`、`data-report`、`data-helpful`）、統計の値（`data-stat-*`）、読み込み時間（`data-debug-load-ms`）、タスク集と書き出しファイルの JSON スキーマと置き場所、seed の形（保存の形式と同じ JSON）だけ。テストの側から差し込むもの：状態の初期化、時刻の固定と実行中に進める手段、タスク集の差し替え、データの投入（seed）、保存の失敗と `persist()` の拒否の注入、スタンドアロン表示と iOS Safari の偽装、通信の遮断と送信の件数の記録、対応ブラウザと実行環境（Chromium と WebKit）。
 
 - AC-1：初めて開くと自己診断が始まり、3問で終わる
-  - Given：保存データがない状態でページを開いた
-  - When：読み込みが終わる
-  - Then：状態 `diagnosis.start` が表示され、質問の総数が 3 で、各質問の画面に進み具合が「n / 3」（n は 1〜3）の形で出て、最後の質問の番号が 3 である
-  - 確かめ方：ブラウザの自動テスト（質問数と進み具合の分母を数える）とスクリーンショット
+  - Given：保存データがない状態でページを開いた（iOS Safari の偽装なし）
+  - When：読み込みが終わり、3問に順に答える
+  - Then：状態 `diagnosis.start` が表示され、質問の総数が 3 で、各質問の画面に進み具合が「n / 3」（n は 1〜3）の形で出て、最後の質問の番号が 3 であり、各質問で回答を確定してから次の質問が表示されるまでが 500 ミリ秒以内である
+  - 確かめ方：ブラウザの自動テスト（質問数と進み具合の分母を数え、切り替えの時間を3回とも記録する）とスクリーンショット
   - 効く機会：O-2
 - AC-2：診断を終えると、その場で今日の課題が1件出る
   - Given：3問すべてに答えた
@@ -162,19 +174,19 @@ Kano の分類は［推測］。候補の RICE：S-1 の診断＋処方（Reach 
 - AC-3：課題は4要素をすべて持ち、15分以内で終わる
   - Given：同梱のタスク集（本番の JSON）を読む
   - When：全件を検査する
-  - Then：全件で、題名、なぜ今これか、やり方、完了の目安の4要素が空でなく、所要時間の数値項目（整数の分）が 15 以下である
+  - Then：全件で、題名、なぜ今これか、やり方、完了の目安の4要素が前後の空白を除いて 1 文字以上あり、所要時間（整数の分）が 1 以上 15 以下である
   - 確かめ方：タスク集の JSON を全件読む自動テスト（受け入れテストの中で行う）と、`task.today` のスクリーンショット
   - 効く機会：O-1
 - AC-4：タスク集は28日分の量がある
   - Given：同梱のタスク集（本番の JSON）を読む
   - When：領域 × 段階の組ごとに件数を数える
-  - Then：全体の件数が 252 以上で、6領域 × 3段階 = 18 の組すべてで件数が 14 以上であり、ID に重複が 0 件である
+  - Then：全体の件数が 252 以上で、6領域 × 3段階 = 18 の組すべてで件数が 14 以上であり、ID に重複が 0 件である（18 の Q2 で件数を減らすなら、この数字を同時に変える）
   - 確かめ方：タスク集の JSON を全件読む自動テスト
   - 効く機会：O-1
 - AC-5：完了すると、その日はもう課題が出ない
   - Given：状態 `task.today` で課題が出ている
   - When：「完了」を申告する
-  - Then：状態 `task.rate` になり、答えるか閉じると状態 `task.done` になる。同じ日（端末の日付）にページを再読み込みしても状態 `task.done` のままで、新しい課題は出ない
+  - Then：状態 `task.rate` になり、答えるか再読み込みすると状態 `task.done` になる。同じ日（端末の日付）にページを再読み込みしても状態 `task.done` のままで、新しい課題は出ない
   - 確かめ方：ブラウザの自動テスト（完了 → 評価 → 再読み込み）
   - 効く機会：O-1
 - AC-6：翌日には、過去に出していない課題が出る
@@ -186,56 +198,56 @@ Kano の分類は［推測］。候補の RICE：S-1 の診断＋処方（Reach 
 - AC-7：「難しすぎ」「簡単すぎ」「今日はできない」を申告すると、その日はもう課題が出ない
   - Given：状態 `task.today` で課題が出ている
   - When：3つのうちどれか1つを申告する
-  - Then：状態 `task.skipped` になり、申告の種類（too_hard / too_easy / no_time）と課題の ID が履歴に残り、同じ日に再読み込みしても状態 `task.skipped` のままで、新しい課題は出ない
+  - Then：状態 `task.skipped` になり、履歴の画面の行に申告の種類（`data-report` が too_hard / too_easy / no_time）と課題の ID（`data-task-id`）が残り、同じ日に再読み込みしても状態 `task.skipped` のままで、新しい課題は出ない
   - 確かめ方：ブラウザの自動テスト（3通り）
   - 効く機会：O-2
 - AC-8：同じ種類の申告が2回連続すると、段階が1つ動く
-  - Given：段階が「中」である
+  - Given：目標の領域の段階と直近の申告の履歴を seed で投入した
   - When：翌日の課題が決まる
-  - Then：直近2件の申告が「難しすぎ」「難しすぎ」なら翌日の `data-task-level` は「初」。「簡単すぎ」「簡単すぎ」なら「上」。「難しすぎ」1回だけなら「中」のまま。「難しすぎ」「完了」「難しすぎ」や「難しすぎ」「今日はできない」「難しすぎ」なら「中」のまま。段階が「初」で「難しすぎ」が2回連続でも「初」のまま
-  - 確かめ方：段階を決める処理の自動テスト（上の5通り）と、ブラウザの自動テスト（「難しすぎ」2回で翌日の段階が「初」）
+  - Then：段階「中」で直近2件が「難しすぎ」「難しすぎ」なら翌日の `data-task-level` は「初」。「中」で「簡単すぎ」「簡単すぎ」なら「上」。「中」で「難しすぎ」1回だけなら「中」のまま。「中」で「簡単すぎ」1回だけなら「中」のまま。「中」で「難しすぎ」「完了」「難しすぎ」や「難しすぎ」「今日はできない」「難しすぎ」なら「中」のまま。「初」で「難しすぎ」2回連続でも「初」のまま。「上」で「簡単すぎ」2回連続でも「上」のまま
+  - 確かめ方：ブラウザの自動テスト（上の7通りをすべて、seed で投入してから時刻を翌日に固定して開き、`data-task-level` を読む。実装の関数は呼ばない）
   - 効く機会：O-2
 - AC-9：「役に立った」は完了の直後に1回だけ聞く
   - Given：「完了」を申告して状態 `task.rate` にいる
   - When：「役に立った」か「立たなかった」を選ぶ、または選ばずにページを再読み込みする
-  - Then：状態 `task.done` になり、同じ課題について再び聞かれない。履歴のその課題の行に、選んだ答え（helpful / not_helpful）か「未回答」が残る
+  - Then：状態 `task.done` になり、同じ課題について再び聞かれない。履歴の画面のその課題の行の `data-helpful` に、選んだ答え（helpful / not_helpful）か unanswered が残る
   - 確かめ方：ブラウザの自動テスト（選んだ場合と、選ばずに再読み込みした場合の2通り）
   - 効く機会：O-1
 - AC-10：課題が尽きたら隠さず知らせ、診断のやり直しへ案内する
   - Given：目標の領域と現在の段階の課題をすべて出し終えた
   - When：翌日にページを読み込む
-  - Then：状態 `task.exhausted` が表示され、文言キー `task.exhausted.message` と、診断のやり直しに進む操作が1つある
-  - 確かめ方：ブラウザの自動テスト（テスト用のタスク集を 2 件にして開く）
+  - Then：状態 `task.exhausted` が表示され、文言キー `task.exhausted.message` と、診断のやり直しに進む操作が1つある。やり直して同じ領域と段階を選ぶと、同じ日のうちに再び状態 `task.exhausted` になる
+  - 確かめ方：ブラウザの自動テスト（テスト用のタスク集を領域 × 段階ごとに 2 件にして開く）
   - 効く機会：当たり前（空）
 - AC-11：保存に失敗しても入力は失われない
-  - Given：診断の途中で、ブラウザの保存先への書き込みが例外を返す（テストで失敗を注入する）
-  - When：回答を確定する
-  - Then：文言キー `error.storage.message` が表示され、それまでの回答が画面に残り、やり直しの操作が1つある
+  - Given：診断の 2 問目に答えた状態で、ブラウザの保存先への書き込みが次の1回だけ例外を返す（テストで失敗を注入する）
+  - When：2 問目の回答を確定する
+  - Then：文言キー `error.storage.message` とやり直しの操作が1つ表示され、表示している質問の番号は 2 のままで、選んでいた選択肢が選ばれたままである。やり直しの操作で保存が成功すると診断が 3 問目に進み、終えて出た課題の `data-task-area` と `data-task-level` が失敗の前に答えた値と一致する
   - 確かめ方：ブラウザの自動テスト（保存の失敗を注入）
   - 効く機会：当たり前（エラー）
-- AC-12：一度読み込んだ後は、ネットワークがなくても動く
+- AC-12：一度読み込んだ後は、ネットワークがなくても画面の中の操作がすべて動く
   - Given：ページを読み込み終えた後に、ネットワークを切った（自動テストでオフラインにする）
-  - When：AC-1、AC-2、AC-5〜AC-10 の操作を行う（再読み込みは含まない）
-  - Then：それぞれの Then がすべて満たされ、その間のネットワークへの送信は 0 件である（18 の Q1 で計測を入れる場合は、計測の送信先への送信を除いて 0 件）
+  - When：再読み込みを挟まずに、AC-1、AC-2、AC-5（`task.rate` → `task.done` まで）、AC-7（`task.skipped` まで）、AC-9（選んだ場合）の操作を行う
+  - Then：それぞれの Then のうち再読み込みより前の部分がすべて満たされ、その間のネットワークへの送信は 0 件である（18 の Q1 で計測を入れる場合は、計測の送信先 1 つへの送信を除いて 0 件）
   - 確かめ方：ブラウザの自動テスト（オフライン設定と、送信の件数の記録）
   - 効く機会：当たり前（オフライン）
 - AC-13：保存の永続化を断っても使える
-  - Given：ブラウザが `navigator.storage.persist()` の求めに対して拒否を返す（テストで拒否を注入する）
-  - When：診断を終えて課題を完了し、同じ日に再読み込みする
-  - Then：状態 `task.done` が表示され、履歴に完了した課題が 1 件あり、設定の画面に文言キー `settings.storage.notPersisted` とホーム画面への追加の案内への操作が1つある
+  - Given：ブラウザが、診断を終えて `task.today` を初めて表示した後の `navigator.storage.persist()` の求めに対して拒否を返す（テストで拒否を注入する）
+  - When：課題を完了し、同じ日に再読み込みする
+  - Then：状態 `task.done` が表示され、履歴に完了した課題が 1 件あり、設定の画面に文言キー `settings.storage.notPersisted` と書き出しの操作が1つある
   - 確かめ方：ブラウザの自動テスト（拒否を注入）とスクリーンショット
   - 効く機会：当たり前（権限を断ったとき）、O-3
 - AC-14：診断をやり直しても履歴は残る
-  - Given：完了した課題が 3 件ある
-  - When：設定から診断をやり直し、3問に答える
-  - Then：状態 `task.today` に新しい課題が出て、履歴の完了した課題は 3 件のままである
-  - 確かめ方：ブラウザの自動テスト
+  - Given：過去 3 日に完了した課題が 3 件あり、今日の課題はまだ出していない
+  - When：設定から診断をやり直し、別の領域を選んで 3 問に答える
+  - Then：状態 `task.today` に新しい課題が出て、その `data-task-area` が新しく選んだ領域と一致し、履歴の完了した課題は 3 件のままである
+  - 確かめ方：ブラウザの自動テスト（seed で 3 件を投入）
   - 効く機会：O-2
 - AC-15：ページを開いてから課題の表示まで2秒以内
-  - Given：診断済みで、ブラウザのキャッシュを消した
+  - Given：診断済み（seed）で、ブラウザのキャッシュがなく、tech-lead が contracts/ に決めた回線と CPU の制限（案：遅延 150 ミリ秒、下り 1.6 Mbps、CPU 4 倍遅い。Chromium の CDP で設定）がかかっている
   - When：ページの URL を開く
-  - Then：ナビゲーションの開始から状態 `task.today` の表示までの時間を、アプリが自分で計って `data-debug-load-ms` に出し、その値が 5 回とも 2,000 以下である（環境：tech-lead が contracts/ に決めた対応ブラウザのうち1つ、ネットワークの制限なし）
-  - 確かめ方：ブラウザの自動テスト（5回の計測値を記録する）
+  - Then：ナビゲーションの開始から状態 `task.today` の表示までの時間を、アプリが自分で計って `data-debug-load-ms` に出し、その値が 5 回とも 2,000 以下である
+  - 確かめ方：ブラウザの自動テスト（Chromium で 5 回の計測値を記録する。時刻を固定するつなぎ口は performance を上書きするので、この AC では使わない）
   - 効く機会：当たり前
 - AC-16：データの全削除で初回の状態に戻る
   - Given：診断済みで完了の履歴が 3 件ある
@@ -244,59 +256,97 @@ Kano の分類は［推測］。候補の RICE：S-1 の診断＋処方（Reach 
   - 確かめ方：ブラウザの自動テスト
   - 効く機会：当たり前
 - AC-17：文字を 200% に拡大しても文言が切れず、横スクロールが出ない
-  - Given：ブラウザの拡大率を 200% にした（表示の幅は 320 CSS ピクセル相当）
+  - Given：表示の幅を 320 CSS ピクセル（deviceScaleFactor 2）にした（WCAG 1.4.10 の 320 CSS px と同じ。拡大率 200% の代わり）
   - When：`diagnosis.start`、`task.today`、`task.done`、`task.exhausted` を表示する
-  - Then：4つの状態で、文言の切り詰め（「…」）が 0 か所で、横スクロールが 0 ピクセルで、すべての操作できる要素が縦スクロールで到達でき、押せる
-  - 確かめ方：スクリーンショット（200%）とアクセシビリティ監査（WCAG 2.1 の 1.4.4 と 1.4.10：https://www.w3.org/WAI/WCAG21/Understanding/resize-text.html ）
+  - Then：4つの状態で、`document.documentElement.scrollWidth` が 320 以下で、`scrollWidth > clientWidth` となる要素が 0 件で、CSS の `text-overflow: ellipsis` で切り詰められている文言の要素が 0 件で、すべての操作できる要素が scrollIntoView の後に押せる
+  - 確かめ方：ブラウザの自動テスト（幅 320 で数える）とスクリーンショット（WCAG 2.1 の 1.4.4 と 1.4.10：https://www.w3.org/WAI/WCAG21/Understanding/resize-text.html ）
   - 効く機会：当たり前
 - AC-18：キーボードだけで診断から完了まで操作できる
   - Given：保存データがない状態でページを開き、マウスとタッチを使わない
   - When：Tab、Shift+Tab、Enter、Space だけで3問に答え、課題を完了する
-  - Then：状態 `task.done` に到達し、途中で操作した要素すべてにフォーカスの表示（枠線）があった
-  - 確かめ方：ブラウザの自動テスト（キーボードの操作だけで進める）
+  - Then：状態 `task.done` に到達し、途中で操作した要素すべてが操作のときに `:focus-visible` に一致し、計算済みスタイルの outline か box-shadow の幅が 2 CSS ピクセル以上（design/ で決めた値があればその値以上）である
+  - 確かめ方：ブラウザの自動テスト（キーボードの操作だけで進め、各操作で activeElement と計算済みスタイルを読む）
   - 効く機会：当たり前
 - AC-19：データを1つのファイルに書き出せる
   - Given：診断済みで完了の履歴が 3 件ある
   - When：設定の「書き出し」を実行する
-  - Then：JSON ファイルが 1 つダウンロードされ、その中に診断の回答、現在の段階、履歴 3 件、形式の版番号が含まれる
+  - Then：JSON ファイルが 1 つダウンロードされ、その中に診断の回答、領域ごとの現在の段階、履歴 3 件、形式の版番号が含まれる
   - 確かめ方：ブラウザの自動テスト（ダウンロードしたファイルの中身を読む）
   - 効く機会：O-3
 - AC-20：書き出したファイルを別のブラウザで読み込むと、同じ状態に戻る
-  - Given：保存データがないブラウザで、AC-19 のファイルがある
+  - Given：保存データがないブラウザで、AC-19 のファイル（版番号が今の版）がある
   - When：設定の「読み込み」でそのファイルを選び、確定する
-  - Then：診断の回答と段階が書き出し元と同じで、履歴が 3 件あり、状態は `task.today` か `task.done`（端末の日付による）になる。形式の版番号が合わないファイルでは文言キー `error.import.message` が出て、既存のデータは変わらない
-  - 確かめ方：ブラウザの自動テスト（正しいファイルと、版番号を壊したファイルの2通り）
+  - Then：診断の回答と領域ごとの段階が書き出し元と同じで、履歴が 3 件あり、状態は `task.today` か `task.done`（端末の日付による）になる
+  - 確かめ方：ブラウザの自動テスト（setInputFiles でファイルを渡す）
   - 効く機会：O-3
-- AC-21：ホーム画面への追加の案内は1回だけ出る
-  - Given：診断を終えて、初めて状態 `task.today` が表示された
-  - When：案内 `home.addToHomeScreen` を閉じる
-  - Then：以後、再読み込みしても案内は表示されず、設定の画面から案内を再び開く操作が1つある
-  - 確かめ方：ブラウザの自動テスト（閉じる → 再読み込み）とスクリーンショット
+- AC-21：iOS の Safari では、診断の前にホーム画面への追加を1回だけ案内する
+  - Given：保存データがなく、User-Agent が iOS の Safari で、スタンドアロン表示でない（テストで UA を偽装し、`navigator.standalone` を false にする）
+  - When：読み込みが終わり、案内 `home.addToHomeScreen` を閉じる
+  - Then：閉じる前は状態 `diagnosis.start` の画面に案内があり、案内の中に手順の文言キー `home.addToHomeScreen.steps`（ホーム画面に追加する手順と、「Safari のデータは引き継がれないので、追加後に Safari で書き出してホーム画面で読み込む」手順）がある。閉じた後は再読み込みしても案内が出ず、設定の画面から案内を再び開く操作が1つある。UA を偽装しない Chromium と WebKit では案内が 0 回出る
+  - 確かめ方：ブラウザの自動テスト（iOS Safari の偽装で閉じる → 再読み込み、偽装なしで開く、の2通り）とスクリーンショット
   - 効く機会：O-3
+- AC-22：ホーム画面から初めて開いたときは、読み込みへ案内する
+  - Given：保存データがなく、スタンドアロン表示である（テストで `navigator.standalone` を true にする）
+  - When：読み込みが終わる
+  - Then：状態 `diagnosis.start` が表示され、文言キー `home.standalone.import`（Safari のデータはここに引き継がれないこと）と、読み込みの操作が1つと、診断を始める操作が1つあり、案内 `home.addToHomeScreen` は出ない。読み込みの操作で AC-19 のファイルを読み込むと AC-20 の Then と同じ状態になる
+  - 確かめ方：ブラウザの自動テスト（スタンドアロンの偽装で開き、ファイルを読み込む）とスクリーンショット
+  - 効く機会：O-3、当たり前（E-7）
+- AC-23：一度読み込んだ後は、オフラインで再読み込みしても動く
+  - Given：診断済みで、状態 `task.today` か `task.done` を表示した後にネットワークを切った
+  - When：ページを再読み込みする、または同じブラウザの新しいタブで同じ URL を開く（ホーム画面からの起動の代わり）
+  - Then：3 秒以内に再読み込み前と同じ状態（`task.today` なら同じ `data-task-id`、`task.done` なら `task.done`）が表示され、ネットワークへの送信は 0 件（Q1 で計測を入れる場合は計測の送信先を除く）である
+  - 確かめ方：ブラウザの自動テスト（Chromium と WebKit で、setOffline の後に reload と新しいタブの2通り）
+  - 効く機会：当たり前（オフライン）、O-3
+- AC-24：統計の画面に、13 の指標を出すための値がそろっている
+  - Given：seed で、初めて開いた日が 2026-11-01、出した課題 5 件、完了 3 件（うち 2026-11-01 に 1 件）、「難しすぎ」1 件、「今日はできない」1 件、「役に立った」2 件、未回答 1 件を投入し、時刻を 2026-11-06 に固定した
+  - When：設定の統計を開く
+  - Then：`data-stat-first-open-date` が 2026-11-01、`data-stat-issued` が 5、`data-stat-completed` が 3、`data-stat-first-day-completed` が true、`data-stat-days-completed-7d` が 3、`data-stat-helpful` が 2、`data-stat-rated` が 2（未回答を除く）、`data-stat-too-hard` が 1 で、同じ 8 つの値が画面の文言として見える
+  - 確かめ方：ブラウザの自動テスト（seed と時刻の固定）とスクリーンショット（判定日に利用者が送る画面と同じもの）
+  - 効く機会：O-3、計測（13、14）
+- AC-25：形式の版番号が新しいファイルは拒み、既存のデータは変わらない
+  - Given：診断済みで完了の履歴が 1 件あり、版番号を今の版より 1 大きくしたファイルがある
+  - When：設定の「読み込み」でそのファイルを選び、確定する
+  - Then：文言キー `error.import.message` が表示され、履歴は 1 件のままで、診断の回答と状態（`task.today` か `task.done`）は読み込みの前と同じである
+  - 確かめ方：ブラウザの自動テスト（版番号を壊したファイルを渡す）
+  - 効く機会：当たり前（エラー）
+- AC-26：ブラウザの言語が英語なら、画面の文言が英語で出る
+  - Given：保存データがなく、ブラウザの言語設定が en（テストで locale を en-US にする）
+  - When：読み込みが終わる
+  - Then：状態 `diagnosis.start` の文言が英語の文言ファイルのものと一致し、ja と en の文言ファイルで片方にしかないキーが 0 件である
+  - 確かめ方：ブラウザの自動テスト（locale を en-US と ja-JP の2通りで開く。文言ファイルのキーの差を数える）
+  - 効く機会：O-1（Q4）
+- AC-27：アクセシビリティの監査に重大な違反がない
+  - Given：`diagnosis.start`、`diagnosis.question`、`task.today`、`task.done`、`task.exhausted`、設定の画面を表示した
+  - When：axe-core（WCAG 2.1 AA の規則）で監査する
+  - Then：6 つの画面すべてで、impact が serious 以上の違反が 0 件である（操作できる要素のアクセシブルな名前、コントラスト 4.5:1 を含む）
+  - 確かめ方：ブラウザの自動テスト（axe-core の結果を証拠として保存する。道具は tech-lead が contracts/dependencies.md に書く）
+  - 効く機会：当たり前
 
 ## 12. 非機能要件
-- 速さ：ページを開いてから課題の表示まで 2 秒以内（AC-15）。診断の各質問の切り替えは 0.5 秒以内。初回の転送量の上限は tech-lead が contracts/ に決める（要確認）。
-- オフラインや通信エラーのとき：一度読み込んだ後は、ネットワークなしで全機能が動く（AC-12）。再読み込みまで保証するかは 10 の要確認。
-- セキュリティとプライバシー：扱う個人データは、自己診断の回答（目標の領域、自己評価、経験年数）、課題の完了と申告の履歴。すべてブラウザの保存（localStorage か IndexedDB。方式は tech-lead）に置き、外部に送らない。18 の Q1 で計測を入れる場合だけ、15 のイベントを匿名で送る。アカウントなし。Cookie なし。削除は AC-16。プライバシーの説明ページを docs/support/ に用意する（G5 の前）。
-- 対応ブラウザ：tech-lead が contracts/ に決める（要確認）。推奨は、直近2年の Safari（iOS、macOS）と Chrome（Android、PC）。
-- 配布：静的ホスティング（GitHub Pages を想定）。HTTPS。
-- アクセシビリティ：文字の拡大 200%（AC-17）、キーボード操作（AC-18）、すべての操作にアクセシブルな名前、コントラスト（designer が G1 で3通りを示す）。
-- 言語：日本語（主）、英語（副）。課題集は v1 では日本語のみ（18 の Q4）。
+すべての行に数字と測り方を付ける（tech-lead r1 の要修正）。
+- 速さ：ページを開いてから課題の表示まで 2 秒以内（AC-15。遅い回線と CPU の制限の下、Chromium で 5 回）。診断の各質問の切り替えは 500 ミリ秒以内（AC-1 で 3 回計る）。初回の転送量は圧縮後の合計 150 KB 以下（tech-lead r1 の案。確定は contracts/。測り方：本番の配布物を `curl --compressed` で取り、転送した大きさの合計を G3 の証拠に書く）。
+- オフラインや通信エラーのとき：一度読み込んだ後は、ネットワークなしで画面の中の操作がすべて動き（AC-12）、再読み込みとホーム画面からの起動でも 3 秒以内に同じ状態が出る（AC-23。Service Worker）。
+- セキュリティとプライバシー：扱う個人データは、自己診断の回答（目標の領域、自己評価、経験年数）、課題の完了と申告の履歴。すべてブラウザの保存（localStorage。確定は tech-lead の G1 の ADR）に置き、ブラウザの外に送らない（AC-12、AC-23 で送信 0 件）。ページの配信元（GitHub Pages）は接続の記録として IP アドレスを保存する（E-10）。18 の Q1 で B を選ぶ場合だけ、15 のイベントを件数として GoatCounter に送る（IP と UA は GoatCounter が受け取るが保存しない：E-11）。アカウントなし。Cookie なし。削除は AC-16。読み込むファイルは信頼できない入力として扱い、スキーマで検査して textContent で表示する（tech-lead r1）。プライバシーの説明ページを docs/support/ に用意する（G5 の前）。
+- 対応ブラウザ：tech-lead が contracts/ に決める。推奨は Safari 17 以上（iOS、macOS）と Chrome の最新 2 版（Android、PC）。自動テストは Playwright の Chromium と WebKit。実機の Safari は G4 で Takuma が確かめる。
+- 配布：静的ホスティング（GitHub Pages を想定）。HTTPS。CSP は meta で書く（tech-lead r1）。
+- アクセシビリティ：幅 320 CSS px で横スクロール 0（AC-17）、キーボード操作とフォーカスの枠 2 CSS px 以上（AC-18）、axe-core の serious 以上の違反 0 件とコントラスト 4.5:1（AC-27）。
+- 言語：日本語（主）、英語（副。画面の文言のみ。AC-26）。課題集は v1 では日本語のみ（18 の Q4）。
 
 ## 13. 仮説と KPI
 - 仮説：すでにコードを書いているエンジニアが、毎日1つ出る課題を完了するようになる。公開を 2026-11-30 と仮置きし、2026-12-28（公開28日後）までに、出した課題に対する完了率が「未計測」から 40% 以上になれば正しい。
-- 計測の手段：サーバーがないので、推奨は A「外部に送らない」。アプリが自分の統計（出した件数、完了した件数、役に立った件数、直近7日の完了日数）を設定の画面に表示し、URL を渡した利用者（Takuma と周りの5人程度）が判定日にその画面のスクリーンショットを Takuma に送る。verifier が集計して判定する。B（GoatCounter などの匿名計測）を選ぶ場合は、同じ指標を 15 のイベントの件数から出す。どちらにするかは 18 の Q1。
+- 計測の手段：サーバーがないので、推奨は A「外部に送らない」。アプリが統計の画面（AC-24。13 の指標と1対1の 8 つの値）を設定に持ち、URL を渡した利用者（Takuma と周りの5人程度）が判定日にその画面のスクリーンショットを Takuma に送る。verifier が集計して判定する。
+- B（GoatCounter などの匿名計測）を選ぶ場合：利用者を区別できない（E-11）ので、出せるのは件数の比だけ。完了率（Task Completed ÷ Task Issued）、「役に立った」率、「難しすぎ」の申告率、Page Loaded の load_ms は出せる。利用者ごとの指標（初めて開いた日に完了した割合、直近7日に3日以上完了した割合、「データが消えた」の割合）は出せないので、B でも A の統計の画面と聞き取りで測る。
 - 報告が 3 人未満のときは「判定できない」として Takuma に報告し、判定日を 14 日延ばす（1回だけ）。
 
-| 指標 | 種類（主 / ガードレール） | 基準値と出典 | 目標 | 判定日 | 計測するイベント |
+| 指標 | 種類（主 / ガードレール） | 基準値と出典 | 目標 | 判定日 | 計測するイベント（A：統計の画面の値） |
 |---|---|---|---|---|---|
-| 出した課題に対する完了率（Task Completed ÷ Task Issued、利用者の合計） | 主 | 未計測（公開後14日で測る） | 40% 以上 | 2026-12-28（公開28日後） | Task Issued、Task Completed |
-| 「役に立った」率（helpful ÷ Task Rated のうち未回答を除く） | 主（副） | 未計測（公開後14日で測る） | 60% 以上 | 2026-12-28 | Task Rated |
-| 初めて開いた日に1件目を完了した利用者の割合 | 入力 | 未計測（公開後14日で測る） | 50% 以上 | 2026-12-28 | Diagnosis Completed、Task Completed |
-| 公開14日後の時点で、直近7日に3日以上完了した利用者の割合（North Star の入口） | 入力 | 未計測（公開後14日で測る） | 50% 以上 | 2026-12-14 と 2026-12-28 | Task Completed |
-| 「データが消えた」と報告した利用者の割合 | ガードレール | 未計測 | 30% 未満 | 2026-12-28 | 聞き取り（A）、Data Lost Reported（B では送らない。聞き取り） |
-| 「難しすぎ」の申告率（Task Skipped reason=too_hard ÷ Task Issued） | ガードレール | 未計測 | 30% 未満 | 2026-12-28 | Task Skipped |
-| ページを開いてから課題の表示までの時間 | ガードレール | AC-15 の G3 の計測値 | 2 秒以内 | 2026-12-14 | Page Loaded（load_ms） |
+| 出した課題に対する完了率（Task Completed ÷ Task Issued、利用者の合計） | 主 | 未計測（公開後14日で測る） | 40% 以上 | 2026-12-28（公開28日後） | Task Issued、Task Completed（A：issued、completed。B でも出せる） |
+| 「役に立った」率（helpful ÷ Task Rated のうち未回答を除く） | 主（副） | 未計測（公開後14日で測る） | 60% 以上 | 2026-12-28 | Task Rated（A：helpful、rated。B でも出せる） |
+| 初めて開いた日に1件目を完了した利用者の割合 | 入力 | 未計測（公開後14日で測る） | 50% 以上 | 2026-12-28 | Diagnosis Completed、Task Completed（A：first-day-completed。B では出せない） |
+| 公開14日後の時点で、直近7日に3日以上完了した利用者の割合（North Star の入口） | 入力 | 未計測（公開後14日で測る） | 50% 以上 | 2026-12-14 と 2026-12-28 | Task Completed（A：days-completed-7d。B では出せない） |
+| 「データが消えた」と報告した利用者の割合 | ガードレール | 未計測 | 30% 未満 | 2026-12-28 | 聞き取り（A、B とも。イベントは送らない） |
+| 「難しすぎ」の申告率（Task Skipped reason=too_hard ÷ Task Issued） | ガードレール | 未計測 | 30% 未満 | 2026-12-28 | Task Skipped（A：too-hard、issued。B でも出せる） |
+| ページを開いてから課題の表示までの時間 | ガードレール | AC-15 の G3 の計測値 | 2 秒以内 | 2026-12-14 | Page Loaded（load_ms。A：G4 で Takuma の実機で計る。B でも出せる） |
 
 ## 14. 撤退基準
 | 状態（指標と数値） | 判定日 | 取る行動 | 判定する役 |
@@ -304,16 +354,16 @@ Kano の分類は［推測］。候補の RICE：S-1 の診断＋処方（Reach 
 | 出した課題に対する完了率が 20% 未満 | 2026-12-28（公開28日後） | 課題集の形（処方型）をやめ、作り直すか機能を外す案を Takuma に出す | verifier |
 | 「役に立った」率が 40% 未満 | 2026-12-28 | 課題集の書き直しを Takuma に提案し、新しい課題の追加を止める | verifier |
 | 初めて開いた日に1件目を完了した利用者の割合が 25% 未満 | 2026-12-28 | 診断と1件目までの流れの見直しを designer に頼む案を Takuma に出す | tech-lead |
-| 「データが消えた」と報告した利用者の割合が 30% 以上 | 2026-12-28 | 保存の方式（IndexedDB、永続化、ホーム画面）の見直し、またはサーバーを持つ案を Takuma に出す | tech-lead |
+| 「データが消えた」と報告した利用者の割合が 30% 以上 | 2026-12-28 | 保存の方式（永続化、ホーム画面、書き出しの案内）の見直し、またはサーバーを持つ案を Takuma に出す | tech-lead |
 | 「難しすぎ」の申告率が 30% 以上 | 2026-12-28 | 段階を決める規則（AC-8）の見直しを Takuma に出す | verifier |
 | 判定日の報告が 3 人未満（延長後も） | 2027-01-11 | 「判定できない」として、配布の範囲を広げるか機能を止めるかを Takuma に出す | verifier |
 
 ## 15. イベントとプライバシー
-A（推奨）では、イベントはブラウザの中に記録するだけで、外部に送らない。B（匿名計測）では、同じ名前のイベントを件数だけ送る。どちらでも名前、メール、Cookie、端末の固有 ID は持たない。「プライバシー表示の区分」は、A では「外部送信なし」、B では iOS 版を出すときのために App Store の区分で書く。
+A（推奨）では、イベントはブラウザの中に記録するだけで、外部に送らない。B（匿名計測）では、同じ名前のイベントを件数だけ GoatCounter に送る（送信先は 1 つの URL に固定し、AC-12 と AC-23 の除外に使う）。どちらでも名前、メール、Cookie、端末の固有 ID は持たない。「プライバシー表示の区分」は、A では「外部送信なし」、B では iOS 版を出すときのために App Store の区分で書く。GitHub Pages の IP の記録（E-10）はイベントでなく配信の記録なので、docs/support/ のプライバシーのページに書く。
 
 | イベント（対象＋動作） | プロパティ | プライバシー表示の区分 | ユーザーと結び付くか | トラッキングか |
 |---|---|---|---|---|
-| Page Loaded | first（初回か）、load_ms | A：外部送信なし / B：使用状況データ（製品の操作） | 結び付かない | いいえ |
+| Page Loaded | first（初回か）、load_ms、standalone（true / false） | A：外部送信なし / B：使用状況データ（製品の操作） | 結び付かない | いいえ |
 | Diagnosis Started | — | A：外部送信なし / B：使用状況データ（製品の操作） | 結び付かない | いいえ |
 | Diagnosis Completed | goal_area、level、years、duration_sec | A：外部送信なし / B：使用状況データ（製品の操作） | 結び付かない | いいえ |
 | Task Issued | task_id、area、level | A：外部送信なし / B：使用状況データ（製品の操作） | 結び付かない | いいえ |
@@ -322,18 +372,19 @@ A（推奨）では、イベントはブラウザの中に記録するだけで�
 | Task Rated | task_id、helpful（true / false / unanswered） | A：外部送信なし / B：使用状況データ（製品の操作） | 結び付かない | いいえ |
 | Level Changed | area、from、to | A：外部送信なし / B：使用状況データ（製品の操作） | 結び付かない | いいえ |
 | Storage Persist Answered | granted（true / false） | A：外部送信なし / B：使用状況データ（製品の操作） | 結び付かない | いいえ |
+| Home Screen Guide Closed | reopened（true / false） | A：外部送信なし / B：使用状況データ（製品の操作） | 結び付かない | いいえ |
 | Data Exported | — | A：外部送信なし / B：使用状況データ（製品の操作） | 結び付かない | いいえ |
-| Data Imported | ok（true / false） | A：外部送信なし / B：使用状況データ（製品の操作） | 結び付かない | いいえ |
+| Data Imported | ok（true / false）、reason（version / schema / none） | A：外部送信なし / B：使用状況データ（製品の操作） | 結び付かない | いいえ |
 | Data Deleted | — | A：外部送信なし / B：使用状況データ（製品の操作） | 結び付かない | いいえ |
 
 ## 16. 収益化への影響
-なし（v1 は無料、広告なし、課金なし、費用ほぼ0）。North Star が動いてから、課題集の追加領域を課金にする案を別の PRD で検討する。Web で課金するには決済とサーバーが要るので、その時点で「サーバーなし」の決定も見直す。
+なし（v1 は無料、広告なし、課金なし、費用ほぼ0）。North Star が動いてから、課題集の追加領域を課金にする案を別の PRD で検討する。Web で課金するには決済とサーバーが要るので、その時点で「サーバーなし」の決定も見直す。GitHub Pages は「online business」「SaaS」を禁じている（tech-lead r1）ので、課金のときは配信先も変える。
 
 ## 17. 審査と法務で気をつけること
 - App Store の審査：なし（Web のため）。iOS 版を出すときに 4.3(b)、2.3、5.1.1 を書く（product.md の「iOS 版を出すときに書く」）。
-- プライバシー：データはブラウザの中だけ。A なら外部送信なしと明記したページを docs/support/ に置く。B なら計測の送信先（例：GoatCounter。「doesn't track users with unique identifiers and doesn't need a GDPR notice」https://www.goatcounter.com/ ［公開情報 URL］）と送る内容を同じページに書く。Cookie バナーは不要（Cookie を使わない）。
+- プライバシー：入力したデータはブラウザの中だけ。docs/support/ のプライバシーのページに、(1) 入力したデータはブラウザの外に送らない、(2) 配信元の GitHub Pages が IP アドレスを記録する（E-10 の URL）、(3) B なら計測の送信先（GoatCounter。「doesn't track users with unique identifiers and doesn't need a GDPR notice」https://www.goatcounter.com/ ［公開情報 URL］）と送る内容、の3つを書く。Cookie バナーは不要（Cookie を使わない）。
 - 著作権：課題の文章は自分で書く。外部の教材や記事へはリンクだけにし、本文を転載しない。
-- ホスティングの規約：GitHub Pages を使う場合は利用規約（https://docs.github.com/en/pages ［公開情報 URL］）の範囲（静的サイト、商用の制限）で使う。tech-lead に要確認。
+- ホスティングの規約：GitHub Pages を使う場合は利用規約（https://docs.github.com/en/pages ［公開情報 URL］）の範囲（静的サイト、商用の制限、1 GB、月 100 GB）で使う。tech-lead r1 で範囲内と確認済み。
 - 生成 AI、ユーザー投稿、第三者への送信、年齢制限、課金：なし。
 
 ## 18. Takuma に決めてほしいこと
@@ -341,14 +392,15 @@ A（推奨）では、イベントはブラウザの中に記録するだけで�
 
 | # | 問い | 選択肢 | 推奨 | 元に戻せるか |
 |---|---|---|---|---|
-| Q1 | 計測の手段（サーバーなし） | A 外部に送らない。アプリ内の統計を利用者が判定日に報告する / B 無料の匿名計測（GoatCounter：無料、Cookie なし。Plausible は月 $9〜 https://plausible.io/ ）を入れて件数を送る | A。v1 の利用者は Takuma と周りの数人で、B でも利用者ごとの継続は測れない。反論：A は自己報告に頼り、報告がなければ判定できない（14 の行6）。利用者を 10 人以上に広げるときは B に切り替える | 戻せる（B はスクリプト1行の追加） |
-| Q2 | 課題集（252件）を誰がどう書くか | A pdm が下書きし Takuma が全件を見る / B Takuma が書く / C AI 下書きを Takuma が1割だけ抜き取りで見る | A。反論：Takuma の時間を 252 件分使う。C は品質が 7 の失敗1に直結する | 戻せる（課題は差し替えられる） |
+| Q1 | 計測の手段（サーバーなし） | A 外部に送らない。アプリ内の統計の画面（AC-24）を利用者が判定日に報告する / B 無料の匿名計測（GoatCounter：無料、Cookie なし。Plausible は月 $9〜 https://plausible.io/ ）を入れて件数を送る | A。v1 の利用者は Takuma と周りの数人で、B でも利用者ごとの指標（初日完了、週3日、データ消失）は出せない（E-11、13）。反論：A は自己報告に頼り、報告がなければ判定できない（14 の行6）。利用者を 10 人以上に広げるときは B を足し、A はそのまま残す | 戻せる（B はスクリプト1行の追加） |
+| Q2 | 課題集を誰が、何件書くか。252件（6領域 × 3段階 × 14件）を1週で下書きすると1日約50件で、Takuma の全件確認は1件2分で約8時間。3週の枠に収まらない危険がある（tech-lead r1） | 書き手：A pdm が下書きし Takuma が全件を見る / B Takuma が書く / C AI 下書きを Takuma が1割だけ抜き取りで見る。件数：D 252件のまま / E v1 は 6領域 × 3段階 × 7件 = 126件（14日分。AC-4 の数字を 126 と 7 に変え、公開後 14 日までに残りを足す） / F 領域を 3 つに減らして 3 × 3 × 14 = 126 件 | A と E。反論：E は公開 15 日目以降に課題が尽きる人が出る（AC-10 で知らせる）ので、残り 126 件を公開後 2 週で足す約束が要る。C は品質が 7 の失敗1に直結する | 戻せる（課題は差し替えられる） |
 | Q3 | v1 の6領域 | 例：バックエンド設計、フロントエンド、データベース、インフラとクラウド、テストと品質、Git とチーム開発 | 上の例。反論：Takuma が想定する「最強のエンジニア」の軸と違うかもしれない | 戻せる |
 | Q4 | 課題集と画面の言語 | A 日本語の課題集、画面は日英 / B 日英の課題集 | A。反論：Web は国の境がなく、英語の課題集があれば母数が取れる。ただし 252 件を2言語で書く時間はない | 戻せる（課題集を足す） |
 | Q5 | 診断の質問数 | A 3問（目標の領域、その自己評価、経験年数）で固定 / B 6領域の自己評価を足して4問（1画面に6行） | A。反論：B なら 002（他で学んだことの反映）の土台になる。A でも診断のやり直しで補える | 戻せる（質問を足すと AC-1 の分母が変わる） |
 | Q6 | リマインダー | A v1 はホーム画面への追加の案内だけ / B Web Push を v1 に入れる（iOS はホーム画面に追加した人だけ。送信にはサーバーが要る） | A。反論：A は翌日戻る動機が本人の習慣だけになり、8 の反論そのもの。002 でカレンダー登録（.ics）か Web Push を決める | 戻せる |
-| Q7 | アプリ（サイト）の名前と URL | A 今日の一手 / B Tetsu / C DevDaily / 別案。URL は GitHub Pages の既定（<owner>.github.io/<repo>）か独自ドメイン | A と既定の URL。反論：英語圏に広げるとき通じにくい。独自ドメインは年額の費用が出る | 戻せる（公開前なら） |
-| Q8 | 過去の行動を聞く問い（Takuma 自身と、周りのエンジニア2人まで）：(1) 最後に「次に何を学ぶか」を決めたのはいつで、どうやって決めたか。(2) 最後に学習サイトや教材をやめたのはいつで、何がきっかけか。(3) 先週、学習に使った時間は何分で、どの時間帯、どの端末（スマホ / PC）か | 回答を 2 の表に E-10 以降として足す | 回答がない場合は［推測］のまま進める | 戻せる |
+| Q7 | アプリ（サイト）の名前と URL | A 今日の一手 / B Tetsu / C DevDaily / 別案。URL は GitHub Pages の既定（<owner>.github.io/<repo>）か独自ドメイン | A と既定の URL。反論：英語圏に広げるとき通じにくい。既定の URL は Takuma の他の github.io のページと保存の origin を共有する（tech-lead r1。保存のキーをアプリ名で分ける）。独自ドメインは年額の費用が出る（料金は未確認） | 戻せる（公開前なら） |
+| Q8 | 過去の行動を聞く問い（Takuma 自身と、周りのエンジニア2人まで）：(1) 最後に「次に何を学ぶか」を決めたのはいつで、どうやって決めたか。(2) 最後に学習サイトや教材をやめたのはいつで、何がきっかけか。(3) 先週、学習に使った時間は何分で、どの時間帯、どの端末（スマホ / PC）か | 回答を 2 の表に E-12 以降として足す | 回答がない場合は［推測］のまま進める | 戻せる |
+| Q9 | 組織の形（PRD の外。tech-lead r1 の提案を指揮役経由で） | (1) GitHub Pages の公開の経路：.github/ の Actions のワークフロー（Takuma だけが触れる）か gh-pages ブランチ。(2) docs/org/gates.md の G2（本物の DB、API1〜API10）、G4（TestFlight）、G5（審査提出）を静的な Web アプリにどう読み替えるか。(3) .claude/org/app.json の commands.backend_test（受け入れテストのコマンド）を G1 の後に入れる | (1) Actions。(2) 読み替えは /retro で gates.md に提案。反論：どれも PRD の判定には関係しない | 戻せる |
 
 ## G0 の前の確認
 pdm は満たしたものを [x] にし、満たせないものに理由を書く。判定役はこの印を信じず、自分で確かめる。
