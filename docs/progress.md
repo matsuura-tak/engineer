@@ -19,3 +19,4 @@
 - 2026-10-30 001-daily-learning G0 PASS Takuma が承認「承認します」。Q1〜Q9 はすべて推奨どおり（docs/approvals/001-daily-learning-G0.md）。要修正6件と決定の反映を pdm に任せる
 - 2026-10-30 001-daily-learning G0 再承認待ち Takuma の追加2点（ブラウザの中で完結、楽に継続）を PRD r5 に反映（AC 28→32、原則 P-1/P-2、Q10 追加）。範囲を変えた箇所と Q10 を Takuma に見せて承認を取り直す（docs/prd/001-daily-learning.md）
 - 2026-10-30 001-daily-learning G0 PASS Takuma が PRD r5 を再承認「承認します」、Q10 は A（docs/approvals/001-daily-learning-G0.md）。G1 へ：designer の調査（5a）から
+- 2026-10-30 001-daily-learning G1 判定r1 design-reviewer FAIL（重大2：診断前の設定への道、状態の表の理由なし「なし」12）、tech-lead PASS（要修正2：答えの保存の間隔、診断途中の再読み込み）。designer に直させて design-reviewer r2 へ（docs/reviews/001-daily-learning-G1-design-reviewer-r1.md、docs/reviews/001-daily-learning-G1-tech-lead-r1.md）
