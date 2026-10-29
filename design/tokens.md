@@ -1,6 +1,6 @@
 # デザイントークン（今日の一手。ブラウザだけで動く Web アプリ）
 
-- 書いた役：designer　日付：2026-10-30　初版（001-daily-learning で導入）
+- 書いた役：designer　日付：2026-10-30　初版（001-daily-learning で導入）。r2：G1 r1 の design-reviewer の指摘 3、5、10、11 を反映（color.overlay、リンクの最小幅、ホバーと押した瞬間、定義リストの使い所、ファイルの読み込みの部品）
 - 使い方：画面の仕様（design/<機能名>.md）と実装（CSS カスタムプロパティ）は、ここにある名前だけを使う。色の値を直接書かない。
 - 単位：CSS px。文字と余白は実装では rem（16 px = 1 rem）にして、ブラウザの文字サイズ設定と拡大に追従させる（調査 R-16、R-26）。
 - 根拠：design/001-daily-learning-research.md の R 番号と、原則 B-1〜B-6（.claude/skills/craft-designer/SKILL.md）。コントラスト比は WCAG 2.2 の式で計算した（計算スクリプトの出力は design/001-daily-learning.md の 9 に転記）。
@@ -22,8 +22,10 @@
 | color.success | 成功の知らせの文字（「保存しました」） | #1B6E3A | #7FD39A | #0E4D28 | #A6E3B5 | `--color-success` |
 | color.warning | 注意の文字（永続化を断られた、ホーム画面の案内の見出し） | #7A4A00 | #F2C35B | #5A3600 | #F7D98B | `--color-warning` |
 | color.error | エラーの文字と枠、取り消せない操作のボタンの文字 | #B42318 | #F28B82 | #8A1A12 | #F7B1AB | `--color-error` |
+| color.overlay | ダイアログの `::backdrop`（後ろの画面を暗くする。半透明はここだけ） | rgba(0,0,0,0.5) | rgba(0,0,0,0.5) | rgba(0,0,0,0.5) | rgba(0,0,0,0.5) | `--color-overlay` |
 
 - 地の色は1つだけ。カード、面、影、グラデーションは置かない（案A「一枚の紙」。B-2）。区切りは余白と 1 px の `color.border` の線だけ。
+- color.overlay は `prefers-reduced-transparency: reduce` では不透明の color.bg にし、ダイアログの境目は枠（color.border）で見せる。地に重ねたときの比は design/001-daily-learning.md の 9（ライトは地の差 3.95:1、ダークは枠 5.92:1 で境目が見える）。
 - リンクは `color.action.primary` の文字に下線を必ず付ける（色だけで区別しない。WCAG 2.2 SC 1.4.1）。
 - `<meta name="color-scheme" content="light dark">` を置き、フォーム部品とスクロールバーもダークに追従させる（R-22）。
 
@@ -73,13 +75,26 @@
 | ボタン（主操作） | `<button>`。塗り color.action.primary、文字 color.action.onPrimary、text.body の太さ 600、高さ 44 px 以上、内側 space.3 と space.4、角 size.radius。幅は列いっぱい（幅 480 px 未満）か内容に合わせる（480 px 以上） |
 | ボタン（副操作） | `<button>`。塗りなし、枠 size.border の color.border、文字 color.text。寸法は主操作と同じ |
 | ボタン（取り消せない操作） | `<button>`。塗りなし、枠 color.error、文字 color.error。確認ダイアログの「削除する」「置き換える」と、設定の「すべてのデータを削除」 |
-| リンク | `<a>`。文字 color.action.primary、下線あり。押せる範囲は行の高さで 44 px に満たないので、単独で置くときは上下に space.3 の内側を付ける |
+| リンク | `<a>`。文字 color.action.primary、下線あり（太さ 1 px）。文字だけでは押せる範囲が 44 px に満たないので、単独で置くとき（nav、「履歴を見る」、「統計を見る」、「設定に戻る」、「プライバシーについて」）は `display: inline-block`、上下に space.3 の内側、左右に space.2 の内側、`min-width: 44px` で 44 × 44 px 以上にする（R-17。design-reviewer r1 の 5）。文中のリンクはこの機能にはない |
 | 入力欄（textarea） | `<textarea>`。枠 color.border、角 size.radius、文字 text.body、内側 space.3、`rows="6"`、幅は列いっぱい。縦だけ伸ばせる |
 | 選択肢（radio） | ネイティブの `<input type="radio">` と `<label>`。ラベル全体を押せる範囲にし、高さ 44 px 以上、選択肢の間 space.2。`accent-color: var(--color-action-primary)` |
-| ダイアログ | `<dialog>` を `showModal()` で開く。幅は min(列の幅, 480 px)、内側 space.5、枠 size.border の color.border、地 color.bg。背景は `::backdrop` を半透明の黒（rgba(0,0,0,0.5)）にする |
+| ダイアログ | ネイティブの `<dialog>` を `showModal()` で開く（開くときに DOM に足し、閉じたら外す）。幅は min(列の幅, 480 px)、内側 space.5、枠 size.border の color.border、地 color.bg。背景は `::backdrop` を color.overlay にする（design-reviewer r1 の 11） |
 | 印（badge） | `<span>` の文字と枠だけ。枠 size.border の color.text、内側 space.1 と space.2、角 size.radius。色は付けない |
 | 知らせ（status、alert） | `<p role="status">` か `<p role="alert">`。文字だけ。成功は color.success、注意は color.warning、エラーは color.error。アイコンは置かない |
-| 定義リスト（統計、課題の要素） | `<dl>`。`<dt>` は text.heading、`<dd>` は text.body。常に縦に積む（横並びにしない。R-16） |
+| 定義リスト（統計、要る道具） | `<dl>`。`<dt>` は text.heading、`<dd>` は text.body。常に縦に積む（横並びにしない。R-16）。S9 の 9 つの値と、S3 の `task.external.tools` に使う |
+| 見出しと段落（課題の 4 要素） | `<h2>`（text.heading）と `<p>`（text.body）。`task.why` / `task.how` / `task.goal` の見出しと本文。定義リストにはしない（読み上げソフトの見出し移動のため。design-reviewer r1 の 3） |
+| ファイルの読み込み | 見える `<button>`（副操作の形。保存データなしの S8 では主操作の形）が、隠した `<input type="file">` の `click()` を呼ぶ。input は視覚的に隠し（1 px、`clip-path: inset(50%)`。`display: none` にしない）、`tabindex="-1"` と `aria-hidden="true"`。フォーカスの枠と名前はボタンが持つ（design/001-daily-learning.md の 9。design-reviewer r1 の 4） |
+
+### ホバーと押した瞬間（design-reviewer r1 の 10）
+新しい色を足さない。変えるのは下線と、既にある 2 色の入れ替えだけ。切り替えに transition を付けない（5）。
+
+| 状態 | ボタン（主操作、副操作、取り消せない操作） | リンク |
+|---|---|---|
+| ホバー（`@media (hover: hover)` の中だけ。タッチでは出ない） | 文字に下線（`text-decoration: underline`、太さ 1 px）。塗り、枠、色は変えない | 下線の太さを 2 px（`text-decoration-thickness`）。色は変えない |
+| 押した瞬間（`:active`） | 塗りと文字の色を入れ替える。主操作：塗り color.action.onPrimary、文字と枠 color.action.primary。副操作：塗り color.text、文字 color.bg。取り消せない操作：塗り color.error、文字 color.bg。入れ替えた組の比は仕様 9 の表にある組と同じ（最小 6.57:1） | ホバーと同じ（下線 2 px） |
+| フォーカス（`:focus-visible`） | size.focus.width の `outline`、size.focus.offset、color.focus（3 の表。ホバーや押した瞬間と重なってもそのまま出す） | 同左 |
+| 無効（`disabled`） | 使わない。進めないときは無効にせず、エラーの文を出す（仕様の D-8） | — |
+| `forced-colors: active` | システム色に任せ、下線と枠だけ残す | 同左 |
 
 ## 5. 動き
 - 画面の切り替えに動きを付けない（状態の差し替えだけ）。

@@ -5,7 +5,7 @@ design/001-daily-learning.md の補助。幅 320 CSS px（AC-17 の条件）で�
 
 ## S1 diagnosis.start（iOS の Safari、非スタンドアロン、閉じた印なし）
 ```
-| 今日の一手                        設定 |   ← header（static。診断前は nav に「設定」だけ）
+| 今日の一手                        設定 |   ← header（static。診断前は nav に「設定」だけ。設定 → S8 の「保存データなし」の表示。AC-20、AC-21 のため）
 |                                        |
 | 3 問に答えると、今日の学習が 1 つ出ます |   h1 text.title
 |                                        |
@@ -26,7 +26,19 @@ design/001-daily-learning.md の補助。幅 320 CSS px（AC-17 の条件）で�
 |                                        |
 | [[ 診断を始める ]]                     |   主操作（列いっぱい、44 px 以上）
 ```
-スタンドアロン表示のとき：説明の直後に `home.standalone.import` の文と `[ ファイルを読み込む ]` が入り、ホーム画面の案内は出ない。
+スタンドアロン表示のとき：説明の直後に `home.standalone.import` の文と `[ ファイルを読み込む ]`（見えるボタン `home.standalone.importButton`。隠した `<input type="file">` `home.standalone.importFile` の `click()` を呼ぶ。S8 と同じ型）が入り、ホーム画面の案内は出ない。
+
+## S0 error（保存先が使えない。tech-lead r1 P1）
+```
+| 今日の一手                             |   header（アプリ名だけ）
+|                                        |
+| このブラウザでは保存を使えません。     |   h1 error.app.storageUnavailable.message
+| ブラウザの設定で、このサイトのデータの  |   error.app.storageUnavailable.detail
+| 保存（Cookie とサイトデータ）が止められ |
+| ています。…                            |
+| [[ 再読み込み ]]                       |   error.app.reload（主操作。書き出しと削除は出さない）
+```
+保存データが形式に合わないときの error は、h1 `error.app.message`、`error.app.detail`、`[[ 再読み込み ]]`、`[ 壊れたデータをファイルに保存 ]`、`[ すべてのデータを削除 ]`（color.error）。
 
 ## S2 diagnosis.question（2 問目）
 ```
@@ -126,7 +138,7 @@ S6 task.skipped は h1 と文が変わり、too_hard / too_easy のときだけ 
 | 書き出しました                         |   settings.export.done（role=status。押した後だけ）
 | 書き出したファイル（.json）を選びます。 |   settings.import.note
 | …置き換わります。                      |
-| [ ファイルを読み込む ]                 |   label > input type=file
+| [ ファイルを読み込む ]                 |   button settings.import（隠した input type=file settings.import.file の click() を呼ぶ）
 | このファイルは読み込めませんでした。…  |   error.import.message（失敗のときだけ。role=alert）
 | ファイルの形式がこの版より新しいです。… |   error.import.reason.version
 |                                        |
@@ -149,6 +161,28 @@ S6 task.skipped は h1 と文が変わり、too_hard / too_easy のときだけ 
 | <u>プライバシーについて</u>            |   settings.privacy
 ```
 
+### S8 settings（保存データなし。S1 の「設定」から来たとき。design-reviewer r1 の 1）
+```
+| 今日の一手                        設定 |   header（nav は「設定」だけ。aria-current）
+|                                        |
+| 設定                                   |   h1
+|                                        |
+| データ                                 |   h2
+| 入力したデータはこのブラウザの中だけに  |   settings.data.note
+| 保存され、外には送りません。…          |
+| 書き出したファイル（.json）を選びます。 |   settings.import.note
+| …置き換わります。                      |
+| [[ ファイルを読み込む ]]               |   settings.import（この表示では主操作の形。隠した settings.import.file の click()）
+| このファイルは読み込めませんでした。…  |   error.import.message（失敗のときだけ）
+|                                        |
+| ホーム画面                             |   h2（iOS の Safari、非スタンドアロンだけ）
+| [ ホーム画面に追加する手順を見る ]     |   settings.homeScreen.open
+|                                        |
+| 版 1.0.0                               |   settings.version
+| <u>プライバシーについて</u>            |   settings.privacy（単独のリンク。44 × 44）
+```
+書き出し、診断、記録、削除の節は出さない。読み込みに成功すると今日の状態（S3 / S5 / S6 / S7）へ移り、確認ダイアログは出ない（AC-20）。
+
 ## ダイアログ settings.delete.confirm
 ```
 ┌──────────────────────────────────┐
@@ -160,6 +194,7 @@ S6 task.skipped は h1 と文が変わり、too_hard / too_easy のときだけ 
 │ [ やめる ]                        │   .cancel（初期フォーカス）
 └──────────────────────────────────┘
 ```
+後ろの画面は color.overlay で暗くなる。ダイアログは開くときに DOM に足し、閉じたら外す。
 `settings.import.confirm` は h2、`.summary`（履歴 n 件、初めて開いた日）、`.body`、`[ 置き換える ]`、`[ やめる ]`。
 
 ## S9 settings.stats

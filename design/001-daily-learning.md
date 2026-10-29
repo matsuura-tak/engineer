@@ -2,7 +2,7 @@
 
 - 対象の PRD：docs/prd/001-daily-learning.md（r5、G0 承認済み。AC-1〜AC-32）
 - 調査：design/001-daily-learning-research.md（この仕様より先に書いた。コミット 854cf47）。方向性は案A「一枚の紙」
-- 書いた役：designer　日付：2026-10-30
+- 書いた役：designer　日付：2026-10-30（r2。G1 r1 の design-reviewer と tech-lead の指摘を反映した。直した箇所の一覧は 11）
 - 図：design/001-daily-learning/screens.md（文字で描いた画面の図）
 - トークン：design/tokens.md（色、文字、余白。この仕様はトークンの名前だけを使う）
 - 原則の番号 B-1〜B-6 は .claude/skills/craft-designer/SKILL.md にある。
@@ -22,25 +22,27 @@
    │     │     → S1 に案内 home.addToHomeScreen（閉じると印を保存して二度と出ない）
    │     └ 「診断を始める」→ S2 ×3（1 / 3 → 2 / 3 → 3 / 3）→ 「診断を終える」
    │            → S3 task.today（1 件目）。初めて S3 を出した直後に navigator.storage.persist() を 1 回だけ呼ぶ（画面には何も出ない）
+   ├ 診断の途中（初回の診断で、回答が 1〜2 問だけ保存されている）→ S2 のまだ答えていない最初の質問。保存した回答は radio に戻す（tech-lead r1 M2。「保存データあり」の定義は contracts/ に委ねる）
    ├ 保存データあり、今日まだ課題を出していない
    │     ├ 出せる課題がある → S3 task.today
-   │     └ ない → S7 task.exhausted →「診断をやり直す」→ S2（1 / 3 から）→ 終える → S3 か S7
+   │     └ ない → S7 task.exhausted →「診断をやり直す」→ S2（1 / 3 から。「やめる」で S7 に戻る：design-reviewer r1 の 8）→ 終える → S3 か S7
    ├ 保存データあり、今日の課題を完了済み → S5 task.done
    ├ 保存データあり、今日の課題を申告済み（難しすぎ、簡単すぎ、今日はできない） → S6 task.skipped
-   └ 保存データが読めない（形式に合わない） → S0 error
+   ├ 保存データが読めない（形式に合わない） → S0 error
+   └ 保存先が使えない（localStorage の読み書きが例外を出す） → S0 error（`error.app.storageUnavailable.*`。tech-lead r1 P1）
 
 S3 task.today
    ├ 「完了」→ S4 task.rate →「役に立った」「立たなかった」「今回は答えない」、または再読み込み → S5 task.done
    ├ 「難しすぎ」「簡単すぎ」「今日はできない」→ S6 task.skipped
-   └ 答えの欄：入力の 1 秒後に保存（同じ日に開き直すと復元）
+   └ 答えの欄：最後の入力から 1 秒以内に保存（間隔は contracts/ で決める。案 300 ms）。pagehide と visibilitychange（hidden）でも保存する。同じ日に開き直すと復元（tech-lead r1 M1）
 
-ヘッダーの nav（診断後のすべての画面）：「履歴」→ S10、「設定」→ S8。アプリ名 →今日の状態（S3 / S5 / S6 / S7）
+ヘッダーの nav：診断前（S1、S2、保存データなしの S8）は「設定」→ S8 だけ。診断後のすべての画面は「履歴」→ S10 と「設定」→ S8。アプリ名 → 今日の状態（S3 / S5 / S6 / S7。診断前は S1）（design-reviewer r1 の 1）
 S8 settings
    ├ 「ファイルに書き出す」→ JSON をダウンロード（画面は変わらない。「書き出しました」の知らせ）
    ├ 「ファイルを読み込む」→ ファイルを選ぶ → 検査
    │     ├ 版が新しい、形式が違う → S8 に error.import.message（確認は出ない）
    │     ├ 保存データあり → ダイアログ settings.import.confirm →「置き換える」→ 置き換え → 今日の状態（S3 / S5 / S6 / S7）
-   │     └ 保存データなし（S1 の案内から読み込んだとき）→ 確認なしで置き換え → 今日の状態
+   │     └ 保存データなし（S1 の案内から、または S1 の「設定」で来た S8 から読み込んだとき）→ 確認なしで置き換え → 今日の状態
    ├ 「診断をやり直す」→ S2（1 / 3 から。「やめる」で S8 に戻る）→ 終える → 今日まだ出していなければ S3 か S7、出していれば元の状態（S3 / S5 / S6）のまま。新しい診断は明日から効く
    ├ 「統計を見る」→ S9 →「設定に戻る」→ S8
    ├ 「履歴を見る」→ S10
@@ -56,7 +58,7 @@ verifier はこの表から受け入れテストを書く。識別子の詳し�
 |---|---|---|
 | AC-1 | S1 → S2 | S1 の `diagnosis.start.begin` を押す → S2 の `diagnosis.progress`（`data-question-index`、`data-question-total`=3）を読み、radio を選んで `diagnosis.next`（3 問目は `diagnosis.finish`）を押す。切り替えは同期（500 ms 以内） |
 | AC-2 | S2 → S3 | `diagnosis.finish` を押す → `data-state="task.today"`、`[data-testid="task.today"]` の `data-task-area`、`data-task-level` |
-| AC-3 | S3（と課題集の JSON） | 4 要素は `task.today.title`（h1）、`task.why`、`task.how`、`task.goal` の各 `<dd>`、所要時間は `task.meta`。全件の検査は JSON に対して行う（画面の対応はスクリーンショットのみ） |
+| AC-3 | S3（と課題集の JSON） | 4 要素は `task.today.title`（h1）と、`<h2>` `task.why` / `task.how` / `task.goal` それぞれの直後の段落 `task.why.text` / `task.how.text` / `task.goal.text`、所要時間は `task.meta`（design-reviewer r1 の 3）。全件の検査は JSON に対して行う（画面の対応はスクリーンショットのみ） |
 | AC-4 | 対応なし | 課題集の JSON の件数の検査。画面には出ない（S7 が尽きたときの表示） |
 | AC-5 | S3 → S4 → S5 | `task.report.done` → `data-state="task.rate"` → `task.rate.helpful` か再読み込み → `data-state="task.done"`。再読み込みしても `task.done` |
 | AC-6 | S3 | 翌日の読み込みで `data-state="task.today"`、`data-task-id` が履歴のどの行とも違う |
@@ -73,9 +75,9 @@ verifier はこの表から受け入れテストを書く。識別子の詳し�
 | AC-17 | S1、S3、S5、S7 | 幅 320 で scrollWidth、ellipsis 0 件（トークンの `overflow-wrap: anywhere`、ellipsis 不使用） |
 | AC-18 | S1 → S2 → S3 → S4 → S5 | Tab / Shift+Tab / Enter / Space だけで `diagnosis.start.begin` → radio → `diagnosis.next` → `diagnosis.finish` → `task.report.done` → `task.rate.helpful`。`:focus-visible` の outline が 3 px（tokens の size.focus.width） |
 | AC-19 | S8 | `settings.export` → ダウンロード（JSON）。`settings.export.done` の知らせ |
-| AC-20 | S8（または S1 の案内） | `settings.import` の `<input type="file">`（`data-testid="settings.import.file"`）に setInputFiles → 保存データなしなら確認なし → 今日の状態 |
-| AC-21 | S1、S8 | S1 の `[data-testid="home.addToHomeScreen"]` の中に `home.addToHomeScreen.steps`。`home.addToHomeScreen.close` → 再読み込みで出ない。S8 の `settings.homeScreen.open` で再び開く。偽装なしでは 0 回 |
-| AC-22 | S1 | `home.standalone.import`（文）、`home.standalone.importButton`（読み込み）、`diagnosis.start.begin`。`home.addToHomeScreen` は出ない。再読み込みで再び出る |
+| AC-20 | S1 → S8（保存データなし）、または S1 の案内 | 保存データのないブラウザで S1 のヘッダーの `nav.settings` → S8（保存データなしの表示。読み込みが主操作）→ 隠した `<input type="file">`（`settings.import.file`。見えるボタンは `settings.import`）に setInputFiles → 検査 → 保存データなしなので確認なし → 今日の状態。S1 のスタンドアロンの案内から読むときは `home.standalone.importFile` に setInputFiles（design-reviewer r1 の 1、4） |
+| AC-21 | S1、S8 | S1 の `[data-testid="home.addToHomeScreen"]` の中に `home.addToHomeScreen.steps`。`home.addToHomeScreen.close` → 再読み込みで出ない。S1 の `nav.settings` → S8（保存データなし）の `settings.homeScreen.open` で再び開く（診断の前でも行ける：design-reviewer r1 の 1）。偽装なしでは 0 回 |
+| AC-22 | S1 | `home.standalone.import`（文）、`home.standalone.importButton`（読み込みの見えるボタン。テストは `home.standalone.importFile` に setInputFiles）、`diagnosis.start.begin`。`home.addToHomeScreen` は出ない。再読み込みで再び出る |
 | AC-23 | S0 → S3 / S5 | オフラインで再読み込み → 3 秒以内に同じ `data-state`（と `data-task-id`）。画面は通常と同じ |
 | AC-24 | S9 | `settings.stats.open` → `data-state="settings.stats"`。`data-stat-first-open-date`、`data-stat-issued`、`data-stat-completed`、`data-stat-first-day-completed`、`data-stat-days-completed-7d`、`data-stat-helpful`、`data-stat-rated`、`data-stat-too-hard`、`data-stat-no-time` を持つ `<dd>` と、同じ値の見える文字。真偽値は `settings.stats.firstDayCompleted.yes` / `.no` |
 | AC-25 | S8（エラー） | 版が新しいファイルを選ぶ → `error.import.message` と `error.import.reason.version`。確認は出ない。履歴と状態は変わらない |
@@ -84,28 +86,28 @@ verifier はこの表から受け入れテストを書く。識別子の詳し�
 | AC-28 | S0（ルート）、S8 | ルートの `data-build-version`。S8 の `settings.version` に同じ値が見える。切り替えは Service Worker の仕事で画面には知らせを出さない（PRD 10） |
 | AC-29 | 対応なし | 課題集の JSON の `mode`、`tools`、URL の検査。画面には出ない（S3 の印は AC-30） |
 | AC-30 | S3 | `[data-testid="task.today"]` の `data-task-mode`、`task.external.badge`、`task.external.tools` の `<li>`。`in_app` では `task.external.badge` が 0 件 |
-| AC-31 | S3、S5 | 操作 0 回で `data-state`。S3 に `task.today.title`、4 要素、`task.answer`、4 つの `task.report.*`。`role="dialog"`、`aria-modal`、`position: fixed` が 0 件（ヘッダーは `position: static`） |
-| AC-32 | S3、S8 | `task.answer` に入力 → 1 秒後に `task.answer.saved` → 再読み込み → 同じ `data-task-id` と同じ内容。翌日は空。S8 の書き出しの `answer` |
+| AC-31 | S3、S5 | 操作 0 回で `data-state`。S3 に `task.today.title`、4 要素、`task.answer`、4 つの `task.report.*`。重なる要素（ダイアログ、`position: fixed`）が 0 件（ヘッダーは `position: static`。ダイアログは閉じたら DOM から外す。数え方は contracts/：tech-lead r1 P3） |
+| AC-32 | S3、S8 | `task.answer` に入力 → 最後の入力から 1 秒以内に保存して `task.answer.saved` → 再読み込み → 同じ `data-task-id` と同じ内容。翌日は空。S8 の書き出しの `answer` |
 
 対応なし：AC-4、AC-29（課題集の JSON だけを検査する AC で、画面の要素がない）。AC-3 は画面の 4 要素の場所だけ対応する。
 
 ## 3. 画面の仕事と主操作、標準部品
-主操作は 1 画面に 1 つ（B-2）。標準部品はネイティブの HTML 要素と WAI-ARIA APG の型。ランドマーク（`<header>`、`<nav>`、`<main>`）は全画面で共通（https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/ 、2026-10-30 確認）。ヘッダーは `position: static`（固定しない。R-18、AC-31）で、アプリ名のリンク `app.name` と、診断後だけ `nav.history`、`nav.settings` のリンク（今いる画面には `aria-current="page"`）。
+主操作は 1 画面に 1 つ（B-2）。標準部品はネイティブの HTML 要素と WAI-ARIA APG の型。ランドマーク（`<header>`、`<nav>`、`<main>`）は全画面で共通（https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/ 、2026-10-30 確認）。ヘッダーは `position: static`（固定しない。R-18、AC-31）で、アプリ名のリンク `app.name` と nav のリンク。nav は診断前（S1、S2、保存データなしの S8）は `nav.settings` だけ、診断後は `nav.history` と `nav.settings`（今いる画面には `aria-current="page"`）。診断前から設定へ行けるのは、保存データのないブラウザでの読み込み（AC-20）と案内の再表示（AC-21）に要るため（design-reviewer r1 の 1）。
 
 | 画面 | 仕事（1文） | 主操作 | 使う標準部品 | 標準から外れる所（本来の部品、理由、対応） |
 |---|---|---|---|---|
 | S0 殻（loading / error） | JS が動くまでの地を出し、保存データが読めないときに次の一手を出す | `error.app.reload`（再読み込み） | `<main>`、`<h1>`、`<p>`、`<noscript>`、`<button>` | なし |
-| S1 diagnosis.start | 何が起きるかを 10 行以内で伝え、診断を始めさせる | `diagnosis.start.begin` | `<main>`、`<h1>`、`<p>`、`<button>`、案内は `<section aria-labelledby>`、手順は `<ol>` | なし。案内は重ねず本文の一部として置く（ダイアログにしない。R-18、AC-31 の「重なる要素 0」と同じ考え） |
+| S1 diagnosis.start | 何が起きるかを 10 行以内で伝え、診断を始めさせる | `diagnosis.start.begin` | `<main>`、`<h1>`、`<p>`、`<button>`、案内は `<section aria-labelledby>`、手順は `<ol>`、スタンドアロンの読み込みは `<button>` + 隠した `<input type="file">` | ファイルの読み込み：本来は `<input type="file">` そのもの。理由：そのままでは「ファイルを読み込む」の文字を文言キーで出せず、他のボタンと形を揃えられない。対応：見える `<button>` が隠した input の `click()` を呼び、フォーカスと名前はボタンが持つ（9「ファイルの読み込みの部品」。design-reviewer r1 の 4）。案内は重ねず本文の一部として置く（ダイアログにしない。R-18、AC-31 の「重なる要素 0」と同じ考え） |
 | S2 diagnosis.question | 1 問だけ見せて答えさせ、確定ごとに保存する | `diagnosis.next`（3 問目は `diagnosis.finish`） | `<form>`、`<fieldset>`、`<legend>`、`<input type="radio">`、`<label>`、`<button>`、進み具合は `<p>`、エラーは `<p role="alert">` | なし。選んだ時点では進まず、ボタンで確定する（WCAG 2.2 SC 3.2.2 On Input：選択で文脈を変えない） |
 | S3 task.today | 今日の課題 1 件を、開いた瞬間に読める形で出し、答えを書かせ、申告させる | `task.report.done` | `<article>`、`<h1>`、`<p>`、`<span>`（印）、`<dl>`（道具）、`<h2>`+`<p>`（4 要素）、`<label>`+`<textarea>`、`<p role="status">`、`<button>` ×4 | なし |
 | S4 task.rate | 完了の直後に、役に立ったかを 1 回だけ聞く | 答える（`task.rate.helpful` と `task.rate.notHelpful` を同格の副操作として並べ、どちらも勧めない） | `<main>`、`<h1>`、`<p>`、`<button>` ×3 | なし |
 | S5 task.done | 今日は終わりだと言い切り、次の課題を見せない | `task.done.history`（履歴へのリンク。目立たせない） | `<main>`、`<h1>`、`<p>`、`<a>` | なし |
 | S6 task.skipped | 今日は終わりだと言い切り、段階の規則を正直に伝える | `task.skipped.history` | `<main>`、`<h1>`、`<p>`、`<a>` | なし |
 | S7 task.exhausted | 課題が尽きたことを隠さず伝え、診断のやり直しへ進ませる | `task.exhausted.redo` | `<main>`、`<h1>`、`<p>`、`<button>` | なし |
-| S8 settings | データを守る操作（書き出し、読み込み）と、診断のやり直し、削除、記録への入口を 1 画面に置く | `settings.export` | `<main>`、`<h1>`、`<section>`+`<h2>`、`<button>`、`<input type="file">`（`<label>` で包む）、`<dialog>`、`<a>`、`<p role="status">`、`<p role="alert">` | なし |
+| S8 settings | データを守る操作（書き出し、読み込み）と、診断のやり直し、削除、記録への入口を 1 画面に置く | `settings.export`（保存データがないときは `settings.export` が出ないので `settings.import` を主操作にする。design-reviewer r1 の 1） | `<main>`、`<h1>`、`<section>`+`<h2>`、`<button>`、`<button>` + 隠した `<input type="file">`（読み込み）、`<dialog>`、`<a>`、`<p role="status">`、`<p role="alert">` | ファイルの読み込み：S1 と同じ型（本来の部品、理由、対応は S1 の行と 9。design-reviewer r1 の 4） |
 | S9 settings.stats | 13 の指標と 1 対 1 の 9 つの値を、スクリーンショット 1 枚で送れる形で出す | `settings.stats.back` | `<main>`、`<h1>`、`<p>`、`<dl>`（`<dt>`/`<dd>`）、`<a>` | なし。グラフは使わない（色と 2 次元が増える。R-16） |
 | S10 history | 出した課題と申告を新しい順に見せ、書いた答えを読み返せるようにする | `history.empty.action`（0 件のとき）/ 行の `history.row.answer`（答えの開閉） | `<main>`、`<h1>`、`<ol>`+`<li>`、`<details>`+`<summary>`、`<a>` | なし |
-| ダイアログ settings.import.confirm / settings.delete.confirm | 取り消せない操作の前に、何が消えるかを見せて確かめる | `.ok`（取り消せない操作のボタン） | `<dialog>`（`showModal()`、`role="dialog"`、`aria-modal="true"`、Escape で閉じる、閉じたら呼び出し元へフォーカスを戻す） | なし（R-20） |
+| ダイアログ settings.import.confirm / settings.delete.confirm | 取り消せない操作の前に、何が消えるかを見せて確かめる | `.ok`（取り消せない操作のボタン） | ネイティブの `<dialog>`（`showModal()` で開く。開くときに DOM に足し、閉じたら DOM から外す。dialog の役割と modal はネイティブが持つので属性を重ねて書かない。Escape で閉じる、閉じたら呼び出し元へフォーカスを戻す） | なし（R-20。重なる要素の数え方は contracts/：tech-lead r1 P3） |
 
 ## 4. 決定と根拠
 | 決定 | 根拠（R-n） | 原則（URL か B-n） |
@@ -114,7 +116,7 @@ verifier はこの表から受け入れテストを書く。識別子の詳し�
 | D-2 診断は 1 画面 1 問、進み具合「質問 n / 3」、ネイティブの radio、確定はボタン | R-8（one thing per page）、R-21（radio の操作） | https://www.w3.org/WAI/ARIA/apg/patterns/radio/ 、https://www.w3.org/WAI/WCAG22/Understanding/on-input.html |
 | D-3 S3 は題名を h1 にし、4 要素を h2 と段落で縦に並べ、申告 4 つは末尾。「完了」だけを塗りの主操作にし、他 3 つは枠の副操作 | R-6（1 日 1 つ）、R-16（320 px）、R-17（44 px） | B-1、B-2、B-3 |
 | D-4 S5 と S6 は次の課題もストリークも見せず、1 文で終える。S5 は完了した課題の題名を 1 行だけ残す（Job の「最近学んだことを言える」のため） | R-6（spend only three minutes）、PRD 10（ストリーク非採用） | B-2。差をつける点 2 |
-| D-5 答えの欄は課題の本文の下、申告の上に `<textarea>` を 1 つ。ラベルに「任意」。保存は黙って行い、「保存しました」を `role="status"` で出す | R-19（status messages）、R-25（16 px）、R-26 | https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html 、B-1 |
+| D-5 答えの欄は課題の本文の下、申告の上に `<textarea>` を 1 つ。ラベルに「任意」。保存は最後の入力から 1 秒以内に黙って行い（pagehide と visibilitychange でも）、「保存しました」を `role="status"` で出す | R-19（status messages）、R-25（16 px）、R-26 | https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html 、B-1 |
 | D-6 外で行う課題の印は、題名の直下に文字だけの印「外で行う」と、「要る道具」の定義リスト。色もアイコンも使わない | R-7（色は意味にだけ）、R-15（枠は 3:1） | https://www.w3.org/WAI/WCAG22/Understanding/use-of-color.html 、B-5 |
 | D-7 空とエラーは「何が起きたか」+「次の一手のボタン」の 2 要素。読み込み中に「0 件」を出さない | R-9、R-10 | https://www.nngroup.com/articles/empty-state-interface-design/ 、B-1 |
 | D-8 エラーは問題の近く（入力欄の直下、ボタンの直上）に文字で出し、入力を保ち、やり直しのボタンを添える。エラーの知らせは `role="alert"` | R-10（near the element、preserve input）、R-19 | https://www.w3.org/WAI/WCAG22/Understanding/error-identification.html 、https://www.w3.org/WAI/ARIA/apg/patterns/alert/ |
@@ -125,7 +127,7 @@ verifier はこの表から受け入れテストを書く。識別子の詳し�
 | D-13 動きは「保存しました」と `app.loading` の不透明度だけ。`prefers-reduced-motion: reduce` で 0 ms | R-23 | https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion 、B-6 |
 | D-14 本文 16 px、行間 1.6、14 px 未満なし、書体はシステムの sans-serif 1 つ、文字の段階は 4 つ | R-26、R-25 | https://design.digital.go.jp/foundations/typography/ 、B-4 |
 | D-15 色は地 1 つ、文字 2 つ、主操作 1 色、意味色 3 つ（成功、注意、エラー）、枠、フォーカスだけ。すべて 3 通りの値（ライト、ダーク、上げる）を tokens に持ち、比を 9 に書く | R-13（カラフルさの好み）、R-14、R-15 | https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html 、B-5 |
-| D-16 押せる範囲は 44 × 44 CSS px 以上（主操作、申告、設定の操作、radio のラベル）。リンクは単独で置くとき上下に余白を足す | R-17 | https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced.html |
+| D-16 押せる範囲は 44 × 44 CSS px 以上（主操作、申告、設定の操作、radio のラベル）。単独のリンクは上下に space.3 の内側と `min-width: 44px` で 44 × 44 にする（tokens 4） | R-17 | https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced.html |
 | D-17 フォーカスの枠は 3 px の `outline` と 2 px の `outline-offset`、色は color.focus | R-15 | https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html |
 | D-18 幅 320 px で横スクロール 0：要素は常に縦に積み、申告の副操作 3 つは `flex-wrap` で折り返す。`text-overflow: ellipsis` を使わない | R-16 | https://www.w3.org/WAI/WCAG22/Understanding/reflow.html 、B-3 |
 | D-19 文言はです・ます、絵文字と感嘆符なし、ボタンは動詞。完了の直後の 1 文だけ労い（事実の言い方）。英語は同じ調子で動詞始まり | R-11、R-12（性格語） | https://www.nngroup.com/articles/tone-of-voice-dimensions/ 、B-1 |
@@ -135,25 +137,28 @@ verifier はこの表から受け入れテストを書く。識別子の詳し�
 | D-23 権限（保存の永続化）は画面で求めず、初めて S3 を出した直後に `persist()` を 1 回だけ呼ぶ。断られたら S8 に注意と「書き出す」を置く | R-9（次の一手）、PRD 11 の冒頭 | B-1 |
 | D-24 読み込みの失敗は、選んだファイルのそば（読み込みのボタンの直下）に「読めなかった」+「理由と直し方」の 2 文。確認は出さない | R-10 | https://www.nngroup.com/articles/error-messages-scoring-rubric/ |
 | D-25 `forced-colors: active` では色の値を持たず、枠と下線で意味を保つ（印は枠、リンクは下線、エラーは文字） | R-15 | https://developer.mozilla.org/en-US/docs/Web/CSS/@media/forced-colors |
+| D-26 S3 の申告（完了、難しすぎ、簡単すぎ、今日はできない）に数秒の取り消しを置かない。予防は事前の注記 `task.report.note` と、主操作（塗り）と副操作（枠）の形と文言の違い（D-3）で行う。理由：(1) AC-5 と AC-7 の Then は申告の直後にその日の状態が確定し「再読み込みしても変わらない」ことで、数秒の猶予はこの読み方を変える。(2) 取り消しの知らせとボタンは S4 / S6 に重ねる要素になり、B-2 と D-10（重ねない）に反する。(3) 申告は法的・金銭的な入力ではなく、間違いの影響は 1 日 1 件で、段階は同じ申告が 2 回続いたときだけ動く（AC-8）ので、1 回の押し間違いで段階は変わらない。(4) 毎日の主操作に確認を足すと「手早い」に反する（design-reviewer r1 の 7） | R-6（1 日 1 つ、3 分で終える）、R-10（予防の文は問題の近くに） | https://www.w3.org/WAI/WCAG22/Understanding/error-prevention-legal-financial-data.html 、B-2 |
+| D-27 ファイルの読み込みは S1 と S8 で同じ型：見える `<button>`（副操作の形。保存データなしの S8 では主操作の形）が、隠した `<input type="file">` の `click()` を呼ぶ。input は `tabindex="-1"` と `aria-hidden="true"` でフォーカスと読み上げの順から外し、フォーカスの枠と名前はボタンが持つ。テストは input に setInputFiles する（9） | R-17（押せる範囲）、R-15（フォーカスの枠） | https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/file 、https://www.w3.org/WAI/WCAG22/Understanding/focus-visible.html 、B-6 |
+| D-28 ホバーと押した瞬間の見た目は tokens 4 の決まりだけ（ホバーは下線、押した瞬間は塗りと文字の入れ替え）。新しい色も transition も足さない | R-15（枠と状態の 3:1）、R-7（色は意味にだけ） | https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html 、B-5 |
 
 ## 5. 画面ごとの状態
-該当しない状態は「なし」と理由。オフラインは全画面で通常と同じ（アプリは読み込み後に通信を使わない。AC-12。Service Worker で再読み込みも同じ：AC-23）。初めての訪問でキャッシュがないままオフラインのときは、ブラウザ自身のエラーページになり、アプリの画面はない（対応は範囲の外）。「一部だけ読めたとき」は、保存は 1 キーの JSON を全体で検査して通るか落ちるかの 2 択（部分の読み込みをしない。読み込むファイルも同じ）なので、S0 の error 以外は「なし」。
+該当しない状態は「なし」と理由。オフラインは全画面で通常と同じ（アプリは読み込み後に通信を使わない。AC-12。Service Worker で再読み込みも同じ：AC-23）。初めての訪問でキャッシュがないままオフラインのときは、ブラウザ自身のエラーページになり、アプリの画面はない（対応は範囲の外）。「一部だけ読めたとき」は、保存は 1 キーの JSON を全体で検査して通るか落ちるかの 2 択（部分の読み込みをしない。読み込むファイルも同じ）なので、S0 の error 以外は「なし」。「権限を断られたとき」は、求める権限が初めて S3 を出した直後の `persist()` だけ（7）なので、S3 と S8 以外は「なし」。design-reviewer r1 の 2 により、すべての「なし」に理由を書く。
 
 | 画面 | 通常 | 空 | 読み込み中 | エラー | オフライン | 権限を断られたとき | 一部だけ読めたとき |
 |---|---|---|---|---|---|---|---|
-| S0 殻 | JS が動くまで `data-state="loading"`。ヘッダーのアプリ名だけ。1 秒たっても JS が動かなければ `app.loading` の文が不透明度で現れる（CSS だけ）。`<noscript>` に `app.noscript` | なし（殻は内容を持たない） | 上の loading そのもの。スピナーも「0 件」も出さない（R-9） | 保存データが形式に合わない → `data-state="error"`。`error.app.message`（何が起きたか）、`error.app.detail`（直し方）、主操作 `error.app.reload`、副操作 `error.app.exportRaw`（壊れたデータをそのままファイルに保存）、`error.app.delete`（確認ダイアログ `settings.delete.confirm` を経て削除 → S1）。PRD にない挙動なので 10 に書く | 通常と同じ | なし | 上のエラーと同じ扱い（部分は読まない） |
-| S1 diagnosis.start | h1 `diagnosis.start.title`、`diagnosis.start.lead.1`〜`.3`、主操作 `diagnosis.start.begin`。スタンドアロンなら説明の直後に `<section>` `home.standalone.import` + `home.standalone.importButton`。iOS の Safari（非スタンドアロン、閉じた印なし）なら説明と主操作の間に `<section>` `home.addToHomeScreen`（`.title`、`.why`、`.steps` の `<ol>` 4 項目、`.close`） | なし（この画面が「保存データなし」の表示そのもの） | なし（殻の loading の後に同期で出る） | 読み込み（スタンドアロンの案内から）の失敗 → `home.standalone.importButton` の直下に `error.import.message` + `error.import.reason.version` か `.schema`（`role="alert"`） | 通常と同じ | なし（この画面で求める権限はない） | なし |
-| S2 diagnosis.question | `diagnosis.progress`（質問 n / 3、`data-question-index`、`data-question-total`）、`<fieldset>` の `<legend>` `diagnosis.q1.legend` / `q2` / `q3`、radio（q1：`area.*` 6 つ、q2：`level.*` 3 つに説明 `level.*.desc`、q3：`years.*` 4 つ）、主操作 `diagnosis.next`（3 問目は `diagnosis.finish`）、副操作 `diagnosis.back`（2 問目以降）、やり直しのときだけ `diagnosis.cancel` | なし（選択肢は固定） | なし（同期） | (1) 未選択で確定 → `<legend>` の直下に `error.diagnosis.required`（`role="alert"`）。進まない。(2) 保存の失敗（AC-11）→ 主操作の直上に `error.storage.message` と `error.storage.retry`。質問の番号と選択は保つ。`error.storage.retry` で保存に成功すれば次の質問へ | 通常と同じ | なし | なし |
-| S3 task.today | `task.today.label`（今日の課題 YYYY-MM-DD）、h1 `task.today.title`、`task.meta`（領域 / 段階 / 所要時間）、`external` なら印 `task.external.badge` と `<dl>` `task.external.tools`（`<dd>` に道具の `<ul>`）、`<h2>` `task.why` / `task.how` / `task.goal` と段落、`<label>` `task.answer.label` + `task.answer.help` + `<textarea>`（`data-testid="task.answer"`）+ `task.answer.saved`（`role="status"`、保存の 150 ms 後に出て、次の入力で消える）、`task.report.note`、主操作 `task.report.done`、副操作 `task.report.tooHard` / `.tooEasy` / `.noTime`。長い題名は折り返す。答えの欄は上限 `answer.max`（10 に書く。contracts/ で決める）に達すると `task.answer.limit` | なし（出せる課題がないときは S7 に移る） | なし（同期。AC-15 は殻の loading の時間） | (1) 答えの自動保存の失敗 → textarea の直下に `error.storage.message`（`role="alert"`）+ `error.storage.retry`。入力は保つ。(2) 申告の保存の失敗 → 申告のボタン群の直上に同じ 2 つ。状態は S3 のまま、答えも保つ | 通常と同じ | 初めて S3 を出した直後の `persist()` が断られても S3 は変わらない（知らせは S8。AC-13） | なし |
-| S4 task.rate | h1 `task.rate.title`、`task.rate.question`、`task.rate.helpful`、`task.rate.notHelpful`（同格の副操作）、文字のボタン `task.rate.close` | なし | なし | 回答の保存の失敗 → ボタン群の直上に `error.storage.message` + `error.storage.retry`。選んだ答えは保つ | 通常と同じ | なし | なし |
-| S5 task.done | h1 `task.done.title`、`task.done.message`、`task.done.task`（完了した課題の題名。text.small、color.text.secondary）、リンク `task.done.history` | なし | なし | なし（表示だけ。保存の読み取りに失敗すれば S0 の error） | 通常と同じ | なし | なし |
-| S6 task.skipped | h1 `task.skipped.title`、`task.skipped.message`、too_hard / too_easy のときだけ `task.skipped.levelHint`、リンク `task.skipped.history` | なし | なし | なし（表示だけ） | 通常と同じ | なし | なし |
-| S7 task.exhausted | h1 `task.exhausted.message`、`task.exhausted.detail`、主操作 `task.exhausted.redo` | この画面が「課題 0 件」の空の表示そのもの（何が起きたか + 次の一手） | なし | なし（表示だけ） | 通常と同じ | なし | なし |
-| S8 settings | h1 `settings.title`。節「データ」：`settings.data.note`、（断られたときだけ）`settings.storage.notPersisted`、主操作 `settings.export`、`settings.export.done`（`role="status"`）、`settings.import.note`、`settings.import`（`<label>` で包んだ `<input type="file" accept=".json,application/json">`）。節「診断」：`settings.diagnosis.current`、`settings.redo`、`settings.redo.note`。節「ホーム画面」（iOS の Safari で非スタンドアロンのときだけ）：`settings.homeScreen.open` → 同じ場所に `home.addToHomeScreen` を開く。節「記録」：`settings.stats.open`、`settings.history.open`。節「削除」：`settings.delete`（取り消せない操作のボタン）。末尾：`settings.version`、`settings.privacy`（リンク） | 保存データがないとき（S1 から来たとき）：節「データ」の読み込みだけと、節「ホーム画面」、末尾を出す。書き出し、診断、記録、削除は出さない（する事がない。B-1） | ファイルの検査は同期（数 KB）。なし | (1) 読み込み：`settings.import` の直下に `error.import.message` + `error.import.reason.version` / `.schema`（`role="alert"`）。確認は出ない。データは変わらない。(2) 書き出し・削除の保存の失敗 → その操作の直下に `error.storage.message` + `error.storage.retry` | 通常と同じ | `persist()` を断られたとき：`settings.storage.notPersisted`（color.warning。エラーの見た目にしない：R-10）を `settings.export` の直上に出す。ファイル選択を取り消したとき：何も起きない | なし |
-| S9 settings.stats | h1 `settings.stats.title`、`settings.stats.today`（今日 YYYY-MM-DD）、`<dl>` 9 行（`settings.stats.firstOpenDate` … `.noTime`。6 の表の順）、`settings.stats.note`、リンク `settings.stats.back` | 診断直後で課題 0 件：値は 0 と初めて開いた日（「0」は本当の 0 なので出す。読み込み中の偽の 0 ではない） | なし（同期） | なし（表示だけ） | 通常と同じ | なし | なし |
-| S10 history | h1 `history.title`、`<ol>` に新しい順の `<li>`（`data-testid="history.row"`、`data-task-id`、`data-date`、`data-report`、`data-helpful`）。行の中：日付（YYYY-MM-DD、text.small）、題名、`report.*`、done のときだけ `helpful.*`、答えがあれば `<details>` `history.row.answer`。件数が多くても全件を 1 列で出す（28 日で 28 行、1 年で 365 行。分けない） | 0 件：`history.empty` + 主操作 `history.empty.action`（今日の課題へ） | なし | なし（表示だけ） | 通常と同じ | なし | なし |
-| ダイアログ settings.import.confirm | `.title`、`.summary`（ファイルの中身：履歴 n 件、初めて開いた日）、`.body`、`.ok`（取り消せない操作のボタン）、`.cancel`（初期フォーカス） | なし | なし | 置き換えの保存の失敗 → ダイアログの中に `error.storage.message` + `error.storage.retry` | 通常と同じ | なし | なし |
-| ダイアログ settings.delete.confirm | `.title`、`.body`、`.ok`、`.cancel`（初期フォーカス） | なし | なし | 削除の失敗 → 同上 | 通常と同じ | なし | なし |
+| S0 殻 | JS が動くまで `data-state="loading"`。ヘッダーのアプリ名だけ。1 秒たっても JS が動かなければ `app.loading` の文が不透明度で現れる（CSS だけ）。`<noscript>` に `app.noscript`。この 2 文は JS が動く前に出るので、HTML に日英を併記する（「読み込んでいます / Loading」の形。キーは 7 に残し、ビルドの手順で HTML に書き込む。tech-lead r1 P2） | なし（殻は内容を持たない） | 上の loading そのもの。スピナーも「0 件」も出さない（R-9） | (1) 保存データが形式に合わない → `data-state="error"`。`error.app.message`（何が起きたか）、`error.app.detail`（直し方）、主操作 `error.app.reload`、副操作 `error.app.exportRaw`（壊れたデータをそのままファイルに保存）、`error.app.delete`（確認ダイアログ `settings.delete.confirm` を経て削除 → S1）。PRD にない挙動なので 10 に書く（U-5）。(2) 保存先が使えない（localStorage の読み書きが例外を出す。Cookie とサイトデータを止めた設定など。どの設定で起きるかは未確認：tech-lead r1 P1）→ `data-state="error"`。`error.app.storageUnavailable.message` + `error.app.storageUnavailable.detail`、主操作 `error.app.reload` だけ。書き出すデータも削除するデータもないので `.exportRaw` と `.delete` は出さない | 通常と同じ | なし（この画面で求める権限はない。権限は S3 の `persist()` だけ：7） | 上のエラー (1) と同じ扱い（部分は読まない） |
+| S1 diagnosis.start | ヘッダーはアプリ名と `nav.settings`（「履歴」は出さない。design-reviewer r1 の 1）。h1 `diagnosis.start.title`、`diagnosis.start.lead.1`〜`.3`、主操作 `diagnosis.start.begin`。スタンドアロンなら説明の直後に `<section>` `home.standalone.import` + 見えるボタン `home.standalone.importButton`（隠した `home.standalone.importFile` の `click()` を呼ぶ。9）。iOS の Safari（非スタンドアロン、閉じた印なし）なら説明と主操作の間に `<section>` `home.addToHomeScreen`（`.title`、`.why`、`.steps` の `<ol>` 4 項目、`.close`） | なし（この画面が「保存データなし」の表示そのもの） | なし（殻の loading の後に同期で出る） | 読み込み（スタンドアロンの案内から）の失敗 → `home.standalone.importButton` の直下に `error.import.message` + `error.import.reason.version` か `.schema`（`role="alert"`）。データは変わらない | 通常と同じ | なし（この画面で求める権限はない） | なし（保存は 1 キーの JSON を全体で検査し、部分の読み込みはしない） |
+| S2 diagnosis.question | `diagnosis.progress`（質問 n / 3、`data-question-index`、`data-question-total`）、`<fieldset>` の `<legend>` `diagnosis.q1.legend` / `q2` / `q3`、radio（q1：`area.*` 6 つ、q2：`level.*` 3 つに説明 `level.*.desc`、q3：`years.*` 4 つ）、主操作 `diagnosis.next`（3 問目は `diagnosis.finish`）、副操作 `diagnosis.back`（2 問目以降）、やり直しのときだけ `diagnosis.cancel`（S8 から入ったら S8 へ、S7 から入ったら S7 へ戻る。design-reviewer r1 の 8）。初回の診断の途中（回答が 1〜2 問だけ保存されている）で開き直したときは、まだ答えていない最初の質問を出し、「前の質問へ」で戻った質問には保存した回答を radio の `checked` に戻す（tech-lead r1 M2） | なし（選択肢は固定） | なし（殻の loading の後に同期で出る） | (1) 未選択で確定 → `<legend>` の直下に `error.diagnosis.required`（`role="alert"`）。進まない。(2) 保存の失敗（AC-11）→ 主操作の直上に `error.storage.message` と `error.storage.retry`。質問の番号と選択は保つ。`error.storage.retry` で保存に成功すれば次の質問へ | 通常と同じ | なし（この画面で求める権限はない） | なし（診断の途中の保存は「一部」ではなく途中の状態として通常の列で扱う：M2。壊れた JSON は S0 の error） |
+| S3 task.today | `task.today.label`（今日の課題 YYYY-MM-DD）、h1 `task.today.title`、`task.meta`（領域 / 段階 / 所要時間）、`external` なら印 `task.external.badge` と `<dl>` `task.external.tools`（`<dd>` に道具の `<ul>`）、`<h2>` `task.why` / `task.how` / `task.goal` と段落、`<label>` `task.answer.label` + `task.answer.help` + `<textarea>`（`data-testid="task.answer"`）+ `task.answer.saved`（`role="status"`、保存の 150 ms 後に出て、次の入力で消える）、`task.report.note`、主操作 `task.report.done`、副操作 `task.report.tooHard` / `.tooEasy` / `.noTime`。答えの保存は最後の入力から 1 秒以内（間隔は contracts/ で決める。案 300 ms）で、`pagehide` と `visibilitychange`（hidden）のときにも保存する（tech-lead r1 M1）。長い題名は折り返す。答えの欄は上限 `answer.max`（10 に書く。contracts/ で決める）に達すると `task.answer.limit`。申告の取り消しは置かない（D-26） | なし（出せる課題がないときは S7 に移る） | なし（殻の loading の後に同期で出る。AC-15 は殻の loading の時間） | (1) 答えの自動保存の失敗 → textarea の直下に `error.storage.message`（`role="alert"`）+ `error.storage.retry`。入力は保つ。(2) 申告の保存の失敗 → 申告のボタン群の直上に同じ 2 つ。状態は S3 のまま、答えも保つ | 通常と同じ | 初めて S3 を出した直後の `persist()` が断られても S3 は変わらない（知らせは S8。AC-13） | なし（部分の読み込みはしない） |
+| S4 task.rate | h1 `task.rate.title`、`task.rate.question`、`task.rate.helpful`、`task.rate.notHelpful`（同格の副操作）、文字のボタン `task.rate.close` | なし（固定の問いとボタン 3 つだけで、一覧を持たない） | なし（S3 の申告の直後に同期で描く） | 回答の保存の失敗 → ボタン群の直上に `error.storage.message` + `error.storage.retry`。選んだ答えは保つ | 通常と同じ | なし（この画面で求める権限はない） | なし（部分の読み込みはしない） |
+| S5 task.done | h1 `task.done.title`、`task.done.message`、`task.done.task`（完了した課題の題名。text.small、color.text.secondary）、リンク `task.done.history` | なし（固定の 2 文と題名 1 行だけで、一覧を持たない） | なし（殻の loading の後、または S4 の直後に同期で描く） | なし（表示だけ。保存の読み取りに失敗すれば S0 の error） | 通常と同じ | なし（この画面で求める権限はない） | なし（部分の読み込みはしない） |
+| S6 task.skipped | h1 `task.skipped.title`、`task.skipped.message`、too_hard / too_easy のときだけ `task.skipped.levelHint`、リンク `task.skipped.history` | なし（固定の文だけで、一覧を持たない） | なし（殻の loading の後、または S3 の申告の直後に同期で描く） | なし（表示だけ。保存の読み取りに失敗すれば S0 の error） | 通常と同じ | なし（この画面で求める権限はない） | なし（部分の読み込みはしない） |
+| S7 task.exhausted | h1 `task.exhausted.message`、`task.exhausted.detail`、主操作 `task.exhausted.redo`（→ S2。「やめる」で S7 に戻る） | この画面が「課題 0 件」の空の表示そのもの（何が起きたか + 次の一手） | なし（殻の loading の後に同期で描く。課題集は配布物に入っていて通信しない） | なし（表示だけ。保存の読み取りに失敗すれば S0 の error） | 通常と同じ | なし（この画面で求める権限はない） | なし（部分の読み込みはしない） |
+| S8 settings | h1 `settings.title`。節「データ」：`settings.data.note`、（断られたときだけ）`settings.storage.notPersisted`、主操作 `settings.export`、`settings.export.done`（`role="status"`）、`settings.import.note`、見えるボタン `settings.import`（隠した `settings.import.file`（`<input type="file" accept=".json,application/json">`）の `click()` を呼ぶ。9）。節「診断」：`settings.diagnosis.current`、`settings.redo`、`settings.redo.note`。節「ホーム画面」（iOS の Safari で非スタンドアロンのときだけ）：`settings.homeScreen.open` → 同じ場所に `home.addToHomeScreen` を開く。節「記録」：`settings.stats.open`、`settings.history.open`。節「削除」：`settings.delete`（取り消せない操作のボタン）。末尾：`settings.version`、`settings.privacy`（単独のリンク。44 × 44） | 保存データがないとき（S1 の `nav.settings` から来たとき）：ヘッダーの nav は「設定」だけ。節「データ」は `settings.data.note`、`settings.import.note`、`settings.import` だけを出し、`settings.import` を主操作の形（塗り）にする（`settings.export` が出ないため。B-2。design-reviewer r1 の 1）。節「ホーム画面」（iOS の Safari）と末尾（版、プライバシー）は出す。書き出し、診断、記録、削除は出さない（する事がない。B-1）。「保存データあり / なし」の定義は contracts/ に委ねる（tech-lead r1 M2） | なし（ファイルの検査は同期で、数 KB なら一瞬。大きさの上限は contracts/） | (1) 読み込み：`settings.import` の直下に `error.import.message` + `error.import.reason.version` / `.schema`（`role="alert"`）。確認は出ない。データは変わらない。(2) 書き出し・削除の保存の失敗 → その操作の直下に `error.storage.message` + `error.storage.retry` | 通常と同じ | `persist()` を断られたとき：`settings.storage.notPersisted`（color.warning。エラーの見た目にしない：R-10）を `settings.export` の直上に出す。ファイル選択を取り消したとき：何も起きない（フォーカスはボタンのまま） | なし（部分の読み込みはしない。読み込むファイルも全体で検査して通るか落ちるかの 2 択） |
+| S9 settings.stats | h1 `settings.stats.title`、`settings.stats.today`（今日 YYYY-MM-DD）、`<dl>` 9 行（`settings.stats.firstOpenDate` … `.noTime`。6 の表の順）、`settings.stats.note`、リンク `settings.stats.back` | 診断直後で課題 0 件：値は 0 と初めて開いた日（「0」は本当の 0 なので出す。読み込み中の偽の 0 ではない） | なし（保存から同期で計算して描く） | なし（表示だけ。保存の読み取りに失敗すれば S0 の error） | 通常と同じ | なし（この画面で求める権限はない） | なし（部分の読み込みはしない） |
+| S10 history | h1 `history.title`、`<ol>` に新しい順の `<li>`（`data-testid="history.row"`、`data-task-id`、`data-date`、`data-report`、`data-helpful`）。行の中：日付（YYYY-MM-DD、text.small）、題名、`report.*`、done のときだけ `helpful.*`、答えがあれば `<details>` `history.row.answer`。件数が多くても全件を 1 列で出す（28 日で 28 行、1 年で 365 行。分けない） | 0 件：`history.empty` + 主操作 `history.empty.action`（今日の課題へ） | なし（履歴は保存から同期で読んで描く。365 行でも段階的には読まない） | なし（表示だけ。保存の読み取りに失敗すれば S0 の error） | 通常と同じ | なし（この画面で求める権限はない） | なし（部分の読み込みはしない） |
+| ダイアログ settings.import.confirm | `.title`、`.summary`（ファイルの中身：履歴 n 件、初めて開いた日）、`.body`、`.ok`（取り消せない操作のボタン）、`.cancel`（初期フォーカス）。開くときに DOM に足し、閉じたら外す（tech-lead r1 P3） | なし（文とボタン 2 つだけで、一覧を持たない） | なし（ファイルの要約は開く前に計算済みで、開くのは同期） | 置き換えの保存の失敗 → ダイアログの中に `error.storage.message` + `error.storage.retry` | 通常と同じ | なし（ダイアログで求める権限はない） | なし（部分の読み込みはしない） |
+| ダイアログ settings.delete.confirm | `.title`、`.body`、`.ok`、`.cancel`（初期フォーカス）。開くときに DOM に足し、閉じたら外す | なし（文とボタン 2 つだけで、一覧を持たない） | なし（開くのは同期で、読むデータがない） | 削除の失敗 → 同上 | 通常と同じ | なし（ダイアログで求める権限はない） | なし（部分の読み込みはしない） |
 
 ## 6. 要素と識別子
 受け入れテストが使う。`data-testid` は 7 の文言キーと同じ名前（文字を持たない要素はここで決める）。ルート要素（`<html>` か `<body>`。tech-lead が決める）は `data-state`、`data-build-version`、`data-debug-load-ms` を持つ。
@@ -162,10 +167,10 @@ verifier はこの表から受け入れテストを書く。識別子の詳し�
 |---|---|---|---|
 | 共通 | ルート | `data-state`、`data-build-version`、`data-debug-load-ms`（S3 を表示した時点で書く） | — |
 | 共通 | ヘッダーのアプリ名（リンク） | `app.name` | 「今日の一手」 |
-| 共通 | nav のリンク | `nav.history`、`nav.settings` | 「履歴」「設定」（今いる画面は aria-current） |
-| S0 | 読み込みの文、noscript、エラーの文と操作 | `app.loading`、`app.noscript`、`error.app.message`、`error.app.detail`、`error.app.reload`、`error.app.exportRaw`、`error.app.delete` | 文言のとおり |
+| 共通 | nav のリンク | `nav.history`、`nav.settings`（診断前は `nav.settings` だけ。design-reviewer r1 の 1） | 「履歴」「設定」（今いる画面は aria-current） |
+| S0 | 読み込みの文、noscript、エラーの文と操作 | `app.loading`、`app.noscript`、`error.app.message`、`error.app.detail`、`error.app.storageUnavailable.message`、`error.app.storageUnavailable.detail`、`error.app.reload`、`error.app.exportRaw`、`error.app.delete` | 文言のとおり |
 | S1 | 題名、説明、主操作 | `diagnosis.start.title`、`diagnosis.start.lead.1`〜`.3`、`diagnosis.start.begin` | 「診断を始める」 |
-| S1 | スタンドアロンの案内 | `<section>` は `home.standalone`（`aria-labelledby` で `home.standalone.import` を指す）、文 `home.standalone.import`、ボタン `home.standalone.importButton`、`<input type="file">` は `home.standalone.importFile` | 「ファイルを読み込む」 |
+| S1 | スタンドアロンの案内 | `<section>` は `home.standalone`（`aria-labelledby` で `home.standalone.import` を指す）、文 `home.standalone.import`、見えるボタン `home.standalone.importButton`（`<button>`）、隠した `<input type="file">` は `home.standalone.importFile`（`aria-hidden`、テストは setInputFiles） | 「ファイルを読み込む」（ボタン。input は読み上げの順に入らない） |
 | S1、S8 | ホーム画面の案内 | `<section>` は `home.addToHomeScreen`（`aria-labelledby` で `.title`）、`home.addToHomeScreen.title`、`.why`、`<ol>` `.steps`、`<li>` `.steps.1`〜`.4`、`.close` | 「閉じる」 |
 | S2 | 進み具合 | `diagnosis.progress`（`data-question-index`、`data-question-total`） | 「質問 1 / 3」 |
 | S2 | 質問と選択肢 | `<fieldset>` は `diagnosis.question`、`<legend>` は `diagnosis.q1.legend` / `q2` / `q3`。radio の `<input>` は `area.backend` … `years.gte5`（値のキー。`value` は contracts/ の ID）。q2 の説明は `level.beginner.desc` 等 | legend の文 + 選択肢の文（例：「初級 基本は知っているが、実務では人に聞きながら進める」） |
@@ -178,7 +183,7 @@ verifier はこの表から受け入れテストを書く。識別子の詳し�
 | S5 | 文とリンク | `task.done.title`、`task.done.message`、`task.done.task`、`task.done.history` | 「履歴を見る」 |
 | S6 | 文とリンク | `task.skipped.title`、`task.skipped.message`、`task.skipped.levelHint`、`task.skipped.history` | 「履歴を見る」 |
 | S7 | 文と操作 | `task.exhausted.message`（h1）、`task.exhausted.detail`、`task.exhausted.redo` | 「診断をやり直す」 |
-| S8 | 節と操作 | `settings.title`、`settings.data.title`、`settings.data.note`、`settings.storage.notPersisted`、`settings.export`、`settings.export.done`、`settings.import.note`、`settings.import`（`<label>`）、`settings.import.file`（`<input type="file">`）、`settings.diagnosis.title`、`settings.diagnosis.current`、`settings.redo`、`settings.redo.note`、`settings.homeScreen.title`、`settings.homeScreen.open`、`settings.records.title`、`settings.stats.open`、`settings.history.open`、`settings.delete.title`、`settings.delete`、`settings.version`、`settings.privacy`、`error.import.message`、`error.import.reason.version`、`error.import.reason.schema` | 「ファイルに書き出す」「ファイルを読み込む」「診断をやり直す」「統計を見る」「履歴を見る」「すべてのデータを削除」 |
+| S8 | 節と操作 | `settings.title`、`settings.data.title`、`settings.data.note`、`settings.storage.notPersisted`、`settings.export`、`settings.export.done`、`settings.import.note`、`settings.import`（見える `<button>`）、`settings.import.file`（隠した `<input type="file">`。`aria-hidden`、テストは setInputFiles）、`settings.diagnosis.title`、`settings.diagnosis.current`、`settings.redo`、`settings.redo.note`、`settings.homeScreen.title`、`settings.homeScreen.open`、`settings.records.title`、`settings.stats.open`、`settings.history.open`、`settings.delete.title`、`settings.delete`、`settings.version`、`settings.privacy`、`error.import.message`、`error.import.reason.version`、`error.import.reason.schema` | 「ファイルに書き出す」「ファイルを読み込む」「診断をやり直す」「統計を見る」「履歴を見る」「すべてのデータを削除」 |
 | S8 | 読み込みの確認 | `<dialog>` `settings.import.confirm`（`aria-labelledby` で `.title`）、`.title`、`.summary`、`.body`、`.ok`、`.cancel` | 「置き換える」「やめる」 |
 | S8 | 削除の確認 | `<dialog>` `settings.delete.confirm`、`.title`、`.body`、`.ok`、`.cancel` | 「削除する」「やめる」 |
 | S9 | 値 | `settings.stats.title`、`settings.stats.today`、`<dt>` はラベルのキー、`<dd>` は同じキー + `.value`：`settings.stats.firstOpenDate.value`（`data-stat-first-open-date`）、`.issued.value`（`data-stat-issued`）、`.completed.value`（`data-stat-completed`）、`.firstDayCompleted.value`（`data-stat-first-day-completed`。文は `.yes` / `.no`）、`.daysCompleted7d.value`（`data-stat-days-completed-7d`）、`.helpful.value`（`data-stat-helpful`）、`.rated.value`（`data-stat-rated`）、`.tooHard.value`（`data-stat-too-hard`）、`.noTime.value`（`data-stat-no-time`）、`settings.stats.note`、`settings.stats.back` | `<dt>` の文 + 値 |
@@ -190,8 +195,8 @@ verifier はこの表から受け入れテストを書く。識別子の詳し�
 | キー | 日本語 | 英語 | 使う場所 |
 |---|---|---|---|
 | app.name | 今日の一手 | 今日の一手 | ヘッダー（英語の表記は 10） |
-| app.loading | 読み込んでいます | Loading | S0（1 秒後） |
-| app.noscript | このページは JavaScript が必要です。ブラウザの設定で JavaScript を有効にしてください。 | This page needs JavaScript. Turn on JavaScript in your browser settings. | S0 |
+| app.loading | 読み込んでいます | Loading | S0（1 秒後。HTML に「読み込んでいます / Loading」と日英を併記：tech-lead r1 P2） |
+| app.noscript | このページは JavaScript が必要です。ブラウザの設定で JavaScript を有効にしてください。 | This page needs JavaScript. Turn on JavaScript in your browser settings. | S0（HTML に日英を併記：tech-lead r1 P2） |
 | nav.history | 履歴 | History | ヘッダー |
 | nav.settings | 設定 | Settings | ヘッダー |
 | error.app.message | 保存データを読めませんでした。 | Saved data could not be read. | S0 error |
@@ -199,6 +204,8 @@ verifier はこの表から受け入れテストを書く。識別子の詳し�
 | error.app.reload | 再読み込み | Reload | S0 error（主操作） |
 | error.app.exportRaw | 壊れたデータをファイルに保存 | Save the damaged data to a file | S0 error |
 | error.app.delete | すべてのデータを削除 | Delete all data | S0 error（確認あり） |
+| error.app.storageUnavailable.message | このブラウザでは保存を使えません。 | Storage is not available in this browser. | S0 error（保存先が使えない。h1） |
+| error.app.storageUnavailable.detail | ブラウザの設定で、このサイトのデータの保存（Cookie とサイトデータ）が止められています。保存を許可してから再読み込みしてください。プライベートブラウズでも起きることがあります。 | Your browser settings block this site from saving data (cookies and site data). Allow it, then reload. This can also happen in private browsing. | S0 error（保存先が使えない） |
 | diagnosis.start.title | 3 問に答えると、今日の学習が 1 つ出ます | Answer 3 questions to get today's task | S1 h1 |
 | diagnosis.start.lead.1 | すでにコードを書いているエンジニア向けです。1 日 1 つ、15 分で終わる課題を出します。 | For engineers who already write code. One task a day, done in 15 minutes. | S1 |
 | diagnosis.start.lead.2 | 登録はありません。入力したデータはこのブラウザの中だけに保存され、外には送りません。 | No sign-up. Your data stays in this browser and is never sent anywhere. | S1 |
@@ -236,7 +243,7 @@ verifier はこの表から受け入れテストを書く。識別子の詳し�
 | diagnosis.next | 次へ | Next | S2 主操作 |
 | diagnosis.finish | 診断を終える | Finish | S2 主操作（3 問目） |
 | diagnosis.back | 前の質問へ | Back | S2 |
-| diagnosis.cancel | やめる | Cancel | S2（やり直しのときだけ） |
+| diagnosis.cancel | やめる | Cancel | S2（やり直しのときだけ。S8 から入ったら S8、S7 から入ったら S7 に戻る） |
 | error.diagnosis.required | 選択肢を 1 つ選んでください。 | Choose one option. | S2 |
 | error.storage.message | 保存できませんでした。入力はそのまま残っています。 | Could not save. Your input is still here. | S2、S3、S4、S8、ダイアログ |
 | error.storage.retry | もう一度保存する | Save again | 同上 |
@@ -279,7 +286,7 @@ verifier はこの表から受け入れテストを書く。識別子の詳し�
 | settings.export | ファイルに書き出す | Export to a file | S8 主操作 |
 | settings.export.done | 書き出しました | Exported | S8 status |
 | settings.import.note | 書き出したファイル（.json）を選びます。このブラウザのデータは、ファイルの内容に置き換わります。 | Choose an exported file (.json). The data in this browser will be replaced with the file's contents. | S8 |
-| settings.import | ファイルを読み込む | Import a file | S8 |
+| settings.import | ファイルを読み込む | Import a file | S8（見えるボタン。保存データがないときは主操作の形） |
 | error.import.message | このファイルは読み込めませんでした。このブラウザのデータは変わっていません。 | This file could not be imported. The data in this browser has not changed. | S8、S1 |
 | error.import.reason.version | ファイルの形式がこの版より新しいです。「今日の一手」を再読み込みして最新の版にしてから、もう一度読み込んでください。 | The file format is newer than this version. Reload 今日の一手 to get the latest version, then try again. | S8、S1 |
 | error.import.reason.schema | 「今日の一手」が書き出したファイルではないか、内容が壊れています。「ファイルに書き出す」で作った .json ファイルを選んでください。 | This is not a file exported by 今日の一手, or its contents are damaged. Choose a .json file created with "Export to a file". | S8、S1 |
@@ -335,7 +342,7 @@ verifier はこの表から受け入れテストを書く。識別子の詳し�
 
 権限と確認の求め方：
 - 保存の永続化（`navigator.storage.persist()`）：画面で理由を説明する事前の画面は置かない。初めて S3 を表示した直後に 1 回だけ呼ぶ（PRD 11 の冒頭）。ブラウザは多くの場合に確認を出さずに決める。断られたら S8 に `settings.storage.notPersisted` と「ファイルに書き出す」を置き、報酬で釣らない。
-- ファイルの読み込み：`<input type="file">` のブラウザ標準の選択ダイアログだけ。取り消したら何もしない。
+- ファイルの読み込み：見えるボタンが隠した `<input type="file">` の `click()` を呼び、ブラウザ標準の選択ダイアログだけを使う（9）。取り消したら何もしない。
 - 通知、位置情報、カメラ：使わない。
 
 ## 8. 見た目
@@ -345,13 +352,23 @@ verifier はこの表から受け入れテストを書く。識別子の詳し�
 - 画面の並び（縦の線）：全画面で本文の列を size.content.max（640 px）に収めて中央に置き、要素の左端を列の左の線にそろえる（B-3）。左右の余白は space.4（幅 600 px 未満）か space.5。題名の上は space.6、節の間は space.5、段落の間は space.4、ボタンの間は space.3、ラベルと入力欄の間は space.2。
 - 性格語が表れている場所（調査 5）：
   - ひとつ：S3 で画面に課題が 1 件だけあり、一覧も地図も進み具合もない。ヘッダーの nav はリンク 2 つだけ。S5 / S6 に次の課題を出さない。
-  - 静か：地が 1 色で、カード、影、グラデーション、アイコン、絵文字がない（tokens 1、D-20）。色は主操作の「完了」と意味色（`task.answer.saved` の成功、`settings.storage.notPersisted` の注意、エラーの文）だけ。動きは不透明度の 150 ms だけ（D-13）。
+  - 静か：地が 1 色で、カード、影、グラデーション、アイコン、絵文字がない（tokens 1、D-20）。動きは不透明度の 150 ms だけ（D-13）。色が付く所は次の一覧がすべて（design-reviewer r1 の 9）。
+    - color.action.primary：主操作の塗り（`diagnosis.start.begin`、`diagnosis.next` / `.finish`、`task.report.done`、`task.exhausted.redo`、`settings.export`、保存データなしの S8 の `settings.import`、`history.empty.action`、`error.app.reload`）、リンクの文字、radio の `accent-color`。color.focus（同じ値）はフォーカスの枠。
+    - color.success：`task.answer.saved`、`settings.export.done`。
+    - color.warning：`settings.storage.notPersisted`、`home.addToHomeScreen.title`（案内の h2）。
+    - color.error：エラーの文（`error.*`）とエラーのときの入力欄の枠、取り消せない操作のボタンの枠と文字（`settings.delete`、`error.app.delete`、`settings.delete.confirm.ok`、`settings.import.confirm.ok`）。
+    - color.overlay：ダイアログの `::backdrop`。
+    - これ以外は color.bg、color.text、color.text.secondary、color.border だけ。ホバーと押した瞬間も新しい色を足さない（tokens 4、D-28）。
   - 正直：S1 の `diagnosis.start.lead.2`（外に送らない）と `.3`（段階が変わる規則）、S7 の `task.exhausted.message`（尽きたと言い切る）、`home.standalone.import`（引き継がれない）、`settings.delete.confirm.body`（元に戻せない）、S9 の `settings.stats.note`（計算の出どころ）。
   - 手早い：S3 は開いて操作 0 回で題名が h1（AC-31）。S2 は 1 画面 1 問で確定は 1 ボタン。ボタンの文言はすべて動詞か 2〜6 文字の名詞（完了、次へ、閉じる）。
 - 差をつける点が表れている場所（調査 6）：
   1. 課題そのものがホーム画面：S3 の初期表示。ヘッダー（アプリ名と nav）の直下に `task.today.label` と h1 `task.today.title`、続けて `task.why`。読み込みが終わった瞬間に題名と「なぜ今これか」が最初の画面に入る（幅 320 px、文字 100% で、題名から「なぜ今これか」の 2 行目までが初期表示に収まるように、ヘッダーの高さを 56 px 以内にする）。
   2. 「今日はここまで」と言い切る終わりの画面：S5 の h1 `task.done.title` と `task.done.message` の 2 行と、小さなリンク 1 つ。S4 は 1 問だけで `task.rate.close` で抜けられる。
-- 参考にした原則のページ（URL、2026-10-30 確認）：https://www.w3.org/WAI/WCAG22/Understanding/use-of-color.html 、https://www.w3.org/WAI/WCAG22/Understanding/on-input.html 、https://www.w3.org/WAI/WCAG22/Understanding/label-in-name.html 、https://www.w3.org/WAI/WCAG22/Understanding/error-identification.html 、https://www.w3.org/WAI/WCAG22/Understanding/error-prevention-legal-financial-data.html 、https://www.w3.org/WAI/WCAG22/Understanding/text-spacing.html 、https://www.w3.org/WAI/ARIA/apg/patterns/alert/ 、https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/ 、https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-contrast 、https://developer.mozilla.org/en-US/docs/Web/CSS/@media/forced-colors 、https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/details 。調査にある R-14〜R-26 の URL も使う。HIG は本文が取れなかったので引用しない（調査 8 の末尾）。
+- ホーム画面のアイコンと manifest（tech-lead r1 P4。U-13 として Takuma の決定待ち。置かない場合はこの項と U-13 を削る）：
+  - 置くもの：`apple-touch-icon`（180 × 180 px の PNG 1 枚、10 KB 以下）と `manifest.webmanifest`（`name` と `short_name` は「今日の一手」、`display: standalone`、`start_url` と `scope` は `./`、`icons` は同じ PNG 1 枚）。どちらも初回転送 150 KB の中に数える。iOS は manifest の icons を使わず `apple-touch-icon` を読む（R-24）。
+  - 絵柄の案（D-20「画面の中のアイコン 0 個」と案A「一枚の紙」に合う最小の案）：地は color.bg のライトの値（#FFFFFF）1 色、中央に文字「一」1 字を color.text のライトの値（#1F1F1F）、書体はシステムの sans-serif の 700、字の幅はアイコンの幅の 60%。角丸はシステムが付けるので描かない。影、枠、グラデーションなし。「一」はアプリ名「今日の一手」の 1 字で、性格語「ひとつ」（1 日 1 つ）をそのまま表す。ダークモードの別版は作らない（iOS のホーム画面アイコンは 1 枚）。
+  - 置くと変わること：Android の Chrome も「ホーム画面に追加」でスタンドアロンになり、S1 の `home.standalone.import` が出る（AC-22 の判定 `display-mode: standalone` に含まれる）。
+- 参考にした原則のページ（URL、2026-10-30 確認）：https://www.w3.org/WAI/WCAG22/Understanding/use-of-color.html 、https://www.w3.org/WAI/WCAG22/Understanding/on-input.html 、https://www.w3.org/WAI/WCAG22/Understanding/label-in-name.html 、https://www.w3.org/WAI/WCAG22/Understanding/error-identification.html 、https://www.w3.org/WAI/WCAG22/Understanding/error-prevention-legal-financial-data.html 、https://www.w3.org/WAI/WCAG22/Understanding/text-spacing.html 、https://www.w3.org/WAI/ARIA/apg/patterns/alert/ 、https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/ 、https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-contrast 、https://developer.mozilla.org/en-US/docs/Web/CSS/@media/forced-colors 、https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/details 、https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/file（ファイルの読み込みの部品。D-27）、https://www.w3.org/WAI/WCAG22/Understanding/focus-visible.html（D-27）。調査にある R-14〜R-26 の URL も使う。HIG は本文が取れなかったので引用しない（調査 8 の末尾）。
 
 ## 9. アクセシビリティ
 - いちばん大きい文字（ブラウザの拡大 200%、幅 320 CSS px、OS の文字サイズ最大）で並びを変える場所：
@@ -365,17 +382,18 @@ verifier はこの表から受け入れテストを書く。識別子の詳し�
 - 色だけで区別していないか：外で行う印は文字「外で行う」と枠。保存の知らせは文字「保存しました」。エラーは文字と `role="alert"`。リンクは下線。radio の選択はネイティブの印。主操作と副操作は塗りと枠の違いに加えて文言で区別する（WCAG 2.2 SC 1.4.1）。
 - 動きを減らす設定、透明度を下げる設定のとき：`prefers-reduced-motion: reduce` で不透明度の変化を 0 ms にする（知らせは即時に出る）。半透明はダイアログの `::backdrop` だけで、`prefers-reduced-transparency: reduce` では不透明の color.bg と同じ地に枠線の見た目にする。`prefers-contrast: more` では tokens の「上げる」の値。`forced-colors: active` ではシステム色に任せ、印とボタンの枠、リンクの下線で意味を保つ（D-25）。
 - VoiceOver（TalkBack、NVDA）の読み上げ順：DOM の順＝見た目の順。
-  - S1：`<header>`（アプリ名）→ `<main>`：h1 → 説明 3 段落 →（スタンドアロンの案内：文 → 読み込むボタン）→（ホーム画面の案内：見出し → 理由 → 手順 1〜4 → 閉じる）→ 診断を始める。
+  - S1：`<header>`（アプリ名 → 設定）→ `<main>`：h1 → 説明 3 段落 →（スタンドアロンの案内：文 → 読み込むボタン。隠した input は読み上げの順に入らない）→（ホーム画面の案内：見出し → 理由 → 手順 1〜4 → 閉じる）→ 診断を始める。
   - S2：ヘッダー → 進み具合「質問 1 / 3」→ `<legend>` → 選択肢（radio のラベル。q2 は段階名と説明を 1 つのラベルにする）→（エラー）→ 次へ → 前の質問へ →（やめる）。質問が切り替わったら `<main>` の先頭（進み具合）にフォーカスを移す。
   - S3：ヘッダー（アプリ名 → 履歴 → 設定）→ 今日の課題と日付 → h1 題名 → 領域 / 段階 / 所要時間 →（外で行う → 要る道具の一覧）→ h2 なぜ今これか → 本文 → h2 やり方 → 本文 → h2 完了の目安 → 本文 → ラベル「答え（任意）」+ 補助文 → textarea →（保存しました：フォーカスを奪わず `role="status"` で読む）→ 申告の注記 → 完了 → 難しすぎ → 簡単すぎ → 今日はできない。
   - S4：ヘッダー → h1 完了しました → 問い → 役に立った → 立たなかった → 今回は答えない。状態が変わったら h1 にフォーカスを移す。
-  - S8：ヘッダー → h1 設定 → データ（注記 →（注意）→ 書き出す →（書き出しました）→ 読み込みの注記 → 読み込む →（エラー））→ 診断 → ホーム画面 → 記録 → 削除 → 版 → プライバシー。ダイアログは開いたら「やめる」にフォーカス、閉じたら呼び出したボタンに戻す。
+  - S8：ヘッダー → h1 設定 → データ（注記 →（注意）→ 書き出す →（書き出しました）→ 読み込みの注記 → 読み込む →（エラー））→ 診断 → ホーム画面 → 記録 → 削除 → 版 → プライバシー。ダイアログは開いたら「やめる」にフォーカス、閉じたら呼び出したボタンに戻す。保存データなしのとき：ヘッダー（アプリ名 → 設定）→ h1 設定 → データ（注記 → 読み込みの注記 → 読み込む →（エラー））→（ホーム画面）→ 版 → プライバシー。
+  - ファイルの読み込みの部品（S1 と S8 で同じ型。D-27。design-reviewer r1 の 4）：見える `<button>`（`home.standalone.importButton` / `settings.import`）が、隠した `<input type="file" accept=".json,application/json">`（`home.standalone.importFile` / `settings.import.file`）の `click()` を呼ぶ。input は視覚的に隠す（`position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%)`。`display: none` と `visibility: hidden` にはしない：MDN の `<input type="file">` のページは、この 2 つを支援技術が「操作できない部品」と解釈するため見えない状態で残す例を示している。2026-10-30 確認。MDN の例は `<label>` を押し口にするが、label は Tab で止まらないので、この仕様では `<button>` と `click()` にする）。input に `tabindex="-1"` と `aria-hidden="true"` を付け、Tab 順と読み上げの順から外す。フォーカスは常にボタンにあり、`:focus-visible` の枠（3 px、color.focus）はボタンに出る（AC-18）。アクセシブルな名前は見えるボタンの文字「ファイルを読み込む」で、input には名前を付けない（読み上げの対象外）。input の `change` で検査を始め、失敗はボタンの直下に出す（D-24）。選択を取り消したら何も起きず、フォーカスはボタンのまま。テストは input の `data-testid` に setInputFiles する（`change` が発火する）。
   - 全画面で、見える文字がアクセシブルな名前の先頭に入る（WCAG 2.2 SC 2.5.3）。`aria-label` で見える文字と違う名前を付けない。
 - 英語が長くなったとき（疑似言語の代わりに、英語の文言と、その 2 倍の長さの文字列で確かめる画面）：S3（申告の 4 ボタンと `task.meta`。英語「Not today」「Outside the browser」）、S8（設定の操作 7 つ。「Show how to add to the Home Screen」が最も長い）、S1（`home.addToHomeScreen.steps.4` の長文と「Import a file」）、ダイアログ（`settings.import.confirm.summary` の複数形）。どの画面もボタンの文字は折り返し可能（`white-space: normal`）で、幅は列いっぱいに広がるので切れない。
-- 押せる範囲：`<button>`、radio の `<label>`、`<summary>`、単独の `<a>` は 44 × 44 CSS px 以上（tokens の size.target.min）。本文の中のリンク（`settings.privacy`）は行の高さのままでよい（WCAG 2.2 SC 2.5.8 の文中の例外）。
+- 押せる範囲：`<button>`、radio の `<label>`、`<summary>`、単独の `<a>`（`nav.history`、`nav.settings`、`task.done.history`、`task.skipped.history`、`settings.stats.open`、`settings.history.open`、`settings.stats.back`、`settings.privacy`）は 44 × 44 CSS px 以上（tokens の size.target.min。リンクは `display: inline-block`、上下 space.3 の内側、`min-width: 44px`：tokens 4）。文中のリンクはこの機能にはない（`settings.privacy` も独立した行の単独のリンクとして扱う。design-reviewer r1 の 5）。ヘッダーの高さは nav のリンク（約 50 px）を入れても 56 px 以内（8 の差をつける点 1）。
 - キーボード：Tab 順は DOM 順。`<dialog>` はフォーカスを閉じ込め、Escape で閉じる。`<details>` は Enter / Space で開閉。radio は矢印で移動し Space で選ぶ（R-21）。フォーカスの枠は 3 px の `outline` と 2 px の `outline-offset`（AC-18 の 2 px 以上）。
 
-コントラスト（WCAG 2.2 の式で計算。独自の色の組ごと。四捨五入せず小数 2 桁で切り捨て。基準は 16 px の文字が 4.5:1 以上、24 px 以上か 18.5 px 以上の太字の文字と操作部品の枠が 3:1 以上：R-14、R-15）
+コントラスト（WCAG 2.2 の式で計算。独自の色の組ごと。小数 3 桁目を四捨五入して 2 桁（design-reviewer r1 の 6）。基準は 16 px の文字が 4.5:1 以上、24 px 以上か 18.5 px 以上の太字の文字と操作部品の枠が 3:1 以上：R-14、R-15）
 | 前景（文字、アイコン、枠）と背景の組 | ライト | ダーク | コントラストを上げる（ライト / ダーク） |
 |---|---|---|---|
 | color.text on color.bg（本文、見出し、印の文字と枠） | 16.48:1 | 15.29:1 | 21.00:1 / 21.00:1 |
@@ -387,7 +405,11 @@ verifier はこの表から受け入れテストを書く。識別子の詳し�
 | color.success on color.bg（保存しました） | 6.29:1 | 10.43:1 | 9.95:1 / 14.28:1 |
 | color.warning on color.bg（永続化の注意） | 7.48:1 | 11.36:1 | 10.70:1 / 15.25:1 |
 | color.error on color.bg（エラーの文字と枠、削除のボタン） | 6.57:1 | 7.84:1 | 9.39:1 / 11.83:1 |
-| radio、`<input type="file">`、`<dialog>` の `::backdrop` | システム色（`color-scheme` と `accent-color` に従う） | 同左 | 同左 |
+| 押した瞬間（`:active`）の入れ替え：color.action.primary on color.action.onPrimary、color.bg on color.text、color.bg on color.error | 6.70:1、16.48:1、6.57:1 | 8.24:1、15.29:1、7.84:1 | 上の行と同じ組の入れ替えなので同じ値（9.84 / 21.00 / 9.39、12.21 / 21.00 / 11.83） |
+| color.overlay（黒 50%）を color.bg に重ねた地と、ダイアログの地 color.bg | 3.95:1 | 1.06:1 | 3.95:1 / 1.00:1 |
+| color.overlay を重ねた地と、ダイアログの枠 color.border | 1.35:1 | 5.92:1 | 5.32:1 / 21.00:1 |
+| （上 2 行：どの設定でも、地の差か枠のどちらかで境目が 3:1 以上。design-reviewer r1 の 11） | | | |
+| radio | システム色（`color-scheme` と `accent-color` に従う） | 同左 | 同左 |
 
 ## 10. 決まっていないこと
 Takuma か tech-lead に決めてほしいこと。仕様はここに書いた暫定で進める。
@@ -395,19 +417,45 @@ Takuma か tech-lead に決めてほしいこと。仕様はここに書いた�
 - U-2（Takuma、見た目）：日付を両言語で ISO 8601（2026-11-01）にした。AC-24 の「見える文字と data-stat が同じ値」と `data-date` を一致させるため。日本語で「2026年11月1日」にしたい場合は、AC-24 の読み方（属性と見える文字の対応）を verifier と決め直す。
 - U-3（Takuma）：英語表示のときのアプリ名。`app.name` と文中の名前は英語でも「今日の一手」のまま置いた。ローマ字（Kyou no Itte）や英語名が要るか。
 - U-4（Takuma、見た目）：S5 に完了した課題の題名を 1 行残す（`task.done.task`）か、h1 と 1 文だけにするか。D-4 は残す側に置いた。
-- U-5（tech-lead、PRD にない挙動）：保存データが形式に合わないときの S0 の error 状態（`error.app.*`。再読み込み、壊れたデータのファイル保存、削除）。PRD の 10 の「保存の方式を後から変えてデータを失う」の手当てとして置いたが、PRD の AC にはない。採るかどうかと、保存の形式の検査の規則は ADR で決める。
+- U-5（tech-lead、PRD にない挙動）：保存データが形式に合わないときの S0 の error 状態（`error.app.*`。再読み込み、壊れたデータのファイル保存、削除）と、保存先が使えないときの変種（`error.app.storageUnavailable.*`。tech-lead r1 P1）。PRD の 10 の「保存の方式を後から変えてデータを失う」の手当てとして置いたが、PRD の AC にはない。tech-lead r1 の確定案は「採る。error にする条件は JSON.parse の失敗、スキーマ不一致、formatVersion が新しい、localStorage の例外」。確定は ADR。
 - U-6（tech-lead）：答えの欄の文字数の上限 `answer.max`（localStorage の容量の都合。`task.answer.limit` の {max}）。
 - U-7（tech-lead）：診断のやり直し（S8 → S2）の保存の仕方。初回は質問ごとに保存する（AC-11）が、やり直しの途中で「やめる」を押したときに元の診断が壊れないよう、やり直しは下書きに保存して「診断を終える」で確定する作りを求める。PRD の「回答は質問ごとに確定したときに保存する」は初回の規則として読んだ。
-- U-8（tech-lead）：経験年数の 4 区分（`years.lt1`、`years.1to3`、`years.3to5`、`years.gte5`）と段階の表示名（初級 / 中級 / 上級）、領域の ID。PRD は区分の中身を決めていない。ID は contracts/ で確定し、文言キーの末尾はそれに合わせて直してよい。
+- U-8（tech-lead）：経験年数の 4 区分（`years.lt1`、`years.1to3`、`years.3to5`、`years.gte5`）と段階の表示名（初級 / 中級 / 上級）、領域の ID。PRD は区分の中身を決めていない。tech-lead r1 の確定案は仕様の値をそのまま ID にする（領域 backend / frontend / database / infra / testing / git、段階 beginner / intermediate / advanced、年数 lt1 / 1to3 / 3to5 / gte5）。文言キーの末尾はこれと同じなので、仕様の表記は変えない。確定は contracts/。
 - U-9（pdm）：`settings.privacy` のリンク先（docs/support/ のプライバシーのページの URL）。G5 の前に決まるまでリンクは出さない。
 - U-10（verifier、PRD の読み方）：AC-21 の状態の説明（PRD 11 の冒頭）は案内を「重ねて出す」と書くが、AC-21 の Then は「画面に案内がある」で足りるので、R-18 と AC-31 に合わせて重ねずに本文の一部として置いた（D-10）。テストは `[data-testid="home.addToHomeScreen"]` の存在で見る。
-- U-11（verifier、識別子の名前）：PRD が仮に置いた `task-answer` を、他のキーと同じドット区切りの `task.answer` にした。
+- U-11（verifier、識別子の名前）：PRD が仮に置いた `task-answer` を、他のキーと同じドット区切りの `task.answer` にした。tech-lead r1 の確定案も `task.answer`。確定は contracts/。
 - U-12（Takuma、見た目）：radio のラベル全体を 44 px の高さにし、q2 の段階に 1 行の説明（`level.*.desc`）を付けた。説明は自己評価のぶれを減らすためだが、PRD の 3 問の文面は pdm と Takuma が最終的に決める。
+- U-13（Takuma、見た目。tech-lead r1 P4）：ホーム画面のアイコン（`apple-touch-icon` 180 px の PNG、10 KB 以下）と manifest（`name`、`display: standalone`、`start_url` と `scope` は `./`）を置くか。置く場合の形と絵柄の案（白地に「一」1 字）は 8 に書いた。Takuma の決定待ち。置かない場合は 8 の項とこの U-13 を削り、iOS のアイコンはページの縮小画像のままになる。
+- 決まったこと（r2 で閉じた）：申告の取り消しは置かない（D-26）。ファイルの読み込みの部品は S1 と S8 で同じ型（D-27）。ホバーと押した瞬間は tokens 4（D-28）。ダイアログの背景は color.overlay（tokens 1）。
+
+## 11. 変更の記録（G1 r1 → r2）
+design-reviewer r2 と tech-lead が追跡するための一覧。行番号は r2 のこのファイル。
+
+| 指摘 | 直した所 |
+|---|---|
+| design-reviewer 1（重大。S1 から設定に行けない） | 1 の流れ（nav の行と、保存データなしの読み込みの行）、2 の AC-20・AC-21・AC-22、3 の冒頭の文と S8 の主操作、5 の S1 の通常と S8 の空（読み込みを主操作に）、6 の nav の行、9 の S1 と S8 の読み上げ順。screens.md の S8（保存データなし）の図を追加 |
+| design-reviewer 2（重大。理由のない「なし」12 セル） | 5 の全行。S4〜S7、S10、ダイアログ 2 つの空と読み込み中に理由を足し、権限と一部だけ読めたときの「なし」にも理由を足した（表の前の説明も） |
+| design-reviewer 3（要修正。4 要素の形） | 2 の AC-3（`<dd>` → `<h2>` と段落）。tokens.md の 4「定義リスト」を統計と要る道具に限定し、「見出しと段落（課題の 4 要素）」の行を足した |
+| design-reviewer 4（要修正。ファイル読み込みの部品） | 3 の S1・S8（本来の部品、理由、対応）、4 の D-27、5 の S1・S8、6 の S1・S8、7 の権限の文、9「ファイルの読み込みの部品」。tokens.md の 4 に「ファイルの読み込み」の行。screens.md の S1 と S8 |
+| design-reviewer 5（要修正。リンクの押せる範囲） | 4 の D-16、9 の押せる範囲（`settings.privacy` を単独のリンクに）、tokens.md の 4「リンク」（上下 space.3、`min-width: 44px`） |
+| design-reviewer 6（提案。注記） | 9 のコントラストの注記を「小数 3 桁目を四捨五入」に。値はそのまま |
+| design-reviewer 7（提案。申告の取り消し） | 置かない。理由は 4 の D-26 |
+| design-reviewer 8（提案。S7 からのやり直しの「やめる」） | 1 の流れ、5 の S2・S7、7 の `diagnosis.cancel` の使う場所（S7 に戻す） |
+| design-reviewer 9（提案。色の使い所） | 8 の「静か」に色ごとの一覧（warning の案内の見出し、error の削除ボタンを含む） |
+| design-reviewer 10（提案。ホバーと押した瞬間） | tokens.md の 4「ホバーと押した瞬間」、4 の D-28、9 のコントラストの表（入れ替えの組） |
+| design-reviewer 11（提案。背景の値） | tokens.md の 1 に color.overlay、4「ダイアログ」を名前で参照。9 の表に重ねた地の比 |
+| tech-lead M1（答えの保存の間隔） | 1 の流れ、2 の AC-32、4 の D-5、5 の S3 |
+| tech-lead M2（診断の途中の行き先） | 1 の流れ、5 の S2 と S8（「保存データあり」の定義は契約） |
+| tech-lead P1（保存が使えない） | 1 の流れ、5 の S0、6 の S0、7 に `error.app.storageUnavailable.message` / `.detail` を追加（143 → 145 キー）、10 の U-5 |
+| tech-lead P2（殻の 2 文） | 5 の S0、7 の `app.loading` と `app.noscript` の使う場所（HTML に日英を併記。キーは残す） |
+| tech-lead P3（ダイアログ） | 2 の AC-31、3 のダイアログの行、5 のダイアログ 2 行（開くときに足し、閉じたら外す。数え方は契約） |
+| tech-lead P4（アイコンと manifest） | 8 の項と 10 の U-13（Takuma の決定待ち） |
+| tech-lead A（U-8、U-11 の確定案） | 10 の U-5、U-8、U-11 に確定案を書いた。仕様の表記は変えていない（確定案と同じ） |
 
 ## 確かめ（提出前に designer が印を付ける。design-reviewer はこれを信じずに確かめる）
 - [x] 調査が先にあり、決定表のすべての行に R-n と原則がある（R-n は調査に実在する）：D-1〜D-25。調査は 854cf47 でコミット済み
 - [x] 全画面に、仕事、主操作1つ、使う標準部品がある（3 の表。S0〜S10 とダイアログ）
-- [x] 全画面の7つの状態が埋まっている（5 の表。該当しない所は「なし」と理由）
+- [x] 全画面の7つの状態が埋まっている（5 の表。「なし」のすべてに理由がある：r2 で数えて 0 件の理由なし）
 - [x] 押せる範囲が 44x44pt 以上。コントラストが基準を満たし、独自の色の組に数字が3通りある（9 の表。最小は 5.33:1）
 - [x] AX5 での並びと、VoiceOver の読み上げ順が書いてある（9）
 - [x] 性格語と差をつける点が、画面のどこに表れているか書いてある（8）
