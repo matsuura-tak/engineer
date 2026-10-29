@@ -1,0 +1,421 @@
+# 赤の証拠 001-personal-learning-loop（実装の前に受け入れテストを動かした記録）
+# 日時: 2026-10-30T07:22:21+0900
+# コミット: f8bb41604edcc6ad1ea6c6aca31642cc73697cdf（ブランチ feat/001-personal-learning-loop。受け入れテストは未コミットの作業ツリー）
+# Python: Python 3.9.6  OS: macOS 27.2
+# backend/ の中身（受け入れテスト以外）: 0 件
+# ポート 8000 の待ち受け（実行前）: 0 件
+
+## 1. CLAUDE.md の受け入れテストのコマンド（そのまま）
+$ python3 -m unittest discover -s backend/tests/acceptance -t backend/tests/acceptance -p "test_*.py"
+EEEEEEEEEEEEEEEEEEEEEEEEEEEE
+======================================================================
+ERROR: test_AC1_URLなし領域自動_3秒以内に201で15XPと3観点の問題1問と初回カードが返り保存される (test_ac1_create_learning.AC1_CreateLearningTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 285, in setUp
+    ensure_server()
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 179, in ensure_server
+    _STATE.base_url = override.rstrip("/") if override else _start_server()
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 149, in _start_server
+    raise RuntimeError(
+RuntimeError: サーバーが起動できない（`python3 -m backend.app` が終了コード 1 で終わった）。サーバーの出力:
+/Applications/Xcode.app/Contents/Developer/usr/bin/python3: No module named backend.app
+
+
+======================================================================
+ERROR: test_AC1_メモ境界値10文字と2000文字_どちらも201 (test_ac1_create_learning.AC1_CreateLearningTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 285, in setUp
+    ensure_server()
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 176, in ensure_server
+    raise RuntimeError(_STATE.failure)
+RuntimeError: サーバーが起動できない（`python3 -m backend.app` が終了コード 1 で終わった）。サーバーの出力:
+/Applications/Xcode.app/Contents/Developer/usr/bin/python3: No module named backend.app
+
+
+======================================================================
+ERROR: test_AC1_公開URLあり取得成功_201でurl_fetch_statusがfetched (test_ac1_create_learning.AC1_CreateLearningTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 285, in setUp
+    ensure_server()
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 176, in ensure_server
+    raise RuntimeError(_STATE.failure)
+RuntimeError: サーバーが起動できない（`python3 -m backend.app` が終了コード 1 で終わった）。サーバーの出力:
+/Applications/Xcode.app/Contents/Developer/usr/bin/python3: No module named backend.app
+
+
+======================================================================
+ERROR: test_AC1_登録の後にサーバーを再起動しても_XPと問題とカードが残る (test_ac1_create_learning.AC1_CreateLearningTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 285, in setUp
+    ensure_server()
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 176, in ensure_server
+    raise RuntimeError(_STATE.failure)
+RuntimeError: サーバーが起動できない（`python3 -m backend.app` が終了コード 1 で終わった）。サーバーの出力:
+/Applications/Xcode.app/Contents/Developer/usr/bin/python3: No module named backend.app
+
+
+======================================================================
+ERROR: test_AC1_領域を指定_6領域それぞれ指定どおりに15XPが入る (test_ac1_create_learning.AC1_CreateLearningTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 285, in setUp
+    ensure_server()
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 176, in ensure_server
+    raise RuntimeError(_STATE.failure)
+RuntimeError: サーバーが起動できない（`python3 -m backend.app` が終了コード 1 で終わった）。サーバーの出力:
+/Applications/Xcode.app/Contents/Developer/usr/bin/python3: No module named backend.app
+
+
+======================================================================
+ERROR: test_AC2_未回答3件と期限到来7枚_1秒以内に200で問題1件とカード古い順5件と総数7 (test_ac2_today_session.AC2_TodaySessionTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 285, in setUp
+    ensure_server()
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 176, in ensure_server
+    raise RuntimeError(_STATE.failure)
+RuntimeError: サーバーが起動できない（`python3 -m backend.app` が終了コード 1 で終わった）。サーバーの出力:
+/Applications/Xcode.app/Contents/Developer/usr/bin/python3: No module named backend.app
+
+
+======================================================================
+ERROR: test_AC2_現在時刻を3日進める_期限到来の総数が9になり表示は5件のまま (test_ac2_today_session.AC2_TodaySessionTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 285, in setUp
+    ensure_server()
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 176, in ensure_server
+    raise RuntimeError(_STATE.failure)
+RuntimeError: サーバーが起動できない（`python3 -m backend.app` が終了コード 1 で終わった）。サーバーの出力:
+/Applications/Xcode.app/Contents/Developer/usr/bin/python3: No module named backend.app
+
+
+======================================================================
+ERROR: test_AC3_3観点すべて達成_1秒以内に200でcompletedと50XPと連続日数が1増え保存される (test_ac3_submit_challenge.AC3_SubmitChallengeTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 285, in setUp
+    ensure_server()
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 176, in ensure_server
+    raise RuntimeError(_STATE.failure)
+RuntimeError: サーバーが起動できない（`python3 -m backend.app` が終了コード 1 で終わった）。サーバーの出力:
+/Applications/Xcode.app/Contents/Developer/usr/bin/python3: No module named backend.app
+
+
+======================================================================
+ERROR: test_AC3_連続日数_当日初回なら1増え当日2回目なら増えない (test_ac3_submit_challenge.AC3_SubmitChallengeTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 285, in setUp
+    ensure_server()
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 176, in ensure_server
+    raise RuntimeError(_STATE.failure)
+RuntimeError: サーバーが起動できない（`python3 -m backend.app` が終了コード 1 で終わった）。サーバーの出力:
+/Applications/Xcode.app/Contents/Developer/usr/bin/python3: No module named backend.app
+
+
+======================================================================
+ERROR: test_AC3_達成観点数0から3_XPは20から50でレベルの境界100をまたぐ (test_ac3_submit_challenge.AC3_SubmitChallengeTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 285, in setUp
+    ensure_server()
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 176, in ensure_server
+    raise RuntimeError(_STATE.failure)
+RuntimeError: サーバーが起動できない（`python3 -m backend.app` が終了コード 1 で終わった）。サーバーの出力:
+/Applications/Xcode.app/Contents/Developer/usr/bin/python3: No module named backend.app
+
+
+======================================================================
+ERROR: test_AC4_rep1から4段階それぞれ_rep間隔EFと次回日時が契約の式どおり (test_ac4_grade_review.AC4_GradeReviewTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 285, in setUp
+    ensure_server()
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 176, in ensure_server
+    raise RuntimeError(_STATE.failure)
+RuntimeError: サーバーが起動できない（`python3 -m backend.app` が終了コード 1 で終わった）。サーバーの出力:
+/Applications/Xcode.app/Contents/Developer/usr/bin/python3: No module named backend.app
+
+
+======================================================================
+ERROR: test_AC4_rep1でgrade3_1秒以内に200でrep2と間隔6日と10XPになり未消化が1件減る (test_ac4_grade_review.AC4_GradeReviewTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 285, in setUp
+    ensure_server()
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 176, in ensure_server
+    raise RuntimeError(_STATE.failure)
+RuntimeError: サーバーが起動できない（`python3 -m backend.app` が終了コード 1 で終わった）。サーバーの出力:
+/Applications/Xcode.app/Contents/Developer/usr/bin/python3: No module named backend.app
+
+
+======================================================================
+ERROR: test_AC4_rep2以上と下限_四捨五入とease_factorの下限1点3 (test_ac4_grade_review.AC4_GradeReviewTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 285, in setUp
+    ensure_server()
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 176, in ensure_server
+    raise RuntimeError(_STATE.failure)
+RuntimeError: サーバーが起動できない（`python3 -m backend.app` が終了コード 1 で終わった）。サーバーの出力:
+/Applications/Xcode.app/Contents/Developer/usr/bin/python3: No module named backend.app
+
+
+======================================================================
+ERROR: test_AC5_レベルの境界_99は1で100は2で199は2で200は3 (test_ac5_skills_summary.AC5_SkillsSummaryTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 285, in setUp
+    ensure_server()
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 176, in ensure_server
+    raise RuntimeError(_STATE.failure)
+RuntimeError: サーバーが起動できない（`python3 -m backend.app` が終了コード 1 で終わった）。サーバーの出力:
+/Applications/Xcode.app/Contents/Developer/usr/bin/python3: No module named backend.app
+
+
+======================================================================
+ERROR: test_AC5_学習実績あり_1秒以内に200で6領域のXPとレベルと残りXPと全体の値が返る (test_ac5_skills_summary.AC5_SkillsSummaryTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 285, in setUp
+    ensure_server()
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 176, in ensure_server
+    raise RuntimeError(_STATE.failure)
+RuntimeError: サーバーが起動できない（`python3 -m backend.app` が終了コード 1 で終わった）。サーバーの出力:
+/Applications/Xcode.app/Contents/Developer/usr/bin/python3: No module named backend.app
+
+
+======================================================================
+ERROR: test_AC5_直近7日間の達成数_思考問題クリア2件と復習grade3以上2件で4 (test_ac5_skills_summary.AC5_SkillsSummaryTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 285, in setUp
+    ensure_server()
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 176, in ensure_server
+    raise RuntimeError(_STATE.failure)
+RuntimeError: サーバーが起動できない（`python3 -m backend.app` が終了コード 1 で終わった）。サーバーの出力:
+/Applications/Xcode.app/Contents/Developer/usr/bin/python3: No module named backend.app
+
+
+======================================================================
+ERROR: test_AC6_学習データ0件_セッションは空で6領域すべて0XPレベル1 (test_ac6_empty_state.AC6_EmptyStateTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 285, in setUp
+    ensure_server()
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 176, in ensure_server
+    raise RuntimeError(_STATE.failure)
+RuntimeError: サーバーが起動できない（`python3 -m backend.app` が終了コード 1 で終わった）。サーバーの出力:
+/Applications/Xcode.app/Contents/Developer/usr/bin/python3: No module named backend.app
+
+
+======================================================================
+ERROR: test_AC6_学習済みでも本日の未回答0件と期限到来0枚_セッションは空 (test_ac6_empty_state.AC6_EmptyStateTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 285, in setUp
+    ensure_server()
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 176, in ensure_server
+    raise RuntimeError(_STATE.failure)
+RuntimeError: サーバーが起動できない（`python3 -m backend.app` が終了コード 1 で終わった）。サーバーの出力:
+/Applications/Xcode.app/Contents/Developer/usr/bin/python3: No module named backend.app
+
+
+======================================================================
+ERROR: test_AC6_画面HTMLに空状態ガイドと登録フォームへの誘導ボタンの識別子がある (test_ac6_empty_state.AC6_EmptyStateTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 285, in setUp
+    ensure_server()
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 176, in ensure_server
+    raise RuntimeError(_STATE.failure)
+RuntimeError: サーバーが起動できない（`python3 -m backend.app` が終了コード 1 で終わった）。サーバーの出力:
+/Applications/Xcode.app/Contents/Developer/usr/bin/python3: No module named backend.app
+
+
+======================================================================
+ERROR: test_AC7_gradeが0と5とマイナスと小数と文字列と真偽値とnullと欠落_1秒以内に400でカードは変わらない (test_ac7_validation_error.AC7_ValidationErrorTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 285, in setUp
+    ensure_server()
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 176, in ensure_server
+    raise RuntimeError(_STATE.failure)
+RuntimeError: サーバーが起動できない（`python3 -m backend.app` が終了コード 1 で終わった）。サーバーの出力:
+/Applications/Xcode.app/Contents/Developer/usr/bin/python3: No module named backend.app
+
+
+======================================================================
+ERROR: test_AC7_メモが9文字と2001文字と空と欠落と型違い_1秒以内に400で保存されない (test_ac7_validation_error.AC7_ValidationErrorTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 285, in setUp
+    ensure_server()
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 176, in ensure_server
+    raise RuntimeError(_STATE.failure)
+RuntimeError: サーバーが起動できない（`python3 -m backend.app` が終了コード 1 で終わった）。サーバーの出力:
+/Applications/Xcode.app/Contents/Developer/usr/bin/python3: No module named backend.app
+
+
+======================================================================
+ERROR: test_AC7_回答が9文字と2001文字と達成観点数がマイナス1と4_400で問題は未回答のまま (test_ac7_validation_error.AC7_ValidationErrorTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 285, in setUp
+    ensure_server()
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 176, in ensure_server
+    raise RuntimeError(_STATE.failure)
+RuntimeError: サーバーが起動できない（`python3 -m backend.app` が終了コード 1 で終わった）。サーバーの出力:
+/Applications/Xcode.app/Contents/Developer/usr/bin/python3: No module named backend.app
+
+
+======================================================================
+ERROR: test_AC8_URL取得がタイムアウトと接続失敗_3秒以内に201でfallback_usedとメモから問題とカードができる (test_ac8_fallback_and_offline.AC8_FallbackAndOfflineTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 285, in setUp
+    ensure_server()
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 176, in ensure_server
+    raise RuntimeError(_STATE.failure)
+RuntimeError: サーバーが起動できない（`python3 -m backend.app` が終了コード 1 で終わった）。サーバーの出力:
+/Applications/Xcode.app/Contents/Developer/usr/bin/python3: No module named backend.app
+
+
+======================================================================
+ERROR: test_AC8_接続先を到達不能にした画面HTMLにエラーバナーと再試行ボタンと入力欄の識別子がある (test_ac8_fallback_and_offline.AC8_FallbackAndOfflineTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 285, in setUp
+    ensure_server()
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 176, in ensure_server
+    raise RuntimeError(_STATE.failure)
+RuntimeError: サーバーが起動できない（`python3 -m backend.app` が終了コード 1 で終わった）。サーバーの出力:
+/Applications/Xcode.app/Contents/Developer/usr/bin/python3: No module named backend.app
+
+
+======================================================================
+ERROR: test_AC8_通信切断後の再試行_同じIdempotency_Keyで2回送っても1件だけ作られる (test_ac8_fallback_and_offline.AC8_FallbackAndOfflineTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 285, in setUp
+    ensure_server()
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 176, in ensure_server
+    raise RuntimeError(_STATE.failure)
+RuntimeError: サーバーが起動できない（`python3 -m backend.app` が終了コード 1 で終わった）。サーバーの出力:
+/Applications/Xcode.app/Contents/Developer/usr/bin/python3: No module named backend.app
+
+
+======================================================================
+ERROR: test_AC9_プライベートとリンクローカルとlocalhostと非HTTPスキーム_すべて400で保存されない (test_ac9_ssrf_and_permissions.AC9_SsrfAndPermissionsTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/test_ac9_ssrf_and_permissions.py", line 43, in setUp
+    super().setUp()
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 285, in setUp
+    ensure_server()
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 176, in ensure_server
+    raise RuntimeError(_STATE.failure)
+RuntimeError: サーバーが起動できない（`python3 -m backend.app` が終了コード 1 で終わった）。サーバーの出力:
+/Applications/Xcode.app/Contents/Developer/usr/bin/python3: No module named backend.app
+
+
+======================================================================
+ERROR: test_AC9_ループバックの待ち受けを指すURL_400で待ち受けへの要求は0件 (test_ac9_ssrf_and_permissions.AC9_SsrfAndPermissionsTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/test_ac9_ssrf_and_permissions.py", line 43, in setUp
+    super().setUp()
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 285, in setUp
+    ensure_server()
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 176, in ensure_server
+    raise RuntimeError(_STATE.failure)
+RuntimeError: サーバーが起動できない（`python3 -m backend.app` が終了コード 1 で終わった）。サーバーの出力:
+/Applications/Xcode.app/Contents/Developer/usr/bin/python3: No module named backend.app
+
+
+======================================================================
+ERROR: test_AC9_画面HTMLは通知やクリップボードなどのブラウザ権限APIを呼ばない (test_ac9_ssrf_and_permissions.AC9_SsrfAndPermissionsTest)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/test_ac9_ssrf_and_permissions.py", line 43, in setUp
+    super().setUp()
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 285, in setUp
+    ensure_server()
+  File "/Users/takumamatsuura/Downloads/学習/backend/tests/acceptance/acceptance_support.py", line 176, in ensure_server
+    raise RuntimeError(_STATE.failure)
+RuntimeError: サーバーが起動できない（`python3 -m backend.app` が終了コード 1 で終わった）。サーバーの出力:
+/Applications/Xcode.app/Contents/Developer/usr/bin/python3: No module named backend.app
+
+
+----------------------------------------------------------------------
+Ran 28 tests in 0.050s
+
+FAILED (errors=28)
+# 終了コード: 1
+
+## 2. 同じコマンドに -v を付けたもの（テストの名前と AC 番号の一覧のため）
+$ python3 -m unittest discover -v -s backend/tests/acceptance -t backend/tests/acceptance -p "test_*.py" 2>&1 | grep -E " \.\.\. |^Ran |^FAILED|^OK"
+test_AC1_URLなし領域自動_3秒以内に201で15XPと3観点の問題1問と初回カードが返り保存される (test_ac1_create_learning.AC1_CreateLearningTest) ... ERROR
+test_AC1_メモ境界値10文字と2000文字_どちらも201 (test_ac1_create_learning.AC1_CreateLearningTest) ... ERROR
+test_AC1_公開URLあり取得成功_201でurl_fetch_statusがfetched (test_ac1_create_learning.AC1_CreateLearningTest) ... ERROR
+test_AC1_登録の後にサーバーを再起動しても_XPと問題とカードが残る (test_ac1_create_learning.AC1_CreateLearningTest) ... ERROR
+test_AC1_領域を指定_6領域それぞれ指定どおりに15XPが入る (test_ac1_create_learning.AC1_CreateLearningTest) ... ERROR
+test_AC2_未回答3件と期限到来7枚_1秒以内に200で問題1件とカード古い順5件と総数7 (test_ac2_today_session.AC2_TodaySessionTest) ... ERROR
+test_AC2_現在時刻を3日進める_期限到来の総数が9になり表示は5件のまま (test_ac2_today_session.AC2_TodaySessionTest) ... ERROR
+test_AC3_3観点すべて達成_1秒以内に200でcompletedと50XPと連続日数が1増え保存される (test_ac3_submit_challenge.AC3_SubmitChallengeTest) ... ERROR
+test_AC3_連続日数_当日初回なら1増え当日2回目なら増えない (test_ac3_submit_challenge.AC3_SubmitChallengeTest) ... ERROR
+test_AC3_達成観点数0から3_XPは20から50でレベルの境界100をまたぐ (test_ac3_submit_challenge.AC3_SubmitChallengeTest) ... ERROR
+test_AC4_rep1から4段階それぞれ_rep間隔EFと次回日時が契約の式どおり (test_ac4_grade_review.AC4_GradeReviewTest) ... ERROR
+test_AC4_rep1でgrade3_1秒以内に200でrep2と間隔6日と10XPになり未消化が1件減る (test_ac4_grade_review.AC4_GradeReviewTest) ... ERROR
+test_AC4_rep2以上と下限_四捨五入とease_factorの下限1点3 (test_ac4_grade_review.AC4_GradeReviewTest) ... ERROR
+test_AC5_レベルの境界_99は1で100は2で199は2で200は3 (test_ac5_skills_summary.AC5_SkillsSummaryTest) ... ERROR
+test_AC5_学習実績あり_1秒以内に200で6領域のXPとレベルと残りXPと全体の値が返る (test_ac5_skills_summary.AC5_SkillsSummaryTest) ... ERROR
+test_AC5_直近7日間の達成数_思考問題クリア2件と復習grade3以上2件で4 (test_ac5_skills_summary.AC5_SkillsSummaryTest) ... ERROR
+test_AC6_学習データ0件_セッションは空で6領域すべて0XPレベル1 (test_ac6_empty_state.AC6_EmptyStateTest) ... ERROR
+test_AC6_学習済みでも本日の未回答0件と期限到来0枚_セッションは空 (test_ac6_empty_state.AC6_EmptyStateTest) ... ERROR
+test_AC6_画面HTMLに空状態ガイドと登録フォームへの誘導ボタンの識別子がある (test_ac6_empty_state.AC6_EmptyStateTest) ... ERROR
+test_AC7_gradeが0と5とマイナスと小数と文字列と真偽値とnullと欠落_1秒以内に400でカードは変わらない (test_ac7_validation_error.AC7_ValidationErrorTest) ... ERROR
+test_AC7_メモが9文字と2001文字と空と欠落と型違い_1秒以内に400で保存されない (test_ac7_validation_error.AC7_ValidationErrorTest) ... ERROR
+test_AC7_回答が9文字と2001文字と達成観点数がマイナス1と4_400で問題は未回答のまま (test_ac7_validation_error.AC7_ValidationErrorTest) ... ERROR
+test_AC8_URL取得がタイムアウトと接続失敗_3秒以内に201でfallback_usedとメモから問題とカードができる (test_ac8_fallback_and_offline.AC8_FallbackAndOfflineTest) ... ERROR
+test_AC8_接続先を到達不能にした画面HTMLにエラーバナーと再試行ボタンと入力欄の識別子がある (test_ac8_fallback_and_offline.AC8_FallbackAndOfflineTest) ... ERROR
+test_AC8_通信切断後の再試行_同じIdempotency_Keyで2回送っても1件だけ作られる (test_ac8_fallback_and_offline.AC8_FallbackAndOfflineTest) ... ERROR
+test_AC9_プライベートとリンクローカルとlocalhostと非HTTPスキーム_すべて400で保存されない (test_ac9_ssrf_and_permissions.AC9_SsrfAndPermissionsTest) ... ERROR
+test_AC9_ループバックの待ち受けを指すURL_400で待ち受けへの要求は0件 (test_ac9_ssrf_and_permissions.AC9_SsrfAndPermissionsTest) ... ERROR
+test_AC9_画面HTMLは通知やクリップボードなどのブラウザ権限APIを呼ばない (test_ac9_ssrf_and_permissions.AC9_SsrfAndPermissionsTest) ... ERROR
+Ran 28 tests in 0.049s
+FAILED (errors=28)
+# 終了コード: 1
+
+## 3. 落ちた理由の集計（書き間違いではないことの確認）
+- ERROR の行の数: 28
+- FAIL の行の数: 0
+- 理由が「サーバーが起動できない」の数: 28
+- テストのモジュールを読み込めなかった数（ImportError / SyntaxError / _FailedTest）: 0
+- サーバーの出力: /Applications/Xcode.app/Contents/Developer/usr/bin/python3: No module named backend.app
+- py_compile: すべて成功（終了コード 0）
+- 実行後のポート 8000 の待ち受け: 0 件（子プロセスの残りなし）
+
+## 4. 参考：テストのコードと起動の補助が最後まで動くかの自己点検（合否の証拠ではない）
+- 契約の例と式だけから書いた使い捨ての偽サーバー（リポジトリの外：/Users/takumamatsuura/.gemini/antigravity/brain/51c66f78-e358-4e79-ac29-85c8bc372cb9/scratch/fakeroot/backend/app.py）を、
+  acceptance_support の REPO_ROOT だけを差し替えて同じ起動の道（python -m backend.app、DEVFORGE_DB_PATH、再起動）で動かした。
+  目的は、テストの中の名前・型・計算の誤りと、起動・再起動・後片付けの誤りで落ちないことの確認だけ。偽サーバーは製品ではなく、G3 の合否に使わない。
+$ python3 -B /Users/takumamatsuura/.gemini/antigravity/brain/51c66f78-e358-4e79-ac29-85c8bc372cb9/scratch/spawn_check.py
+............................
+----------------------------------------------------------------------
+Ran 28 tests in 1.706s
+
+OK
+# 終了コード: 0
+$ 1本ずつ別プロセスで実行（order_check.py one <テストID> を全テストで）
+# 28 本を1本ずつ実行、失敗 0 本
+$ ランダム順（order_check.py shuffle <seed>、seed 1〜3）
+seed 1: OK
+seed 2: OK
+seed 3: OK
+- 実行後のポート 8000 の待ち受け: 0 件
