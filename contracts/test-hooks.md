@@ -25,6 +25,7 @@ verifier G0 r3 の W-1〜W-16 を、名前と値まで決めたものです。�
 - `page.clock.setFixedTime(…)`（Date と new Date だけを固定し、タイマーは動く）と、コンテキストの `timezoneId: 'Asia/Tokyo'`。`page.clock.install()` は使わない（答えの保存の 300 ms のタイマーが止まるため）。
 - 日付を進めるときは `setFixedTime` を新しい日時で呼び直してから読み込む。
 - AC-15 では時刻を固定しない（performance を上書きしないため）。
+- setFixedTime の下では、ページの `performance` は Playwright の置き換えになり、`Date.now()` は止まる。AC-1、AC-2、AC-23 の秒数は「時間の計り方」の節のとおりに計る。
 - SW は時刻を使わない（service-worker.md の 5）ので、SW の中に時刻が効かなくても結果は変わらない。
 - AC-19 と AC-20 は同じ固定の日付で行う。日付が変わると、書き出したときの `current` が読み込みの後に `none` の行として `history` に移り、履歴が 1 行増える（data.md の 4）。
 
@@ -67,6 +68,7 @@ verifier G0 r3 の W-1〜W-16 を、名前と値まで決めたものです。�
 
 ## W-10 読み込み時間
 - ルートの `data-debug-load-ms`（identifiers.md の 1）。本番にも残る読み取り専用の値。
+- 読むのは AC-15 だけ。アプリが出す値なので、AC-1、AC-2、AC-23 の秒数には使わない（「時間の計り方」の節）。
 
 ## W-11 AC-15 の制限
 - Chromium だけ。`context.newCDPSession(page)` で：
@@ -75,6 +77,53 @@ verifier G0 r3 の W-1〜W-16 を、名前と値まで決めたものです。�
 - 1 回ごとに新しいコンテキスト（キャッシュなし）に seed を入れ、制限をかけてから `goto`。`data-state="task.today"` を待って `data-debug-load-ms` を読む。5 回とも 2,000 以下。
 - serviceWorkers は既定（allow）のまま。初めての訪問では SW はまだ動いておらず、登録は画面を描いた後（service-worker.md の 1）。
 - 監査の道具 @axe-core/playwright（AC-27）は contracts/dependencies.md にある。
+
+## 時間の計り方（AC-1、AC-2、AC-23 の秒数）
+G2 tech-lead r2 の要修正への決定です。今の `expect(...).toHaveAttribute` で終わりを待つ形は、Playwright の確かめる間隔（270 ms を過ぎると 500 ms おき）の分だけ値が長くなるので使いません。
+- 決定：文書が変わらない区間（AC-1、AC-2。AC-12 で同じ操作を計るときも）は、ページの中で計る（案 (a)）。文書が変わる区間（AC-23 の再読み込みと新しいタブ）は、テストの側の時計と 20 ms おきの `expect.poll` で計る。
+- AC-15 との違い：AC-15 の `data-debug-load-ms`（W-10）はアプリが出す値で、時計を固定しないテストで読む。AC-1、AC-2、AC-23 の値はテストが計る値で、アプリは何も書かない。本番の配布物には何も入れない。
+- 値は ms の整数（小数は切り上げ）で annotation に残し、G3 の証拠にする。合否は「値 ≤ 上限」。
+
+### 文書が変わらない区間（AC-1、AC-2）
+1. 仕掛け：計る文書で、最初に計る click の前に `page.evaluate` で 1 回だけ入れる（再読み込みしたら入れ直す）。記録はテスト側の変数 `globalThis.__acceptanceTiming` に置く（W-9 の印と同じく、アプリは読まない）。
+2. 始点：`window` に capture 段の `click` リスナー（`addEventListener('click', h, { capture: true })`）を置き、`performance.now()` と、`event.target.closest('[data-testid]')` の `data-testid` を記録する。始点にするのは、計る操作の testid（下の表）の click のうち最後の 1 件。radio の `check()` も click を出す（spike 1 で `area.backend` の click も記録された）ので、testid で分ける。
+3. 終点：`new MutationObserver(cb).observe(document, { subtree: true, childList: true, attributes: true, attributeFilter: ['data-state', 'data-question-index'] })`。cb では変化の記録でなく、その時点の DOM を読む（`<html>` の `data-state` と、`[data-testid="diagnosis.progress"]` の `data-question-index`。なければ null）。前の記録から変わったら、`performance.now()` と一緒に記録する。childList も見るのは、アプリが要素を作り直す実装でも取りこぼさないため（spike 1 は作り直す実装で計った）。
+4. 区間と終点の条件（終点は、始点より後の記録のうち、条件を満たす最初のもの）：
+
+   | 区間 | 始点の testid | 終点の条件 | 上限 |
+   |---|---|---|---|
+   | 始める → 1 問目 | `diagnosis.start.begin` | `data-state` が `diagnosis.question`、`data-question-index` が `1` | 500 ms |
+   | n 問目 → n+1 問目（n＝1、2） | `diagnosis.next` | `data-state` が `diagnosis.question`、`data-question-index` が n+1 | 500 ms |
+   | 3 問目 → 課題 | `diagnosis.finish` | `data-state` が `task.today` | 1,000 ms（AC-2） |
+
+5. 値＝終点 − 始点。差を取った後で、今の expect で状態と中身を確かめる（expect は正しさの確かめで、時間には使わない）。始点か終点の記録がなければ「計れなかった」として落とす（null や 0 を通さない）。
+6. 終点は DOM が変わった時刻で、画面に塗られる次のフレーム（60 Hz で約 17 ms）は含めない。AC-15 の `data-debug-load-ms` も `data-state` を書いた直後の時刻なので、定義をそろえる。`data-state` はその状態の DOM を入れ終えた後に書く（identifiers.md の 1）ので、終点の時点で中身はある。
+7. W-3 の setFixedTime の下でも使える。ページの `performance.now()` は Playwright の置き換え（`() => clock.performanceNow()`）になるが、同じ文書の中の差は実際の時間どおりに進む（spike 1）。ページの `Date.now()` は止まっているので使わない。
+8. 設計メモ 6 の「申告から次の状態まで」の記録（AC-5、AC-7）も、この仕掛けで計ってよい（始点は申告のボタンの testid、終点は `data-state`）。
+
+### 文書が変わる区間（AC-23）
+1. 始点：`page.reload({ waitUntil: 'commit' })`、新しいタブは `page2.goto(url, { waitUntil: 'commit' })` を呼ぶ直前の、テスト側の `Date.now()`。既定の `waitUntil`（load）は使わない（load を待つ分だけ長くなるため）。
+2. 終点：`await expect.poll(() => page.evaluate(() => document.documentElement.getAttribute('data-state')).catch(() => null), { intervals: [20], timeout: 3000 }).toBe(状態)` が返った直後の `Date.now()`。`.catch(() => null)` は、ナビゲーションの途中の evaluate の失敗を「まだ」として扱うため。
+3. 値＝終点 − 始点。ずれは「間隔 20 ms と往復 1 回」まで（spike 6 で +7〜+30 ms）。始点はナビゲーションより前、終点は状態を見た後なので、本当の値より短くなることはない。
+4. 同じ `data-task-id` の確かめと W-12 の送信の数え方は、終点の後に行う（時間に含めない）。
+5. ページの中で計らない理由：setFixedTime の下では、新しい文書の `performance.now()` も `Event` の `timeStamp` も、その文書のナビゲーションの開始を 0 にしない（spike 4）。時計を固定しなければ合う（spike 5）が、AC-23 は seed の日付のために時計を固定する（W-3）。
+
+### 選ばなかった方法
+- 計る区間の expect に `{ timeout: 上限 }` を渡す（案 (b)）：間隔は 100 ms 以下になるが、約 100 ms のずれが残り、G3 の値も実際より大きいまま。AC-23 の 3,000 ms では timeout ÷ 5 が 500 を超えるので、500 ms の間隔が外れず効かない。
+- AC-23 もページの中で計る：上の 5 のとおり、時計を固定したテストでは値が合わない。
+
+### spike（tech-lead、2026-10-31。リポジトリの外。@playwright/test 1.64.1、macOS、Chromium と WebKit）
+本当の遅れ（アプリの代わりの stub が setTimeout で状態を変えるまで）に対する、計った値（ms。chromium / webkit）：
+
+| 計り方 | 0 | 300 | 450 | 900 | 2,500 |
+|---|---|---|---|---|---|
+| spike 1：今の expect の待ち（click の前 → toHaveAttribute） | 48 / 27 | 828 / 836 | 827 / 828 | 1,335 / 1,334 | — |
+| spike 1：ページの中（click の capture → MutationObserver。時計固定） | 15 / 1 | 302 / 302 | 452 / 452 | 903 / 902 | — |
+| spike 4：ページの中、新しいタブ（Event の timeStamp。時計固定） | 219 / 367 | — | 2,194 / 2,349 | — | 8,318 / 8,430 |
+| spike 4：同じとき、テスト側の expect の待ち | 17 / 23 | — | 808 / 815 | — | 2,837 / 2,839 |
+| spike 5：ページの中、新しいタブ（時計を固定しない） | 4 / 4 | — | 456 / 454 | — | 2,505 / 2,504 |
+| spike 6：テスト側、再読み込み（commit と expect.poll 20 ms。時計固定） | 9 / 10 | 316 / 317 | 460 / 479 | 912 / 917 | 2,522 / 2,527 |
+| spike 6：テスト側、新しいタブ（同上） | 7 / 11 | 324 / 320 | 468 / 480 | 930 / 925 | 2,512 / 2,521 |
 
 ## W-12 通信の数え方（AC-12、AC-23）
 - 「送信」＝ `page.on('response')` のうち `response.fromServiceWorker()` が false のもの + `page.on('requestfailed')` の件数。数える区間は「オフラインにした直後から、Then を確かめ終えるまで」。
@@ -110,6 +159,9 @@ verifier G0 r3 の W-1〜W-16 を、名前と値まで決めたものです。�
 - 理由：macOS の Playwright WebKit（27.2）では、ふつうの `Tab` がボタン、radio、リンクに止まらず、textarea と body だけを回る。`Alt+Tab` ではすべての要素を回る（Safari の既定の「Option+Tab ですべての項目に移る」と同じ）。tech-lead G2 r1 の spike：`Tab` を 6 回押したフォーカスの順は chromium が `link > r1 > btn > ta > BODY > link`、webkit が `ta > BODY > ta > BODY …`。webkit で `Alt+Tab` にすると `link > r1 > btn > ta`。
 - 確定（決定）を押すキー（`Enter`、`Space`）はどちらのエンジンでも同じ。
 - 未確認：Linux の WebKit（CI）での `Tab` と `Alt+Tab` のふるまい。最初の CI の実行で、両方のキーで回したフォーカスの順の出力を evidence に残す。Linux で `Tab` だけで回るなら、このキーの表を直す。
+  - WebKit のソースの裏付け（動かしたのではなく、読んだもの。2026-10-31 に取得した main）：Source/WebCore/page/EventHandler.cpp の `tabsToAllFormControls` は、`PLATFORM(COCOA)` 以外では常に true（5129-5157 行。「We always allow tabs to all controls」）。Option+Tab で向きを反転するのも Cocoa だけ（`eventInvertsTabsToLinksClientCallResult`、5097-5105 行）。`defaultTabEventHandler` が移動を止めるのは Ctrl と Meta だけで、Alt は止めない（5482-5504 行）。リンクに移るかを決める TabsToLinks の既定は GTK と WPE で true（Source/WTF/Scripts/Preferences/UnifiedWebPreferences.yaml の 6207-6215 行）。
+  - 読めること：Linux の WebKit では、`Tab` でも `Alt+Tab` でも、ボタン、radio、リンクに移る。今のキーの表（WebKit は `Alt+Tab`）のままで回れる見込み。
+  - 残ること：Playwright の Linux 版 WebKit が、これらの既定を変えていないかはソースからは分からない。実際に動かしての確認は、上のとおり最初の CI に残す。
 
 ## AC-31 の重なる要素の数え方
 `data-state="task.today"`（と `task.done`）を、操作 0 回で読んだ後に：
