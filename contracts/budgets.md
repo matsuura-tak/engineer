@@ -24,6 +24,7 @@ PRD 12（速さ、配布、対応ブラウザ）と AC-15、AC-17 を、作り�
 - 全体の上限（受け入れテストで数える。JSON Schema では書けない）：
   - 4 つの本文（title、why、how、goal）の字数の合計を件数で割った値が 600 以下。v1 の 126 件版も、公開後の 252 件版も。
   - tasks.json の gzip 後の大きさが 106,000 バイト以下。
+  - この 2 つのテストの名前は `BUDGET2_` で始めます（test-hooks.md の W-6）。PRD の AC ではないので `AC<番号>_` の名前を付けず、G3 の AC の表に混ぜません。検証レポートでは「予算」の行として別に書きます。
 - 1 件の本文が平均で約 650 字を超えると、252 件版で 150 KB を超えます（tech-lead G1 r1 の spike）。
 
 ## 3. CSP（本番の HTML の `<meta http-equiv="Content-Security-Policy">` に 1 つだけ）

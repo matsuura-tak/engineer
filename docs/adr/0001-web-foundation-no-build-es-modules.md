@@ -23,18 +23,21 @@
 | backend/tests/unit/ | 単体テスト（`node --test`）。ファイル名は `*.test.mjs` |
 | backend/tests/acceptance/ | 受け入れテスト（verifier。ADR 0004） |
 | backend/dist/ | ビルドの出力。コミットしない（.gitignore） |
-| backend/package.json、package-lock.json | `"type": "module"`、`"private": true`、`"engines": { "node": ">=24 <25" }`、devDependencies は contracts/dependencies.md の 3 件を版の固定で |
+| backend/package.json、package-lock.json | `"type": "module"`、`"private": true`、`"engines": { "node": ">=24 <25" }`、devDependencies は ajv 8.20.0 だけ（版の固定。@playwright/test と @axe-core/playwright は受け入れテストのフォルダの package.json にだけ置く：ADR 0004 の「依存の置き場所」、contracts/dependencies.md） |
 
 package.json の scripts（この名前で作る。CLAUDE.md のコマンドがこれを使う）：
 ```json
 {
-  "build": "node scripts/build.mjs --out dist --version dev",
+  "build": "node scripts/build.mjs --out dist",
   "check:contracts": "node ../contracts/tools/check-schemas.mjs",
   "test:unit": "node --test 'tests/unit/**/*.test.mjs'",
-  "test:acceptance": "playwright test -c tests/acceptance",
+  "test:acceptance": "cd tests/acceptance && npm ci && npx playwright install chromium webkit && npx playwright test",
   "test": "npm run check:contracts && npm run test:unit && npm run test:acceptance"
 }
 ```
+- `build` は版を持たない。版は呼ぶ人が渡す：`npm run build -- --version 2026-11-30.1`。build.mjs は `--version` がないか、identifiers.md の `data-build-version` の形 `YYYY-MM-DD.N`（正規表現は contracts/test-hooks.md の「ビルドの手順の約束」）に合わなければ終了コード 1（前の案の `--version dev` は形に合わないのでやめた。2026-10-31）。
+- `check:contracts`：check-schemas.mjs は ajv を、スクリプトの場所でなく実行したフォルダ（`process.cwd()`）から探す。npm の scripts は backend/ で動くので、backend/package.json に ajv が入っていれば動く。入っていないと `Cannot find module 'ajv/dist/2020'` で落ちる（G2 reviewer r1 の提案 6 の答え。2026-10-31 にスクラッチパッドの backend/ の写しで、ajv だけを入れて `npm run check:contracts` → 見本 41 件、期待と違う結果 0 件、終了コード 0。外すと同じエラー）。
+- `test:acceptance` は受け入れテストのフォルダで依存とブラウザを入れてから動かす（ADR 0004）。`npm test` だけで、新しい手元でも 3 つが順に動く。
 - 層とモジュールの数の上限：JS のファイルは 15 個まで（modulepreload の数と、読む人の量を抑えるため）。class の継承、DI の仕組み、状態管理のライブラリは作らない。
 - 単体テストで確かめること（最低限）：手書きのデータの検査が contracts/fixtures/ のすべてで ajv と同じ合否、段階の規則の 9 通り（data.md の 5。AC-8）、日付の作り方（Asia/Tokyo 以外の TZ でも端末の日付）、差し込みの 10 キー、CSP の文字列が budgets.md と一致、`FILES` と出力のフォルダのファイルが一致、365 行の保存データが 1,000,000 字以下。
 
@@ -65,7 +68,7 @@ package.json の scripts（この名前で作る。CLAUDE.md のコマンドが�
 - spike（tech-lead G1 r1、Playwright 1.64.1、node v24.22.1、Chromium の CDP で遅延 150 ms・下り 1.6 Mbps・CPU 4 倍）：252 件 × 600 字で preload あり 970〜978 ms、なし 1,299〜1,317 ms。126 件 × 600 字で 719〜765 ms。
 - MDN の互換データ（@mdn/browser-compat-data 8.1.7、2026-10-30）：`html.elements.link.rel.modulepreload` は Safari 17、`html.elements.script.type.module` は Safari 10.1。
 - `node --test 'tests/unit/**/*.test.mjs'` は Node 24.22.1 で動いた（`ℹ tests 1`、`ℹ pass 1`）。`node --test tests/unit/` はフォルダを指すと `Cannot find module` で失敗したので、scripts は glob の形にした。
-- 未確認：backend/ はまだないので、build.mjs と check-budget.mjs と package.json の scripts は動かしていない（G2 で backend-engineer が確かめる）。
+- 未確認：backend/ はまだないので、本物の build.mjs と check-budget.mjs と package.json の scripts は動かしていない（G2 で backend-engineer が確かめる）。scripts の形（`check:contracts`、`test:unit`、`test:acceptance`、`test`）は、2026-10-31 にスクラッチパッドの backend/ の写しで `npm ci && npm test` を動かし、契約の検査と単体テスト（仮の 1 件）が通り、受け入れテストが 131 件とも「build.mjs が見つからない」で落ちる（実装前の赤）ところまで確かめた。
 
 ## 確かめ（B）
 - [x] 案が2つ以上あり、どの案にも悪い点が書いてある

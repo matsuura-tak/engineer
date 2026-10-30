@@ -14,16 +14,18 @@
 コマンドを変えたら、app.json の更新を Takuma に頼みます（.claude/ は Takuma だけが直せます）。
 受け入れテストは、受け入れテストのフォルダの中の設定（backend/tests/acceptance/playwright.config.mjs）だけで動きます。
 - iOS のビルド、iOS のテスト：なし（iOS のアプリは作らない。stacks は backend だけ）
-- バックエンドのテスト（app.json の backend_test。Takuma の決定 D8 で G2 の直前に Takuma が main で入れる。未確認：G2 で backend-engineer が確かめる）：
-  `cd backend && npm ci && npx playwright install --with-deps chromium webkit && npm test`
-  - `npm test` の中身（ADR 0001 の scripts）：契約の検査 → 単体テスト → 受け入れテスト
+- バックエンドのテスト（app.json の backend_test の案。Takuma の決定 D8 で G2 の直前に Takuma が main で入れる。未確認：backend/package.json がまだない。同じ形の写しでは 2026-10-31 に確認）：
+  `cd backend && npm ci && npm test`
+  - `npm test` の中身（ADR 0001 の scripts）：契約の検査 → 単体テスト → 受け入れテスト（`test:acceptance` が受け入れテストのフォルダで npm ci とブラウザの入れ方までする）
+  - Linux の CI で WebKit の OS のライブラリ（`npx playwright install-deps`）が要るかは未確認（ADR 0004）
+- 受け入れテスト（依存は受け入れテストのフォルダの package.json だけ。ADR 0004）：
+  `cd backend/tests/acceptance && npm ci && npx playwright install chromium webkit && npx playwright test`（2026-10-31 に `--list` で 131 本まで確認。合格は実装の後）
 - 個別のコマンド（どれも backend/ で実行）：
-  - 契約の検査：`node ../contracts/tools/check-schemas.mjs`（確認済み：2026-10-30、ajv 8.20.0 を入れたフォルダから同じスクリプトを実行し、見本 41 件、期待と違う結果 0 件、終了コード 0。backend/ からは未確認）
+  - 契約の検査：`npm run check:contracts`（= `node ../contracts/tools/check-schemas.mjs`。ajv は実行したフォルダから探すので backend/package.json に ajv が要る。写しで確認済み：見本 41 件、期待と違う結果 0 件、終了コード 0。本物の backend/ では未確認）
   - 単体テスト：`node --test 'tests/unit/**/*.test.mjs'`（形は Node 24.22.1 で確認済み。フォルダを渡す形 `tests/unit/` は失敗する。backend/ では未確認）
-  - 受け入れテスト：`npx playwright test -c tests/acceptance`（-c がフォルダの中の playwright.config.mjs を読むことは、同じ形の仮のフォルダで確認済み。本物のテストは未確認）
-  - ビルド：`node scripts/build.mjs --out dist --version <YYYY-MM-DD.N>`（未確認。backend-engineer が作る）
+  - ビルド：`npm run build -- --version <YYYY-MM-DD.N>`（未確認。backend-engineer が作る。形に合わない版は終了コード 1）
   - 転送量の予算：`node scripts/check-budget.mjs dist`（未確認。150,000 バイト以下で終了コード 0）
-- 作る物（backend-engineer。ADR 0001）：backend/package.json と package-lock.json（devDependencies は contracts/dependencies.md の 3 件を版の固定で）、scripts/build.mjs、scripts/check-budget.mjs。
+- 作る物（backend-engineer。ADR 0001）：backend/package.json と package-lock.json（devDependencies は ajv 8.20.0 だけ。contracts/dependencies.md）、scripts/build.mjs、scripts/check-budget.mjs。
 - Node は 24（.tool-versions）。
 
 ## 構成

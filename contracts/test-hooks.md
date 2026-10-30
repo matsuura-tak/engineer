@@ -4,14 +4,16 @@ verifier G0 r3 の W-1〜W-16 を、名前と値まで決めたものです。�
 大原則（PRD 11 の冒頭）：つなぎ口は本番の配布物に入れません。アプリの側にあるのは、読み取り専用の印（identifiers.md）とスキーマ（schemas/）だけです。URL の引数、`window.__test` のような入口、テスト用のビルドはありません。注入はすべて Playwright の側から行います。
 
 ## 実行の環境（W-11）
-- 置き場所：`backend/tests/acceptance/`。設定は `backend/tests/acceptance/playwright.config.mjs` だけで動き、`cd backend && npx playwright test -c tests/acceptance` で走ります（2026-10-30 に、同じ形の仮のフォルダで、-c がフォルダの中の playwright.config.mjs を読むことを確かめた）。
+- 置き場所：`backend/tests/acceptance/`。設定は `backend/tests/acceptance/playwright.config.mjs` だけで動きます。
+- 依存の置き場所（ADR 0004 の「依存の置き場所」。B）：@playwright/test、@axe-core/playwright、ajv は `backend/tests/acceptance/package.json` と、その package-lock.json に置きます。backend/package.json には @playwright/test と @axe-core/playwright を入れません（2 つのコピーを作らないため）。
+- 実行のコマンド：`cd backend/tests/acceptance && npm ci && npx playwright install chromium webkit && npx playwright test`。backend の `npm test` からは `npm run test:acceptance` が同じことをします（ADR 0001 の scripts）。`cd backend && npx playwright test -c tests/acceptance` の形は使いません（backend/ に @playwright/test がないので動かない）。
 - projects は `chromium` と `webkit` の 2 つ。`retries: 0`。
 - テスト用の静的サーバー（`backend/tests/acceptance/server/` に verifier が node の組み込みだけで書く）：
   - 配布物は `backend/scripts/build.mjs`（ADR 0001。backend-engineer）でビルドしたフォルダを使う。`backend/public/` をそのまま配らない（版の刻印と SW のファイル一覧が入らないため）。
   - 配布物を `/engineer/` の下に置く（本番と同じパス。`/` で始まる URL の誤りを見つけるため）。baseURL は `http://127.0.0.1:<port>/engineer/`。127.0.0.1 は安全な文脈なので SW が動く。
   - GitHub Pages と同じヘッダーを返す：`Cache-Control: max-age=600`、`Accept-Encoding` に gzip があれば `Content-Encoding: gzip`、拡張子に合う `Content-Type`（`.js` は `text/javascript`、`.json` は `application/json`、`.webmanifest` は `application/manifest+json`、`.png` は `image/png`）。`/engineer` は `/engineer/` に 301。ないファイルは 404。
   - 実行中に配る中身のフォルダを差し替える関数を持つ（AC-28）。
-- ビルドの手順の約束（backend-engineer が作る。テストはこれだけを使う）：`node scripts/build.mjs --out <フォルダ> --version <版> [--tasks <tasks.json のパス>]`。`build({ out, version, tasks })` を export もする。`--tasks` を渡すと課題集をそのファイルに差し替える（スキーマに通らなければ失敗）。
+- ビルドの手順の約束（backend-engineer が作る。テストはこれだけを使う）：`node scripts/build.mjs --out <フォルダ> --version <版> [--tasks <tasks.json のパス>]`。`--version` は必須で、identifiers.md の `data-build-version` の形 `YYYY-MM-DD.N`（正規表現 `^[0-9]{4}-[0-9]{2}-[0-9]{2}\.[1-9][0-9]*$`。例 `2026-11-30.1`）に合わなければ終了コード 1（`dev` のような値は受け付けない）。`build({ out, version, tasks })` を export もする。`--tasks` を渡すと課題集をそのファイルに差し替える（スキーマに通らなければ失敗）。
 
 ## W-1 状態の初期化
 - テストごとに新しいブラウザコンテキスト（保存、SW、キャッシュが空）。アプリの側のつなぎ口はない。
@@ -38,6 +40,7 @@ verifier G0 r3 の W-1〜W-16 を、名前と値まで決めたものです。�
 ## W-6 課題集のスキーマと検査
 - スキーマ：contracts/schemas/tasks.schema.json。ajv（`ajv/dist/2020`、strict）で本番の tasks.json を検査する（AC-3、AC-29 の大半）。
 - スキーマの外なので、テストのコードで数えるもの：件数（v1 は 126 以上、足す版は 252 以上）、18 の組ごとの件数（7 以上 / 14 以上）、ID の重複 0（AC-4）、組ごとの external の割合 20% 以下（AC-29）、本文の平均 600 字以下と gzip 後 106,000 バイト以下（budgets.md の 2）。
+- budgets.md の 2 の予算のテストは、名前を `BUDGET2_` で始めます（例 `BUDGET2_本文の平均は600字以下`）。`AC<番号>_` の名前を付けず、G3 の AC の表に混ぜません。検証レポートでは AC の表とは別の「予算」の行に、合否と値を書きます。
 
 ## W-7 データの投入（seed）
 - 形：contracts/schemas/data.schema.json（保存の形と同じ）。見本：contracts/fixtures/seeds/ と contracts/fixtures/data/v1/。verifier は自分のフォルダに seed を置き、テストの中で ajv に通してから使う。
@@ -46,16 +49,18 @@ verifier G0 r3 の W-1〜W-16 を、名前と値まで決めたものです。�
   if (!localStorage.getItem('test:seeded')) { localStorage.setItem('kyounoitte:data', SEED); localStorage.setItem('test:seeded', '1'); }
   ```
   アプリは自分のキー以外に触らない（data.md の 1）ので、印は削除（AC-16）の後も残り、seed は入れ直されない。
-- seed の setItem は、W-9 の失敗の注入より先に登録する（注入の「次の 1 回」を seed が使わないため）。
+- seed の setItem は、W-9 の失敗の注入より先に登録する（失敗は印を立てた後の 1 回だけなので seed は落ちないが、順番も守る）。
 - AC-24 の seed は、時刻を固定する日（2026-11-06）の行を `history` に入れる。入れないと、開いたときにアプリがその日の課題を出し、`issued` が 1 増える（data.md の 4 の 6）。見本：fixtures/seeds/seed-ac24-stats.json。
 - AC-8 の seed の各行の `level` は、その課題が出たときの段階にする（PRD 11 の AC-8 の確かめ方、data.md の 5）。見本は fixtures/seeds/ の `seed-ac8-*`（3 件。対応は data.md の 5 の表）。9 通り目の seed だけは、`levels` が `intermediate` で古い 2 行の `level` が `advanced` になる。
+- AC-14 の seed は、AC-10 と同じく本番の課題集から作る「出し終えた」履歴にする（今の組の課題をすべて `history` に入れ、そのうち過去 3 日の 3 件を `done` にする）。PRD の Given「今日の課題はまだ出していない」は、data.md の 4 の 6-4 の下では、目標の組を出し終えた日（`task.exhausted`）にしか作れないため。固定の seed は置かない（課題集の中身に依存するため）。
+  - fixtures/seeds/seed-ac14-three-completed.json は、開くと今日の課題が出るので AC-14 の Given を満たさない。名前は残し、完了 3 件の履歴の見本として AC-5 などに使う。
 
 ## W-8 履歴の読み出し
 - S10 の `[data-testid="history.row"]` の `data-task-id`、`data-date`、`data-report`（`done`、`too_hard`、`too_easy`、`no_time`、`none`）、`data-helpful`（`done` の行だけ。`helpful`、`not_helpful`、`unanswered`）。
 - 「完了」は `done`（W-8 案の `completed` ではない）。S10 に出るのは `history` だけで、まだ申告していない今日の課題は出ない。
 
 ## W-9 失敗と拒否の注入、書き出しの形
-- 保存の失敗（AC-11）：addInitScript で `Storage.prototype.setItem` を包み、次の 1 回だけ `new DOMException('injected', 'QuotaExceededError')` を投げる。アプリは保存 1 回につき setItem を 1 回だけ呼ぶ。保存データが「なし」か「診断の途中」の起動では setItem を呼ばない（AC-11 の注入はこの状態で行う）。「あり」の起動では data.md の 2 のとおり最大 1 回（診断の 2 問目の確定はちょうど 1 回の setItem）。
+- 保存の失敗（AC-11）：addInitScript で `Storage.prototype.setItem` を包み、テストが印（ページの `globalThis` に置くテスト側の変数。アプリは読まない）を立てた後の次の 1 回だけ `new DOMException('injected', 'QuotaExceededError')` を投げる。投げたら印を下ろす。アプリは保存 1 回につき setItem を 1 回だけ呼ぶ。保存データが「なし」か「診断の途中」の起動では setItem を呼ばない（AC-11 の注入はこの状態で行う）。「あり」の起動では data.md の 2 のとおり最大 1 回（診断の 2 問目の確定はちょうど 1 回の setItem）。
 - 永続化の拒否（AC-13）：addInitScript で `StorageManager.prototype.persist = async () => false`。アプリは `navigator.storage.persist()` を、`task.today` を初めて描いた後に 1 回だけ呼ぶ（`device.persistRequested` が true なら呼ばない）。
 - 書き出し：`page.waitForEvent('download')` で 1 件。中身は data.schema.json に通り、`device` を含まない。版の項目は `formatVersion`、今の値は 1。AC-25 のファイルは `formatVersion: 2` にする（fixtures/data/invalid-newer-version.json が見本）。
 - 読み込み：隠した input（`settings.import.file`、`home.standalone.importFile`）に `setInputFiles`。
@@ -77,7 +82,8 @@ verifier G0 r3 の W-1〜W-16 を、名前と値まで決めたものです。�
 - Q1 は A（外に送らない）なので、除く送信先はない。
 - オフラインは `context.setOffline(true)`。
 
-## W-13 SW の準備（AC-23、AC-28）
+## W-13 SW の準備（AC-12、AC-23、AC-28）
+- AC-12 でも、オフラインにする前にこの合図を待つ（アプリは画面を描いた後に SW を登録するので、待たないと `sw.js` の取得とオフラインが競る。WebKit では `sw.js` の requestfailed が W-12 の 1 件に数えられる：tech-lead G2 r1 の spike）。PRD の「読み込み終えた後に」をこの合図で読む。
 - 「オフラインで開ける」の合図：`await page.evaluate(async () => { await navigator.serviceWorker.ready; return navigator.serviceWorker.controller !== null; })` が true。false なら `controllerchange` を待つ。SW は install で全ファイルを取り終えてから有効になる（service-worker.md の 3）ので、この合図の後はオフラインで開ける。
 - SW を使うテストは serviceWorkers を既定（allow）にする。
 
@@ -97,11 +103,19 @@ verifier G0 r3 の W-1〜W-16 を、名前と値まで決めたものです。�
 - 偽装：`devices['iPhone 15']` などの UA と、addInitScript で `Object.defineProperty(Navigator.prototype, 'standalone', { get: () => false })`（AC-22 は true）。iPad は Mac の UA と `Object.defineProperty(Navigator.prototype, 'maxTouchPoints', { get: () => 5 })`。`display-mode` は偽装しない。
 - 案内 `home.addToHomeScreen` は「保存データなし、iOS の Safari、スタンドアロンでない、`device.homeGuideClosed` が true でない」のときだけ出る。閉じた後の保存データは `device` だけで、`firstOpenDate` はない（data.md の 2。見本：fixtures/data/v1/valid-guide-closed-only.json）。`home.standalone` は「保存データなし、スタンドアロン」のとき毎回出る（UA にかかわらない。AC-22）。
 
+## キーボードの移動キー（AC-18）
+- 「次の要素へ」と「前の要素へ」のキー：
+  - WebKit：`Alt+Tab` と `Alt+Shift+Tab`。
+  - それ以外（Chromium）：`Tab` と `Shift+Tab`。
+- 理由：macOS の Playwright WebKit（27.2）では、ふつうの `Tab` がボタン、radio、リンクに止まらず、textarea と body だけを回る。`Alt+Tab` ではすべての要素を回る（Safari の既定の「Option+Tab ですべての項目に移る」と同じ）。tech-lead G2 r1 の spike：`Tab` を 6 回押したフォーカスの順は chromium が `link > r1 > btn > ta > BODY > link`、webkit が `ta > BODY > ta > BODY …`。webkit で `Alt+Tab` にすると `link > r1 > btn > ta`。
+- 確定（決定）を押すキー（`Enter`、`Space`）はどちらのエンジンでも同じ。
+- 未確認：Linux の WebKit（CI）での `Tab` と `Alt+Tab` のふるまい。最初の CI の実行で、両方のキーで回したフォーカスの順の出力を evidence に残す。Linux で `Tab` だけで回るなら、このキーの表を直す。
+
 ## AC-31 の重なる要素の数え方
 `data-state="task.today"`（と `task.done`）を、操作 0 回で読んだ後に：
 1. `page.getByRole('dialog')` の件数が 0（ネイティブの `<dialog>` は属性を書かなくても dialog の役割を持つ。閉じたダイアログは DOM にない：identifiers.md の 3）。
 2. `[aria-modal="true"]` の件数が 0。
-3. 計算済みの `position` が `fixed` か `sticky` の要素のうち、`[data-testid="task.today.title"]` の矩形と重なるものが 0（`getBoundingClientRect` で比べる。`task.done` では題名の代わりに `task.done.title`）。
+3. 計算済みの `position` が `fixed` か `sticky` の要素のうち、`[data-testid="task.today.title"]` の矩形と重なるものが 0（`getBoundingClientRect` で比べる。`task.done` では題名の代わりに `task.done.title`）。題名とその祖先（`el === title || el.contains(title)`）は数えない（祖先は子孫の下に描かれ、題名を覆わないため）。
 
 ## AC-28 の配布物の差し替え
 1. `build({ out: 旧, version: '2026-11-30.1' })` と、課題を足した課題集で `build({ out: 新, version: '2026-12-14.1', tasks: 足した課題集 })` を作る。足す課題は、スキーマに通る未使用の ID（例 `backend-intermediate-900`）にする。

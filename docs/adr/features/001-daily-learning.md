@@ -25,13 +25,13 @@ operationId は全行「なし（端末のみ）」。代わりに「データ�
 | AC-9 | S4 → S5、S10 | なし（端末のみ） | `history[].helpful`、`data-helpful` | 受け入れ 2：選ぶ／再読み込み |
 | AC-10 | S7 → S2 | なし（端末のみ） | data.md の 4 の 6-4、5（候補が 0 → S7、保存しない） | 受け入れ 2：seed で 7 件を出し終えた |
 | AC-11 | S2 | なし（端末のみ） | data.md の 2（1 問ごとに 1 回の setItem。保存データが「なし」か「診断の途中」の起動では setItem を呼ばない（AC-11 の注入はこの状態で行う）。「あり」の起動では data.md の 2 のとおり最大 1 回）、W-9 | 受け入れ 2：setItem の失敗の注入 |
-| AC-12 | S1〜S6 | なし（端末のみ） | test-hooks.md の W-12（送信の数え方）、CSP の `connect-src 'self'` | 受け入れ 2：オフライン |
+| AC-12 | S1〜S6 | なし（端末のみ） | test-hooks.md の W-12（送信の数え方）、W-13（オフラインにする前に SW の準備を待つ）、CSP の `connect-src 'self'` | 受け入れ 2：オフライン |
 | AC-13 | S3 → S5、S8 | なし（端末のみ） | `device.persistRequested`、`device.persistGranted`、W-9 | 受け入れ 2：persist の拒否の注入 |
-| AC-14 | S8 → S2 → S3、S10 | なし（端末のみ） | data.md の 2（やり直しは終えるときに 1 回）、fixtures/seeds/seed-ac14-* | 受け入れ 2 |
+| AC-14 | S7 → S8 → S2 → S3、S10 | なし（端末のみ） | data.md の 2（やり直しは終えるときに 1 回）、4 の 6-4。seed は AC-10 と同じく本番の課題集から作る「出し終えた」履歴（過去 3 日の 3 件が `done`）。fixtures/seeds/seed-ac14-three-completed.json は Given を満たさない（test-hooks.md の W-7） | 受け入れ 2 |
 | AC-15 | S0 → S3 | なし（端末のみ） | `data-debug-load-ms`、W-11 の制限、budgets.md の 1 と 4 | 受け入れ C：5 回 |
 | AC-16 | S8 → ダイアログ → S1 | なし（端末のみ） | data.md の 7（`removeItem` だけ）、W-7 の印 | 受け入れ 2 |
 | AC-17 | S1、S3、S5、S7 | なし（端末のみ） | strings.md の 5（`<pre>` なし、`<code>` は折り返す）、tasks.schema.json の「```」の禁止 | 受け入れ 2：幅 320 |
-| AC-18 | S1 → S5 | なし（端末のみ） | identifiers.md（操作する要素の `data-testid`） | 受け入れ 2：キーボードだけ |
+| AC-18 | S1 → S5 | なし（端末のみ） | identifiers.md（操作する要素の `data-testid`）、test-hooks.md の「キーボードの移動キー」（WebKit は `Alt+Tab`） | 受け入れ 2：キーボードだけ |
 | AC-19 | S8 | なし（端末のみ） | schemas/data.schema.json（書き出し＝保存。`device` を除く）、data.md の 7 | 受け入れ 2：ダウンロードを ajv で検査 |
 | AC-20 | S1 → S8 | なし（端末のみ） | data.md の 7（読み込みの流れ。`firstOpenDate` はファイルの値）、`history[].answer` | 受け入れ 2：setInputFiles、同じ固定の日付（W-3） |
 | AC-21 | S1、S8 | なし（端末のみ） | test-hooks.md の W-16（iOS Safari の判定）、`device.homeGuideClosed`（`device` だけの保存。`firstOpenDate` は書かない：data.md の 2、fixtures/data/v1/valid-guide-closed-only.json） | 受け入れ 2：偽装あり／なし |
@@ -294,3 +294,13 @@ Takuma の決定 D1〜D10 と PRD r6、design r4 に合わせた（2026-10-30、
 - D9 と D10：data.md の 2 と 5 の「PRD 11 の冒頭を参照」を、参照先の語（「初めて開いた日」、「連続」の定義）が分かる書き方にした。
 - U-7：data.md の 2 と ADR 0002 に「やり直しの診断で終える前に離れたら（やめる、nav、アプリ名、再読み込み、日付の変わり目）下書きを捨て、元の診断のまま」を足した（designer の申し送り）。
 - 件数：4 の check-schemas の出力を貼り直した（38 → 41 件）。4 の表、ADR 0004、CLAUDE.md の件数を 41 にした。10 の未確認に `apple-mobile-web-app-title` と Pages の Content-Type を足した。
+
+G2（受け入れテスト）の tech-lead r1 と reviewer r1 で「契約、ADR、CLAUDE.md の側で直す」とした項目を反映した（2026-10-31、tech-lead）。1 行に 1 つの変更。
+- 依存の置き場所 B：ADR 0004 の決定に置き場所とコマンド `cd backend/tests/acceptance && npm ci && npx playwright install chromium webkit && npx playwright test` を書き、案 A、B、C を足した。test-hooks.md の「実行の環境」、dependencies.md（「入る package.json」の列と決まり）、CLAUDE.md を同じにした。
+- ADR 0001：backend の devDependencies を ajv だけにし、`test:acceptance` を受け入れテストのフォルダで動かす形にした。`build` から `--version dev` を外し、版は呼ぶ人が `YYYY-MM-DD.N` で渡す（形に合わなければ終了コード 1。test-hooks.md の「ビルドの手順の約束」に正規表現）。check:contracts が backend/ の ajv で動く理由を書いた（G2 reviewer r1 の提案 6）。
+- test-hooks.md：「キーボードの移動キー」（AC-18。WebKit は `Alt+Tab` と `Alt+Shift+Tab`、それ以外は `Tab` と `Shift+Tab`。Linux の WebKit は未確認）を足した。2 の AC-18 の行も直した。
+- test-hooks.md：W-13 の対象に AC-12 を足した（オフラインにする前に SW の準備を待つ）。2 の AC-12 の行も直した。
+- test-hooks.md：W-9 の失敗の注入を「テストが印を立てた後の次の 1 回」にし、W-7 の順番の理由と data.md の 1 の理由の文を合わせた。
+- test-hooks.md：AC-31 の数え方の 3 に「題名とその祖先は数えない」を足した。
+- test-hooks.md：W-7 に AC-14 の seed（本番の課題集から作る出し終えた履歴。seed-ac14-three-completed.json は Given を満たさない）を足した。2 の AC-14 の行も直した。PRD の Given の書き方は pdm への問い（G2 tech-lead r1 の未解決 (2)）。
+- test-hooks.md の W-6 と budgets.md の 2：予算のテストの名前を `BUDGET2_` で始め、AC の表に混ぜないとした（G2 reviewer r1 の提案 4）。
