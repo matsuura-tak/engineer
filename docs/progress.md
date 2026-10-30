@@ -27,3 +27,4 @@
 - 2026-10-30 001-daily-learning G1 Takuma の決定 D1〜D10 すべて推奨どおり（docs/approvals/001-daily-learning-G0.md）。pdm に PRD r6（D6、D9、D10、段階の規則の文）を任せ、再承認へ
 - 2026-10-30 001-daily-learning G0 再承認 Takuma が PRD r6 を承認「承認します」（docs/approvals/001-daily-learning-G0.md）。designer r4（決定待ちの確定）をコミット。tech-lead に契約の印の確定と AC-8 の seed の文を直させ、verifier（9）へ
 - 2026-10-31 001-daily-learning G2（受け入れテスト）判定r1 reviewer PASS（要修正1：AC-2 の計測）、tech-lead FAIL（重大1：AC-18 の Tab が WebKit で止まらない。要修正4）。依存の置き場所は B（tests/acceptance の中）。tech-lead が契約・ADR・CLAUDE.md を直し、verifier がテストを直して tech-lead r2 へ（docs/reviews/001-daily-learning-G2-tests-reviewer-r1.md、docs/reviews/001-daily-learning-G2-tests-tech-lead-r1.md）
+- 2026-10-31 001-daily-learning G2（受け入れテスト）判定r2 tech-lead PASS（要修正1：時間の計り方）。reviewer r1 PASS と合わせて2体 PASS。要修正は契約に「時間の計り方」を足して verifier が直し、その後 push と下書き PR（docs/reviews/001-daily-learning-G2-tests-tech-lead-r2.md）
