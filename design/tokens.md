@@ -1,6 +1,6 @@
 # デザイントークン（今日の一手。ブラウザだけで動く Web アプリ）
 
-- 書いた役：designer　日付：2026-10-30　初版（001-daily-learning で導入）。r2：G1 r1 の design-reviewer の指摘 3、5、10、11 を反映（color.overlay、リンクの最小幅、ホバーと押した瞬間、定義リストの使い所、ファイルの読み込みの部品）
+- 書いた役：designer　日付：2026-10-30　初版（001-daily-learning で導入）。r2：G1 r1 の design-reviewer の指摘 3、5、10、11 を反映（color.overlay、リンクの最小幅、ホバーと押した瞬間、定義リストの使い所、ファイルの読み込みの部品）。r3：G1 r2 の design-reviewer の提案 1 を反映（4「リンク」の列挙にヘッダーのアプリ名 `app.name` を足した）
 - 使い方：画面の仕様（design/<機能名>.md）と実装（CSS カスタムプロパティ）は、ここにある名前だけを使う。色の値を直接書かない。
 - 単位：CSS px。文字と余白は実装では rem（16 px = 1 rem）にして、ブラウザの文字サイズ設定と拡大に追従させる（調査 R-16、R-26）。
 - 根拠：design/001-daily-learning-research.md の R 番号と、原則 B-1〜B-6（.claude/skills/craft-designer/SKILL.md）。コントラスト比は WCAG 2.2 の式で計算した（計算スクリプトの出力は design/001-daily-learning.md の 9 に転記）。
@@ -75,7 +75,7 @@
 | ボタン（主操作） | `<button>`。塗り color.action.primary、文字 color.action.onPrimary、text.body の太さ 600、高さ 44 px 以上、内側 space.3 と space.4、角 size.radius。幅は列いっぱい（幅 480 px 未満）か内容に合わせる（480 px 以上） |
 | ボタン（副操作） | `<button>`。塗りなし、枠 size.border の color.border、文字 color.text。寸法は主操作と同じ |
 | ボタン（取り消せない操作） | `<button>`。塗りなし、枠 color.error、文字 color.error。確認ダイアログの「削除する」「置き換える」と、設定の「すべてのデータを削除」 |
-| リンク | `<a>`。文字 color.action.primary、下線あり（太さ 1 px）。文字だけでは押せる範囲が 44 px に満たないので、単独で置くとき（nav、「履歴を見る」、「統計を見る」、「設定に戻る」、「プライバシーについて」）は `display: inline-block`、上下に space.3 の内側、左右に space.2 の内側、`min-width: 44px` で 44 × 44 px 以上にする（R-17。design-reviewer r1 の 5）。文中のリンクはこの機能にはない |
+| リンク | `<a>`。文字 color.action.primary、下線あり（太さ 1 px）。文字だけでは押せる範囲が 44 px に満たないので、単独で置くとき（ヘッダーのアプリ名 `app.name`、nav、「履歴を見る」、「統計を見る」、「設定に戻る」、「プライバシーについて」）は `display: inline-block`、上下に space.3 の内側、左右に space.2 の内側、`min-width: 44px` で 44 × 44 px 以上にする（R-17。design-reviewer r1 の 5）。文中のリンクはこの機能にはない |
 | 入力欄（textarea） | `<textarea>`。枠 color.border、角 size.radius、文字 text.body、内側 space.3、`rows="6"`、幅は列いっぱい。縦だけ伸ばせる |
 | 選択肢（radio） | ネイティブの `<input type="radio">` と `<label>`。ラベル全体を押せる範囲にし、高さ 44 px 以上、選択肢の間 space.2。`accent-color: var(--color-action-primary)` |
 | ダイアログ | ネイティブの `<dialog>` を `showModal()` で開く（開くときに DOM に足し、閉じたら外す）。幅は min(列の幅, 480 px)、内側 space.5、枠 size.border の color.border、地 color.bg。背景は `::backdrop` を color.overlay にする（design-reviewer r1 の 11） |

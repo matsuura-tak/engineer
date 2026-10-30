@@ -40,9 +40,9 @@ design/001-daily-learning.md の補助。幅 320 CSS px（AC-17 の条件）で�
 ```
 保存データが形式に合わないときの error は、h1 `error.app.message`、`error.app.detail`、`[[ 再読み込み ]]`、`[ 壊れたデータをファイルに保存 ]`、`[ すべてのデータを削除 ]`（color.error）。
 
-## S2 diagnosis.question（2 問目）
+## S2 diagnosis.question（初回の 2 問目）
 ```
-| 今日の一手                        設定 |
+| 今日の一手                        設定 |   header（初回の S2 と途中の再開は nav に「設定」だけ。S7 か S8 から入ったやり直しの S2 は診断後なので「履歴  設定」。design-reviewer r2 の 3）
 |                                        |
 | 質問 2 / 3                             |   diagnosis.progress（text.small、data-question-index=2）
 |                                        |
@@ -161,7 +161,7 @@ S6 task.skipped は h1 と文が変わり、too_hard / too_easy のときだけ 
 | <u>プライバシーについて</u>            |   settings.privacy
 ```
 
-### S8 settings（保存データなし。S1 の「設定」から来たとき。design-reviewer r1 の 1）
+### S8 settings（保存データなし。S1 か初回の S2 の「設定」から来たとき。契約 data.md 3 の「なし」と「診断の途中」の両方でこの表示。design-reviewer r1 の 1、r2 の 2）
 ```
 | 今日の一手                        設定 |   header（nav は「設定」だけ。aria-current）
 |                                        |
@@ -181,7 +181,7 @@ S6 task.skipped は h1 と文が変わり、too_hard / too_easy のときだけ 
 | 版 1.0.0                               |   settings.version
 | <u>プライバシーについて</u>            |   settings.privacy（単独のリンク。44 × 44）
 ```
-書き出し、診断、記録、削除の節は出さない。読み込みに成功すると今日の状態（S3 / S5 / S6 / S7）へ移り、確認ダイアログは出ない（AC-20）。
+書き出し、診断、記録、削除の節は出さない（「診断の途中」でも同じ）。読み込みに成功すると今日の状態（S3 / S5 / S6 / S7）へ移り、確認ダイアログは出ない（AC-20。「診断の途中」でも確認なし：契約 data.md 7）。
 
 ## ダイアログ settings.delete.confirm
 ```
