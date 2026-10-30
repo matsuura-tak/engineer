@@ -1,13 +1,13 @@
 # テスト計画 001-daily-learning：診断と今日の学習（Web アプリ「今日の一手」）
 
-- 書いた役：verifier　日付：2026-10-31（r2：G2 の判定 tech-lead r1 / reviewer r1 の指摘を反映。直した所は 10 章）
+- 書いた役：verifier　日付：2026-10-31（r3：G2 の判定 tech-lead r2 の要修正「時間の計り方」と提案 4 件を反映。直した所は 10 章。r2 の反映も 10 章）
 - 実装のコードを見ずに書いた：はい（backend/ は空。読んだのは下のファイルだけ）
 - 読んだファイル（PRD、design/、contracts/ と、指揮役が指定した ADR・型・前回の判定）：
   - docs/prd/001-daily-learning.md（r6。11 の冒頭の決まりと AC-1〜AC-32、12）
   - design/001-daily-learning.md（r4。1 流れ、2 AC と画面の対応、5 状態、6 識別子、7 文言）、design/001-daily-learning/screens.md、design/tokens.md（size.focus.width 3 px）
   - contracts/README.md、data.md、strings.md、identifiers.md、test-hooks.md（W-1〜W-16、AC-31 の数え方、AC-28 の差し替え、静的サーバーのヘッダー）、service-worker.md、budgets.md、dependencies.md、schemas/data.schema.json、tasks.schema.json、strings.schema.json、fixtures/seeds/*、fixtures/data/v1/*、fixtures/data/invalid-newer-version.json、fixtures/tasks/valid-sample.json、fixtures/strings/valid-*.json、tools/check-schemas.mjs
   - docs/adr/0001、0002、0003、0004、0005、docs/adr/features/001-daily-learning.md（2 の対応表）
-  - docs/templates/test-plan.md、docs/org/gates.md、CLAUDE.md、docs/reviews/001-daily-learning-G0-verifier-r3.md（W-1〜W-16 の元）、docs/reviews/001-daily-learning-G2-tests-tech-lead-r1.md、docs/reviews/001-daily-learning-G2-tests-reviewer-r1.md（r2 で反映）
+  - docs/templates/test-plan.md、docs/org/gates.md、CLAUDE.md、docs/reviews/001-daily-learning-G0-verifier-r3.md（W-1〜W-16 の元）、docs/reviews/001-daily-learning-G2-tests-tech-lead-r1.md、docs/reviews/001-daily-learning-G2-tests-reviewer-r1.md（r2 で反映）、docs/reviews/001-daily-learning-G2-tests-tech-lead-r2.md と contracts/test-hooks.md「時間の計り方」（r3 で反映）
 - 読み替え：Web アプリなので、型の「launch argument」は「Playwright の addInitScript、clock、setOffline、CDP、locale、UA」、「再起動」は「再読み込みと新しいタブ」、「API の受け入れテスト」は「配布物の JSON（課題集、文言）を HTTP で読む検査」に読み替える。
 - テストの置き場所：backend/tests/acceptance/（設定、サーバー、ヘルパー、seed、tests/）。動かし方は同じフォルダの README.md。
 
@@ -29,8 +29,8 @@
 ファイルはすべて backend/tests/acceptance/tests/。テスト名は `AC<番号>_<結果>`（grep で数えられる）。chromium と webkit の両方で動かす（AC-15 だけ chromium）。seed の形はすべて contracts/schemas/data.schema.json に通したもの。日付は `page.clock.setFixedTime`（W-3）で固定し、timezoneId は Asia/Tokyo。
 | AC | リスク | 技法 | 試す値（境界、遷移、ルールの列） | 種類 | ファイル::テストの名前 | 確かめる結果（具体的な値） |
 |---|---|---|---|---|---|---|
-| AC-1 | R3 | 状態遷移、境界（500 ms） | 保存なし → S1 → S2 ×3 → S3。時刻 2026-11-03 | 画面 | ac01-ac02-diagnosis.spec.mjs::AC1_初めて開くと診断が始まり3問で終わる_進み具合n/3_切り替え500ms以内 | `data-state` が `diagnosis.start` → `diagnosis.question`。`diagnosis.progress` の `data-question-index` が 1、2、3、`data-question-total` が 3、文字が ja の「質問 n / 3」。4 区間を記録：始める→1 問目、1→2、2→3 が各 500 ms 以下（PRD 12「AC-1 で 3 回計る」）、3→課題が 1,000 ms 以下（AC-2）。時間は click の直前の t0 から、次の印（`data-question-index`、`data-state`）を確かめ終えるまでの差。最後の番号が 3 で、課題の後に progress が 0 件 |
-| AC-2 | R3 | 同値分割（領域 × 段階を変えた 3 通り） | (backend, intermediate, 1to3)、(frontend, beginner, lt1)、(git, advanced, gte5) | 画面 | 同::AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_<area>_<level>（3 本） | finish の click の直前から `data-state=task.today` を確かめ終えるまでの差（helpers/app.mjs の diagnose の finishMs）が 1,000 ms 以下（click の往復だけを計らない）。`[data-testid="task.today"]` が 1 件、`data-task-area` と `data-task-level` が回答と一致 |
+| AC-1 | R3 | 状態遷移、境界（500 ms） | 保存なし → S1 → S2 ×3 → S3。時刻 2026-11-03 | 画面 | ac01-ac02-diagnosis.spec.mjs::AC1_初めて開くと診断が始まり3問で終わる_進み具合n/3_切り替え500ms以内 | `data-state` が `diagnosis.start` → `diagnosis.question`。`diagnosis.progress` の `data-question-index` が 1、2、3、`data-question-total` が 3、文字が ja の「質問 n / 3」。4 区間を記録：始める→1 問目、1→2、2→3 が各 500 ms 以下（PRD 12「AC-1 で 3 回計る」）、3→課題が 1,000 ms 以下（AC-2）。時間は契約「時間の計り方」の「文書が変わらない区間」のとおりページの中で計る（始点：操作の testid の click の capture 段の `performance.now()`、終点：MutationObserver が `data-state=diagnosis.question` と `data-question-index=n+1`（課題は `data-state=task.today`）を見た時刻。記録は `globalThis.__acceptanceTiming`。ms の整数に切り上げて annotation に残す。記録がなければ落とす）。差を取った後に expect で状態と中身を確かめる（expect は時間に使わない）。最後の番号が 3 で、課題の後に progress が 0 件。ja.json に `diagnosis.progress` があることを先に確かめる |
+| AC-2 | R3 | 同値分割（領域 × 段階を変えた 3 通り） | (backend, intermediate, 1to3)、(frontend, beginner, lt1)、(git, advanced, gte5) | 画面 | 同::AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_<area>_<level>（3 本） | `diagnosis.finish` の click（capture 段の `performance.now()`）から `data-state=task.today` になった DOM の変化までを、ページの中で計った値（helpers/app.mjs の diagnose の finishMs。契約「時間の計り方」）が 1,000 ms 以下。`[data-testid="task.today"]` が 1 件、`data-task-area` と `data-task-level` が回答と一致 |
 | AC-3 | R7 | 全数検査、境界（1〜15） | 配布物 `data/tasks.json` の全件 | JSON | ac03-ac04-ac29-tasks-json.spec.mjs::AC3_課題集の全件が4要素を持ち所要時間が1〜15分 | 200 と `application/json`。tasks.schema.json に通る。全件で title、why、how、goal の trim 後が 1 文字以上、minutes が整数で 1 以上 15 以下。違反の一覧が [] |
 | AC-4 | R7 | 全数検査、件数 | 全体、18 組、ID | JSON | 同::AC4_課題集は126件以上で18組すべて7件以上でIDの重複が0件 | 全体 ≥ 126、組が 18 で各 ≥ 7、重複 ID が [] |
 | AC-5 | R3 | 状態遷移（S3 → S4 → S5、再読み込み ×2） | seed-ac14（3 件完了）、2026-11-04 | 画面 | ac05-ac06-ac07-ac09-report.spec.mjs::AC5_完了するとtask.rateになり_答えるとtask.done_同じ日に再読み込みしてもtask.doneのまま | `task.rate` → `task.done`。再読み込み 2 回とも `task.done` で `task.today` が 0 件。履歴の先頭の行が {taskId, date 2026-11-04, report done} |
@@ -40,7 +40,7 @@
 | AC-9 | R2 | 同値分割（選ぶ ×2、閉じる、再読み込み） | helpful、not_helpful、close、reload | 画面 | 同（ac05…）::AC9_役に立ったを選ぶ…helpful ／ AC9_立たなかった…not_helpful ／ AC9_選ばずに再読み込み…unanswered ／ AC9_今回は答えない…unanswered（4 本） | `task.done` になり、再読み込みで `task.rate.helpful` が 0 件（再び聞かれない）。履歴の先頭の `data-helpful` が helpful / not_helpful / unanswered / unanswered |
 | AC-10 | R3 | 空、状態遷移 | 本番の課題集の backend/intermediate を全件出し終えた seed（件数は課題集から動的）。翌日 | 画面 | ac10-ac30-exhausted-external.spec.mjs::AC10_課題が尽きるとtask.exhaustedと文言とやり直しの操作が出て_同じ領域と段階でやり直すと同じ日に再びtask.exhausted | `task.exhausted`、`task.exhausted.message` の文字が ja の値、`task.exhausted.redo` が 1 件、`task.today` 0 件。redo → S2 → 同じ組 → 同じ日に `task.exhausted` |
 | AC-11 | R5 | エラーの注入（次の 1 回） | 2 問目（database, advanced）の確定で setItem が QuotaExceededError | 画面 | ac11-ac13-storage.spec.mjs::AC11_2問目の保存が失敗してもerror.storage.messageと選択が残り_やり直すと3問目に進み課題が回答と一致する | `error.storage.message` 表示、`error.storage.retry` 1 件、`data-question-index` 2 のまま、`level.advanced` が checked。retry → index 3、message 0 件。finish → `task.today` で area database、level advanced |
-| AC-12 | R4 | オフライン（送信 0 件） | 読み込み後、W-13（SW の準備）の合図を待ってから setOffline（PRD の「読み込み終えた後に」をこの合図で読む。待たないと `sw.js` の取得と競る）。(a) AC-1、2、5、9 (b) AC-1、2、7 | 画面 | ac12-ac23-offline.spec.mjs::AC12_オフラインでもAC-1_AC-2_AC-5_AC-9の操作が動き_送信は0件 ／ AC12_オフラインでもAC-7の申告が動き_送信は0件 | 各 AC の再読み込みより前の Then（(a) は始める→1、1→2、2→3 が各 500 ms、3→課題が 1,000 ms を AC-1、AC-2 と同じ計り方で、領域、`task.done`、履歴の helpful。(b) は `task.skipped`、no_time）。fromServiceWorker でない応答 + requestfailed が 0 件（W-12） |
+| AC-12 | R4 | オフライン（送信 0 件） | 読み込み後、W-13（SW の準備）の合図を待ってから setOffline（PRD の「読み込み終えた後に」をこの合図で読む。待たないと `sw.js` の取得と競る）。(a) AC-1、2、5、9 (b) AC-1、2、7 | 画面 | ac12-ac23-offline.spec.mjs::AC12_オフラインでもAC-1_AC-2_AC-5_AC-9の操作が動き_送信は0件 ／ AC12_オフラインでもAC-7の申告が動き_送信は0件 | 各 AC の再読み込みより前の Then（(a) は始める→1、1→2、2→3 が各 500 ms、3→課題が 1,000 ms を AC-1、AC-2 と同じ計り方（ページの中。契約「時間の計り方」）で、領域、`task.done`、履歴の helpful。(b) は `task.skipped`、no_time）。fromServiceWorker でない応答 + requestfailed が 0 件（W-12） |
 | AC-13 | R5 | 権限の拒否の注入 | `StorageManager.prototype.persist` が false。testing/beginner を診断 | 画面 | 同（ac11…）::AC13_persistを断られても完了と再読み込みでtask.done_履歴1件_設定にnotPersistedと書き出しがある | 再読み込みで `task.done`、履歴 1 行 {taskId, done}、S8 に `settings.storage.notPersisted` が見え `settings.export` が 1 件 |
 | AC-14 | R1、R2 | 状態遷移（S7 → S8 → S2 → S3） | 本番の課題集から作る backend/intermediate を出し終えた seed（W-7 の AC-14 の行。最後の 3 行＝今日の直前の 3 日が done、残りは no_time。fixtures の seed-ac14-three-completed.json は使わない）。翌日 → `task.exhausted` → 設定 → やり直し → frontend/beginner | 画面 | ac14-ac16-redo-delete.spec.mjs::AC14_今日の課題を出していない日に設定からやり直して別の領域を選ぶと_新しい領域の課題が出て完了の履歴は3件のまま | seed の done 3 行の日付が今日の -3、-2、-1 日。`task.today` の `data-task-area` が frontend、level beginner。履歴の done が 3 行、行数は seed と同じ |
 | AC-15 | R4 | 性能（5 回、境界 2,000） | Chromium。CDP：latency 150、下り 200,000 B/s、上り 93,750 B/s、CPU 4 倍。新しいコンテキスト × 5、seed-diagnosed-2026-10、時刻は固定しない | 画面 | ac15-load-time.spec.mjs::AC15_遅い回線とCPU4倍の制限でキャッシュなしに開き_data-debug-load-msが5回とも2000以下 | `task.today` を待って `data-debug-load-ms`（整数の文字列）を 5 回読み、全部 2,000 以下。値を annotation に残す |
@@ -51,7 +51,7 @@
 | AC-20 | R1 | 往復（書き出し → 別のコンテキストで読み込み） | seed-three-done-one-answer を A で書き出し → 保存なしの B に setInputFiles。同じ 11-03 | 画面 | 同::AC20_保存データのないブラウザで読み込むと_診断と段階が同じで履歴3件（answerも同じ）_状態はtask.todayかtask.done | B で `settings.export` 0 件（保存なし）→ 読み込み後 `settings.import.confirm` 0 件、`error.import.message` 0 件、状態 `task.done`（11-03 に done）。履歴 003、002、001 の順、001 の answerText が 50 文字。再書き出しの diagnosis、levels、firstOpenDate、history が A と deep equal、answer が [50 文字, '', ''] |
 | AC-21 | R8 | 同値分割（偽装 3 通り） | iPhone 15 の UA + standalone false、Mac Safari UA + maxTouchPoints 5、偽装なし。11-03 | 画面 | ac21-ac22-home-screen.spec.mjs::AC21_iOS_Safariでは診断の前に案内が出て_閉じると再読み込みしても出ず_設定から再び開ける ／ AC21_iPadOS_Safari（MacのUAとmaxTouchPoints5）でも診断の前に案内が出る ／ AC21_UAを偽装しないChromiumとWebKitでは案内が0回出る | 偽装あり：`diagnosis.start` に `home.addToHomeScreen` 1 件、`.steps` 1 件、`.steps.1`〜`.4` が見え、`.steps.4` の文字が ja の値。close → 0 件、再読み込みでも 0 件。S8 に `settings.homeScreen.open` 1 件 → 押すと案内 1 件。偽装なし：0 件（再読み込み後も）、`settings.homeScreen.open` 0 件 |
 | AC-22 | R8、R1 | 状態遷移（案内 → 読み込み） | standalone true、保存なし、11-04。fixtures/data/v1/valid-export-three-completed.json | 画面 | 同::AC22_スタンドアロンで初めて開くと読み込みの案内が出て_再読み込みでも出て_ファイルを読み込むとAC-20の状態になる | `home.standalone.import` が見え文字が ja の値、`home.standalone.importButton` 1、`diagnosis.start.begin` 1、`home.addToHomeScreen` 0。再読み込みで同じ。読み込み → `task.today` で ID backend-intermediate-004、履歴 3 行、書き出しの diagnosis・levels・firstOpenDate・history が見本と等しく current が {11-04, 004, ''} |
-| AC-23 | R4 | オフライン（再読み込み、新しいタブ）× 2 状態 | seed-ac14。task.today（11-04）、task.done（11-03）。W-13 の合図の後に setOffline | 画面 | ac12-ac23-offline.spec.mjs::AC23_task.today…3秒以内に同じdata-task-id_送信0件 ／ AC23_task.done…3秒以内にtask.done_送信0件 | 再読み込みと新しいタブの両方で 3,000 ms 以内に同じ状態（today は同じ `data-task-id`）。送信が合計 0 件 |
+| AC-23 | R4 | オフライン（再読み込み、新しいタブ）× 2 状態 | seed-ac14。task.today（11-04）、task.done（11-03）。W-13 の合図の後に setOffline | 画面 | ac12-ac23-offline.spec.mjs::AC23_task.today…3秒以内に同じdata-task-id_送信0件 ／ AC23_task.done…3秒以内にtask.done_送信0件 | 再読み込みと新しいタブの両方で 3,000 ms 以内に同じ状態（today は同じ `data-task-id`）。時間は契約「時間の計り方」の「文書が変わる区間」のとおりテスト側で計る：`Date.now()` → `page.reload({ waitUntil: 'commit' })` / `page2.goto(url, { waitUntil: 'commit' })` → `expect.poll(data-state, { intervals: [20], timeout: 3000 })` が返った直後の `Date.now()`（ずれは 20 ms と往復 1 回まで）。同じ `data-task-id` と送信の数え方は終点の後。送信が合計 0 件 |
 | AC-24 | R2 | 全数（9 値） | fixtures/seeds/seed-ac24-stats.json、2026-11-06 | 画面 | ac24-stats.spec.mjs::AC24_統計の9つの値が期待どおりで_数値7つと日付1つは同じ文字が見え_真偽値はfirstDayCompleted.yesの文言が見える | first-open-date 2026-11-01、issued 5、completed 3、first-day-completed true、days-completed-7d 3、helpful 2、rated 2、too-hard 1、no-time 1。各 `.value` の文字が属性と同じ（真偽値は ja の `settings.stats.firstDayCompleted.yes`、`.no` は 0 件） |
 | AC-25 | R1 | エラー（版 +1） | seed-one-done、11-02。fixtures/data/invalid-newer-version.json | 画面 | ac19…::AC25_版番号が新しいファイルはerror.import.messageで拒み_履歴1件と診断と状態は変わらない | `error.import.message` と `error.import.reason.version` が見え、`settings.import.confirm` 0 件。書き出しで history 1 件（001 done）、diagnosis と levels が seed と同じ。アプリ名 → `task.today` で ID が前と同じ、履歴 1 行 |
 | AC-26 | R9 | ペア（locale 2 通り） | en-US、ja-JP | 画面 + JSON | ac26-language.spec.mjs::AC26_en-USではdiagnosis.startの文言が英語の文言ファイルと一致し_キーの差が0件 ／ AC26_ja-JPでは…一致する | `<html lang>` が en / ja。画面にある `data-testid` のうち文言キーで差し込み（`{…}`）のないものすべての文字がその言語のファイルの値（title、lead.1〜3、begin、nav.settings、app.name の 7 個は必ず含まれること）。ja にしかないキー []、en にしかないキー []。両ファイルが strings.schema.json に通る |
@@ -123,7 +123,8 @@ contracts/ にないつなぎ口はない。r1 で「未解決」に書いた食
 - ビルド済みの配布物を検証するとき：`KYOUNOITTE_DIST=<フォルダ> npx playwright test`。
 - 判定の実行では再試行を付けない（`retries: 0`。`--retries` を渡さない）。
 - 揺れの確認：同じコマンドを 5 回。影響「大」の AC（R1〜R5：AC-1、2、5〜16、19、20、22〜25、28、31、32）と、一度でも落ちたテストが対象。
-- 証拠：スクリーンショットと axe の JSON は test-results/（.gitignore 済み）に出し、G3 で docs/verification/001-daily-learning/evidence/ に写す。
+- 証拠：スクリーンショットと axe の JSON は test-results/（.gitignore 済み）に出し、G3 で docs/verification/001-daily-learning/evidence/ に写す。AC-1、AC-2、AC-12、AC-23 の計った時間（ms）はテストの annotation に残る（`--reporter=list,json` の JSON で読める）。G3 では AC ごとの値を verification.md に写す。
+- 時間の計測が合っていることの確かめ（実装の前。契約「時間の計り方」）：遅れを設定できる stub（リポジトリに入れない）を `KYOUNOITTE_DIST` に指し、`npx playwright test -g 'AC1_|AC2_|AC12_|AC23_' --reporter=list,json` を遅れ 0 / 300 / 900 ms で両ブラウザ。結果は evidence/timing.log（8 章）。
 
 ## 6. 探索のチャーター
 影響「大」のリスクごとに 1 本。G3 で行い、結果は verification.md の 8 章に書く。
@@ -159,7 +160,7 @@ contracts/ にないつなぎ口はない。r1 で「未解決」に書いた食
 | （G3 で追加） | 全画面 S0〜S10 とダイアログのダーク（`colorScheme: 'dark'`）、英語、幅 320。S0 error の 2 変種、S10 の空と行あり、S8 の保存データなし | <画面>_<状態>_<dark|en|w320>.png |
 
 ## 8. 赤の証拠（実装の前に落ちたこと）
-- ログ：docs/verification/001-daily-learning/evidence/red.log（r2 で取り直し。コミット f339a95 の作業ツリー）
+- ログ：docs/verification/001-daily-learning/evidence/red.log（r3 で取り直し。コミット 009322d の作業ツリー。2026-10-31 01:14 JST）
 - 実行したコマンドと終了コード：`cd backend/tests/acceptance && npm ci && npx playwright install chromium webkit && npx playwright test --reporter=list` → 終了コード 1、131 本すべて失敗（chromium 66、webkit 65）、成功 0、飛ばし 0
 - 落ちた理由（1 行）：配布物を作る `backend/scripts/build.mjs` がまだなく（実装前）、global-setup がその理由を各テストに渡して全テストが「配布物を作れない：backend/scripts/build.mjs が見つからない（実装がまだない）」で落ちた。
 - テストの書き間違いではないことの証拠（stub の配布物での実行。tech-lead G2 r1 の要修正）：スクラッチパッドに最小の配布物（`data-state="diagnosis.start"` の HTML と testid 7 個、空の課題集 `{"tasks":[]}`、必須キーの足りない文言ファイル。JS も SW もない。リポジトリに入れない）を作り、`KYOUNOITTE_DIST` に指して両ブラウザで動かした。
@@ -178,6 +179,11 @@ contracts/ にないつなぎ口はない。r1 で「未解決」に書いた食
   - 通った 1 本（両ブラウザとも `AC17_diagnosis.start`）：stub の S1 が幅 320 で横スクロールも切り詰めもなく 3 つの操作要素が押せるので、Then を本当に満たして通った（空振りではない）。
   - AC-30 の external：r1 では空の課題集で「該当なし」として通っていたが、守り（tasks.schema.json、126 件以上、18 組 7 件以上）を足した r2 では落ちる（理由 C）。
   - AC-18（webkit）：tabTo が `Alt+Tab` で `diagnosis.start.begin` に届き、Enter の後に状態が変わらないこと（理由 A）で落ちる。r1 の「Tab を 40 回押しても届かない」ではない。
+- 時間の計測の確認（r3。契約「時間の計り方」）：evidence/timing.log。遅れを 0 / 300 / 900 ms に設定できる stub（S1 → S2 → task.today → task.done / task.skipped → history、seed の読み書き、SW、126 件の課題集。begin、next、finish と起動の描画を setTimeout で遅らせる）で AC-1、AC-2、AC-12、AC-23 の 8 本 × 2 ブラウザを動かした。
+  - ページの中の区間（AC-1、AC-2、AC-12 (a)）：計った値が、遅れ 0 で chromium 12〜16 / webkit 0〜2、遅れ 300 で 301〜302 / 301〜302、遅れ 900 で 901〜903 / 900〜902。r2 の expect の待ち（遅れ 300 で 814〜825）のずれは消えた。
+  - テスト側の区間（AC-23）：遅れ 0 で 13〜76、300 で 321〜337、900 で 920〜940（契約の見込み +7〜+30 ms より新しいタブが少し大きい。46〜76 は新しいタブの最初の往復を含む）。
+  - 結果：遅れ 0 と 300 は 16 本すべて通る（終了コード 0）。遅れ 900 は AC-1 と AC-12 (a) が両ブラウザで「始める → 1 問目 Expected <= 500 Received 900〜902」で落ち、AC-2（上限 1,000）と AC-23（上限 3,000）は通る（12 passed / 4 failed、終了コード 1）。上限を超えたものだけが落ちる。
+  - 付け足し：SW のない stub で `waitServiceWorkerReady` が 10,000 ms で「SW が登録されない：navigator.serviceWorker.ready と controller が 10000 ms で満たされない（W-13）」と落ちる（以前はテストの timeout 60 s まで止まっていた）。
 - キーボードの移動キーの確認：evidence/tab-keys.log（stub にリンク、radio、ボタン、textarea を置き、`Tab` と `Alt+Tab` を 6 回。WebKit の `Tab` は textarea と BODY だけ、`Alt+Tab` はすべてに届く。Chromium はどちらでもすべてに届く）。
 
 ## 9. 範囲の外
@@ -189,7 +195,24 @@ contracts/ にないつなぎ口はない。r1 で「未解決」に書いた食
 - サーバーエラー（5xx）：静的ホスティングで、アプリの画面の状態がない。
 - 課題集の中身の質（文章として役に立つか）：Takuma の全件確認（Q2）と 13 の「役に立った」率で見る。
 
-## 10. r2 で直した所（G2 の判定 tech-lead r1 / reviewer r1 への対応）
+## 10. 判定への対応で直した所
+### r3（G2 の判定 tech-lead r2 への対応）
+テストを直すのは、PRD の行か契約の節で根拠を示せるときだけ。1 行に 1 指摘。
+| 指摘（判定、重大度） | どこをどう直したか | 根拠 |
+|---|---|---|
+| 時間の終わりを expect の待ちで取るので、計った値が確かめる間隔の分（最大約 500 ms）長くなる（tech-lead、要修正） | helpers/app.mjs に `armTiming`（計る文書に 1 回だけ：window の capture 段の click で `performance.now()` と testid を記録、MutationObserver（document、subtree、childList、attributes：`data-state`、`data-question-index`）でその時点の DOM を読み、変わったら `performance.now()` と記録。`globalThis.__acceptanceTiming`）と `readInterval`（始点＝その testid の最後の click、終点＝始点より後で条件を満たす最初の記録。ms に切り上げ。記録がなければ例外）を足し、`diagnose` の beginMs、transitions、finishMs をこれで計る。ac01-ac02-diagnosis.spec.mjs の AC1 の 4 区間も同じ。差を取った後で expect で状態を確かめる。AC-12 (a) は `diagnose` 経由で同じ計り方 | contracts/test-hooks.md「時間の計り方」の「文書が変わらない区間」1〜7。PRD AC-1「500 ms」、AC-2「1 秒以内」、PRD 12。Then は変えていない |
+| 同上（AC-23 の再読み込みと新しいタブ） | ac12-ac23-offline.spec.mjs の `offlineReloadAndNewTab`：始点は `page.reload({ waitUntil: 'commit' })` / `page2.goto(baseURL, { waitUntil: 'commit' })` の直前の `Date.now()`、終点は `expect.poll(() => data-state（evaluate の失敗は null）, { intervals: [20], timeout: 3000 }).toBe(state)` が返った直後の `Date.now()`。同じ `data-task-id` と送信の数え方は終点の後 | contracts/test-hooks.md「時間の計り方」の「文書が変わる区間」1〜5。PRD AC-23「3 秒以内」 |
+| `ja['diagnosis.progress']` がないと `fill(undefined)` の TypeError になり、赤の理由がテストの誤りに見える（tech-lead、提案） | ac01 の AC1 の冒頭で `expect(ja).toHaveProperty(['diagnosis.progress'])`（配列：キーの「.」を経路に読ませない） | strings.schema.json の必須キー、W-14。Then は変えていない |
+| `waitServiceWorkerReady` が SW のないときテストの 60 s の timeout まで止まる（tech-lead、提案） | ページの中で `ready` → `controller` の約束を WAIT_MS（10,000 ms）の上限と `Promise.race` し、「SW が登録されない：…（W-13）」で落とす。上限は待つためではなく止まらないための timer（setTimeout の 2 件目。確かめの項目に書いた） | test-hooks.md W-13。確かめ：timing.log の付け足し |
+| `engineOf` が `browser()` の null を黙って chromium にする（tech-lead、提案） | null なら「ブラウザの種類が分からない」の例外にした | test-hooks.md「キーボードの移動キー（AC-18）」（判定はブラウザの種類で行う） |
+| helpers/fixtures.mjs:2 のコメントが「backend/dist/」のまま（tech-lead、提案） | mkdtemp の一時フォルダ（`KYOUNOITTE_DIST`）に直した | コメントだけ。ADR 0004 |
+| 計測の仕方を変えたので証拠を取り直す | red.log を 009322d の作業ツリーで取り直し（131 failed、理由は同じ）。evidence/timing.log を足した（8 章） | craft-verifier 2 章「赤の証拠」 |
+
+取り込まなかったもの（理由）：
+- 契約の Linux WebKit の「未確認」への裏付け（tech-lead 提案 5）：tech-lead が契約の方に書いた（test-hooks.md「キーボードの移動キー」）。テストの変更はない。
+- 設計メモ 6 の「申告から次の状態まで」（AC-5、AC-7）の記録（契約の 8「計ってよい」）：PRD の AC-5、AC-7 に秒数の Then がないので計らない。足すなら G3 の探索で。
+
+### r2（G2 の判定 tech-lead r1 / reviewer r1 への対応）
 テストを直すのは、PRD の行か契約の節で根拠を示せるときだけ（役割ファイル「やらないこと」）。1 行に 1 指摘。
 | 指摘（判定、重大度） | どこをどう直したか | 根拠 |
 |---|---|---|
@@ -221,6 +244,7 @@ contracts/ にないつなぎ口はない。r1 で「未解決」に書いた食
 - [x] 影響「大」のリスク（R1〜R5）のすべてに、自動テスト、3 章の行、6 章のチャーターがある。
 - [x] 3 章の 9 行すべてに選んだものがあり、範囲外には理由がある。
 - [x] 4 章のつなぎ口がすべて contracts/ にある。契約と仕様の食い違いは報告の「未解決」に書いた。
-- [x] 受け入れテストのフォルダで（r2 で数え直し）、sleep（`sleep\(|usleep|Thread\.sleep|time\.sleep|asyncio\.sleep|waitForTimeout`）0 件、skip / xfail / fixme / only 0 件、`retry|rerun` は tests/ で 2 件（どちらも契約の識別子 `error.storage.retry` を指す文字列で、再試行ではない。設定の `retries: 0` と README の説明は除く）、`@testable` と実装の import 0 件、`setTimeout` 1 件（AC-28 の PRD が決めた 2 秒の間隔。helpers/app.mjs の pause）。表示の文字で探す locator（`getByText|getByLabel|text=|hasText`）0 件（`getByRole('dialog')` 1 件は test-hooks.md の AC-31 の数え方、`.nth()` 5 件は繰り返す行と道具の項目）。
-- [x] r2 の直しは、判定の指摘ごとに 10 章の表に「どこをどう直したか」と根拠（PRD の行か契約の節）を書いた。
+- [x] 受け入れテストのフォルダで（r2 で数え直し）、sleep（`sleep\(|usleep|Thread\.sleep|time\.sleep|asyncio\.sleep|waitForTimeout`）0 件、skip / xfail / fixme / only 0 件、`retry|rerun` は tests/ で 2 件（どちらも契約の識別子 `error.storage.retry` を指す文字列で、再試行ではない。設定の `retries: 0` と README の説明は除く）、`@testable` と実装の import 0 件、`setTimeout` 2 件（helpers/app.mjs の pause：AC-28 の PRD が決めた 2 秒の間隔。helpers/app.mjs の waitServiceWorkerReady：SW が登録されないときに WAIT_MS で止まらないための上限で、待つためではない）。`Date.now` はテストで 4 件（ac12-ac23 の AC-23 の始点と終点。契約「文書が変わる区間」）、`performance.now` は helpers/app.mjs の armTiming の 2 件（契約「文書が変わらない区間」）。表示の文字で探す locator（`getByText|getByLabel|text=|hasText`）0 件（`getByRole('dialog')` 1 件は test-hooks.md の AC-31 の数え方、`.nth()` 5 件は繰り返す行と道具の項目）。
+- [x] r2、r3 の直しは、判定の指摘ごとに 10 章の表に「どこをどう直したか」と根拠（PRD の行か契約の節）を書いた。
+- [x] 時間の計測（AC-1、AC-2、AC-12、AC-23）が契約「時間の計り方」のとおりで、stub の本当の遅れに対して AC-1 / AC-2 は +0〜+3 ms、AC-23 は +13〜+40 ms に収まることを両ブラウザで確かめた（evidence/timing.log）。
 - [x] 8 章の赤の証拠があり、落ちた理由が書き間違いではなく「機能がまだない」こと。

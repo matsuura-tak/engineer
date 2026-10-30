@@ -28,7 +28,7 @@ npx playwright test                      # 判定の実行。再試行は 0（re
 | global-setup.mjs | 配布物のビルド（1 回。一時フォルダに出し、teardown で消す）。結果を env で各ワーカーに渡す |
 | server/static-server.mjs | テスト用の静的サーバー（node の組み込みだけ。gzip、`Cache-Control: max-age=600`、Content-Type、`/engineer` → `/engineer/` の 301、404、実行中の差し替え `setRoot`） |
 | helpers/fixtures.mjs | worker ごとのサーバーと baseURL |
-| helpers/app.mjs | 画面の操作と読み出し（data-testid、data-state、履歴の行、書き出し、送信の数え方 W-12、SW の準備 W-13、キーボードの移動キー：WebKit は Alt+Tab、それ以外は Tab） |
+| helpers/app.mjs | 画面の操作と読み出し（data-testid、data-state、履歴の行、書き出し、送信の数え方 W-12、SW の準備 W-13、時間の計り方 `armTiming` / `readInterval`、キーボードの移動キー：WebKit は Alt+Tab、それ以外は Tab） |
 | helpers/seed.mjs | seed の投入（W-7）、保存の失敗と persist の拒否の注入（W-9）、standalone と UA の偽装（W-16）、課題集から「出し終えた」履歴を作る |
 | helpers/schema.mjs | contracts/schemas を ajv（2020-12、strict）で検査 |
 | helpers/build.mjs | build.mjs の CLI を呼ぶ（AC-28 の旧版と新版） |
@@ -37,7 +37,8 @@ npx playwright test                      # 判定の実行。再試行は 0（re
 
 ## 守っていること
 - 要素は contracts/identifiers.md の `data-testid` と `data-*` でだけ探す。表示の文字では探さない（文字は文言ファイル i18n/*.json の値と比べる）。
-- 待つのは状態や要素の変化だけ（expect / toHaveAttribute / toHaveCount）。`waitForTimeout` や sleep は使わない。例外は AC-28 の PRD が決めた「2 秒以上の間隔」（helpers/app.mjs の `pause`）の 1 か所だけ。
+- 待つのは状態や要素の変化だけ（expect / toHaveAttribute / toHaveCount）。`waitForTimeout` や sleep は使わない。例外は AC-28 の PRD が決めた「2 秒以上の間隔」（helpers/app.mjs の `pause`）の 1 か所だけ。`waitServiceWorkerReady` の setTimeout は、SW が登録されないときに止まらないための上限（WAIT_MS）で、待つためではない。
+- 時間（AC-1、AC-2、AC-12、AC-23 の秒数）は契約 test-hooks.md「時間の計り方」のとおりに計る。同じ文書の中はページの中（click の capture 段 → MutationObserver。helpers/app.mjs の `armTiming` / `readInterval`）、文書が変わる区間はテスト側の `Date.now()` と `waitUntil: 'commit'` + 20 ms おきの `expect.poll`。expect の待ちで時間を取らない。
 - つなぎ口はすべて Playwright の側（addInitScript、clock、setOffline、CDP、setInputFiles）。本番の配布物には何も入れない。
 - 実装のモジュールを import しない。配布物は HTTP で、ビルドは CLI で使う。
 - `test.skip`、`test.fixme`、`retries` を使わない。

@@ -43,45 +43,101 @@ export async function readTask(page) {
 }
 
 /**
+ * 時間の計り方（contracts/test-hooks.md「時間の計り方」の「文書が変わらない区間」。AC-1、AC-2。AC-12 で同じ操作を計るときも）。
+ * 計る文書に 1 回だけ仕掛ける（再読み込みしたら入れ直す）。記録はテスト側の変数 globalThis.__acceptanceTiming（アプリは読まない）。
+ *   始点：window の capture 段の click で performance.now() と、event.target.closest('[data-testid]') の data-testid を記録する。
+ *   終点：MutationObserver（document、subtree、childList、attributes：data-state と data-question-index）。cb ではその時点の DOM
+ *         （<html> の data-state、diagnosis.progress の data-question-index）を読み、前の記録から変わったら performance.now() と一緒に記録する。
+ * setFixedTime の下でも、同じ文書の中の performance.now() の差は実際の時間どおりに進む（契約の 7）。Date.now() は止まるので使わない。
+ */
+export const TIMING_KEY = '__acceptanceTiming';
+
+export async function armTiming(page) {
+  await page.evaluate((key) => {
+    if (globalThis[key]) return;
+    const log = (globalThis[key] = { clicks: [], marks: [] });
+    addEventListener(
+      'click',
+      (e) => {
+        const el = e.target instanceof Element ? e.target.closest('[data-testid]') : null;
+        log.clicks.push({ id: el?.getAttribute('data-testid') ?? null, t: performance.now() });
+      },
+      { capture: true },
+    );
+    const snap = () => ({
+      state: document.documentElement.getAttribute('data-state'),
+      index: document.querySelector('[data-testid="diagnosis.progress"]')?.getAttribute('data-question-index') ?? null,
+    });
+    let last = snap();
+    new MutationObserver(() => {
+      const now = snap();
+      if (now.state === last.state && now.index === last.index) return;
+      last = now;
+      log.marks.push({ ...now, t: performance.now() });
+    }).observe(document, { subtree: true, childList: true, attributes: true, attributeFilter: ['data-state', 'data-question-index'] });
+  }, TIMING_KEY);
+}
+
+/**
+ * 区間の値（ms の整数。小数は切り上げ）＝終点 − 始点（契約の 4、5）。
+ *   始点：startTestId の click のうち最後の 1 件（radio の check() も click を出すので testid で分ける）。
+ *   終点：始点より後の記録のうち、state（と index）が一致する最初のもの。
+ * 始点か終点の記録がなければ「計れなかった」として例外（null や 0 を通さない）。
+ */
+export async function readInterval(page, { startTestId, state, index = null }) {
+  const log = await page.evaluate((key) => globalThis[key] ?? null, TIMING_KEY);
+  if (!log) throw new Error(`時間の記録がない（armTiming をこの文書で呼んでいない）：${startTestId} → ${state}${index ? ` / ${index}` : ''}`);
+  const start = log.clicks.filter((c) => c.id === startTestId).at(-1);
+  if (!start) throw new Error(`始点の click の記録がない：${startTestId}（記録：${log.clicks.map((c) => c.id).join(', ') || 'なし'}）`);
+  const end = log.marks.find((m) => m.t >= start.t && m.state === state && (index === null || m.index === index));
+  if (!end) {
+    const seen = log.marks.filter((m) => m.t >= start.t).map((m) => `${m.state}/${m.index}`).join(', ') || 'なし';
+    throw new Error(`終点の記録がない：${startTestId} → data-state=${state}${index ? `、data-question-index=${index}` : ''}（始点の後の記録：${seen}）`);
+  }
+  return Math.ceil(end.t - start.t);
+}
+
+/**
  * 診断に答える。S1 なら「診断を始める」を押してから。S2 の 3 問に radio（area.*、level.*、years.*）で答え、最後に diagnosis.finish。
- * 時間はすべて「操作（click）の直前の t0」から「次の画面の印を確かめ終えた後」までの差（PRD AC-1「確定してから次の質問が表示されるまで」、
- * AC-2「1 秒以内に task.today が表示され」）。click の往復だけを計らない。
- * 戻り値：
- *   beginMs     「診断を始める」→ 1 問目（data-question-index=1）。S1 から始めなかったときは null
+ * 時間は契約「時間の計り方」のとおりページの中で計る（始点：操作の click の capture 段、終点：data-state / data-question-index が条件を満たした
+ * DOM の変化）。差を取った後で expect で状態と中身を確かめる（expect は時間には使わない）。
+ * PRD AC-1「確定してから次の質問が表示されるまで 500 ms」、AC-2「1 秒以内に task.today が表示され」。
+ * 戻り値（ms の整数）：
+ *   beginMs     「診断を始める」→ 1 問目（data-state=diagnosis.question、data-question-index=1）。S1 から始めなかったときは null
  *   transitions [1 問目 → 2 問目, 2 問目 → 3 問目]
- *   finishMs    diagnosis.finish → finishTo の状態（既定 task.today）。finishTo が null なら click が返るまで
+ *   finishMs    diagnosis.finish → finishTo の状態（既定 task.today）。finishTo が null なら計らず null
  */
 export async function diagnose(page, { area, level, years = '1to3' }, { finishTo = 'task.today', finishTimeout = WAIT_MS } = {}) {
   const progress = tid(page, 'diagnosis.progress');
+  await armTiming(page);
   let beginMs = null;
   if ((await readState(page)) === 'diagnosis.start') {
-    const tb = Date.now();
     await tid(page, 'diagnosis.start.begin').click();
     await expectState(page, 'diagnosis.question');
     await expect(progress).toHaveAttribute('data-question-index', '1');
-    beginMs = Date.now() - tb;
+    beginMs = await readInterval(page, { startTestId: 'diagnosis.start.begin', state: 'diagnosis.question', index: '1' });
   }
   await expectState(page, 'diagnosis.question');
   const transitions = [];
 
   await expect(progress).toHaveAttribute('data-question-index', '1');
   await tid(page, `area.${area}`).check();
-  let t0 = Date.now();
   await tid(page, 'diagnosis.next').click();
   await expect(progress).toHaveAttribute('data-question-index', '2');
-  transitions.push(Date.now() - t0);
+  transitions.push(await readInterval(page, { startTestId: 'diagnosis.next', state: 'diagnosis.question', index: '2' }));
 
   await tid(page, `level.${level}`).check();
-  t0 = Date.now();
   await tid(page, 'diagnosis.next').click();
   await expect(progress).toHaveAttribute('data-question-index', '3');
-  transitions.push(Date.now() - t0);
+  transitions.push(await readInterval(page, { startTestId: 'diagnosis.next', state: 'diagnosis.question', index: '3' }));
 
   await tid(page, `years.${years}`).check();
-  t0 = Date.now();
   await tid(page, 'diagnosis.finish').click();
-  if (finishTo) await expectState(page, finishTo, finishTimeout);
-  const finishMs = Date.now() - t0;
+  let finishMs = null;
+  if (finishTo) {
+    await expectState(page, finishTo, finishTimeout);
+    finishMs = await readInterval(page, { startTestId: 'diagnosis.finish', state: finishTo });
+  }
   return { beginMs, transitions, finishMs };
 }
 
@@ -171,14 +227,25 @@ export function networkCounter(page) {
   };
 }
 
-/** SW の準備（W-13）：ready と controller。 */
+/**
+ * SW の準備（W-13）：ready と controller。
+ * navigator.serviceWorker.ready は SW が登録されないと解決しないので、WAIT_MS と競わせて「SW が登録されない」と分かる形で落とす
+ * （待つためのタイマーではなく、止まらないための上限）。
+ */
 export async function waitServiceWorkerReady(page) {
-  await page.evaluate(async () => {
-    const reg = await navigator.serviceWorker.ready;
-    if (navigator.serviceWorker.controller) return reg.active !== null;
-    await new Promise((resolve) => navigator.serviceWorker.addEventListener('controllerchange', resolve, { once: true }));
-    return navigator.serviceWorker.controller !== null;
-  });
+  await page.evaluate(async (waitMs) => {
+    const ready = (async () => {
+      const reg = await navigator.serviceWorker.ready;
+      if (!navigator.serviceWorker.controller) {
+        await new Promise((resolve) => navigator.serviceWorker.addEventListener('controllerchange', resolve, { once: true }));
+      }
+      return reg.active !== null && navigator.serviceWorker.controller !== null;
+    })();
+    const gaveUp = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(`SW が登録されない：navigator.serviceWorker.ready と controller が ${waitMs} ms で満たされない（W-13）`)), waitMs),
+    );
+    return Promise.race([ready, gaveUp]);
+  }, WAIT_MS);
   await expect
     .poll(() => page.evaluate(() => navigator.serviceWorker.controller !== null), { timeout: WAIT_MS })
     .toBe(true);
@@ -198,7 +265,9 @@ export async function shot(page, testInfo, name) {
  * それ以外（Chromium）は Tab / Shift+Tab。確定のキー（Enter、Space）はどちらも同じ。
  */
 export function engineOf(page) {
-  return page.context().browser()?.browserType().name() ?? 'chromium';
+  const browser = page.context().browser();
+  if (!browser) throw new Error('ブラウザの種類が分からない（page.context().browser() が null）。移動キーを決められない');
+  return browser.browserType().name();
 }
 
 export function navKeys(page) {
