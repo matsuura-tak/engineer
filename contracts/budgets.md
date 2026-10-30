@@ -4,7 +4,7 @@ PRD 12（速さ、配布、対応ブラウザ）と AC-15、AC-17 を、作り�
 判断の理由は docs/adr/0001-web-foundation-no-build-es-modules.md と docs/adr/0005-csp-and-trust-boundaries.md。
 
 ## 1. 転送量（PRD 12：初回の転送量は圧縮後 150 KB 以下）
-- 数え方：ビルドした配布物のフォルダのすべてのファイルを、それぞれ gzip の最大圧縮（`zlib.gzipSync(buf, { level: 9 })`、`gzip -9` と同じ）にした大きさの合計。
+- 数え方：ビルドした配布物のフォルダのすべてのファイルを、それぞれ gzip の最大圧縮（node の `zlib.gzipSync(buf, { level: 9 })`）にした大きさの合計。正は zlib の値です。`gzip -9` の CLI は実装により数十バイト違います（下の文言の行）。
 - 上限：150,000 バイト（KB を 1,000 バイトとして読む。1,024 より厳しい側）。
 - 検査：`node scripts/check-budget.mjs <配布物のフォルダ>`（backend-engineer が node の組み込みだけで書く）。上限を超えたら終了コード 1。G3 の証拠には、ファイルごとの大きさと合計を出した出力を貼る。
 - 公開後：本番の URL のファイルを `curl --compressed` で取った転送量の合計（GitHub Pages は gzip を返す。br は返さない：tech-lead G1 r1 の curl）。
@@ -13,7 +13,7 @@ PRD 12（速さ、配布、対応ブラウザ）と AC-15、AC-17 を、作り�
 | 部分 | 上限（gzip 後のバイト） | 根拠 |
 |---|---|---|
 | 殻（HTML、CSS、すべての JS、sw.js、manifest） | 26,000 | spike の殻は約 15,800 バイト（60 KB の代わりの JS を含む） |
-| 文言（ja.json と en.json の 2 つ） | 8,000 | fixtures/strings の 145 キーの見本を詰めて gzip -9 にすると 3,453 + 2,987 = 6,440（2026-10-30） |
+| 文言（ja.json と en.json の 2 つ） | 8,000 | 約 6,500。fixtures/strings の 145 キーの見本を `JSON.stringify` で詰めて `zlib.gzipSync(level 9)` にすると 3,501 + 2,969 = 6,470（node v24.22.1）。同じものを Apple の gzip 487.40.2 の `gzip -9` にすると 3,453 + 2,987 = 6,440（2026-10-30） |
 | ホーム画面のアイコン（置く場合。Takuma の決定待ち P4） | 10,000 | 180 × 180 の PNG 1 枚 |
 | 課題集 tasks.json | 106,000 | 252 件 × 平均 600 字の合成で 106,113（spike） |
 

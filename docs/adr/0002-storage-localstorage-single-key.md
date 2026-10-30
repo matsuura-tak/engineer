@@ -26,6 +26,7 @@
 - 「保存データあり」は、診断を終えたか履歴が 1 行以上（data.md の 3）。
 - 段階は申告を保存するときに変え（data.md の 5）、`levels` に持つ。書き出しに「領域ごとの現在の段階」が入る（AC-19）。
 - 申告の「完了」の値は `done`（verifier G0 r3 の W-8 案の `completed` ではなく、design と PRD AC-32 の `none` に合わせた）。
+- `firstOpenDate`（統計の「初めて開いた日」）は、保存データが「なし」の状態で初回の診断の 1 問目を確定する保存で書き、以後変えない。`device` だけの保存（案内を閉じた印、persist の印）では書かない。そのためスキーマでは、`diagnosis` と `levels` が空で `history` が 0 行のときだけ省ける（data.md の 2 と 3。pdm の G1 の確認：iOS の Safari だけ案内を閉じた日が初日になり、first-day-completed が他のブラウザとずれるのを防ぐ）。v1 はまだ配っていないので、版は上げない（前の形で通った見本 18 件は、今の形でも合否が同じ）。
 
 ## 検討した案
 | 案 | 良い点 | 悪い点 | 選ばなかった理由 |
@@ -44,7 +45,7 @@
 - 難しくなること、守り続けること：
   - 版を上げるたびに、1 版ずつ移す手順と、contracts/fixtures/data/v<n>/ の見本を足し、古い見本を読み続ける単体テストを残す。
   - 課題の ID と語彙を変えない。課題集を直すときは中身を直し、ID は変えない。
-  - 起動時に setItem を呼ばない。他のキーに触らない。
+  - 保存データが「なし」か「診断の途中」の起動では setItem を呼ばない（AC-11 の注入はこの状態で行う）。「あり」の起動では data.md の 2 のとおり最大 1 回（日付が変わった課題を `none` の行に移す、今日の課題を出す。AC-6、AC-32）。他のキーに触らない。
 - 元に戻すとき（(b) に移す）：新しい版のアプリが localStorage を読んで IndexedDB に移し、キーを消す。書き出しの形は変えない。3〜5 日と、移す手順のテスト。
 
 ## 見直す条件
@@ -53,7 +54,8 @@
 - 端末の間で自動で同期したい、またはサーバーを持つと決めた（002 以降）。
 
 ## 確かめたこと
-- `node contracts/tools/check-schemas.mjs`（ajv 8.20.0、Ajv2020 の strict）：data.schema.json はメタスキーマに通り、見本 18 件（valid 4、seed 3、invalid 11）がすべて期待どおり。出力は設計メモの 4。
+- `node contracts/tools/check-schemas.mjs`（ajv 8.20.0、Ajv2020 の strict）：data.schema.json はメタスキーマに通り、data の見本 22 件（valid 5、seed 3、invalid 14）がすべて期待どおり（2026-10-30、firstOpenDate の見本 4 件を足した後。足す前は 18 件）。出力は設計メモの 4。
+- `firstOpenDate` の条件（2026-10-30、スクラッチパッドの ajv 8.20.0）：`device` だけ → true、`device` だけ＋persist の印 → true、`device` だけ＋1 問目で `firstOpenDate` なし → false（`/diagnosis must NOT have more than 0 properties`）、同じく `firstOpenDate` あり → true。072d0e3 の形で通った・落ちた data と seed の見本 18 件は、今の形でも合否が 18 件とも同じ（緩めただけ）。
 - tech-lead G0 r1 の spike 4（setItem の失敗の注入）と G1 r1 の spike 2（版を差し替えても履歴 3 件が残った）。
 - localStorage の上限の数字：未確認（ブラウザの公式な数字を見つけていない。実機の G4 でも測らない。見直す条件で監視する）。
 

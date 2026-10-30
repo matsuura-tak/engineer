@@ -29,7 +29,7 @@ verifier G0 r3 の W-1〜W-16 を、名前と値まで決めたものです。�
 ## W-4 課題集の URL と差し替え
 - 課題集は配布物の `./data/tasks.json`（`/engineer/data/tasks.json`）で、実行時に fetch で読む。
 - AC-10 と AC-30 は差し替えずに、本番の課題集のまま seed で「出し終えた」履歴を入れる（PRD r5）。
-- それでも差し替えるときは `page.route` を使い、そのテストのコンテキストは `serviceWorkers: 'block'` にする（SW が返すと route を通らないため：tech-lead G0 r2 の spike B）。
+- それでも差し替えるときは `page.route` を使い、そのテストでは `serviceWorkers: 'block'` にする（SW が返すと route を通らないため：tech-lead G0 r2 の spike B）。渡し方は、テストの設定の `use`（`test.use({ serviceWorkers: 'block' })`。Playwright の文書は testOptions として説明）でも、`browser.newContext({ serviceWorkers: 'block' })` でもよい（https://playwright.dev/docs/service-workers 、https://playwright.dev/docs/api/class-browser ）。
 
 ## W-5 課題と段階の素性
 - `[data-testid="task.today"]` の `data-task-id`、`data-task-area`、`data-task-level`、`data-task-mode`。値の語彙は identifiers.md の 5。
@@ -55,7 +55,7 @@ verifier G0 r3 の W-1〜W-16 を、名前と値まで決めたものです。�
 - 「完了」は `done`（W-8 案の `completed` ではない）。S10 に出るのは `history` だけで、まだ申告していない今日の課題は出ない。
 
 ## W-9 失敗と拒否の注入、書き出しの形
-- 保存の失敗（AC-11）：addInitScript で `Storage.prototype.setItem` を包み、次の 1 回だけ `new DOMException('injected', 'QuotaExceededError')` を投げる。アプリは保存 1 回につき setItem を 1 回だけ呼び、起動時には setItem を呼ばない（data.md の 2。診断の 2 問目の確定はちょうど 1 回の setItem）。
+- 保存の失敗（AC-11）：addInitScript で `Storage.prototype.setItem` を包み、次の 1 回だけ `new DOMException('injected', 'QuotaExceededError')` を投げる。アプリは保存 1 回につき setItem を 1 回だけ呼ぶ。保存データが「なし」か「診断の途中」の起動では setItem を呼ばない（AC-11 の注入はこの状態で行う）。「あり」の起動では data.md の 2 のとおり最大 1 回（診断の 2 問目の確定はちょうど 1 回の setItem）。
 - 永続化の拒否（AC-13）：addInitScript で `StorageManager.prototype.persist = async () => false`。アプリは `navigator.storage.persist()` を、`task.today` を初めて描いた後に 1 回だけ呼ぶ（`device.persistRequested` が true なら呼ばない）。
 - 書き出し：`page.waitForEvent('download')` で 1 件。中身は data.schema.json に通り、`device` を含まない。版の項目は `formatVersion`、今の値は 1。AC-25 のファイルは `formatVersion: 2` にする（fixtures/data/invalid-newer-version.json が見本）。
 - 読み込み：隠した input（`settings.import.file`、`home.standalone.importFile`）に `setInputFiles`。
@@ -95,7 +95,7 @@ verifier G0 r3 の W-1〜W-16 を、名前と値まで決めたものです。�
   - UA が `/CriOS|FxiOS|EdgiOS|OPiOS/` に当たらない（iOS の他のブラウザ）。
   - LINE などのアプリ内ブラウザの UA は未確認（G4 で実機）。
 - 偽装：`devices['iPhone 15']` などの UA と、addInitScript で `Object.defineProperty(Navigator.prototype, 'standalone', { get: () => false })`（AC-22 は true）。iPad は Mac の UA と `Object.defineProperty(Navigator.prototype, 'maxTouchPoints', { get: () => 5 })`。`display-mode` は偽装しない。
-- 案内 `home.addToHomeScreen` は「保存データなし、iOS の Safari、スタンドアロンでない、`device.homeGuideClosed` が true でない」のときだけ出る。`home.standalone` は「保存データなし、スタンドアロン」のとき毎回出る（UA にかかわらない。AC-22）。
+- 案内 `home.addToHomeScreen` は「保存データなし、iOS の Safari、スタンドアロンでない、`device.homeGuideClosed` が true でない」のときだけ出る。閉じた後の保存データは `device` だけで、`firstOpenDate` はない（data.md の 2。見本：fixtures/data/v1/valid-guide-closed-only.json）。`home.standalone` は「保存データなし、スタンドアロン」のとき毎回出る（UA にかかわらない。AC-22）。
 
 ## AC-31 の重なる要素の数え方
 `data-state="task.today"`（と `task.done`）を、操作 0 回で読んだ後に：

@@ -10,13 +10,14 @@
 
 ## 2. 書き込みの決まり
 - 1 回の保存は、`localStorage.setItem('kyounoitte:data', 文字列)` をちょうど 1 回呼ぶことです。setItem を書き込みの試しなど、他の目的に使いません（AC-11 の失敗の注入が「次の 1 回」を数えるため）。
-- 起動の途中で保存するのは、4 の (5) で日付が変わった課題を移すときと、今日の課題を出すときだけです。この 2 つが重なったら 1 回の保存にまとめます。
+- 起動の途中で保存するのは、4 の 6-1 で日付が変わった課題を移すときと、6-4 で今日の課題を出すときだけです。この 2 つが重なったら 1 回の保存にまとめます。
+- つまり、保存データが「なし」か「診断の途中」（3）の起動では setItem を呼びません（AC-11 の注入はこの状態で行う）。「あり」の起動では、上の 2 つのどちらかがあるときだけ、最大 1 回です。
 - 保存する時機（これ以外では保存しない）：
 
 | 操作 | 保存する中身 | 1 回で |
 |---|---|---|
-| 案内 `home.addToHomeScreen` を閉じる | `device.homeGuideClosed: true` | はい |
-| 初回の診断で 1 問目、2 問目を確定する | `diagnosis.area`、`diagnosis.level` | はい |
+| 案内 `home.addToHomeScreen` を閉じる | `device.homeGuideClosed: true`（`firstOpenDate` は書かない） | はい |
+| 初回の診断で 1 問目、2 問目を確定する | `diagnosis.area`、`diagnosis.level`。「なし」の状態で 1 問目を確定する保存では、`firstOpenDate` に今日も書く | はい |
 | 初回の診断で 3 問目を確定する（診断を終える） | `diagnosis.years`、`diagnosis.completedOn`、`levels[area]`、今日の課題（`current`） | はい（まとめて 1 回） |
 | やり直しの診断を終える | `diagnosis` を新しい回答で置き換え、`levels[area]`。今日まだ課題を出していなければ `current` も | はい |
 | 起動時に日付が変わった課題を移す、今日の課題を出す | `history` に足す、`current` | はい（まとめて 1 回） |
@@ -27,7 +28,10 @@
 | 読み込みで置き換える | ファイルの中身（`device` はこのブラウザの値を残す） | はい |
 | すべて削除 | `localStorage.removeItem('kyounoitte:data')`（setItem ではない） | — |
 
-- `firstOpenDate` は、保存データがないときに開いた日をメモリに持ち、最初の保存のときに書きます。保存しないまま閉じたら記録しません（次に開いた日が初めての日になる）。
+- `firstOpenDate`（統計の「初めて開いた日」。意味は PRD 11 の冒頭を参照）は、保存データが「なし」（3）の状態で初回の診断の 1 問目を確定する保存（`diagnosis.area` を書く保存）のときに、その時点の今日（4 の「今日」）を書きます。「診断の途中」と「あり」の状態の保存（2 問目以降、1 問目の答え直し、やり直しの診断、申告など）では変えません。
+  - `device` だけの保存（案内を閉じた `homeGuideClosed`、`persistRequested` と `persistGranted`）では書きません。開いただけの日、案内を閉じて診断せずに去った日は数えないので、iOS の Safari と他のブラウザで「初めて開いた日に完了したか」（9）が同じ基準になります（例：11-01 に案内を閉じて去り、11-03 に診断して完了 → `firstOpenDate` は 11-03、first-day-completed は true）。
+  - 削除（7。`removeItem`）の後に診断すれば、その 1 問目の日が新しい `firstOpenDate` です。読み込み（7）では、ファイルの値をそのまま使います。
+  - 名前 `firstOpenDate`、`data-stat-first-open-date`、文言キーは変えません（ID を変えない決まり。ADR 0002）。
 - 保存に失敗したら（setItem の例外。QuotaExceededError を含む）、画面の中身はそのまま残し、その操作の近くに `error.storage.message` と `error.storage.retry` を出します（design の 5）。やり直しの操作は同じ中身で setItem をもう 1 回呼びます。
 - 起動時に今日の課題を出す保存が失敗したら、課題は画面に出し（メモリに持つ）、`error.storage.message` を出します。次の保存に含めます。
 
@@ -35,7 +39,9 @@
 読めた保存データを次のように分けます。起動時の判定（4）、読み込みの確認（7）、設定の画面（design の S8）で同じ定義を使います。
 - あり：`diagnosis.completedOn` がある、または `history` が 1 行以上。
 - 診断の途中：「あり」ではなく、`diagnosis.area` がある（1〜2 問だけ答えた）。
-- なし：キーがない、または上のどちらでもない（例：`device` と `firstOpenDate` だけ。AC-21 で案内を閉じた後の状態）。
+- なし：キーがない、または上のどちらでもない（例：`device` だけで、`diagnosis` と `levels` が空、`history` が 0 行。`firstOpenDate` はない。AC-21 で案内を閉じた後の状態。見本：fixtures/data/v1/valid-guide-closed-only.json）。
+- スキーマでは、`firstOpenDate` を省けるのは `diagnosis` と `levels` が空で `history` が 0 行のときだけです（data.schema.json の allOf の 3 つ目）。「診断の途中」と「あり」では必ずあります。
+- 設定の画面（S8）の「保存データがないとき」の表示（書き出し、診断、記録、削除を出さない）は、「なし」と「診断の途中」の両方で使います。統計（9）と書き出しは「あり」のときだけなので、`firstOpenDate` は必ずあります。
 
 ## 4. 起動時の判定（行き先の順番）
 上から順に調べ、最初に当てはまったものに進みます。
@@ -48,11 +54,12 @@
    1. `current` があり、その `date` が今日でない → `current` を `report: "none"` の行として `history` に足し、`current` を外す（答えは行に残る。AC-32）。
    2. `history` に今日の日付の行がある → `report` が `done` なら S5（`task.done`）、それ以外なら S6（`task.skipped`）。
    3. `current` がある（今日の日付）→ S3（`task.today`）。答えを書く欄に `current.answer` を戻す。
-   4. 5 の規則で今日の課題を選ぶ。選べたら `current` に入れて保存し、S3。選べなければ S7（`task.exhausted`。保存しない）。
+   4. 5 の規則で今日の課題を選ぶ。選べたら `current` に入れて保存し、S3。選べなければ S7（`task.exhausted`。`current` は保存しない。1 で行を移したときは、その移しだけを 1 回保存する）。
 
 design-reviewer G1 r2 の提案 2 の順（読めない → 保存先が使えない → 診断の途中 → なし → あり）と、2 と 3 の順が逆です。読めるかを調べるには先に getItem が成功している必要があるためで、2 と 3 は同時には起きないので、結果は同じです。
 - 「今日」は端末の日付です。`new Date()` の `getFullYear()`、`getMonth()`、`getDate()` から `YYYY-MM-DD` を作ります。`toISOString()` は UTC なので使いません。
 - 画面を開いたまま日付が変わったとき：操作（ボタン、リンク、radio の確定）のたびに今日を計算し直し、画面を描いた日と違えば、書きかけの答えを保存してから、その操作はせずに 4 の判定をやり直します（PRD 11「翌日（…最初の読み込みか操作）」）。
+  - 例：23:55 に出した課題を、画面を開いたまま 0:05 に「完了」しようとすると、完了は保存されず（`done` の行も `task.rate` もない）、その課題は 6-1 で `report: "none"` の行に移り、6-4 で翌日の課題が出ます。
 - ヘッダーのアプリ名 `app.name` を押したときも、4 の判定をやり直します（診断の途中なら S2。design-reviewer G1 r2 の提案 2）。
 
 ## 5. 今日の課題の選び方と、段階の規則
@@ -61,7 +68,7 @@ design-reviewer G1 r2 の提案 2 の順（読めない → 保存先が使え�
 - 選ぶ：候補のうち ID が最も小さいもの（文字列の比較。3 桁の 0 埋めなので番号の順と同じ）。`mode` で順番を変えない（PRD 11）。
 - 段階の規則（申告を保存するときに行う。AC-8）：
   1. 申告した行の領域を `a` とする。`history` から、領域が `a` で `report` が `none` でない行を新しい順に並べる。
-  2. その並びの先頭から、行の `level` が今の `levels[a]` と同じ行が続く間だけを取る（違う段階の行に当たったら止める。段階が変わる前の申告を次の判定に持ち越さないため）。
+  2. その並びの先頭から、行の `level` が今の `levels[a]` と同じ行が続く間だけを取る（違う段階の行に当たったら止める。段階が変わる前の申告を次の判定に持ち越さないため。やり直しの診断で段階が変わった直後も同じ。PRD 11 の冒頭を参照）。
   3. 取った行の先頭 2 行がどちらも `too_hard` なら `levels[a]` を 1 段下げる。どちらも `too_easy` なら 1 段上げる。`beginner` より下、`advanced` より上には動かない。
   4. 変わった段階は翌日の課題から効く（今日はもう課題を出さない）。
 - AC-8 の 7 通りの期待値は、この規則で全部そのとおりになります。seed の古い行の `level` は、seed の `levels[a]` と同じ値にします（fixtures/seeds/seed-ac8-intermediate-one-too-hard.json）。
@@ -70,16 +77,19 @@ design-reviewer G1 r2 の提案 2 の順（読めない → 保存先が使え�
 - 順番：JSON.parse → オブジェクトか → `formatVersion` が整数で今の版（1）より大きければ「版が新しい」→ 今の版より小さければ 1 版ずつ今の形に移す → スキーマの検査。v1 は最初の版なので、移す手順はまだありません。
 - アプリの中の検査は手で書きます（ajv は CSP の下で動かないため。ADR 0005）。手で書いた検査は、contracts/fixtures/ のすべての見本で ajv と同じ合否になることを、単体テストで確かめます（ADR 0004）。
 - 移した結果は、次に保存するときに今の版で書きます。古い版の形では書きません。
+- 日付（`firstOpenDate`、`diagnosis.completedOn`、各行と `current` の `date`）は形 `YYYY-MM-DD` だけを検査し、暦にあるか（例：`2026-02-30`）は検査しません。日付は文字列のまま比べ、`new Date()` に渡しません（直近 7 暦日の境目も、端末の今日から作った `YYYY-MM-DD` の文字列と比べる）。
+- `firstOpenDate` がないのは「なし」のときだけ（3）。それ以外で欠けていればスキーマで落ちます。
 - 読み手が知らない項目か値を書く変更（新しい領域の ID、新しい申告の種類、新しい項目）は、必ず `formatVersion` を上げます。スキーマは知らない項目を拒むので、版を上げずに足すと、古いアプリと古いアプリへの読み込みが「読めない」になります。
 - contracts/fixtures/data/v1/ の見本は消しません。版を上げた後も、新しいアプリがこれを読めることを単体テストで確かめ続けます。
 
 ## 7. 書き出し、読み込み、壊れたデータの保存、削除
-- 書き出し（AC-19）：保存データから `device` を除いたものを `JSON.stringify(データ, null, 2)` にし、`Blob`（`application/json`）と `<a download>` で保存します。ファイル名は `kyounoitte-YYYY-MM-DD.json`（今日の日付）。作った URL は `URL.revokeObjectURL` で消します。
+- 書き出し（AC-19）：保存データが「あり」のときだけ出します（3 の S8 の表示）。保存データから `device` を除いたものを `JSON.stringify(データ, null, 2)` にし、`Blob`（`application/json`）と `<a download>` で保存します。ファイル名は `kyounoitte-YYYY-MM-DD.json`（今日の日付）。作った URL は `URL.revokeObjectURL` で消します。
 - 読み込み（AC-20、AC-22、AC-25）：
   1. ファイルの大きさが 5,000,000 バイトを超えたら読まずに「形式が違う」。
   2. `file.text()` → 6 の順で検査。版が新しければ `error.import.message` と `error.import.reason.version`、それ以外の失敗は `error.import.message` と `error.import.reason.schema`。確認は出さず、データは変えない。
+     - スキーマに通っても、ファイルの中身が「なし」（3。`firstOpenDate` もない）なら `error.import.reason.schema` で止める。アプリは「なし」を書き出さないので手で作ったファイルしかなく、置き換えると削除と同じになるのに削除の確認を通らないため。
   3. 今のブラウザの保存データが「あり」なら `settings.import.confirm` を出す（要約の `{count}` は `history` の行数、`{date}` は `firstOpenDate`）。「なし」か「診断の途中」なら確認を出さない。
-  4. 置き換える：ファイルの中身に、今のブラウザの `device` を付けて 1 回で保存する（結合しない）。ファイルの `device` は使わない。
+  4. 置き換える：ファイルの中身に、今のブラウザの `device` を付けて 1 回で保存する（結合しない）。ファイルの `device` は使わない。`firstOpenDate` はファイルの値をそのまま使う。
   5. 4 の判定をやり直す（`task.today` か `task.done` など。端末の日付による）。
 - 壊れたデータの保存（S0 error の `error.app.exportRaw`）：getItem で読んだ文字列をそのまま `Blob` にし、`kyounoitte-raw-YYYY-MM-DD.json` で保存します。
 - 削除（AC-16）：`removeItem('kyounoitte:data')` だけを行い、S1 を描きます。キャッシュ（配布物）は消しません。
@@ -88,6 +98,7 @@ design-reviewer G1 r2 の提案 2 の順（読めない → 保存先が使え�
 アプリはこれを守って書きます。読むときは、守られていなくても止まらずに動きます（例：同じ日の行が 2 つあれば新しい方を使う）。contracts/tools/check-schemas.mjs は、valid と seed の見本がこれを守っているかも確かめます。
 - `history` は日付の古い順で、同じ日付の行は 1 つまで。
 - どの行の日付も `firstOpenDate` 以上。`current` の日付は `history` の最後の行より新しい。
+- 「なし」の状態では `firstOpenDate` を書かない（2）。
 - 同じ課題の ID は `history` と `current` を通して 1 回だけ（AC-6）。
 - 診断済みなら `levels[diagnosis.area]` がある。
 

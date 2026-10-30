@@ -41,9 +41,9 @@
 
 ## 確かめたこと
 - 2026-10-30、スクラッチパッドの仮の backend/tests/acceptance/playwright.config.mjs で `npx playwright test -c tests/acceptance` → `✓ [chromium] … ✓ [webkit] … 2 passed (1.8s)`、`info.config.configFile` が tests/acceptance/playwright.config.mjs。
-- Playwright 1.64.1 の型定義に `setFixedTime(`、`fromServiceWorker(): boolean`、`serviceWorkers?: "allow"|"block"`、`setOffline(`、`newCDPSession(` がある（grep の件数 4、1、4、1、2）。`setFixedTime` の説明は「keeps all the timers running」。
+- Playwright 1.64.1 の型定義に `setFixedTime(`、`fromServiceWorker(): boolean`、`serviceWorkers?: "allow"|"block"`、`setOffline(`、`newCDPSession(` がある（grep の件数 4、1、4、1、2）。`setFixedTime` の説明は「keeps all the timers running」。`serviceWorkers` はテストの設定の `use`（testOptions）でも `browser.newContext()` の引数でも渡せる（https://playwright.dev/docs/service-workers 「set testOptions.serviceWorkers to 'block'」、https://playwright.dev/docs/api/class-browser の newContext「Whether to allow sites to register Service workers. Defaults to 'allow'」。2026-10-30 に開いた）。
 - tech-lead G1 r1 の spike 3 と、この ADR の spike：Trusted Types を含む厳しい CSP の下で、@axe-core/playwright 4.14.0 が Chromium 156 と WebKit 27.2 で動き、わざと置いた違反を `label:critical` で見つけた。
-- `node contracts/tools/check-schemas.mjs`（ajv 8.20.0）：見本 34 件、期待と違う結果 0 件、終了コード 0。わざと壊したスキーマ（`type: 'strin'`）はメタスキーマの検査で false、未知のキーワードは strict で例外。出力は設計メモの 4。
+- `node contracts/tools/check-schemas.mjs`（ajv 8.20.0）：見本 38 件、期待と違う結果 0 件、終了コード 0（2026-10-30。G1 reviewer r1 の後に firstOpenDate の見本 4 件を足した。最初は 34 件）。わざと壊したスキーマ（`type: 'strin'`）はメタスキーマの検査で false、未知のキーワードは strict で例外。出力は設計メモの 4。
 - https://playwright.dev/docs/browsers（WebKit は最新の WebKit のビルド。G1 r1 で開いた）
 
 ## 確かめ（B）

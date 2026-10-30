@@ -24,7 +24,7 @@ operationId は全行「なし（端末のみ）」。代わりに「データ�
 | AC-8 | S3 | なし（端末のみ） | data.md の 5（段階の規則）、`levels`、`history[].level`、fixtures/seeds/seed-ac8-* | 受け入れ 2：7 通り。単体：規則 |
 | AC-9 | S4 → S5、S10 | なし（端末のみ） | `history[].helpful`、`data-helpful` | 受け入れ 2：選ぶ／再読み込み |
 | AC-10 | S7 → S2 | なし（端末のみ） | data.md の 4 の 6-4、5（候補が 0 → S7、保存しない） | 受け入れ 2：seed で 7 件を出し終えた |
-| AC-11 | S2 | なし（端末のみ） | data.md の 2（1 問ごとに 1 回の setItem、起動時に setItem しない）、W-9 | 受け入れ 2：setItem の失敗の注入 |
+| AC-11 | S2 | なし（端末のみ） | data.md の 2（1 問ごとに 1 回の setItem。保存データが「なし」か「診断の途中」の起動では setItem を呼ばない（AC-11 の注入はこの状態で行う）。「あり」の起動では data.md の 2 のとおり最大 1 回）、W-9 | 受け入れ 2：setItem の失敗の注入 |
 | AC-12 | S1〜S6 | なし（端末のみ） | test-hooks.md の W-12（送信の数え方）、CSP の `connect-src 'self'` | 受け入れ 2：オフライン |
 | AC-13 | S3 → S5、S8 | なし（端末のみ） | `device.persistRequested`、`device.persistGranted`、W-9 | 受け入れ 2：persist の拒否の注入 |
 | AC-14 | S8 → S2 → S3、S10 | なし（端末のみ） | data.md の 2（やり直しは終えるときに 1 回）、fixtures/seeds/seed-ac14-* | 受け入れ 2 |
@@ -33,8 +33,8 @@ operationId は全行「なし（端末のみ）」。代わりに「データ�
 | AC-17 | S1、S3、S5、S7 | なし（端末のみ） | strings.md の 5（`<pre>` なし、`<code>` は折り返す）、tasks.schema.json の「```」の禁止 | 受け入れ 2：幅 320 |
 | AC-18 | S1 → S5 | なし（端末のみ） | identifiers.md（操作する要素の `data-testid`） | 受け入れ 2：キーボードだけ |
 | AC-19 | S8 | なし（端末のみ） | schemas/data.schema.json（書き出し＝保存。`device` を除く）、data.md の 7 | 受け入れ 2：ダウンロードを ajv で検査 |
-| AC-20 | S1 → S8 | なし（端末のみ） | data.md の 7（読み込みの流れ）、`firstOpenDate`、`history[].answer` | 受け入れ 2：setInputFiles、同じ固定の日付（W-3） |
-| AC-21 | S1、S8 | なし（端末のみ） | test-hooks.md の W-16（iOS Safari の判定）、`device.homeGuideClosed` | 受け入れ 2：偽装あり／なし |
+| AC-20 | S1 → S8 | なし（端末のみ） | data.md の 7（読み込みの流れ。`firstOpenDate` はファイルの値）、`history[].answer` | 受け入れ 2：setInputFiles、同じ固定の日付（W-3） |
+| AC-21 | S1、S8 | なし（端末のみ） | test-hooks.md の W-16（iOS Safari の判定）、`device.homeGuideClosed`（`device` だけの保存。`firstOpenDate` は書かない：data.md の 2、fixtures/data/v1/valid-guide-closed-only.json） | 受け入れ 2：偽装あり／なし |
 | AC-22 | S1 | なし（端末のみ） | W-16（スタンドアロンの判定）、data.md の 3（「なし」の間は毎回） | 受け入れ 2 |
 | AC-23 | S0 → S3 / S5 | なし（端末のみ） | contracts/service-worker.md、W-12、W-13 | 受け入れ 2：再読み込みと新しいタブ |
 | AC-24 | S9 | なし（端末のみ） | data.md の 9、identifiers.md の 4 の `data-stat-*`、fixtures/seeds/seed-ac24-stats.json | 受け入れ 2 |
@@ -85,11 +85,11 @@ HTTP の operation はない。代わりに契約のファイルの一覧（す�
 | schemas/data.schema.json | 足す | AC-5〜AC-11、AC-13、AC-14、AC-16、AC-19〜AC-25、AC-32 | 不要 | 対象外 |
 | schemas/strings.schema.json | 足す | AC-26 | 不要 | 対象外 |
 | data.md、strings.md、identifiers.md、test-hooks.md、service-worker.md、budgets.md | 足す | 全 AC | 不要 | 対象外 |
-| fixtures/（34 件）、tools/check-schemas.mjs | 足す | 上と同じ | 不要 | 対象外 |
+| fixtures/（38 件）、tools/check-schemas.mjs | 足す | 上と同じ | 不要 | 対象外 |
 
 - spectral の出力：未検査（OpenAPI なし。指揮役の裁定 E2）。
 - oasdiff breaking の出力：未検査（OpenAPI なし）。main に契約はなく、すべて新規。
-- 代わりの検査：`node contracts/tools/check-schemas.mjs`（ajv 8.20.0 を入れたスクラッチパッドで実行。backend ができたら `cd backend && node ../contracts/tools/check-schemas.mjs`）。2026-10-30 の出力（全文）：
+- 代わりの検査：`node contracts/tools/check-schemas.mjs`（ajv 8.20.0 を入れたスクラッチパッドで実行。backend ができたら `cd backend && node ../contracts/tools/check-schemas.mjs`）。2026-10-30 の出力（全文。G1 reviewer r1 と pdm の確認を直した後に実行し直した）：
 ```
 ajv 8.20.0（Ajv2020、strict）
 OK  メタスキーマ data.schema.json
@@ -103,6 +103,9 @@ OK  data/invalid-current-before-diagnosis.json 期待：落ちる → 落ちた�
 OK  data/invalid-done-without-helpful.json 期待：落ちる → 落ちた（data/history/2 must have required property 'helpful' / data/history/2 must match "then" schema）
 OK  data/invalid-extra-field.json 期待：落ちる → 落ちた（data must NOT have additional properties）
 OK  data/invalid-helpful-on-skipped.json 期待：落ちる → 落ちた（data/history/3 must NOT be valid / data/history/3 must match "else" schema）
+OK  data/invalid-history-without-first-open-date.json 期待：落ちる → 落ちた（data/history must NOT have more than 0 items / data must match "then" schema）
+OK  data/invalid-in-progress-without-first-open-date.json 期待：落ちる → 落ちた（data/diagnosis must NOT have more than 0 properties / data must match "then" schema）
+OK  data/invalid-levels-without-first-open-date.json 期待：落ちる → 落ちた（data/levels must NOT have more than 0 properties / data must match "then" schema）
 OK  data/invalid-newer-version.json 期待：落ちる → 落ちた（data/formatVersion must be equal to constant）
 OK  data/invalid-not-json.json 期待：落ちる → 落ちた（JSON.parse の失敗）
 OK  data/invalid-other-app.json 期待：落ちる → 落ちた（data/app must be equal to constant）
@@ -112,6 +115,7 @@ OK  data/invalid-years-without-level.json 期待：落ちる → 落ちた（dat
 OK  data/v1/valid-all-fields.json 期待：通る → 通った
 OK  data/v1/valid-export-three-completed.json 期待：通る → 通った
 OK  data/v1/valid-guide-closed-only.json 期待：通る → 通った
+OK  data/v1/valid-guide-closed-then-in-progress.json 期待：通る → 通った
 OK  data/v1/valid-in-progress.json 期待：通る → 通った
 OK  seeds/seed-ac14-three-completed.json 期待：通る → 通った
 OK  seeds/seed-ac24-stats.json 期待：通る → 通った
@@ -132,12 +136,23 @@ OK  tasks/invalid-in-app-url.json 期待：落ちる → 落ちた（data/tasks/
 OK  tasks/invalid-minutes-16.json 期待：落ちる → 落ちた（data/tasks/0/minutes must be <= 15）
 OK  tasks/invalid-unknown-mode.json 期待：落ちる → 落ちた（data/tasks/0/mode must be equal to one of the allowed values）
 OK  tasks/valid-sample.json 期待：通る → 通った
-見本 34 件、期待と違う結果 0 件
+見本 38 件、期待と違う結果 0 件
 exit=0
 ```
 - 検査が空振りでないこと：スキーマの `formatVersion` の type を `strin` に壊すとメタスキーマの検査が false（`must be equal to one of the allowed values`）、未知のキーワード `minItemz` は strict で `unknown keyword` の例外（同じ日、スクラッチパッドで実行）。
+- `firstOpenDate` の条件（2026-10-30、スクラッチパッドの ajv 8.20.0。data.schema.json の allOf の 3 つ目：`firstOpenDate` がなければ `diagnosis` と `levels` は 0 項目、`history` は 0 行）：
+```
+device だけ（valid-guide-closed-only.json） → true
+device だけ＋persist の印 → true
+空（device もない） → true
+device だけ＋1 問目（firstOpenDate なし） → false（/diagnosis must NOT have more than 0 properties / / must match "then" schema）
+device だけ＋1 問目＋firstOpenDate → true
+firstOpenDate 2026-02-30（P1） → true
+072d0e3 の data と seed の見本 18 件：旧と新のスキーマで合否が同じ 18 件、違う 0 件
+```
+- check-schemas.mjs の「なしなのに firstOpenDate がある」の検査が空振りでないこと：072d0e3 の valid-guide-closed-only.json（`firstOpenDate` あり）だけを置いた写しで実行 → `NG  data/v1/valid-guide-closed-only.json 期待：通る → 通った スキーマの外の決まり：「なし」なのに firstOpenDate がある（1 問目の確定の前には書かない）`、`見本 1 件、期待と違う結果 1 件`、exit=1。
 - 互換性を壊す変更：なし（新規）。以後の決まり：読み手が知らない項目か値を書く変更は `formatVersion` を上げる。古い版は 1 版ずつ移して読み、新しい版は拒む（ADR 0002、data.md の 6）。
-- 返す enum に値を足すとき：保存データのスキーマは知らない値を拒むので、値を足すことは版を上げることと同じ。古いアプリは「版が新しい」として `error.import.reason.version` か S0 error を出し、データを上書きしない。verifier に頼む項目：fixtures/data/v1/ の 4 件が今のアプリで読めること（読み込みで同じ状態になる）と、`formatVersion: 2` のファイルが拒まれること（AC-25）。
+- 返す enum に値を足すとき：保存データのスキーマは知らない値を拒むので、値を足すことは版を上げることと同じ。古いアプリは「版が新しい」として `error.import.reason.version` か S0 error を出し、データを上書きしない。verifier に頼む項目：fixtures/data/v1/ の 5 件が今のアプリで読めること（読み込みで同じ状態になる）と、`formatVersion: 2` のファイルが拒まれること（AC-25）。
 - エラーと文言（problem+json の代わり）：
 | 起きること | 画面に出す文言キー |
 |---|---|
@@ -152,13 +167,13 @@ exit=0
 ## 5. データモデルと移行
 | エンティティ | 正しいデータの置き場所 | 個人情報か | 保存期間 | 消し方 |
 |---|---|---|---|---|
-| 保存データ（診断の回答、領域ごとの段階、今日の課題、履歴と答え、初めて開いた日、このブラウザの印）。形は data.schema.json | 端末（localStorage `kyounoitte:data`） | はい（自己評価、経験年数、学習の履歴、自由記述の答え。名前やメールは持たない） | 利用者が消すまで。Safari は 7 日使わないと消すことがある | 設定の「すべてのデータを削除」（`removeItem`）、ブラウザのサイトデータの削除 |
+| 保存データ（診断の回答、領域ごとの段階、今日の課題、履歴と答え、初めて開いた日（初回の診断の 1 問目を確定した日。data.md の 2）、このブラウザの印）。形は data.schema.json | 端末（localStorage `kyounoitte:data`） | はい（自己評価、経験年数、学習の履歴、自由記述の答え。名前やメールは持たない） | 利用者が消すまで。Safari は 7 日使わないと消すことがある | 設定の「すべてのデータを削除」（`removeItem`）、ブラウザのサイトデータの削除 |
 | 書き出しファイル（`device` を除いた保存データ） | 端末のファイル（利用者が置いた場所） | はい（同上） | 利用者が消すまで | 利用者がファイルを消す |
 | 課題集 tasks.json、文言 ja.json と en.json | 配布物（GitHub Pages）と Cache Storage | いいえ | 版ごと。古い版のキャッシュは activate で消す | 新しい版の SW が消す |
 | 配信の記録（IP アドレス） | GitHub（アプリの外） | はい | GitHub の決まりによる | アプリからは消せない。プライバシーのページに書く（PRD 17） |
 
 - SwiftData の版：該当なし（Web）。代わりに `formatVersion` 1。移す手順は v1 なのでまだない（data.md の 6）。
-- 前の版の保存データを開けるかのテスト（verifier と backend-engineer に頼む項目）：contracts/fixtures/data/v1/ の 4 件を、単体テストで手書きの検査に通し、受け入れテストで読み込む。版を上げた後も消さずに読み続ける。
+- 前の版の保存データを開けるかのテスト（verifier と backend-engineer に頼む項目）：contracts/fixtures/data/v1/ の 5 件を、単体テストで手書きの検査に通し、受け入れテストで読み込む。版を上げた後も消さずに読み続ける。
 - サーバーの DB：なし。
 
 ## 6. 非機能の目標
@@ -243,3 +258,19 @@ exit=0
 - [x] 7 が STRIDE の6行か「新しい境界なし」のどちらか。受け入れた危険に理由がある
 - [x] 8 で、PRD 15 の全イベントに送る場所がある（13 件すべて「送らない」）
 - [x] 新しい依存に、解決とビルドの出力があり、dependencies.md の全列が埋まっている（ビルドの出力の代わりに、解決と、実際に動かしたテストの形の出力）
+
+## 変更の記録
+G1 reviewer（設計）r1 の要修正と提案、pdm の G1 の確認（firstOpenDate）を反映した（2026-10-30、tech-lead）。1 行に 1 つの変更。
+- M1：ADR 0002 の「結果」、test-hooks.md の W-9、この 2 の AC-11 の行を「なしか診断の途中の起動では setItem を呼ばない（AC-11 の注入はこの状態）。ありの起動では data.md の 2 のとおり最大 1 回」に揃えた。
+- M1：data.md の 2 に同じ文を足し、参照の誤り「4 の (5)」を「4 の 6-1」「6-4」に直した。4 の 6-4 に「選べなくても 6-1 で移した行は 1 回保存する」を足した。
+- P1：data.md の 6 に「日付の実在は検査しない。文字列のまま比べ、new Date() に渡さない」を足した。
+- P2：data.md の 5 の 2 に「やり直しの診断で段階が変わった直後も同じ。PRD 11 の冒頭を参照」を足した（PRD の文は pdm）。
+- P3：service-worker.md の 1 に「ポリシーは起動ごとに 1 回だけ作り、トップレベルに持つ」と spike（2 回目は Chromium と WebKit で TypeError）を足した。
+- P4：budgets.md の 1 の数え方を zlib を正とし、文言の行を「約 6,500」と zlib（6,470）と gzip -9（6,440）の両方の値にした。
+- P5：test-hooks.md の W-4 と ADR 0004 の確かめたことに「use（testOptions）でも newContext でも渡せる」と URL を足した。
+- P6：identifiers.md の `task.external.tools` と `.item` を「`<dd>` の中の `<ul>` の `<li>`」にした。
+- firstOpenDate：data.md の 2（表の 2 行と規則）、3（なしの例、スキーマの条件、S8 の表示）、4（23:55 と 0:05 の例）、6、7（書き出しはありだけ、なしのファイルは読まない、ファイルの値を使う）、8 を直した。
+- firstOpenDate：data.schema.json の required から外し、allOf の 3 つ目（なければ diagnosis、levels、history が空）を足した。description を直した。
+- firstOpenDate：fixtures の valid-guide-closed-only.json から firstOpenDate を外し、valid-guide-closed-then-in-progress.json と invalid-{in-progress,history,levels}-without-first-open-date.json を足した（34 → 38 件）。
+- firstOpenDate：check-schemas.mjs に「なしなのに firstOpenDate がある」の検査を足した。ADR 0002 の「一緒に決めたこと」と「確かめたこと」、test-hooks.md の W-16、この 2 の AC-20、AC-21、4、5 を直した。
+- 件数：ADR 0004、CLAUDE.md、この 4 の見本の件数を 38 にした。

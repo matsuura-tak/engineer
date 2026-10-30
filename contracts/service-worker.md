@@ -6,6 +6,7 @@ v1 の Service Worker（以下 SW）は「配布物を先に取っておいて�
 ## 1. 登録
 - ファイルは配布物のルートの `sw.js`。登録は `navigator.serviceWorker.register(url, { scope: './' })`。URL は相対の `./sw.js`。
 - 本番の CSP は Trusted Types を求める（budgets.md の 3）ので、`window.trustedTypes` があれば、名前 `kyounoitte-sw` のポリシーの `createScriptURL` を通した値を渡します。ポリシーは `./sw.js` 以外の文字列を受け取ったら例外を出します。`trustedTypes` がないブラウザ（Safari 17〜25）では文字列のまま渡します。
+  - ポリシーは起動ごとに 1 回だけ作り、モジュールのトップレベルに持ちます（register の呼び出しごとに作らない）。CSP の `trusted-types` に `'allow-duplicates'` がないので、同じ名前で 2 回作ると例外になります（spike 2026-10-30、Playwright 1.64.1：2 回目の `createPolicy` は Chromium と WebKit の両方で TypeError）。
   - spike（2026-10-30、Playwright 1.64.1）：Trusted Types を求める CSP の下では、文字列のまま register すると Chromium と WebKit の両方で TypeError になり、ポリシーを通すと両方で成功した。
 - 登録する時機：最初の画面（`data-state` が `loading` 以外）を描いた後、`load` イベントの後。AC-15 の読み込みと帯域を取り合わないため。
 - `navigator.serviceWorker` がない環境（安全でない文脈など）では登録しません。アプリはそのまま動きます。

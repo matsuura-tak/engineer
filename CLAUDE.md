@@ -18,7 +18,7 @@
   `cd backend && npm ci && npx playwright install --with-deps chromium webkit && npm test`
   - `npm test` の中身（ADR 0001 の scripts）：契約の検査 → 単体テスト → 受け入れテスト
 - 個別のコマンド（どれも backend/ で実行）：
-  - 契約の検査：`node ../contracts/tools/check-schemas.mjs`（確認済み：2026-10-30、ajv 8.20.0 を入れたフォルダから同じスクリプトを実行し、見本 34 件、期待と違う結果 0 件、終了コード 0。backend/ からは未確認）
+  - 契約の検査：`node ../contracts/tools/check-schemas.mjs`（確認済み：2026-10-30、ajv 8.20.0 を入れたフォルダから同じスクリプトを実行し、見本 38 件、期待と違う結果 0 件、終了コード 0。backend/ からは未確認）
   - 単体テスト：`node --test 'tests/unit/**/*.test.mjs'`（形は Node 24.22.1 で確認済み。フォルダを渡す形 `tests/unit/` は失敗する。backend/ では未確認）
   - 受け入れテスト：`npx playwright test -c tests/acceptance`（-c がフォルダの中の playwright.config.mjs を読むことは、同じ形の仮のフォルダで確認済み。本物のテストは未確認）
   - ビルド：`node scripts/build.mjs --out dist --version <YYYY-MM-DD.N>`（未確認。backend-engineer が作る）

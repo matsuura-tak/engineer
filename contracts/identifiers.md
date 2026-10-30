@@ -46,8 +46,8 @@
 | `task.today` | `<article>`。4 の `data-task-*` を持つ | S3 |
 | `task.today.title` | `<h1>`。課題の題名（課題集から） | S3 |
 | `task.why.text`、`task.how.text`、`task.goal.text` | 本文の入れ物。中の段落と `<code>` は strings.md の「課題の本文」 | S3 |
-| `task.external.tools` | `<dl>`（要る道具） | S3（external） |
-| `task.external.tools.item` | 道具の `<li>`（繰り返す） | S3（external） |
+| `task.external.tools` | `<dl>`（要る道具。`<dd>` の中に `<ul>`） | S3（external） |
+| `task.external.tools.item` | `<dd>` の中の `<ul>` の `<li>`（道具 1 つ。繰り返す） | S3（external） |
 | `task.answer` | `<textarea>`（`maxlength="2000"`） | S3 |
 | `diagnosis.question` | `<fieldset>` | S2 |
 | `home.standalone` | 案内の `<section>` | S1 |

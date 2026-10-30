@@ -1,0 +1,13 @@
+{
+  "formatVersion": 1,
+  "app": "kyounoitte",
+  "firstOpenDate": "2026-11-03",
+  "diagnosis": {
+    "area": "backend"
+  },
+  "levels": {},
+  "history": [],
+  "device": {
+    "homeGuideClosed": true
+  }
+}

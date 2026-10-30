@@ -2,13 +2,12 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:kyounoitte:schema:data:1",
   "title": "保存データ＝書き出しファイル＝seed（formatVersion 1）",
-  "description": "localStorage のキー kyounoitte:data に入れる JSON 文字列の形。書き出しファイルと受け入れテストの seed も同じ形（device だけは書き出しに含めない）。読み方、移し方、起動時の判定は contracts/data.md。AC-5〜AC-11、AC-13、AC-14、AC-16、AC-19〜AC-25、AC-32。",
+  "description": "localStorage のキー kyounoitte:data に入れる JSON 文字列の形。書き出しファイルと受け入れテストの seed も同じ形（device だけは書き出しに含めない）。読み方、移し方、起動時の判定は contracts/data.md。firstOpenDate は「なし」の区分（diagnosis、levels、history が空）でだけ省ける（allOf の 3 つ目）。AC-5〜AC-11、AC-13、AC-14、AC-16、AC-19〜AC-25、AC-32。",
   "type": "object",
   "additionalProperties": false,
   "required": [
     "formatVersion",
     "app",
-    "firstOpenDate",
     "diagnosis",
     "levels",
     "history"
@@ -24,7 +23,7 @@
     },
     "firstOpenDate": {
       "$ref": "#/$defs/date",
-      "description": "初めて開いた日（端末の日付）。最初の保存のときに書き、以後変えない"
+      "description": "統計の「初めて開いた日」（端末の日付）。保存データが「なし」の状態で初回の診断の 1 問目を確定する保存のときに書き、以後変えない。device だけの保存（案内を閉じた印など）では書かない（contracts/data.md の 2）。AC-19、AC-20、AC-24"
     },
     "diagnosis": {
       "type": "object",
@@ -387,6 +386,39 @@
           "levels": {
             "type": "object",
             "minProperties": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "type": "object",
+        "not": {
+          "type": "object",
+          "properties": {
+            "firstOpenDate": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "firstOpenDate"
+          ]
+        }
+      },
+      "then": {
+        "type": "object",
+        "properties": {
+          "diagnosis": {
+            "type": "object",
+            "maxProperties": 0
+          },
+          "levels": {
+            "type": "object",
+            "maxProperties": 0
+          },
+          "history": {
+            "type": "array",
+            "maxItems": 0
           }
         }
       }

@@ -36,6 +36,8 @@ const walk = (d) => readdirSync(d).flatMap((n) => statSync(join(d, n)).isDirecto
 function semantic(doc) {
   const errs = [];
   const h = doc.history;
+  const nashi = !doc.diagnosis.completedOn && h.length === 0 && !doc.diagnosis.area; // data.md の 3 の「なし」
+  if (nashi && 'firstOpenDate' in doc) errs.push('「なし」なのに firstOpenDate がある（1 問目の確定の前には書かない）');
   for (let i = 1; i < h.length; i++) if (h[i].date <= h[i - 1].date) errs.push(`history[${i}] の日付が前の行より新しくない`);
   for (const r of h) if (r.date < doc.firstOpenDate) errs.push(`${r.date} が firstOpenDate より前`);
   if (doc.current) {
