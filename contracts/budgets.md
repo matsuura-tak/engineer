@@ -12,9 +12,9 @@ PRD 12（速さ、配布、対応ブラウザ）と AC-15、AC-17 を、作り�
 
 | 部分 | 上限（gzip 後のバイト） | 根拠 |
 |---|---|---|
-| 殻（HTML、CSS、すべての JS、sw.js、manifest） | 26,000 | spike の殻は約 15,800 バイト（60 KB の代わりの JS を含む） |
+| 殻（HTML、CSS、すべての JS、sw.js） | 26,000 | spike の殻は約 15,800 バイト（60 KB の代わりの JS を含む） |
 | 文言（ja.json と en.json の 2 つ） | 8,000 | 約 6,500。fixtures/strings の 145 キーの見本を `JSON.stringify` で詰めて `zlib.gzipSync(level 9)` にすると 3,501 + 2,969 = 6,470（node v24.22.1）。同じものを Apple の gzip 487.40.2 の `gzip -9` にすると 3,453 + 2,987 = 6,440（2026-10-30） |
-| ホーム画面のアイコン（置く場合。Takuma の決定待ち P4） | 10,000 | 180 × 180 の PNG 1 枚 |
+| ホーム画面のアイコン `icon-180.png` と `manifest.webmanifest`（Takuma の決定 D5。6） | 10,000 | 180 × 180 の 2 色の PNG 1 枚（design 8 の想定は 2 KB 前後）と、7 項目の JSON（約 200 バイト） |
 | 課題集 tasks.json | 106,000 | 252 件 × 平均 600 字の合成で 106,113（spike） |
 
 - 初めての訪問では SW が同じファイルを `cache: 'reload'` でもう一度取るので、実際の通信は最大でこの 2 倍です。SW の登録は最初の画面を描いた後なので、AC-15 の 2 秒には入りません（service-worker.md の 1）。
@@ -61,3 +61,39 @@ default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img
 - 使ってよい（同じ互換データで Safari 17 以下）：ES modules、`<link rel="modulepreload">`（17）、`<dialog>` と `showModal`（15.4）、`StorageManager.persist`（15.2）、`Blob.text`（14）、`Intl.PluralRules`（13）、`Set.prototype.union`（17）、`URL.canParse`（17）、`structuredClone`（15.4）、`:has()`（15.4）、`overflow-wrap: anywhere`（15.4）、`display-mode` のメディアクエリ（13）。
 - 効かなくても困らないもの：`accent-color`（Safari 26.2）は radio がシステムの色になるだけ。`prefers-reduced-transparency`（Safari にない）は半透明のままになるだけ。
 - reviewer は G2 で、上の「使わない」を grep で探します。
+
+## 6. ホーム画面のアイコンと manifest（Takuma の決定 D5。design/001-daily-learning.md の 8 と D-29）
+- ファイル（元は `backend/public/`、配布物のルートに置く。backend-engineer が作る）：
+  - `./icon-180.png`：180 × 180 px の PNG 1 枚。ファイルの大きさ（生）も 10,000 バイト以下。色、字、書体、作り方は design の 8。
+  - `./manifest.webmanifest`：配るときの `Content-Type` は `application/manifest+json`。テスト用のサーバーはこの値を返します（test-hooks.md の「実行の環境」）。GitHub Pages が返す値は未確認で、公開後に `curl -sI https://matsuura-tak.github.io/engineer/manifest.webmanifest` で確かめます（G4）。
+  - どちらも service-worker.md の 3 の FILES に入れ、1 の表の「ホーム画面のアイコンと manifest」の枠に数えます。
+- manifest の中身は、次の 7 項目だけです（JSON。項目の順は問わない。これ以外の項目を置かない）：
+  ```json
+  {
+    "name": "今日の一手",
+    "short_name": "今日の一手",
+    "lang": "ja",
+    "start_url": "./",
+    "scope": "./",
+    "display": "standalone",
+    "icons": [{ "src": "./icon-180.png", "sizes": "180x180", "type": "image/png" }]
+  }
+  ```
+  - 置かない項目：`theme_color`、`background_color`（ダークモードと合わなくなる）、`description`、`id`、他の寸法のアイコン。英語版の manifest は作りません（D3）。
+  - `start_url` にクエリを付けません（D6：イベントを記録しない。アプリは URL の引数も読まない：test-hooks.md）。
+  - `name` と `short_name` は文言の `app.name`（ja と en の両方で「今日の一手」。strings.md の 6）と同じ値です。
+- 静的な HTML の `<head>` に置くもの（URL はすべて相対。4）：
+  ```html
+  <title>今日の一手</title>
+  <meta name="apple-mobile-web-app-title" content="今日の一手">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="apple-touch-icon" href="./icon-180.png">
+  <link rel="manifest" href="./manifest.webmanifest">
+  ```
+  - `<title>` と `apple-mobile-web-app-title` の値はどちらも ja.json の `app.name` で、ビルドの手順が書き込みます（strings.md の 6、ADR 0001）。言語を決めた後も JS は `document.title` を変えません。
+  - `apple-mobile-web-app-capable` は Apple の Safari HTML Reference にある（https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariHTMLRef/Articles/MetaTags.html 、2026-10-30 確認）。`apple-mobile-web-app-title` は Apple の公式の文書で見つけていない（未確認）。効かなくても、iOS は `<title>` か manifest の `name` を使い、どれも同じ値なので結果は同じです。
+- CSP（3）との整合：manifest は `manifest-src 'self'`、アイコンは `img-src 'self'` で許されます。どちらも同じ origin の相対 URL なので、CSP の文字列は変えません。
+- 確かめ方：
+  - 単体テスト（backend-engineer。G2）：配布物の `manifest.webmanifest` を `JSON.parse` した値が上の JSON と深く等しい。`icon-180.png` の先頭 8 バイトが PNG の印、IHDR の幅と高さ（16〜23 バイト目）が 180 と 180、大きさが 10,000 バイト以下。`index.html` の `<head>` に上の 5 行がある。
+  - 受け入れテスト（verifier）：テスト用のサーバーから `./manifest.webmanifest` と `./icon-180.png` が 200 と上の `Content-Type` で返り、一度読み込んだ後はオフラインでも Service Worker から返る（AC-12、AC-23 の範囲。どの AC の Then にもないので、足すかは verifier の判断）。
+  - 実機（G4、Takuma）：iOS の Safari の「ホーム画面に追加」で、名前が「今日の一手」、アイコンが白地に「一」。

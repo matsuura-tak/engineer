@@ -13,7 +13,7 @@ tech-lead だけが書きます。変えるときは足すだけにし、読み�
 | identifiers.md | data-state、data-testid、data-* の名前と値 |
 | test-hooks.md | 受け入れテストのつなぎ口 W-1〜W-16 |
 | service-worker.md | Service Worker の決まり |
-| budgets.md | 転送量、課題集の長さ、CSP、対応ブラウザと使わない機能 |
+| budgets.md | 転送量、課題集の長さ、CSP、対応ブラウザと使わない機能、ホーム画面のアイコンと manifest |
 | dependencies.md | 使ってよい依存ライブラリ |
 | fixtures/ | 見本（valid-、seed- は通る、invalid- は落ちる）。data/v1/ は消さない |
 | tools/check-schemas.mjs | スキーマと見本の検査。`cd backend && node ../contracts/tools/check-schemas.mjs` |

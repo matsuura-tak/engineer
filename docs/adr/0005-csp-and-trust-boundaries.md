@@ -10,7 +10,7 @@
   - 読み込むファイル：利用者が選んだ JSON で、中身は信頼できない（AC-20、AC-22、AC-25）。課題集の文字列も、画面に出す前は信頼しない扱いにする。
   - origin の共有：`matsuura-tak.github.io` は同じアカウントの他の Pages のリポジトリと同じ origin で、localStorage と Cache Storage を共有する。ルートの scope の SW があれば `/engineer/` の要求も横取りできる。
 - GitHub Pages では HTTP のヘッダーを足せないので、CSP は meta で書く。meta では `frame-ancestors` が効かない。
-- HTTPS の転送（Enforce HTTPS）は Takuma がリポジトリの設定で入れる（Takuma の決定待ち E3）。
+- HTTPS の転送（Enforce HTTPS）は、公開時に Takuma がリポジトリの Pages の設定で入れる（Takuma の決定 D7、2026-10-30。設計メモの E3）。
 
 ## 決定
 - 本番の HTML に、budgets.md の 3 の CSP を meta で 1 つだけ置く。`default-src 'none'` から始め、自分の origin だけを許し、`require-trusted-types-for 'script'` と `trusted-types kyounoitte-sw` で文字列の HTML の代入を止める。

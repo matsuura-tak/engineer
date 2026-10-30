@@ -9,7 +9,7 @@ verifier G0 r3 の W-1〜W-16 を、名前と値まで決めたものです。�
 - テスト用の静的サーバー（`backend/tests/acceptance/server/` に verifier が node の組み込みだけで書く）：
   - 配布物は `backend/scripts/build.mjs`（ADR 0001。backend-engineer）でビルドしたフォルダを使う。`backend/public/` をそのまま配らない（版の刻印と SW のファイル一覧が入らないため）。
   - 配布物を `/engineer/` の下に置く（本番と同じパス。`/` で始まる URL の誤りを見つけるため）。baseURL は `http://127.0.0.1:<port>/engineer/`。127.0.0.1 は安全な文脈なので SW が動く。
-  - GitHub Pages と同じヘッダーを返す：`Cache-Control: max-age=600`、`Accept-Encoding` に gzip があれば `Content-Encoding: gzip`、拡張子に合う `Content-Type`（`.js` は `text/javascript`、`.json` は `application/json`、`.webmanifest` は `application/manifest+json`）。`/engineer` は `/engineer/` に 301。ないファイルは 404。
+  - GitHub Pages と同じヘッダーを返す：`Cache-Control: max-age=600`、`Accept-Encoding` に gzip があれば `Content-Encoding: gzip`、拡張子に合う `Content-Type`（`.js` は `text/javascript`、`.json` は `application/json`、`.webmanifest` は `application/manifest+json`、`.png` は `image/png`）。`/engineer` は `/engineer/` に 301。ないファイルは 404。
   - 実行中に配る中身のフォルダを差し替える関数を持つ（AC-28）。
 - ビルドの手順の約束（backend-engineer が作る。テストはこれだけを使う）：`node scripts/build.mjs --out <フォルダ> --version <版> [--tasks <tasks.json のパス>]`。`build({ out, version, tasks })` を export もする。`--tasks` を渡すと課題集をそのファイルに差し替える（スキーマに通らなければ失敗）。
 
@@ -48,7 +48,7 @@ verifier G0 r3 の W-1〜W-16 を、名前と値まで決めたものです。�
   アプリは自分のキー以外に触らない（data.md の 1）ので、印は削除（AC-16）の後も残り、seed は入れ直されない。
 - seed の setItem は、W-9 の失敗の注入より先に登録する（注入の「次の 1 回」を seed が使わないため）。
 - AC-24 の seed は、時刻を固定する日（2026-11-06）の行を `history` に入れる。入れないと、開いたときにアプリがその日の課題を出し、`issued` が 1 増える（data.md の 4 の 6）。見本：fixtures/seeds/seed-ac24-stats.json。
-- AC-8 の seed の古い行の `level` は、seed の `levels` の値と同じにする（data.md の 5）。見本：fixtures/seeds/seed-ac8-intermediate-one-too-hard.json。
+- AC-8 の seed の各行の `level` は、その課題が出たときの段階にする（PRD 11 の AC-8 の確かめ方、data.md の 5）。見本は fixtures/seeds/ の `seed-ac8-*`（3 件。対応は data.md の 5 の表）。9 通り目の seed だけは、`levels` が `intermediate` で古い 2 行の `level` が `advanced` になる。
 
 ## W-8 履歴の読み出し
 - S10 の `[data-testid="history.row"]` の `data-task-id`、`data-date`、`data-report`（`done`、`too_hard`、`too_easy`、`no_time`、`none`）、`data-helpful`（`done` の行だけ。`helpful`、`not_helpful`、`unanswered`）。

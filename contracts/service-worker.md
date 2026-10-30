@@ -19,7 +19,7 @@ v1 の Service Worker（以下 SW）は「配布物を先に取っておいて�
 - `caches.open(名前)` → `cache.addAll(FILES.map((u) => new Request(u, { cache: 'reload' })))` を `event.waitUntil` に渡します。1 つでも取れなければ install は失敗し、古い版のまま動きます。
 - `cache: 'reload'` は必須です。GitHub Pages は `Cache-Control: max-age=600` を返すので、これがないと新しい SW がブラウザの HTTP キャッシュから古いファイルを取ることがあります（tech-lead G1 r1 の spike 2：Chromium で 5 回とも古い版のままだった）。
 - `self.skipWaiting()` を呼びます。
-- FILES は配布物のすべてのファイルです（`./index.html`、CSS、すべての JS モジュール、`./data/tasks.json`、`./i18n/ja.json`、`./i18n/en.json`、`./manifest.webmanifest` とアイコン（置く場合））。`./sw.js` 自身は入れません。ビルドの手順は、配布物のフォルダのファイルと FILES が一致することを確かめ、違えば失敗します。
+- FILES は配布物のすべてのファイルです（`./index.html`、CSS、すべての JS モジュール、`./data/tasks.json`、`./i18n/ja.json`、`./i18n/en.json`、`./manifest.webmanifest`、`./icon-180.png`（Takuma の決定 D5。budgets.md の 6））。`./sw.js` 自身は入れません。ビルドの手順は、配布物のフォルダのファイルと FILES が一致することを確かめ、違えば失敗します。
 
 ## 4. activate
 - 名前が `kyounoitte-` で始まり、今の名前でないキャッシュだけを消します。他の接頭辞のキャッシュには触りません。

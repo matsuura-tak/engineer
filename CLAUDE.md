@@ -14,11 +14,11 @@
 コマンドを変えたら、app.json の更新を Takuma に頼みます（.claude/ は Takuma だけが直せます）。
 受け入れテストは、受け入れテストのフォルダの中の設定（backend/tests/acceptance/playwright.config.mjs）だけで動きます。
 - iOS のビルド、iOS のテスト：なし（iOS のアプリは作らない。stacks は backend だけ）
-- バックエンドのテスト（app.json の backend_test に入れる案。未確認：G2 で backend-engineer が確かめる）：
+- バックエンドのテスト（app.json の backend_test。Takuma の決定 D8 で G2 の直前に Takuma が main で入れる。未確認：G2 で backend-engineer が確かめる）：
   `cd backend && npm ci && npx playwright install --with-deps chromium webkit && npm test`
   - `npm test` の中身（ADR 0001 の scripts）：契約の検査 → 単体テスト → 受け入れテスト
 - 個別のコマンド（どれも backend/ で実行）：
-  - 契約の検査：`node ../contracts/tools/check-schemas.mjs`（確認済み：2026-10-30、ajv 8.20.0 を入れたフォルダから同じスクリプトを実行し、見本 38 件、期待と違う結果 0 件、終了コード 0。backend/ からは未確認）
+  - 契約の検査：`node ../contracts/tools/check-schemas.mjs`（確認済み：2026-10-30、ajv 8.20.0 を入れたフォルダから同じスクリプトを実行し、見本 41 件、期待と違う結果 0 件、終了コード 0。backend/ からは未確認）
   - 単体テスト：`node --test 'tests/unit/**/*.test.mjs'`（形は Node 24.22.1 で確認済み。フォルダを渡す形 `tests/unit/` は失敗する。backend/ では未確認）
   - 受け入れテスト：`npx playwright test -c tests/acceptance`（-c がフォルダの中の playwright.config.mjs を読むことは、同じ形の仮のフォルダで確認済み。本物のテストは未確認）
   - ビルド：`node scripts/build.mjs --out dist --version <YYYY-MM-DD.N>`（未確認。backend-engineer が作る）
@@ -31,7 +31,7 @@
 
 | 場所 | 中身 | 書く役 |
 |---|---|---|
-| backend/public/ | 配布物の元（index.html、CSS、ES modules、sw.js、data/tasks.json、i18n/ja.json と en.json） | backend-engineer（tasks.json の中身は pdm の下書きを写す） |
+| backend/public/ | 配布物の元（index.html、CSS、ES modules、sw.js、data/tasks.json、i18n/ja.json と en.json、manifest.webmanifest、icon-180.png） | backend-engineer（tasks.json の中身は pdm の下書きを写す） |
 | backend/scripts/ | ビルド（写して版を刻印する）と転送量の検査 | backend-engineer |
 | backend/tests/unit/ | 単体テスト（node --test） | backend-engineer |
 | backend/tests/acceptance/ | 受け入れテスト、設定、テスト用の静的サーバー | verifier |

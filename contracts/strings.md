@@ -34,7 +34,7 @@ AC-26、つなぎ口 W-14。
 | `settings.version` | `{version}` | `data-build-version` と同じ値 |
 | `settings.stats.today` | `{date}` | 今日 `YYYY-MM-DD` |
 
-- 日付は両言語とも ISO 8601 の `YYYY-MM-DD` です（design の U-2。Takuma の決定待ち D2）。
+- 日付は両言語とも ISO 8601 の `YYYY-MM-DD` です（design の U-2。Takuma の決定 D2、2026-10-30）。
 
 ## 4. 画面に文字を出す方法
 - 文字は `textContent`（か `createTextNode`）でだけ入れます。`innerHTML`、`outerHTML`、`insertAdjacentHTML`、`document.write` は使いません。
@@ -50,4 +50,4 @@ AC-26、つなぎ口 W-14。
 
 ## 6. JS が動く前の文（静的な HTML）
 - `app.loading` と `app.noscript` は、ビルドの手順（ADR 0001）が ja と en のファイルから「日本語 / 英語」の形で HTML に書き込みます（tech-lead G1 r1 の P2、design の S0）。
-- 静的な HTML の `<title>` と、ヘッダーの `app.name` も、ビルドの手順が ja.json の値を書き込みます。`app.name` の英語の値は今は日本語と同じ「今日の一手」です（Takuma の決定待ち D3）。
+- 静的な HTML の `<title>` と、ヘッダーの `app.name` も、ビルドの手順が ja.json の値を書き込みます。`app.name` の値は ja と en の両方で「今日の一手」です（Takuma の決定 D3、2026-10-30。ローマ字や英語名は置かない）。strings.schema.json は `app.name` をこの値に固定しています（fixtures/strings/invalid-app-name-english.json が落ちる見本）。manifest の `name` と `short_name`、`apple-mobile-web-app-title` も同じ値です（budgets.md の 6）。

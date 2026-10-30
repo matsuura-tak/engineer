@@ -13,12 +13,12 @@
 ## 決定
 - JS は変換もまとめもせず、ネイティブの ES modules のファイルのまま配る。`<head>` に全モジュールの `modulepreload` と、JSON 3 つの `preload` を置く。動的な `import()` は使わない。
 - 本番の配布物に入る依存ライブラリは 0 件。文言の差し込み、日付、データの検査、SW は標準の API で自分で書く。
-- 「ビルド」は写して刻印するだけ：`backend/scripts/build.mjs` が `backend/public/` を出力のフォルダに写し、版（`data-build-version`、sw.js の `VERSION`）、SW のファイル一覧 `FILES`、静的な HTML の日英の 2 文と `<title>` を書き込む。予算の検査は `backend/scripts/check-budget.mjs`。どちらも node の組み込みだけで書く。
+- 「ビルド」は写して刻印するだけ：`backend/scripts/build.mjs` が `backend/public/` を出力のフォルダに写し、版（`data-build-version`、sw.js の `VERSION`）、SW のファイル一覧 `FILES`、静的な HTML の日英の 2 文と `<title>`、`apple-mobile-web-app-title` を書き込む。予算の検査は `backend/scripts/check-budget.mjs`。どちらも node の組み込みだけで書く。
 
 ## 置き場所と作る物（backend-engineer が作る。tech-lead は書かない）
 | 場所 | 中身 |
 |---|---|
-| backend/public/ | 配布物の元（index.html、CSS、JS のモジュール、sw.js、data/tasks.json、i18n/ja.json、i18n/en.json、manifest.webmanifest とアイコン（置く場合）） |
+| backend/public/ | 配布物の元（index.html、CSS、JS のモジュール、sw.js、data/tasks.json、i18n/ja.json、i18n/en.json、manifest.webmanifest、icon-180.png（Takuma の決定 D5。contracts/budgets.md の 6）） |
 | backend/scripts/build.mjs、check-budget.mjs | 上の「ビルド」と予算の検査。`build({ out, version, tasks })` を export する（contracts/test-hooks.md） |
 | backend/tests/unit/ | 単体テスト（`node --test`）。ファイル名は `*.test.mjs` |
 | backend/tests/acceptance/ | 受け入れテスト（verifier。ADR 0004） |
@@ -36,7 +36,7 @@ package.json の scripts（この名前で作る。CLAUDE.md のコマンドが�
 }
 ```
 - 層とモジュールの数の上限：JS のファイルは 15 個まで（modulepreload の数と、読む人の量を抑えるため）。class の継承、DI の仕組み、状態管理のライブラリは作らない。
-- 単体テストで確かめること（最低限）：手書きのデータの検査が contracts/fixtures/ のすべてで ajv と同じ合否、段階の規則の 7 通り（data.md の 5）、日付の作り方（Asia/Tokyo 以外の TZ でも端末の日付）、差し込みの 10 キー、CSP の文字列が budgets.md と一致、`FILES` と出力のフォルダのファイルが一致、365 行の保存データが 1,000,000 字以下。
+- 単体テストで確かめること（最低限）：手書きのデータの検査が contracts/fixtures/ のすべてで ajv と同じ合否、段階の規則の 9 通り（data.md の 5。AC-8）、日付の作り方（Asia/Tokyo 以外の TZ でも端末の日付）、差し込みの 10 キー、CSP の文字列が budgets.md と一致、`FILES` と出力のフォルダのファイルが一致、365 行の保存データが 1,000,000 字以下。
 
 ## 検討した案
 | 案 | 良い点 | 悪い点 | 選ばなかった理由 |

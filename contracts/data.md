@@ -28,7 +28,9 @@
 | 読み込みで置き換える | ファイルの中身（`device` はこのブラウザの値を残す） | はい |
 | すべて削除 | `localStorage.removeItem('kyounoitte:data')`（setItem ではない） | — |
 
-- `firstOpenDate`（統計の「初めて開いた日」。意味は PRD 11 の冒頭を参照）は、保存データが「なし」（3）の状態で初回の診断の 1 問目を確定する保存（`diagnosis.area` を書く保存）のときに、その時点の今日（4 の「今日」）を書きます。「診断の途中」と「あり」の状態の保存（2 問目以降、1 問目の答え直し、やり直しの診断、申告など）では変えません。
+- やり直しの診断（S7 か S8 から入った S2）の回答は、メモリの下書きにだけ持ち、「診断を終える」（`diagnosis.finish`）で上の表の 1 回だけ保存します（ADR 0002 の U-7）。終える前に離れたとき（`diagnosis.cancel`、nav の `nav.history` と `nav.settings`、アプリ名 `app.name`、再読み込み、タブを閉じる、4 の「画面を開いたまま日付が変わったとき」）は、下書きを捨てます。保存せず、保存データは元の診断のままです。
+
+- `firstOpenDate`（統計の「初めて開いた日」。意味は PRD 11 の冒頭の「初めて開いた日」。D9）は、保存データが「なし」（3）の状態で初回の診断の 1 問目を確定する保存（`diagnosis.area` を書く保存）のときに、その時点の今日（4 の「今日」）を書きます。「診断の途中」と「あり」の状態の保存（2 問目以降、1 問目の答え直し、やり直しの診断、申告など）では変えません。
   - `device` だけの保存（案内を閉じた `homeGuideClosed`、`persistRequested` と `persistGranted`）では書きません。開いただけの日、案内を閉じて診断せずに去った日は数えないので、iOS の Safari と他のブラウザで「初めて開いた日に完了したか」（9）が同じ基準になります（例：11-01 に案内を閉じて去り、11-03 に診断して完了 → `firstOpenDate` は 11-03、first-day-completed は true）。
   - 削除（7。`removeItem`）の後に診断すれば、その 1 問目の日が新しい `firstOpenDate` です。読み込み（7）では、ファイルの値をそのまま使います。
   - 名前 `firstOpenDate`、`data-stat-first-open-date`、文言キーは変えません（ID を変えない決まり。ADR 0002）。
@@ -68,10 +70,19 @@ design-reviewer G1 r2 の提案 2 の順（読めない → 保存先が使え�
 - 選ぶ：候補のうち ID が最も小さいもの（文字列の比較。3 桁の 0 埋めなので番号の順と同じ）。`mode` で順番を変えない（PRD 11）。
 - 段階の規則（申告を保存するときに行う。AC-8）：
   1. 申告した行の領域を `a` とする。`history` から、領域が `a` で `report` が `none` でない行を新しい順に並べる。
-  2. その並びの先頭から、行の `level` が今の `levels[a]` と同じ行が続く間だけを取る（違う段階の行に当たったら止める。段階が変わる前の申告を次の判定に持ち越さないため。やり直しの診断で段階が変わった直後も同じ。PRD 11 の冒頭を参照）。
+  2. その並びの先頭から、行の `level` が今の `levels[a]` と同じ行が続く間だけを取る（違う段階の行に当たったら止める。段階が変わる前の申告を次の判定に持ち越さないため。やり直しの診断で段階が変わった直後も同じ。PRD 11 の冒頭の「連続」の定義。D10）。
   3. 取った行の先頭 2 行がどちらも `too_hard` なら `levels[a]` を 1 段下げる。どちらも `too_easy` なら 1 段上げる。`beginner` より下、`advanced` より上には動かない。
   4. 変わった段階は翌日の課題から効く（今日はもう課題を出さない）。
-- AC-8 の 7 通りの期待値は、この規則で全部そのとおりになります。seed の古い行の `level` は、seed の `levels[a]` と同じ値にします（fixtures/seeds/seed-ac8-intermediate-one-too-hard.json）。
+- AC-8 の 9 通りの期待値は、この規則で全部そのとおりになります。seed の各行の `level` は、その課題が出たときの段階にします（PRD 11 の AC-8 の確かめ方）。多くの通りでは seed の `levels[a]` と同じ値ですが、9 通り目は `levels[a]` が `intermediate` で、古い 2 行が `advanced` です。
+- AC-8 の seed の見本（どれも目標の領域は `backend`。テストは最後の行の翌日 2026-11-03 に時刻を固定して開き、画面で直近の 1 件を申告し、2026-11-04 に固定して開く）：
+
+| 通り | 見本 | 古い方の履歴（古い順） | 画面で申告 | 2026-11-04 の `data-task-level` |
+|---|---|---|---|---|
+| 1 通り目 | fixtures/seeds/seed-ac8-intermediate-one-too-hard.json | 中で完了、中で難しすぎ | 難しすぎ | `beginner` |
+| 8 通り目 | fixtures/seeds/seed-ac8-intermediate-too-hard-then-none.json | 中で難しすぎ、中で `none` | 難しすぎ | `beginner`（`none` は数えず流れも切らない） |
+| 9 通り目 | fixtures/seeds/seed-ac8-intermediate-after-advanced-two-too-hard.json | 上で難しすぎ、上で難しすぎ（`levels` は `intermediate`） | 難しすぎ | `intermediate`（`advanced` の 2 行は数えない） |
+
+  - 残りの 6 通りの seed は、上の形で古い行の `report` と `level`、`levels` を変えて verifier が作ります（test-hooks.md の W-7）。
 
 ## 6. 読むときの検査と、版の移し方
 - 順番：JSON.parse → オブジェクトか → `formatVersion` が整数で今の版（1）より大きければ「版が新しい」→ 今の版より小さければ 1 版ずつ今の形に移す → スキーマの検査。v1 は最初の版なので、移す手順はまだありません。

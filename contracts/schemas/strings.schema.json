@@ -154,7 +154,9 @@
   ],
   "properties": {
     "app.name": {
-      "$ref": "#/$defs/plain"
+      "$ref": "#/$defs/plain",
+      "const": "今日の一手",
+      "description": "ja と en の両方でこの値（Takuma の決定 D3。contracts/strings.md の 6）"
     },
     "app.loading": {
       "$ref": "#/$defs/plain"
