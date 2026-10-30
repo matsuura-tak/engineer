@@ -1,6 +1,8 @@
 // AC-12：一度読み込んだ後は、ネットワークがなくても画面の中の操作がすべて動く（送信 0 件）。
 // AC-23：一度読み込んだ後は、オフラインで再読み込みしても動く（3 秒以内、送信 0 件。Service Worker）。
 // 送信の数え方は W-12（fromServiceWorker でない応答 + requestfailed）。
+// AC-12 でも、オフラインにする前に W-13（SW の準備）を待つ。PRD AC-12 Given「ページを読み込み終えた後に」をこの合図で読む
+// （アプリは画面を描いた後に SW を登録するので、待たないと sw.js の取得とオフラインが競る：tech-lead G2 r1 の spike）。
 import { test, expect } from '../helpers/fixtures.mjs';
 import * as app from '../helpers/app.mjs';
 import { injectSeed, loadContractFixture } from '../helpers/seed.mjs';
@@ -11,16 +13,19 @@ test('AC12_オフラインでもAC-1_AC-2_AC-5_AC-9の操作が動き_送信は0
   await app.fixDate(page, '2026-11-03');
   await app.open(page, baseURL);
   await app.expectState(page, 'diagnosis.start');
+  await app.waitServiceWorkerReady(page);
 
   await context.setOffline(true);
   const net = app.networkCounter(page);
   net.start();
 
-  const { transitions, finishMs } = await app.diagnose(page, { area: 'infra', level: 'intermediate', years: '3to5' }, { finishTo: null });
-  await app.expectState(page, 'task.today', 1000);
-  expect(transitions[0]).toBeLessThanOrEqual(500);
-  expect(transitions[1]).toBeLessThanOrEqual(500);
-  expect(finishMs).toBeLessThanOrEqual(1000);
+  // AC-1 と AC-2 の Then（時間は click の直前から表示を確かめ終えるまで：helpers/app.mjs の diagnose）
+  const { beginMs, transitions, finishMs } = await app.diagnose(page, { area: 'infra', level: 'intermediate', years: '3to5' }, { finishTo: 'task.today' });
+  testInfo.annotations.push({ type: '切り替えの時間 ms（始める→1、1→2、2→3、3→課題）', description: `${beginMs}, ${transitions.join(', ')}, ${finishMs}` });
+  expect(beginMs, '始める → 1 問目').toBeLessThanOrEqual(500);
+  expect(transitions[0], '1 問目 → 2 問目').toBeLessThanOrEqual(500);
+  expect(transitions[1], '2 問目 → 3 問目').toBeLessThanOrEqual(500);
+  expect(finishMs, '3 問目 → task.today（AC-2 の 1 秒）').toBeLessThanOrEqual(1000);
   const task = await app.readTask(page);
   expect(task.area).toBe('infra');
   expect(task.level).toBe('intermediate');
@@ -43,6 +48,7 @@ test('AC12_オフラインでもAC-7の申告が動き_送信は0件', async ({ 
   await app.fixDate(page, '2026-11-03');
   await app.open(page, baseURL);
   await app.expectState(page, 'diagnosis.start');
+  await app.waitServiceWorkerReady(page);
 
   await context.setOffline(true);
   const net = app.networkCounter(page);

@@ -44,14 +44,24 @@ export async function readTask(page) {
 
 /**
  * 診断に答える。S1 なら「診断を始める」を押してから。S2 の 3 問に radio（area.*、level.*、years.*）で答え、最後に diagnosis.finish。
- * 戻り値：各質問の切り替えにかかった時間（ミリ秒）の配列（AC-1）と、finish を押してから task.today までの時間（AC-2）。
+ * 時間はすべて「操作（click）の直前の t0」から「次の画面の印を確かめ終えた後」までの差（PRD AC-1「確定してから次の質問が表示されるまで」、
+ * AC-2「1 秒以内に task.today が表示され」）。click の往復だけを計らない。
+ * 戻り値：
+ *   beginMs     「診断を始める」→ 1 問目（data-question-index=1）。S1 から始めなかったときは null
+ *   transitions [1 問目 → 2 問目, 2 問目 → 3 問目]
+ *   finishMs    diagnosis.finish → finishTo の状態（既定 task.today）。finishTo が null なら click が返るまで
  */
-export async function diagnose(page, { area, level, years = '1to3' }, { finishTo = 'task.today' } = {}) {
+export async function diagnose(page, { area, level, years = '1to3' }, { finishTo = 'task.today', finishTimeout = WAIT_MS } = {}) {
+  const progress = tid(page, 'diagnosis.progress');
+  let beginMs = null;
   if ((await readState(page)) === 'diagnosis.start') {
+    const tb = Date.now();
     await tid(page, 'diagnosis.start.begin').click();
+    await expectState(page, 'diagnosis.question');
+    await expect(progress).toHaveAttribute('data-question-index', '1');
+    beginMs = Date.now() - tb;
   }
   await expectState(page, 'diagnosis.question');
-  const progress = tid(page, 'diagnosis.progress');
   const transitions = [];
 
   await expect(progress).toHaveAttribute('data-question-index', '1');
@@ -70,9 +80,9 @@ export async function diagnose(page, { area, level, years = '1to3' }, { finishTo
   await tid(page, `years.${years}`).check();
   t0 = Date.now();
   await tid(page, 'diagnosis.finish').click();
-  if (finishTo) await expectState(page, finishTo);
+  if (finishTo) await expectState(page, finishTo, finishTimeout);
   const finishMs = Date.now() - t0;
-  return { transitions, finishMs };
+  return { beginMs, transitions, finishMs };
 }
 
 export async function goSettings(page) {
@@ -182,9 +192,28 @@ export async function shot(page, testInfo, name) {
   return file;
 }
 
-/** Tab（Shift+Tab）だけで data-testid の要素にフォーカスを移す（AC-18）。見つからなければ例外。 */
+/**
+ * キーボードの移動キー（contracts/test-hooks.md「キーボードの移動キー（AC-18）」）。
+ * WebKit は Alt+Tab / Alt+Shift+Tab（macOS の Playwright WebKit では Tab がボタン、radio、リンクに止まらない。Safari の「Option+Tab ですべての項目に移る」と同じ）。
+ * それ以外（Chromium）は Tab / Shift+Tab。確定のキー（Enter、Space）はどちらも同じ。
+ */
+export function engineOf(page) {
+  return page.context().browser()?.browserType().name() ?? 'chromium';
+}
+
+export function navKeys(page) {
+  return engineOf(page) === 'webkit' ? { next: 'Alt+Tab', prev: 'Alt+Shift+Tab' } : { next: 'Tab', prev: 'Shift+Tab' };
+}
+
+/** 「前の要素へ」を 1 回押す（AC-18 の Shift+Tab の確認）。 */
+export async function pressPrev(page) {
+  await page.keyboard.press(navKeys(page).prev);
+}
+
+/** 移動キーだけで data-testid の要素にフォーカスを移す（AC-18）。見つからなければ例外。 */
 export async function tabTo(page, testId, { shift = false, max = 40 } = {}) {
-  const key = shift ? 'Shift+Tab' : 'Tab';
+  const keys = navKeys(page);
+  const key = shift ? keys.prev : keys.next;
   for (let i = 0; i < max; i++) {
     const current = await page.evaluate(() => document.activeElement?.getAttribute('data-testid') ?? null);
     if (current === testId) return;

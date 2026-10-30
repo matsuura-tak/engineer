@@ -1,6 +1,6 @@
 // AC-3、AC-4、AC-29：同梱の課題集（配布物の data/tasks.json）を全件読んで検査する（W-6）。
 // 期待値は PRD 11 の AC-3（4 要素が 1 文字以上、1 ≤ 分 ≤ 15）、AC-4（126 以上、18 組 × 7 以上、ID の重複 0）、
-// AC-29（mode、external は組の 20% 以下、in_app に URL も tools もない、external は tools 1 件以上）と budgets.md の 2。
+// AC-29（mode、external は組の 20% 以下、in_app に URL も tools もない、external は tools 1 件以上）と budgets.md の 2（BUDGET2_）。
 import { gzipSync } from 'node:zlib';
 import { test, expect } from '../helpers/fixtures.mjs';
 import { loadTasks } from '../helpers/app.mjs';
@@ -44,8 +44,9 @@ test('AC4_課題集は126件以上で18組すべて7件以上でIDの重複が0�
   expect(dup, 'ID の重複').toEqual([]);
 });
 
-test('AC4_課題集の量の予算_本文の平均600字以下_gzip後106000バイト以下', async ({ request }, testInfo) => {
-  // budgets.md の 2（受け入れテストで数える）。AC-4 の「量」の検査の一部として置く。
+test('BUDGET2_課題集の本文の平均600字以下_gzip後106000バイト以下', async ({ request }, testInfo) => {
+  // contracts/budgets.md の 2（受け入れテストで数える）。PRD の AC ではないので名前は BUDGET2_（test-hooks.md W-6）。
+  // 検証レポートでは AC の表とは別の「予算」の行に合否と値を書く。
   const res = await request.get('data/tasks.json');
   expect(res.status()).toBe(200);
   const raw = await res.body();

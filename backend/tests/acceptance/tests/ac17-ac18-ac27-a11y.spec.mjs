@@ -1,4 +1,5 @@
 // AC-17：幅 320 CSS px で文言が切れず横スクロールが出ない。AC-18：キーボードだけで診断から完了まで。
+// AC-18 の移動キーは contracts/test-hooks.md「キーボードの移動キー」：WebKit は Alt+Tab / Alt+Shift+Tab、それ以外は Tab / Shift+Tab（helpers/app.mjs の navKeys）。
 // AC-27：axe-core（WCAG 2.1 AA）で serious 以上の違反が 0 件（6 つの画面）。
 import AxeBuilder from '@axe-core/playwright';
 import { test, expect } from '../helpers/fixtures.mjs';
@@ -100,10 +101,12 @@ test.describe('AC-17 幅 320 CSS px（deviceScaleFactor 2）', () => {
 });
 
 // ---- AC-18 ----
-test('AC18_Tab_Shift+Tab_Enter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上', async ({ page, baseURL }, testInfo) => {
+test('AC18_移動キー(Tab系)とEnter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上', async ({ page, baseURL }, testInfo) => {
   await app.fixDate(page, '2026-11-03');
   await app.open(page, baseURL);
   await app.expectState(page, 'diagnosis.start');
+  const keys = app.navKeys(page);
+  testInfo.annotations.push({ type: '移動キー', description: `${app.engineOf(page)}：次へ ${keys.next}、前へ ${keys.prev}` });
   const records = [];
   const record = async (step) => {
     const s = await app.readFocusStyle(page);
@@ -126,10 +129,10 @@ test('AC18_Tab_Shift+Tab_Enter_Spaceだけで診断から完了まで進み_操�
   await activate('diagnosis.next', 'Enter', 'Q1 次へ');
   await expect(progress).toHaveAttribute('data-question-index', '2');
 
-  // Shift+Tab でも戻れる（Q2 の radio から前の要素へ）ことを 1 回だけ確かめ、Tab で戻る
+  // 「前の要素へ」（Shift+Tab 系）でも戻れる（Q2 の radio から前の要素へ）ことを 1 回だけ確かめ、「次へ」で戻る
   await app.tabTo(page, 'level.beginner');
-  await page.keyboard.press('Shift+Tab');
-  const back = await record('Q2 Shift+Tab');
+  await app.pressPrev(page);
+  const back = await record('Q2 前の要素へ');
   expect(back.testId).not.toBe('level.beginner');
   await activate('level.beginner', 'Space', 'Q2 radio');
   await expect(app.tid(page, 'level.beginner')).toBeChecked();

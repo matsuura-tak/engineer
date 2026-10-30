@@ -63,13 +63,25 @@ export async function armStorageFailure(page) {
   }, STORAGE_FAILURE_FLAG);
 }
 
-/** 永続化の拒否の注入（AC-13、W-9）。 */
+/**
+ * 永続化の拒否の注入（AC-13、W-9）。呼ばれた回数をテスト側の変数（globalThis。アプリは読まない）に数え、
+ * 拒否の注入が実際に効いた（アプリが persist() を 1 回呼んだ）ことを確かめられるようにする。回数は読み込みごと（ページの globalThis）。
+ */
+export const PERSIST_CALLS_FLAG = '__acceptancePersistCalls';
+
 export async function injectPersistDenied(context) {
-  await context.addInitScript(() => {
+  await context.addInitScript((flag) => {
     if (typeof StorageManager !== 'undefined') {
-      StorageManager.prototype.persist = async () => false;
+      StorageManager.prototype.persist = async function () {
+        globalThis[flag] = (globalThis[flag] ?? 0) + 1;
+        return false;
+      };
     }
-  });
+  }, PERSIST_CALLS_FLAG);
+}
+
+export async function readPersistCalls(page) {
+  return page.evaluate((flag) => globalThis[flag] ?? 0, PERSIST_CALLS_FLAG);
 }
 
 /** navigator.standalone の偽装（AC-21、AC-22、W-16）。 */
@@ -132,13 +144,13 @@ export function tasksOf(tasks, area, level) {
 
 /**
  * 組の課題を全部（または mode で絞って）出し終えた seed。最後の行の翌日が「今日」になるように firstOpenDate から並べる。
- * reportFor(index, task) で各行の申告を決める（既定は done）。
+ * reportFor(index, task, total) で各行の申告を決める（既定は done）。
  */
 export function exhaustedSeed(tasks, { area, level, firstOpenDate, only, reportFor }) {
   const list = tasksOf(tasks, area, level).filter((t) => (only ? t.mode === only : true));
   if (list.length === 0) throw new Error(`課題集に ${area}/${level}${only ? `/${only}` : ''} の課題がない`);
   const rows = list.map((t, i) => {
-    const report = reportFor ? reportFor(i, t) : 'done';
+    const report = reportFor ? reportFor(i, t, list.length) : 'done';
     return { taskId: t.id, report, mode: t.mode, helpful: report === 'done' ? 'helpful' : undefined };
   });
   const seed = makeSeed({ area, level, firstOpenDate, rows });

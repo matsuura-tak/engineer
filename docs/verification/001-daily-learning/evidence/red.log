@@ -1,150 +1,153 @@
 # red.log：実装の前に受け入れテストを動かして落ちた記録（001-daily-learning）
-# 日付：2026-10-31 00:01 JST　コミット：dcc3589　node v24.22.1　@playwright/test 1.64.1　@axe-core/playwright 4.14.0　ajv 8.20.0
+# 日付：2026-10-31 00:37 JST　コミット：f339a95（G2 の判定 tech-lead r1 / reviewer r1 の指摘を反映した後。未コミットの作業ツリー）　node v24.22.1　@playwright/test 1.64.1　@axe-core/playwright 4.14.0　ajv 8.20.0
 # 実行したコマンド：
 #   cd backend/tests/acceptance && npm ci && npx playwright install chromium webkit && npx playwright test --reporter=list
 # 終了コード：1
-# 前提：backend/scripts/build.mjs と backend/public/ はまだない（実装前）。global-setup.mjs がビルドできないことを各ワーカーに渡し、全テストが「配布物を作れない：backend/scripts/build.mjs が見つからない（実装がまだない）」で落ちる。
-# 落ちた理由：機能（配布物とビルドの手順）がまだないこと。テストの書き間違いや設定の誤りではない（同じ設定で、スクラッチパッドの最小の HTML を KYOUNOITTE_DIST に指すと、サーバー・baseURL・seed・request の配線が動き、要素や状態の不足で落ちることを確かめた）。
+# 前提：backend/scripts/build.mjs と backend/public/ はまだない（実装前）。global-setup.mjs がビルドできないことを各ワーカーに渡し、全テスト（131 本）が「配布物を作れない：backend/scripts/build.mjs が見つからない（実装がまだない）」で落ちる。
+# 落ちた理由：機能（配布物とビルドの手順）がまだないこと。テストの書き間違いや設定の誤りではない。
+# テストの本体が動くこと（サーバー、baseURL、seed、request、スキーマの配線）は、同じ設定でスクラッチパッドの最小の HTML（data-state="diagnosis.start" と testid 7 個、空の課題集、キーの足りない文言ファイル。SW なし）を
+# KYOUNOITTE_DIST に指して動かした stub-chromium.log と stub-webkit.log（同じフォルダ）で確かめた。そこでは全テストが本体まで進み、「まだない」理由（状態が diagnosis.start のまま、課題集 0 件、スキーマの不通、SW がない、build.mjs がない）で落ちる。
+# stub はリポジトリに入れていない。
 
 npm notice run npx
 npm notice run 'playwright' test --reporter=list
 
 Running 131 tests using 5 workers
 
-  ✘    2 [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:56:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_backend_intermediate (0ms)
-  ✘    1 [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:8:1 › AC1_初めて開くと診断が始まり3問で終わる_進み具合n/3_切り替え500ms以内 (0ms)
-  ✘    3 [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:56:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_frontend_beginner (0ms)
-  ✘    4 [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:56:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_git_advanced (0ms)
+  ✘    1 [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:10:1 › AC1_初めて開くと診断が始まり3問で終わる_進み具合n/3_切り替え500ms以内 (0ms)
+  ✘    2 [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:62:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_git_advanced (0ms)
+  ✘    3 [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:62:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_backend_intermediate (0ms)
+  ✘    4 [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:62:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_frontend_beginner (0ms)
   ✘    5 [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:13:1 › AC3_課題集の全件が4要素を持ち所要時間が1〜15分 (0ms)
-  ✘    6 [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:47:1 › AC4_課題集の量の予算_本文の平均600字以下_gzip後106000バイト以下 (0ms)
-  ✘    8 [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:61:1 › AC29_各組でexternalが20%以下_in_appにURLもtoolsもなく_externalはtoolsが1件以上 (0ms)
+  ✘    6 [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:31:1 › AC4_課題集は126件以上で18組すべて7件以上でIDの重複が0件 (0ms)
+  ✘    7 [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:62:1 › AC29_各組でexternalが20%以下_in_appにURLもtoolsもなく_externalはtoolsが1件以上 (0ms)
+  ✘    8 [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:47:1 › BUDGET2_課題集の本文の平均600字以下_gzip後106000バイト以下 (0ms)
   ✘    9 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:20:1 › AC5_完了するとtask.rateになり_答えるとtask.done_同じ日に再読み込みしてもtask.doneのまま (0ms)
-  ✘    7 [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:31:1 › AC4_課題集は126件以上で18組すべて7件以上でIDの重複が0件 (0ms)
   ✘   10 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:40:1 › AC6_翌日には過去に出した課題のIDと一致しない課題が出る (0ms)
   ✘   11 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_too_hardを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない (0ms)
-  ✘   12 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_too_easyを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない (1ms)
-  ✘   13 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_no_timeを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない (0ms)
-  ✘   15 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:78:1 › AC9_役に立ったを選ぶとtask.doneになり_再び聞かれず_履歴のdata-helpfulがhelpful (0ms)
-  ✘   14 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:92:1 › AC9_立たなかったを選ぶと履歴のdata-helpfulがnot_helpful (1ms)
-  ✘   16 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:103:1 › AC9_選ばずに再読み込みするとtask.doneになり_履歴のdata-helpfulがunanswered (2ms)
+  ✘   14 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_no_timeを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない (0ms)
+  ✘   12 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:78:1 › AC9_役に立ったを選ぶとtask.doneになり_再び聞かれず_履歴のdata-helpfulがhelpful (0ms)
+  ✘   13 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_too_easyを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない (0ms)
+  ✘   15 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:92:1 › AC9_立たなかったを選ぶと履歴のdata-helpfulがnot_helpful (0ms)
+  ✘   16 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:103:1 › AC9_選ばずに再読み込みするとtask.doneになり_履歴のdata-helpfulがunanswered (0ms)
   ✘   17 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_3通り目_中で難しすぎ1回だけ→中のまま (0ms)
-  ✘   19 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:116:1 › AC9_今回は答えないを押すとtask.doneになり_履歴のdata-helpfulがunanswered (0ms)
-  ✘   18 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_2通り目_中で簡単すぎ簡単すぎ→上 (0ms)
-  ✘   20 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_1通り目_中で難しすぎ難しすぎ→初 (0ms)
-  ✘   21 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_4通り目_中で簡単すぎ1回だけ→中のまま (0ms)
+  ✘   18 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_1通り目_中で難しすぎ難しすぎ→初 (0ms)
+  ✘   19 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_2通り目_中で簡単すぎ簡単すぎ→上 (0ms)
+  ✘   20 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:116:1 › AC9_今回は答えないを押すとtask.doneになり_履歴のdata-helpfulがunanswered (0ms)
+  ✘   21 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_5b通り目_中で難しすぎ今日はできない難しすぎ→中のまま (0ms)
   ✘   22 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_5a通り目_中で難しすぎ完了難しすぎ→中のまま (0ms)
-  ✘   23 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_5b通り目_中で難しすぎ今日はできない難しすぎ→中のまま (0ms)
   ✘   24 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_6通り目_初で難しすぎ2回連続→初のまま (0ms)
+  ✘   23 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_4通り目_中で簡単すぎ1回だけ→中のまま (0ms)
   ✘   25 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_7通り目_上で簡単すぎ2回連続→上のまま (0ms)
   ✘   26 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_8通り目_中で難しすぎ_none_難しすぎ→初（noneは数えず流れも切らない） (0ms)
-  ✘   27 [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:9:1 › AC10_課題が尽きるとtask.exhaustedと文言とやり直しの操作が出て_同じ領域と段階でやり直すと同じ日に再びtask.exhausted (0ms)
-  ✘   28 [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:30:1 › AC30_in_appを出し終えた翌日はexternalの課題が出て_印と要る道具が題名と同じ画面に見える (0ms)
-  ✘   29 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_9通り目_上で2回難しすぎで中になった翌日に中で難しすぎ1回→中のまま (0ms)
-  ✘   30 [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:65:1 › AC30_in_appの課題を出した日はdata-task-modeがin_appで印が0件 (0ms)
-  ✘   31 [chromium] › tests/ac12-ac23-offline.spec.mjs:10:1 › AC12_オフラインでもAC-1_AC-2_AC-5_AC-9の操作が動き_送信は0件 (0ms)
-  ✘   33 [chromium] › tests/ac11-ac13-storage.spec.mjs:8:1 › AC11_2問目の保存が失敗してもerror.storage.messageと選択が残り_やり直すと3問目に進み課題が回答と一致する (0ms)
-  ✘   34 [chromium] › tests/ac12-ac23-offline.spec.mjs:98:1 › AC23_task.todayを表示した後にオフラインで再読み込みと新しいタブ_3秒以内に同じdata-task-id_送信0件 (0ms)
-  ✘   32 [chromium] › tests/ac11-ac13-storage.spec.mjs:44:1 › AC13_persistを断られても完了と再読み込みでtask.done_履歴1件_設定にnotPersistedと書き出しがある (0ms)
-  ✘   35 [chromium] › tests/ac12-ac23-offline.spec.mjs:42:1 › AC12_オフラインでもAC-7の申告が動き_送信は0件 (0ms)
-  ✘   36 [chromium] › tests/ac12-ac23-offline.spec.mjs:106:1 › AC23_task.doneを表示した後にオフラインで再読み込みと新しいタブ_3秒以内にtask.done_送信0件 (0ms)
-  ✘   37 [chromium] › tests/ac15-load-time.spec.mjs:7:1 › AC15_遅い回線とCPU4倍の制限でキャッシュなしに開き_data-debug-load-msが5回とも2000以下 (0ms)
-  ✘   38 [chromium] › tests/ac14-ac16-redo-delete.spec.mjs:40:1 › AC16_すべてのデータを削除すると再読み込みでdiagnosis.startになり_やり直した後の履歴は0件 (0ms)
-  ✘   39 [chromium] › tests/ac14-ac16-redo-delete.spec.mjs:6:1 › AC14_今日の課題を出していない日に設定からやり直して別の領域を選ぶと_新しい領域の課題が出て完了の履歴は3件のまま (0ms)
-  ✘   40 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:60:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_diagnosis.start_横スクロール0_切り詰め0_操作できる要素がすべて押せる (0ms)
-  ✘   41 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:60:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.done_横スクロール0_切り詰め0_操作できる要素がすべて押せる (0ms)
-  ✘   42 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:60:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.today_横スクロール0_切り詰め0_操作できる要素がすべて押せる (0ms)
-  ✘   43 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:103:1 › AC18_Tab_Shift+Tab_Enter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上 (0ms)
-  ✘   44 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:60:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.exhausted_横スクロール0_切り詰め0_操作できる要素がすべて押せる (0ms)
-  ✘   45 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_diagnosis.start_axe-coreでserious以上の違反が0件 (0ms)
-  ✘   46 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_diagnosis.question_axe-coreでserious以上の違反が0件 (0ms)
-  ✘   47 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_task.done_axe-coreでserious以上の違反が0件 (0ms)
-  ✘   48 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_task.today_axe-coreでserious以上の違反が0件 (0ms)
-  ✘   49 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_task.exhausted_axe-coreでserious以上の違反が0件 (0ms)
-  ✘   50 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_settings_axe-coreでserious以上の違反が0件 (0ms)
-  ✘   52 [chromium] › tests/ac19-ac20-ac25-export-import.spec.mjs:12:1 › AC19_書き出すとJSONが1つダウンロードされ_診断_段階_履歴3件（50文字のanswer）_初めて開いた日_版番号を含む (0ms)
-  ✘   51 [chromium] › tests/ac19-ac20-ac25-export-import.spec.mjs:48:1 › AC20_保存データのないブラウザで読み込むと_診断と段階が同じで履歴3件（answerも同じ）_状態はtask.todayかtask.done (0ms)
-  ✘   53 [chromium] › tests/ac19-ac20-ac25-export-import.spec.mjs:91:1 › AC25_版番号が新しいファイルはerror.import.messageで拒み_履歴1件と診断と状態は変わらない (0ms)
+  ✘   27 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_9通り目_上で2回難しすぎで中になった翌日に中で難しすぎ1回→中のまま (0ms)
+  ✘   28 [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:33:1 › AC30_in_appを出し終えた翌日はexternalの課題が出て_印と要る道具が題名と同じ画面に見える (0ms)
+  ✘   30 [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:77:1 › AC30_in_appの課題を出した日はdata-task-modeがin_appで印が0件 (0ms)
+  ✘   29 [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:12:1 › AC10_課題が尽きるとtask.exhaustedと文言とやり直しの操作が出て_同じ領域と段階でやり直すと同じ日に再びtask.exhausted (0ms)
+  ✘   31 [chromium] › tests/ac11-ac13-storage.spec.mjs:44:1 › AC13_persistを断られても完了と再読み込みでtask.done_履歴1件_設定にnotPersistedと書き出しがある (0ms)
+  ✘   33 [chromium] › tests/ac12-ac23-offline.spec.mjs:104:1 › AC23_task.todayを表示した後にオフラインで再読み込みと新しいタブ_3秒以内に同じdata-task-id_送信0件 (0ms)
+  ✘   32 [chromium] › tests/ac11-ac13-storage.spec.mjs:8:1 › AC11_2問目の保存が失敗してもerror.storage.messageと選択が残り_やり直すと3問目に進み課題が回答と一致する (0ms)
+  ✘   34 [chromium] › tests/ac12-ac23-offline.spec.mjs:47:1 › AC12_オフラインでもAC-7の申告が動き_送信は0件 (0ms)
+  ✘   35 [chromium] › tests/ac12-ac23-offline.spec.mjs:12:1 › AC12_オフラインでもAC-1_AC-2_AC-5_AC-9の操作が動き_送信は0件 (0ms)
+  ✘   36 [chromium] › tests/ac12-ac23-offline.spec.mjs:112:1 › AC23_task.doneを表示した後にオフラインで再読み込みと新しいタブ_3秒以内にtask.done_送信0件 (0ms)
+  ✘   37 [chromium] › tests/ac14-ac16-redo-delete.spec.mjs:6:1 › AC14_今日の課題を出していない日に設定からやり直して別の領域を選ぶと_新しい領域の課題が出て完了の履歴は3件のまま (0ms)
+  ✘   38 [chromium] › tests/ac14-ac16-redo-delete.spec.mjs:44:1 › AC16_すべてのデータを削除すると再読み込みでdiagnosis.startになり_やり直した後の履歴は0件 (0ms)
+  ✘   39 [chromium] › tests/ac15-load-time.spec.mjs:7:1 › AC15_遅い回線とCPU4倍の制限でキャッシュなしに開き_data-debug-load-msが5回とも2000以下 (0ms)
+  ✘   40 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_diagnosis.start_横スクロール0_切り詰め0_操作できる要素がすべて押せる (0ms)
+  ✘   41 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.done_横スクロール0_切り詰め0_操作できる要素がすべて押せる (0ms)
+  ✘   42 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:104:1 › AC18_移動キー(Tab系)とEnter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上 (0ms)
+  ✘   43 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.today_横スクロール0_切り詰め0_操作できる要素がすべて押せる (0ms)
+  ✘   44 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.exhausted_横スクロール0_切り詰め0_操作できる要素がすべて押せる (0ms)
+  ✘   45 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_diagnosis.start_axe-coreでserious以上の違反が0件 (0ms)
+  ✘   46 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_diagnosis.question_axe-coreでserious以上の違反が0件 (0ms)
+  ✘   47 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.today_axe-coreでserious以上の違反が0件 (0ms)
+  ✘   49 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.done_axe-coreでserious以上の違反が0件 (0ms)
+  ✘   48 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.exhausted_axe-coreでserious以上の違反が0件 (0ms)
+  ✘   50 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_settings_axe-coreでserious以上の違反が0件 (0ms)
+  ✘   51 [chromium] › tests/ac19-ac20-ac25-export-import.spec.mjs:12:1 › AC19_書き出すとJSONが1つダウンロードされ_診断_段階_履歴3件（50文字のanswer）_初めて開いた日_版番号を含む (0ms)
+  ✘   52 [chromium] › tests/ac19-ac20-ac25-export-import.spec.mjs:91:1 › AC25_版番号が新しいファイルはerror.import.messageで拒み_履歴1件と診断と状態は変わらない (0ms)
+  ✘   53 [chromium] › tests/ac19-ac20-ac25-export-import.spec.mjs:48:1 › AC20_保存データのないブラウザで読み込むと_診断と段階が同じで履歴3件（answerも同じ）_状態はtask.todayかtask.done (0ms)
   ✘   54 [chromium] › tests/ac21-ac22-home-screen.spec.mjs:21:3 › AC-21 iPhone の Safari の偽装 › AC21_iOS_Safariでは診断の前に案内が出て_閉じると再読み込みしても出ず_設定から再び開ける (0ms)
   ✘   55 [chromium] › tests/ac21-ac22-home-screen.spec.mjs:47:3 › AC-21 iPadOS の Safari の偽装（Mac の UA と maxTouchPoints > 1） › AC21_iPadOS_Safari（MacのUAとmaxTouchPoints5）でも診断の前に案内が出る (0ms)
-  ✘   56 [chromium] › tests/ac21-ac22-home-screen.spec.mjs:70:1 › AC22_スタンドアロンで初めて開くと読み込みの案内が出て_再読み込みでも出て_ファイルを読み込むとAC-20の状態になる (0ms)
-  ✘   57 [chromium] › tests/ac24-stats.spec.mjs:18:1 › AC24_統計の9つの値が期待どおりで_数値7つと日付1つは同じ文字が見え_真偽値はfirstDayCompleted.yesの文言が見える (1ms)
-  ✘   58 [chromium] › tests/ac21-ac22-home-screen.spec.mjs:58:1 › AC21_UAを偽装しないChromiumとWebKitでは案内が0回出る (0ms)
-  ✘   59 [chromium] › tests/ac26-language.spec.mjs:33:3 › AC-26 locale en-US › AC26_en-USではdiagnosis.startの文言が英語の文言ファイルと一致し_キーの差が0件 (0ms)
-  ✘   60 [chromium] › tests/ac26-language.spec.mjs:40:3 › AC-26 locale ja-JP › AC26_ja-JPではdiagnosis.startの文言が日本語の文言ファイルと一致する (0ms)
+  ✘   56 [chromium] › tests/ac21-ac22-home-screen.spec.mjs:58:1 › AC21_UAを偽装しないChromiumとWebKitでは案内が0回出る (0ms)
+  ✘   57 [chromium] › tests/ac24-stats.spec.mjs:18:1 › AC24_統計の9つの値が期待どおりで_数値7つと日付1つは同じ文字が見え_真偽値はfirstDayCompleted.yesの文言が見える (0ms)
+  ✘   58 [chromium] › tests/ac21-ac22-home-screen.spec.mjs:70:1 › AC22_スタンドアロンで初めて開くと読み込みの案内が出て_再読み込みでも出て_ファイルを読み込むとAC-20の状態になる (0ms)
+  ✘   59 [chromium] › tests/ac26-language.spec.mjs:39:3 › AC-26 locale en-US › AC26_en-USではdiagnosis.startの文言が英語の文言ファイルと一致し_キーの差が0件 (0ms)
+  ✘   60 [chromium] › tests/ac26-language.spec.mjs:46:3 › AC-26 locale ja-JP › AC26_ja-JPではdiagnosis.startの文言が日本語の文言ファイルと一致する (0ms)
   ✘   61 [chromium] › tests/ac28-update.spec.mjs:17:1 › AC28_差し替え後2秒おきの再読み込み3回以内でdata-build-versionが新版になり_旧版に戻らず_履歴3件と診断と段階は同じ (0ms)
-  ✘   62 [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:31:1 › AC31_診断済みで開くと操作0回でtask.todayが見え_題名と4要素と答えの欄と4つの申告が同じ画面にあり_重なる要素0件 (0ms)
-  ✘   63 [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:51:1 › AC31_今日の課題を完了済みなら操作0回でtask.doneが見え_重なる要素0件 (0ms)
-  ✘   64 [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:79:1 › AC32_200文字を入力して再読み込みすると_同じdata-task-idで答えがそのまま入っている (0ms)
+  ✘   62 [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:79:1 › AC32_200文字を入力して再読み込みすると_同じdata-task-idで答えがそのまま入っている (0ms)
+  ✘   63 [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:31:1 › AC31_診断済みで開くと操作0回でtask.todayが見え_題名と4要素と答えの欄と4つの申告が同じ画面にあり_重なる要素0件 (0ms)
+  ✘   64 [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:51:1 › AC31_今日の課題を完了済みなら操作0回でtask.doneが見え_重なる要素0件 (0ms)
   ✘   65 [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:88:1 › AC32_200文字を入力してタブを閉じ新しいタブで開くと_同じdata-task-idで答えがそのまま入っている (0ms)
-  ✘   66 [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:56:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_backend_intermediate (0ms)
-  ✘   67 [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:56:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_frontend_beginner (0ms)
-  ✘   68 [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:8:1 › AC1_初めて開くと診断が始まり3問で終わる_進み具合n/3_切り替え500ms以内 (0ms)
-  ✘   69 [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:98:1 › AC32_翌日に開くと新しい課題の答えの欄は空で_前日の200文字は書き出しのnoneの行のanswerに残る (0ms)
-  ✘   70 [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:56:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_git_advanced (0ms)
-  ✘   71 [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:47:1 › AC4_課題集の量の予算_本文の平均600字以下_gzip後106000バイト以下 (0ms)
-  ✘   72 [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:31:1 › AC4_課題集は126件以上で18組すべて7件以上でIDの重複が0件 (0ms)
-  ✘   73 [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:13:1 › AC3_課題集の全件が4要素を持ち所要時間が1〜15分 (0ms)
+  ✘   66 [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:62:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_backend_intermediate (0ms)
+  ✘   67 [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:98:1 › AC32_翌日に開くと新しい課題の答えの欄は空で_前日の200文字は書き出しのnoneの行のanswerに残る (0ms)
+  ✘   68 [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:10:1 › AC1_初めて開くと診断が始まり3問で終わる_進み具合n/3_切り替え500ms以内 (0ms)
+  ✘   69 [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:62:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_git_advanced (0ms)
+  ✘   70 [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:62:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_frontend_beginner (0ms)
+  ✘   71 [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:31:1 › AC4_課題集は126件以上で18組すべて7件以上でIDの重複が0件 (0ms)
+  ✘   72 [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:13:1 › AC3_課題集の全件が4要素を持ち所要時間が1〜15分 (0ms)
+  ✘   73 [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:62:1 › AC29_各組でexternalが20%以下_in_appにURLもtoolsもなく_externalはtoolsが1件以上 (0ms)
   ✘   74 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:20:1 › AC5_完了するとtask.rateになり_答えるとtask.done_同じ日に再読み込みしてもtask.doneのまま (0ms)
-  ✘   75 [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:61:1 › AC29_各組でexternalが20%以下_in_appにURLもtoolsもなく_externalはtoolsが1件以上 (0ms)
-  ✘   76 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_no_timeを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない (0ms)
-  ✘   77 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:40:1 › AC6_翌日には過去に出した課題のIDと一致しない課題が出る (0ms)
-  ✘   78 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_too_hardを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない (0ms)
+  ✘   75 [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:47:1 › BUDGET2_課題集の本文の平均600字以下_gzip後106000バイト以下 (0ms)
+  ✘   76 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:40:1 › AC6_翌日には過去に出した課題のIDと一致しない課題が出る (0ms)
+  ✘   77 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_too_easyを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない (0ms)
+  ✘   78 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_no_timeを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない (0ms)
+  ✘   79 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_too_hardを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない (0ms)
   ✘   80 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:78:1 › AC9_役に立ったを選ぶとtask.doneになり_再び聞かれず_履歴のdata-helpfulがhelpful (0ms)
-  ✘   79 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_too_easyを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない (0ms)
-  ✘   81 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:103:1 › AC9_選ばずに再読み込みするとtask.doneになり_履歴のdata-helpfulがunanswered (0ms)
-  ✘   83 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_2通り目_中で簡単すぎ簡単すぎ→上 (0ms)
-  ✘   82 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:92:1 › AC9_立たなかったを選ぶと履歴のdata-helpfulがnot_helpful (1ms)
-  ✘   84 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:116:1 › AC9_今回は答えないを押すとtask.doneになり_履歴のdata-helpfulがunanswered (0ms)
-  ✘   85 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_1通り目_中で難しすぎ難しすぎ→初 (0ms)
-  ✘   86 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_4通り目_中で簡単すぎ1回だけ→中のまま (0ms)
-  ✘   87 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_5b通り目_中で難しすぎ今日はできない難しすぎ→中のまま (0ms)
-  ✘   88 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_3通り目_中で難しすぎ1回だけ→中のまま (0ms)
-  ✘   89 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_6通り目_初で難しすぎ2回連続→初のまま (0ms)
-  ✘   90 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_5a通り目_中で難しすぎ完了難しすぎ→中のまま (0ms)
-  ✘   92 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_7通り目_上で簡単すぎ2回連続→上のまま (1ms)
-  ✘   91 [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:30:1 › AC30_in_appを出し終えた翌日はexternalの課題が出て_印と要る道具が題名と同じ画面に見える (1ms)
+  ✘   81 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:92:1 › AC9_立たなかったを選ぶと履歴のdata-helpfulがnot_helpful (0ms)
+  ✘   82 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_2通り目_中で簡単すぎ簡単すぎ→上 (0ms)
+  ✘   83 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_1通り目_中で難しすぎ難しすぎ→初 (0ms)
+  ✘   84 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:103:1 › AC9_選ばずに再読み込みするとtask.doneになり_履歴のdata-helpfulがunanswered (0ms)
+  ✘   85 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:116:1 › AC9_今回は答えないを押すとtask.doneになり_履歴のdata-helpfulがunanswered (0ms)
+  ✘   86 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_3通り目_中で難しすぎ1回だけ→中のまま (0ms)
+  ✘   87 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_4通り目_中で簡単すぎ1回だけ→中のまま (0ms)
+  ✘   88 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_5a通り目_中で難しすぎ完了難しすぎ→中のまま (0ms)
+  ✘   89 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_5b通り目_中で難しすぎ今日はできない難しすぎ→中のまま (0ms)
+  ✘   90 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_6通り目_初で難しすぎ2回連続→初のまま (0ms)
+  ✘   91 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_7通り目_上で簡単すぎ2回連続→上のまま (0ms)
+  ✘   92 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_8通り目_中で難しすぎ_none_難しすぎ→初（noneは数えず流れも切らない） (0ms)
   ✘   93 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_9通り目_上で2回難しすぎで中になった翌日に中で難しすぎ1回→中のまま (0ms)
-  ✘   94 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_8通り目_中で難しすぎ_none_難しすぎ→初（noneは数えず流れも切らない） (0ms)
-  ✘   95 [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:9:1 › AC10_課題が尽きるとtask.exhaustedと文言とやり直しの操作が出て_同じ領域と段階でやり直すと同じ日に再びtask.exhausted (1ms)
+  ✘   94 [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:33:1 › AC30_in_appを出し終えた翌日はexternalの課題が出て_印と要る道具が題名と同じ画面に見える (0ms)
+  ✘   95 [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:12:1 › AC10_課題が尽きるとtask.exhaustedと文言とやり直しの操作が出て_同じ領域と段階でやり直すと同じ日に再びtask.exhausted (0ms)
+  ✘   97 [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:77:1 › AC30_in_appの課題を出した日はdata-task-modeがin_appで印が0件 (0ms)
   ✘   96 [webkit] › tests/ac11-ac13-storage.spec.mjs:8:1 › AC11_2問目の保存が失敗してもerror.storage.messageと選択が残り_やり直すと3問目に進み課題が回答と一致する (0ms)
-  ✘   97 [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:65:1 › AC30_in_appの課題を出した日はdata-task-modeがin_appで印が0件 (2ms)
-  ✘   98 [webkit] › tests/ac11-ac13-storage.spec.mjs:44:1 › AC13_persistを断られても完了と再読み込みでtask.done_履歴1件_設定にnotPersistedと書き出しがある (0ms)
-  ✘   99 [webkit] › tests/ac12-ac23-offline.spec.mjs:42:1 › AC12_オフラインでもAC-7の申告が動き_送信は0件 (0ms)
-  ✘  100 [webkit] › tests/ac12-ac23-offline.spec.mjs:10:1 › AC12_オフラインでもAC-1_AC-2_AC-5_AC-9の操作が動き_送信は0件 (0ms)
-  ✘  101 [webkit] › tests/ac14-ac16-redo-delete.spec.mjs:6:1 › AC14_今日の課題を出していない日に設定からやり直して別の領域を選ぶと_新しい領域の課題が出て完了の履歴は3件のまま (0ms)
-  ✘  102 [webkit] › tests/ac12-ac23-offline.spec.mjs:98:1 › AC23_task.todayを表示した後にオフラインで再読み込みと新しいタブ_3秒以内に同じdata-task-id_送信0件 (0ms)
-  ✘  103 [webkit] › tests/ac12-ac23-offline.spec.mjs:106:1 › AC23_task.doneを表示した後にオフラインで再読み込みと新しいタブ_3秒以内にtask.done_送信0件 (0ms)
-  ✘  104 [webkit] › tests/ac14-ac16-redo-delete.spec.mjs:40:1 › AC16_すべてのデータを削除すると再読み込みでdiagnosis.startになり_やり直した後の履歴は0件 (0ms)
-  ✘  105 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:60:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_diagnosis.start_横スクロール0_切り詰め0_操作できる要素がすべて押せる (0ms)
-  ✘  106 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:60:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.today_横スクロール0_切り詰め0_操作できる要素がすべて押せる (0ms)
-  ✘  107 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:60:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.done_横スクロール0_切り詰め0_操作できる要素がすべて押せる (0ms)
-  ✘  109 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:103:1 › AC18_Tab_Shift+Tab_Enter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上 (0ms)
-  ✘  108 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:60:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.exhausted_横スクロール0_切り詰め0_操作できる要素がすべて押せる (0ms)
-  ✘  110 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_diagnosis.start_axe-coreでserious以上の違反が0件 (0ms)
-  ✘  111 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_diagnosis.question_axe-coreでserious以上の違反が0件 (0ms)
-  ✘  112 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_task.done_axe-coreでserious以上の違反が0件 (0ms)
-  ✘  114 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_task.today_axe-coreでserious以上の違反が0件 (0ms)
-  ✘  113 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_task.exhausted_axe-coreでserious以上の違反が0件 (0ms)
-  ✘  115 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_settings_axe-coreでserious以上の違反が0件 (0ms)
+  ✘   98 [webkit] › tests/ac12-ac23-offline.spec.mjs:12:1 › AC12_オフラインでもAC-1_AC-2_AC-5_AC-9の操作が動き_送信は0件 (0ms)
+  ✘   99 [webkit] › tests/ac11-ac13-storage.spec.mjs:44:1 › AC13_persistを断られても完了と再読み込みでtask.done_履歴1件_設定にnotPersistedと書き出しがある (0ms)
+  ✘  100 [webkit] › tests/ac12-ac23-offline.spec.mjs:47:1 › AC12_オフラインでもAC-7の申告が動き_送信は0件 (0ms)
+  ✘  101 [webkit] › tests/ac12-ac23-offline.spec.mjs:104:1 › AC23_task.todayを表示した後にオフラインで再読み込みと新しいタブ_3秒以内に同じdata-task-id_送信0件 (0ms)
+  ✘  102 [webkit] › tests/ac14-ac16-redo-delete.spec.mjs:44:1 › AC16_すべてのデータを削除すると再読み込みでdiagnosis.startになり_やり直した後の履歴は0件 (0ms)
+  ✘  103 [webkit] › tests/ac12-ac23-offline.spec.mjs:112:1 › AC23_task.doneを表示した後にオフラインで再読み込みと新しいタブ_3秒以内にtask.done_送信0件 (0ms)
+  ✘  104 [webkit] › tests/ac14-ac16-redo-delete.spec.mjs:6:1 › AC14_今日の課題を出していない日に設定からやり直して別の領域を選ぶと_新しい領域の課題が出て完了の履歴は3件のまま (0ms)
+  ✘  105 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_diagnosis.start_横スクロール0_切り詰め0_操作できる要素がすべて押せる (0ms)
+  ✘  106 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.today_横スクロール0_切り詰め0_操作できる要素がすべて押せる (0ms)
+  ✘  107 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.exhausted_横スクロール0_切り詰め0_操作できる要素がすべて押せる (0ms)
+  ✘  108 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.done_横スクロール0_切り詰め0_操作できる要素がすべて押せる (0ms)
+  ✘  109 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:104:1 › AC18_移動キー(Tab系)とEnter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上 (0ms)
+  ✘  110 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_diagnosis.start_axe-coreでserious以上の違反が0件 (0ms)
+  ✘  111 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.today_axe-coreでserious以上の違反が0件 (0ms)
+  ✘  112 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_diagnosis.question_axe-coreでserious以上の違反が0件 (0ms)
+  ✘  113 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.exhausted_axe-coreでserious以上の違反が0件 (0ms)
+  ✘  114 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.done_axe-coreでserious以上の違反が0件 (0ms)
+  ✘  115 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_settings_axe-coreでserious以上の違反が0件 (0ms)
   ✘  116 [webkit] › tests/ac19-ac20-ac25-export-import.spec.mjs:48:1 › AC20_保存データのないブラウザで読み込むと_診断と段階が同じで履歴3件（answerも同じ）_状態はtask.todayかtask.done (0ms)
   ✘  117 [webkit] › tests/ac19-ac20-ac25-export-import.spec.mjs:12:1 › AC19_書き出すとJSONが1つダウンロードされ_診断_段階_履歴3件（50文字のanswer）_初めて開いた日_版番号を含む (0ms)
   ✘  118 [webkit] › tests/ac21-ac22-home-screen.spec.mjs:21:3 › AC-21 iPhone の Safari の偽装 › AC21_iOS_Safariでは診断の前に案内が出て_閉じると再読み込みしても出ず_設定から再び開ける (0ms)
-  ✘  119 [webkit] › tests/ac19-ac20-ac25-export-import.spec.mjs:91:1 › AC25_版番号が新しいファイルはerror.import.messageで拒み_履歴1件と診断と状態は変わらない (1ms)
+  ✘  119 [webkit] › tests/ac19-ac20-ac25-export-import.spec.mjs:91:1 › AC25_版番号が新しいファイルはerror.import.messageで拒み_履歴1件と診断と状態は変わらない (0ms)
   ✘  120 [webkit] › tests/ac21-ac22-home-screen.spec.mjs:47:3 › AC-21 iPadOS の Safari の偽装（Mac の UA と maxTouchPoints > 1） › AC21_iPadOS_Safari（MacのUAとmaxTouchPoints5）でも診断の前に案内が出る (0ms)
-  ✘  123 [webkit] › tests/ac24-stats.spec.mjs:18:1 › AC24_統計の9つの値が期待どおりで_数値7つと日付1つは同じ文字が見え_真偽値はfirstDayCompleted.yesの文言が見える (0ms)
-  ✘  121 [webkit] › tests/ac21-ac22-home-screen.spec.mjs:58:1 › AC21_UAを偽装しないChromiumとWebKitでは案内が0回出る (0ms)
-  ✘  122 [webkit] › tests/ac21-ac22-home-screen.spec.mjs:70:1 › AC22_スタンドアロンで初めて開くと読み込みの案内が出て_再読み込みでも出て_ファイルを読み込むとAC-20の状態になる (0ms)
-  ✘  124 [webkit] › tests/ac26-language.spec.mjs:33:3 › AC-26 locale en-US › AC26_en-USではdiagnosis.startの文言が英語の文言ファイルと一致し_キーの差が0件 (0ms)
-  ✘  125 [webkit] › tests/ac26-language.spec.mjs:40:3 › AC-26 locale ja-JP › AC26_ja-JPではdiagnosis.startの文言が日本語の文言ファイルと一致する (0ms)
-  ✘  126 [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:51:1 › AC31_今日の課題を完了済みなら操作0回でtask.doneが見え_重なる要素0件 (0ms)
-  ✘  128 [webkit] › tests/ac28-update.spec.mjs:17:1 › AC28_差し替え後2秒おきの再読み込み3回以内でdata-build-versionが新版になり_旧版に戻らず_履歴3件と診断と段階は同じ (0ms)
+  ✘  121 [webkit] › tests/ac21-ac22-home-screen.spec.mjs:70:1 › AC22_スタンドアロンで初めて開くと読み込みの案内が出て_再読み込みでも出て_ファイルを読み込むとAC-20の状態になる (0ms)
+  ✘  122 [webkit] › tests/ac24-stats.spec.mjs:18:1 › AC24_統計の9つの値が期待どおりで_数値7つと日付1つは同じ文字が見え_真偽値はfirstDayCompleted.yesの文言が見える (0ms)
+  ✘  123 [webkit] › tests/ac26-language.spec.mjs:39:3 › AC-26 locale en-US › AC26_en-USではdiagnosis.startの文言が英語の文言ファイルと一致し_キーの差が0件 (0ms)
+  ✘  124 [webkit] › tests/ac21-ac22-home-screen.spec.mjs:58:1 › AC21_UAを偽装しないChromiumとWebKitでは案内が0回出る (0ms)
+  ✘  125 [webkit] › tests/ac26-language.spec.mjs:46:3 › AC-26 locale ja-JP › AC26_ja-JPではdiagnosis.startの文言が日本語の文言ファイルと一致する (0ms)
+  ✘  126 [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:79:1 › AC32_200文字を入力して再読み込みすると_同じdata-task-idで答えがそのまま入っている (0ms)
   ✘  127 [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:31:1 › AC31_診断済みで開くと操作0回でtask.todayが見え_題名と4要素と答えの欄と4つの申告が同じ画面にあり_重なる要素0件 (0ms)
-  ✘  129 [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:79:1 › AC32_200文字を入力して再読み込みすると_同じdata-task-idで答えがそのまま入っている (0ms)
+  ✘  128 [webkit] › tests/ac28-update.spec.mjs:17:1 › AC28_差し替え後2秒おきの再読み込み3回以内でdata-build-versionが新版になり_旧版に戻らず_履歴3件と診断と段階は同じ (0ms)
+  ✘  129 [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:51:1 › AC31_今日の課題を完了済みなら操作0回でtask.doneが見え_重なる要素0件 (0ms)
   ✘  130 [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:88:1 › AC32_200文字を入力してタブを閉じ新しいタブで開くと_同じdata-task-idで答えがそのまま入っている (0ms)
   ✘  131 [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:98:1 › AC32_翌日に開くと新しい課題の答えの欄は空で_前日の200文字は書き出しのnoneの行のanswerに残る (0ms)
 
 
-  1) [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:8:1 › AC1_初めて開くと診断が始まり3問で終わる_進み具合n/3_切り替え500ms以内 
+  1) [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:10:1 › AC1_初めて開くと診断が始まり3問で終わる_進み具合n/3_切り替え500ms以内 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -167,7 +170,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  2) [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:56:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_backend_intermediate 
+  2) [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:62:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_backend_intermediate 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -190,7 +193,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  3) [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:56:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_frontend_beginner 
+  3) [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:62:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_frontend_beginner 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -213,7 +216,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  4) [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:56:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_git_advanced 
+  4) [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:62:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_git_advanced 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -282,7 +285,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  7) [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:47:1 › AC4_課題集の量の予算_本文の平均600字以下_gzip後106000バイト以下 
+  7) [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:47:1 › BUDGET2_課題集の本文の平均600字以下_gzip後106000バイト以下 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -298,14 +301,14 @@ Running 131 tests using 5 workers
         at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
 
     attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
-    test-results/ac03-ac04-ac29-tasks-json--2a499-文の平均600字以下-gzip後106000バイト以下-chromium/trace.zip
+    test-results/ac03-ac04-ac29-tasks-json--fde99-文の平均600字以下-gzip後106000バイト以下-chromium/trace.zip
     Usage:
 
-        npx playwright show-trace test-results/ac03-ac04-ac29-tasks-json--2a499-文の平均600字以下-gzip後106000バイト以下-chromium/trace.zip
+        npx playwright show-trace test-results/ac03-ac04-ac29-tasks-json--fde99-文の平均600字以下-gzip後106000バイト以下-chromium/trace.zip
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  8) [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:61:1 › AC29_各組でexternalが20%以下_in_appにURLもtoolsもなく_externalはtoolsが1件以上 
+  8) [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:62:1 › AC29_各組でexternalが20%以下_in_appにURLもtoolsもなく_externalはtoolsが1件以上 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -765,7 +768,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  28) [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:9:1 › AC10_課題が尽きるとtask.exhaustedと文言とやり直しの操作が出て_同じ領域と段階でやり直すと同じ日に再びtask.exhausted 
+  28) [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:12:1 › AC10_課題が尽きるとtask.exhaustedと文言とやり直しの操作が出て_同じ領域と段階でやり直すと同じ日に再びtask.exhausted 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -788,7 +791,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  29) [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:30:1 › AC30_in_appを出し終えた翌日はexternalの課題が出て_印と要る道具が題名と同じ画面に見える 
+  29) [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:33:1 › AC30_in_appを出し終えた翌日はexternalの課題が出て_印と要る道具が題名と同じ画面に見える 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -811,7 +814,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  30) [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:65:1 › AC30_in_appの課題を出した日はdata-task-modeがin_appで印が0件 
+  30) [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:77:1 › AC30_in_appの課題を出した日はdata-task-modeがin_appで印が0件 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -880,7 +883,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  33) [chromium] › tests/ac12-ac23-offline.spec.mjs:10:1 › AC12_オフラインでもAC-1_AC-2_AC-5_AC-9の操作が動き_送信は0件 
+  33) [chromium] › tests/ac12-ac23-offline.spec.mjs:12:1 › AC12_オフラインでもAC-1_AC-2_AC-5_AC-9の操作が動き_送信は0件 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -903,7 +906,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  34) [chromium] › tests/ac12-ac23-offline.spec.mjs:42:1 › AC12_オフラインでもAC-7の申告が動き_送信は0件 ────────────
+  34) [chromium] › tests/ac12-ac23-offline.spec.mjs:47:1 › AC12_オフラインでもAC-7の申告が動き_送信は0件 ────────────
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -926,7 +929,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  35) [chromium] › tests/ac12-ac23-offline.spec.mjs:98:1 › AC23_task.todayを表示した後にオフラインで再読み込みと新しいタブ_3秒以内に同じdata-task-id_送信0件 
+  35) [chromium] › tests/ac12-ac23-offline.spec.mjs:104:1 › AC23_task.todayを表示した後にオフラインで再読み込みと新しいタブ_3秒以内に同じdata-task-id_送信0件 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -949,7 +952,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  36) [chromium] › tests/ac12-ac23-offline.spec.mjs:106:1 › AC23_task.doneを表示した後にオフラインで再読み込みと新しいタブ_3秒以内にtask.done_送信0件 
+  36) [chromium] › tests/ac12-ac23-offline.spec.mjs:112:1 › AC23_task.doneを表示した後にオフラインで再読み込みと新しいタブ_3秒以内にtask.done_送信0件 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -995,7 +998,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  38) [chromium] › tests/ac14-ac16-redo-delete.spec.mjs:40:1 › AC16_すべてのデータを削除すると再読み込みでdiagnosis.startになり_やり直した後の履歴は0件 
+  38) [chromium] › tests/ac14-ac16-redo-delete.spec.mjs:44:1 › AC16_すべてのデータを削除すると再読み込みでdiagnosis.startになり_やり直した後の履歴は0件 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -1041,7 +1044,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  40) [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:60:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_diagnosis.start_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
+  40) [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_diagnosis.start_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -1064,7 +1067,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  41) [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:60:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.today_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
+  41) [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.today_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -1087,7 +1090,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  42) [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:60:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.done_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
+  42) [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.done_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -1110,7 +1113,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  43) [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:60:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.exhausted_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
+  43) [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.exhausted_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -1133,7 +1136,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  44) [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:103:1 › AC18_Tab_Shift+Tab_Enter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上 
+  44) [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:104:1 › AC18_移動キー(Tab系)とEnter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -1149,14 +1152,14 @@ Running 131 tests using 5 workers
         at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
 
     attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
-    test-results/ac17-ac18-ac27-a11y-AC18-T-b0755-作した要素がfocus-visibleで枠が3px以上-chromium/trace.zip
+    test-results/ac17-ac18-ac27-a11y-AC18-移-74b17-作した要素がfocus-visibleで枠が3px以上-chromium/trace.zip
     Usage:
 
-        npx playwright show-trace test-results/ac17-ac18-ac27-a11y-AC18-T-b0755-作した要素がfocus-visibleで枠が3px以上-chromium/trace.zip
+        npx playwright show-trace test-results/ac17-ac18-ac27-a11y-AC18-移-74b17-作した要素がfocus-visibleで枠が3px以上-chromium/trace.zip
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  45) [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_diagnosis.start_axe-coreでserious以上の違反が0件 
+  45) [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_diagnosis.start_axe-coreでserious以上の違反が0件 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -1179,7 +1182,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  46) [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_diagnosis.question_axe-coreでserious以上の違反が0件 
+  46) [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_diagnosis.question_axe-coreでserious以上の違反が0件 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -1202,7 +1205,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  47) [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_task.today_axe-coreでserious以上の違反が0件 
+  47) [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.today_axe-coreでserious以上の違反が0件 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -1225,7 +1228,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  48) [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_task.done_axe-coreでserious以上の違反が0件 
+  48) [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.done_axe-coreでserious以上の違反が0件 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -1248,7 +1251,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  49) [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_task.exhausted_axe-coreでserious以上の違反が0件 
+  49) [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.exhausted_axe-coreでserious以上の違反が0件 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -1271,7 +1274,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  50) [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_settings_axe-coreでserious以上の違反が0件 
+  50) [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_settings_axe-coreでserious以上の違反が0件 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -1478,7 +1481,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  59) [chromium] › tests/ac26-language.spec.mjs:33:3 › AC-26 locale en-US › AC26_en-USではdiagnosis.startの文言が英語の文言ファイルと一致し_キーの差が0件 
+  59) [chromium] › tests/ac26-language.spec.mjs:39:3 › AC-26 locale en-US › AC26_en-USではdiagnosis.startの文言が英語の文言ファイルと一致し_キーの差が0件 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -1501,7 +1504,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  60) [chromium] › tests/ac26-language.spec.mjs:40:3 › AC-26 locale ja-JP › AC26_ja-JPではdiagnosis.startの文言が日本語の文言ファイルと一致する 
+  60) [chromium] › tests/ac26-language.spec.mjs:46:3 › AC-26 locale ja-JP › AC26_ja-JPではdiagnosis.startの文言が日本語の文言ファイルと一致する 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -1662,7 +1665,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  67) [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:8:1 › AC1_初めて開くと診断が始まり3問で終わる_進み具合n/3_切り替え500ms以内 
+  67) [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:10:1 › AC1_初めて開くと診断が始まり3問で終わる_進み具合n/3_切り替え500ms以内 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -1685,7 +1688,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  68) [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:56:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_backend_intermediate 
+  68) [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:62:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_backend_intermediate 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -1708,7 +1711,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  69) [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:56:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_frontend_beginner 
+  69) [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:62:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_frontend_beginner 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -1731,7 +1734,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  70) [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:56:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_git_advanced 
+  70) [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:62:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_git_advanced 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -1800,7 +1803,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  73) [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:47:1 › AC4_課題集の量の予算_本文の平均600字以下_gzip後106000バイト以下 
+  73) [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:47:1 › BUDGET2_課題集の本文の平均600字以下_gzip後106000バイト以下 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -1816,14 +1819,14 @@ Running 131 tests using 5 workers
         at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
 
     attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
-    test-results/ac03-ac04-ac29-tasks-json--2a499-文の平均600字以下-gzip後106000バイト以下-webkit/trace.zip
+    test-results/ac03-ac04-ac29-tasks-json--fde99-文の平均600字以下-gzip後106000バイト以下-webkit/trace.zip
     Usage:
 
-        npx playwright show-trace test-results/ac03-ac04-ac29-tasks-json--2a499-文の平均600字以下-gzip後106000バイト以下-webkit/trace.zip
+        npx playwright show-trace test-results/ac03-ac04-ac29-tasks-json--fde99-文の平均600字以下-gzip後106000バイト以下-webkit/trace.zip
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  74) [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:61:1 › AC29_各組でexternalが20%以下_in_appにURLもtoolsもなく_externalはtoolsが1件以上 
+  74) [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:62:1 › AC29_各組でexternalが20%以下_in_appにURLもtoolsもなく_externalはtoolsが1件以上 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -2283,7 +2286,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  94) [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:9:1 › AC10_課題が尽きるとtask.exhaustedと文言とやり直しの操作が出て_同じ領域と段階でやり直すと同じ日に再びtask.exhausted 
+  94) [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:12:1 › AC10_課題が尽きるとtask.exhaustedと文言とやり直しの操作が出て_同じ領域と段階でやり直すと同じ日に再びtask.exhausted 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -2306,7 +2309,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  95) [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:30:1 › AC30_in_appを出し終えた翌日はexternalの課題が出て_印と要る道具が題名と同じ画面に見える 
+  95) [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:33:1 › AC30_in_appを出し終えた翌日はexternalの課題が出て_印と要る道具が題名と同じ画面に見える 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -2329,7 +2332,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  96) [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:65:1 › AC30_in_appの課題を出した日はdata-task-modeがin_appで印が0件 
+  96) [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:77:1 › AC30_in_appの課題を出した日はdata-task-modeがin_appで印が0件 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -2398,7 +2401,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  99) [webkit] › tests/ac12-ac23-offline.spec.mjs:10:1 › AC12_オフラインでもAC-1_AC-2_AC-5_AC-9の操作が動き_送信は0件 
+  99) [webkit] › tests/ac12-ac23-offline.spec.mjs:12:1 › AC12_オフラインでもAC-1_AC-2_AC-5_AC-9の操作が動き_送信は0件 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -2421,7 +2424,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  100) [webkit] › tests/ac12-ac23-offline.spec.mjs:42:1 › AC12_オフラインでもAC-7の申告が動き_送信は0件 ─────────────
+  100) [webkit] › tests/ac12-ac23-offline.spec.mjs:47:1 › AC12_オフラインでもAC-7の申告が動き_送信は0件 ─────────────
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -2444,7 +2447,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  101) [webkit] › tests/ac12-ac23-offline.spec.mjs:98:1 › AC23_task.todayを表示した後にオフラインで再読み込みと新しいタブ_3秒以内に同じdata-task-id_送信0件 
+  101) [webkit] › tests/ac12-ac23-offline.spec.mjs:104:1 › AC23_task.todayを表示した後にオフラインで再読み込みと新しいタブ_3秒以内に同じdata-task-id_送信0件 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -2467,7 +2470,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  102) [webkit] › tests/ac12-ac23-offline.spec.mjs:106:1 › AC23_task.doneを表示した後にオフラインで再読み込みと新しいタブ_3秒以内にtask.done_送信0件 
+  102) [webkit] › tests/ac12-ac23-offline.spec.mjs:112:1 › AC23_task.doneを表示した後にオフラインで再読み込みと新しいタブ_3秒以内にtask.done_送信0件 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -2513,7 +2516,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  104) [webkit] › tests/ac14-ac16-redo-delete.spec.mjs:40:1 › AC16_すべてのデータを削除すると再読み込みでdiagnosis.startになり_やり直した後の履歴は0件 
+  104) [webkit] › tests/ac14-ac16-redo-delete.spec.mjs:44:1 › AC16_すべてのデータを削除すると再読み込みでdiagnosis.startになり_やり直した後の履歴は0件 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -2536,7 +2539,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  105) [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:60:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_diagnosis.start_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
+  105) [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_diagnosis.start_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -2559,7 +2562,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  106) [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:60:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.today_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
+  106) [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.today_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -2582,7 +2585,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  107) [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:60:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.done_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
+  107) [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.done_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -2605,7 +2608,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  108) [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:60:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.exhausted_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
+  108) [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.exhausted_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -2628,7 +2631,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  109) [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:103:1 › AC18_Tab_Shift+Tab_Enter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上 
+  109) [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:104:1 › AC18_移動キー(Tab系)とEnter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -2644,14 +2647,14 @@ Running 131 tests using 5 workers
         at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
 
     attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
-    test-results/ac17-ac18-ac27-a11y-AC18-T-b0755-作した要素がfocus-visibleで枠が3px以上-webkit/trace.zip
+    test-results/ac17-ac18-ac27-a11y-AC18-移-74b17-作した要素がfocus-visibleで枠が3px以上-webkit/trace.zip
     Usage:
 
-        npx playwright show-trace test-results/ac17-ac18-ac27-a11y-AC18-T-b0755-作した要素がfocus-visibleで枠が3px以上-webkit/trace.zip
+        npx playwright show-trace test-results/ac17-ac18-ac27-a11y-AC18-移-74b17-作した要素がfocus-visibleで枠が3px以上-webkit/trace.zip
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  110) [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_diagnosis.start_axe-coreでserious以上の違反が0件 
+  110) [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_diagnosis.start_axe-coreでserious以上の違反が0件 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -2674,7 +2677,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  111) [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_diagnosis.question_axe-coreでserious以上の違反が0件 
+  111) [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_diagnosis.question_axe-coreでserious以上の違反が0件 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -2697,7 +2700,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  112) [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_task.today_axe-coreでserious以上の違反が0件 
+  112) [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.today_axe-coreでserious以上の違反が0件 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -2720,7 +2723,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  113) [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_task.done_axe-coreでserious以上の違反が0件 
+  113) [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.done_axe-coreでserious以上の違反が0件 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -2743,7 +2746,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  114) [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_task.exhausted_axe-coreでserious以上の違反が0件 
+  114) [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.exhausted_axe-coreでserious以上の違反が0件 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -2766,7 +2769,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  115) [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_settings_axe-coreでserious以上の違反が0件 
+  115) [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_settings_axe-coreでserious以上の違反が0件 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -2973,7 +2976,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  124) [webkit] › tests/ac26-language.spec.mjs:33:3 › AC-26 locale en-US › AC26_en-USではdiagnosis.startの文言が英語の文言ファイルと一致し_キーの差が0件 
+  124) [webkit] › tests/ac26-language.spec.mjs:39:3 › AC-26 locale en-US › AC26_en-USではdiagnosis.startの文言が英語の文言ファイルと一致し_キーの差が0件 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -2996,7 +2999,7 @@ Running 131 tests using 5 workers
 
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
-  125) [webkit] › tests/ac26-language.spec.mjs:40:3 › AC-26 locale ja-JP › AC26_ja-JPではdiagnosis.startの文言が日本語の文言ファイルと一致する 
+  125) [webkit] › tests/ac26-language.spec.mjs:46:3 › AC-26 locale ja-JP › AC26_ja-JPではdiagnosis.startの文言が日本語の文言ファイルと一致する 
 
     Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
 
@@ -3158,14 +3161,14 @@ Running 131 tests using 5 workers
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
   131 failed
-    [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:8:1 › AC1_初めて開くと診断が始まり3問で終わる_進み具合n/3_切り替え500ms以内 
-    [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:56:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_backend_intermediate 
-    [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:56:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_frontend_beginner 
-    [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:56:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_git_advanced 
+    [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:10:1 › AC1_初めて開くと診断が始まり3問で終わる_進み具合n/3_切り替え500ms以内 
+    [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:62:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_backend_intermediate 
+    [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:62:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_frontend_beginner 
+    [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:62:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_git_advanced 
     [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:13:1 › AC3_課題集の全件が4要素を持ち所要時間が1〜15分 ───────
     [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:31:1 › AC4_課題集は126件以上で18組すべて7件以上でIDの重複が0件 
-    [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:47:1 › AC4_課題集の量の予算_本文の平均600字以下_gzip後106000バイト以下 
-    [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:61:1 › AC29_各組でexternalが20%以下_in_appにURLもtoolsもなく_externalはtoolsが1件以上 
+    [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:47:1 › BUDGET2_課題集の本文の平均600字以下_gzip後106000バイト以下 
+    [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:62:1 › AC29_各組でexternalが20%以下_in_appにURLもtoolsもなく_externalはtoolsが1件以上 
     [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:20:1 › AC5_完了するとtask.rateになり_答えるとtask.done_同じ日に再読み込みしてもtask.doneのまま 
     [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:40:1 › AC6_翌日には過去に出した課題のIDと一致しない課題が出る ───
     [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_too_hardを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない 
@@ -3185,29 +3188,29 @@ Running 131 tests using 5 workers
     [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_7通り目_上で簡単すぎ2回連続→上のまま ────────────────────
     [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_8通り目_中で難しすぎ_none_難しすぎ→初（noneは数えず流れも切らない） 
     [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_9通り目_上で2回難しすぎで中になった翌日に中で難しすぎ1回→中のまま ─────
-    [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:9:1 › AC10_課題が尽きるとtask.exhaustedと文言とやり直しの操作が出て_同じ領域と段階でやり直すと同じ日に再びtask.exhausted 
-    [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:30:1 › AC30_in_appを出し終えた翌日はexternalの課題が出て_印と要る道具が題名と同じ画面に見える 
-    [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:65:1 › AC30_in_appの課題を出した日はdata-task-modeがin_appで印が0件 
+    [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:12:1 › AC10_課題が尽きるとtask.exhaustedと文言とやり直しの操作が出て_同じ領域と段階でやり直すと同じ日に再びtask.exhausted 
+    [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:33:1 › AC30_in_appを出し終えた翌日はexternalの課題が出て_印と要る道具が題名と同じ画面に見える 
+    [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:77:1 › AC30_in_appの課題を出した日はdata-task-modeがin_appで印が0件 
     [chromium] › tests/ac11-ac13-storage.spec.mjs:8:1 › AC11_2問目の保存が失敗してもerror.storage.messageと選択が残り_やり直すと3問目に進み課題が回答と一致する 
     [chromium] › tests/ac11-ac13-storage.spec.mjs:44:1 › AC13_persistを断られても完了と再読み込みでtask.done_履歴1件_設定にnotPersistedと書き出しがある 
-    [chromium] › tests/ac12-ac23-offline.spec.mjs:10:1 › AC12_オフラインでもAC-1_AC-2_AC-5_AC-9の操作が動き_送信は0件 
-    [chromium] › tests/ac12-ac23-offline.spec.mjs:42:1 › AC12_オフラインでもAC-7の申告が動き_送信は0件 ──────────────
-    [chromium] › tests/ac12-ac23-offline.spec.mjs:98:1 › AC23_task.todayを表示した後にオフラインで再読み込みと新しいタブ_3秒以内に同じdata-task-id_送信0件 
-    [chromium] › tests/ac12-ac23-offline.spec.mjs:106:1 › AC23_task.doneを表示した後にオフラインで再読み込みと新しいタブ_3秒以内にtask.done_送信0件 
+    [chromium] › tests/ac12-ac23-offline.spec.mjs:12:1 › AC12_オフラインでもAC-1_AC-2_AC-5_AC-9の操作が動き_送信は0件 
+    [chromium] › tests/ac12-ac23-offline.spec.mjs:47:1 › AC12_オフラインでもAC-7の申告が動き_送信は0件 ──────────────
+    [chromium] › tests/ac12-ac23-offline.spec.mjs:104:1 › AC23_task.todayを表示した後にオフラインで再読み込みと新しいタブ_3秒以内に同じdata-task-id_送信0件 
+    [chromium] › tests/ac12-ac23-offline.spec.mjs:112:1 › AC23_task.doneを表示した後にオフラインで再読み込みと新しいタブ_3秒以内にtask.done_送信0件 
     [chromium] › tests/ac14-ac16-redo-delete.spec.mjs:6:1 › AC14_今日の課題を出していない日に設定からやり直して別の領域を選ぶと_新しい領域の課題が出て完了の履歴は3件のまま 
-    [chromium] › tests/ac14-ac16-redo-delete.spec.mjs:40:1 › AC16_すべてのデータを削除すると再読み込みでdiagnosis.startになり_やり直した後の履歴は0件 
+    [chromium] › tests/ac14-ac16-redo-delete.spec.mjs:44:1 › AC16_すべてのデータを削除すると再読み込みでdiagnosis.startになり_やり直した後の履歴は0件 
     [chromium] › tests/ac15-load-time.spec.mjs:7:1 › AC15_遅い回線とCPU4倍の制限でキャッシュなしに開き_data-debug-load-msが5回とも2000以下 
-    [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:60:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_diagnosis.start_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
-    [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:60:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.today_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
-    [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:60:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.done_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
-    [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:60:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.exhausted_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
-    [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:103:1 › AC18_Tab_Shift+Tab_Enter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上 
-    [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_diagnosis.start_axe-coreでserious以上の違反が0件 
-    [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_diagnosis.question_axe-coreでserious以上の違反が0件 
-    [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_task.today_axe-coreでserious以上の違反が0件 
-    [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_task.done_axe-coreでserious以上の違反が0件 
-    [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_task.exhausted_axe-coreでserious以上の違反が0件 
-    [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_settings_axe-coreでserious以上の違反が0件 ─
+    [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_diagnosis.start_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
+    [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.today_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
+    [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.done_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
+    [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.exhausted_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
+    [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:104:1 › AC18_移動キー(Tab系)とEnter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上 
+    [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_diagnosis.start_axe-coreでserious以上の違反が0件 
+    [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_diagnosis.question_axe-coreでserious以上の違反が0件 
+    [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.today_axe-coreでserious以上の違反が0件 
+    [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.done_axe-coreでserious以上の違反が0件 
+    [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.exhausted_axe-coreでserious以上の違反が0件 
+    [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_settings_axe-coreでserious以上の違反が0件 ─
     [chromium] › tests/ac19-ac20-ac25-export-import.spec.mjs:12:1 › AC19_書き出すとJSONが1つダウンロードされ_診断_段階_履歴3件（50文字のanswer）_初めて開いた日_版番号を含む 
     [chromium] › tests/ac19-ac20-ac25-export-import.spec.mjs:48:1 › AC20_保存データのないブラウザで読み込むと_診断と段階が同じで履歴3件（answerも同じ）_状態はtask.todayかtask.done 
     [chromium] › tests/ac19-ac20-ac25-export-import.spec.mjs:91:1 › AC25_版番号が新しいファイルはerror.import.messageで拒み_履歴1件と診断と状態は変わらない 
@@ -3216,22 +3219,22 @@ Running 131 tests using 5 workers
     [chromium] › tests/ac21-ac22-home-screen.spec.mjs:58:1 › AC21_UAを偽装しないChromiumとWebKitでは案内が0回出る ─
     [chromium] › tests/ac21-ac22-home-screen.spec.mjs:70:1 › AC22_スタンドアロンで初めて開くと読み込みの案内が出て_再読み込みでも出て_ファイルを読み込むとAC-20の状態になる 
     [chromium] › tests/ac24-stats.spec.mjs:18:1 › AC24_統計の9つの値が期待どおりで_数値7つと日付1つは同じ文字が見え_真偽値はfirstDayCompleted.yesの文言が見える 
-    [chromium] › tests/ac26-language.spec.mjs:33:3 › AC-26 locale en-US › AC26_en-USではdiagnosis.startの文言が英語の文言ファイルと一致し_キーの差が0件 
-    [chromium] › tests/ac26-language.spec.mjs:40:3 › AC-26 locale ja-JP › AC26_ja-JPではdiagnosis.startの文言が日本語の文言ファイルと一致する 
+    [chromium] › tests/ac26-language.spec.mjs:39:3 › AC-26 locale en-US › AC26_en-USではdiagnosis.startの文言が英語の文言ファイルと一致し_キーの差が0件 
+    [chromium] › tests/ac26-language.spec.mjs:46:3 › AC-26 locale ja-JP › AC26_ja-JPではdiagnosis.startの文言が日本語の文言ファイルと一致する 
     [chromium] › tests/ac28-update.spec.mjs:17:1 › AC28_差し替え後2秒おきの再読み込み3回以内でdata-build-versionが新版になり_旧版に戻らず_履歴3件と診断と段階は同じ 
     [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:31:1 › AC31_診断済みで開くと操作0回でtask.todayが見え_題名と4要素と答えの欄と4つの申告が同じ画面にあり_重なる要素0件 
     [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:51:1 › AC31_今日の課題を完了済みなら操作0回でtask.doneが見え_重なる要素0件 
     [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:79:1 › AC32_200文字を入力して再読み込みすると_同じdata-task-idで答えがそのまま入っている 
     [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:88:1 › AC32_200文字を入力してタブを閉じ新しいタブで開くと_同じdata-task-idで答えがそのまま入っている 
     [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:98:1 › AC32_翌日に開くと新しい課題の答えの欄は空で_前日の200文字は書き出しのnoneの行のanswerに残る 
-    [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:8:1 › AC1_初めて開くと診断が始まり3問で終わる_進み具合n/3_切り替え500ms以内 ─
-    [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:56:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_backend_intermediate 
-    [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:56:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_frontend_beginner 
-    [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:56:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_git_advanced 
+    [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:10:1 › AC1_初めて開くと診断が始まり3問で終わる_進み具合n/3_切り替え500ms以内 
+    [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:62:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_backend_intermediate 
+    [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:62:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_frontend_beginner 
+    [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:62:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_git_advanced 
     [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:13:1 › AC3_課題集の全件が4要素を持ち所要時間が1〜15分 ─────────
     [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:31:1 › AC4_課題集は126件以上で18組すべて7件以上でIDの重複が0件 ──
-    [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:47:1 › AC4_課題集の量の予算_本文の平均600字以下_gzip後106000バイト以下 
-    [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:61:1 › AC29_各組でexternalが20%以下_in_appにURLもtoolsもなく_externalはtoolsが1件以上 
+    [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:47:1 › BUDGET2_課題集の本文の平均600字以下_gzip後106000バイト以下 
+    [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:62:1 › AC29_各組でexternalが20%以下_in_appにURLもtoolsもなく_externalはtoolsが1件以上 
     [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:20:1 › AC5_完了するとtask.rateになり_答えるとtask.done_同じ日に再読み込みしてもtask.doneのまま 
     [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:40:1 › AC6_翌日には過去に出した課題のIDと一致しない課題が出る ─────
     [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_too_hardを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない 
@@ -3251,28 +3254,28 @@ Running 131 tests using 5 workers
     [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_7通り目_上で簡単すぎ2回連続→上のまま ──────────────────────
     [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_8通り目_中で難しすぎ_none_難しすぎ→初（noneは数えず流れも切らない） ──
     [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_9通り目_上で2回難しすぎで中になった翌日に中で難しすぎ1回→中のまま ───────
-    [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:9:1 › AC10_課題が尽きるとtask.exhaustedと文言とやり直しの操作が出て_同じ領域と段階でやり直すと同じ日に再びtask.exhausted 
-    [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:30:1 › AC30_in_appを出し終えた翌日はexternalの課題が出て_印と要る道具が題名と同じ画面に見える 
-    [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:65:1 › AC30_in_appの課題を出した日はdata-task-modeがin_appで印が0件 
+    [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:12:1 › AC10_課題が尽きるとtask.exhaustedと文言とやり直しの操作が出て_同じ領域と段階でやり直すと同じ日に再びtask.exhausted 
+    [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:33:1 › AC30_in_appを出し終えた翌日はexternalの課題が出て_印と要る道具が題名と同じ画面に見える 
+    [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:77:1 › AC30_in_appの課題を出した日はdata-task-modeがin_appで印が0件 
     [webkit] › tests/ac11-ac13-storage.spec.mjs:8:1 › AC11_2問目の保存が失敗してもerror.storage.messageと選択が残り_やり直すと3問目に進み課題が回答と一致する 
     [webkit] › tests/ac11-ac13-storage.spec.mjs:44:1 › AC13_persistを断られても完了と再読み込みでtask.done_履歴1件_設定にnotPersistedと書き出しがある 
-    [webkit] › tests/ac12-ac23-offline.spec.mjs:10:1 › AC12_オフラインでもAC-1_AC-2_AC-5_AC-9の操作が動き_送信は0件 ─
-    [webkit] › tests/ac12-ac23-offline.spec.mjs:42:1 › AC12_オフラインでもAC-7の申告が動き_送信は0件 ────────────────
-    [webkit] › tests/ac12-ac23-offline.spec.mjs:98:1 › AC23_task.todayを表示した後にオフラインで再読み込みと新しいタブ_3秒以内に同じdata-task-id_送信0件 
-    [webkit] › tests/ac12-ac23-offline.spec.mjs:106:1 › AC23_task.doneを表示した後にオフラインで再読み込みと新しいタブ_3秒以内にtask.done_送信0件 
+    [webkit] › tests/ac12-ac23-offline.spec.mjs:12:1 › AC12_オフラインでもAC-1_AC-2_AC-5_AC-9の操作が動き_送信は0件 ─
+    [webkit] › tests/ac12-ac23-offline.spec.mjs:47:1 › AC12_オフラインでもAC-7の申告が動き_送信は0件 ────────────────
+    [webkit] › tests/ac12-ac23-offline.spec.mjs:104:1 › AC23_task.todayを表示した後にオフラインで再読み込みと新しいタブ_3秒以内に同じdata-task-id_送信0件 
+    [webkit] › tests/ac12-ac23-offline.spec.mjs:112:1 › AC23_task.doneを表示した後にオフラインで再読み込みと新しいタブ_3秒以内にtask.done_送信0件 
     [webkit] › tests/ac14-ac16-redo-delete.spec.mjs:6:1 › AC14_今日の課題を出していない日に設定からやり直して別の領域を選ぶと_新しい領域の課題が出て完了の履歴は3件のまま 
-    [webkit] › tests/ac14-ac16-redo-delete.spec.mjs:40:1 › AC16_すべてのデータを削除すると再読み込みでdiagnosis.startになり_やり直した後の履歴は0件 
-    [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:60:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_diagnosis.start_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
-    [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:60:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.today_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
-    [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:60:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.done_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
-    [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:60:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.exhausted_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
-    [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:103:1 › AC18_Tab_Shift+Tab_Enter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上 
-    [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_diagnosis.start_axe-coreでserious以上の違反が0件 
-    [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_diagnosis.question_axe-coreでserious以上の違反が0件 
-    [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_task.today_axe-coreでserious以上の違反が0件 ─
-    [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_task.done_axe-coreでserious以上の違反が0件 ──
-    [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_task.exhausted_axe-coreでserious以上の違反が0件 
-    [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:159:3 › AC27_settings_axe-coreでserious以上の違反が0件 ───
+    [webkit] › tests/ac14-ac16-redo-delete.spec.mjs:44:1 › AC16_すべてのデータを削除すると再読み込みでdiagnosis.startになり_やり直した後の履歴は0件 
+    [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_diagnosis.start_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
+    [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.today_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
+    [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.done_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
+    [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.exhausted_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
+    [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:104:1 › AC18_移動キー(Tab系)とEnter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上 
+    [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_diagnosis.start_axe-coreでserious以上の違反が0件 
+    [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_diagnosis.question_axe-coreでserious以上の違反が0件 
+    [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.today_axe-coreでserious以上の違反が0件 ─
+    [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.done_axe-coreでserious以上の違反が0件 ──
+    [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.exhausted_axe-coreでserious以上の違反が0件 
+    [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_settings_axe-coreでserious以上の違反が0件 ───
     [webkit] › tests/ac19-ac20-ac25-export-import.spec.mjs:12:1 › AC19_書き出すとJSONが1つダウンロードされ_診断_段階_履歴3件（50文字のanswer）_初めて開いた日_版番号を含む 
     [webkit] › tests/ac19-ac20-ac25-export-import.spec.mjs:48:1 › AC20_保存データのないブラウザで読み込むと_診断と段階が同じで履歴3件（answerも同じ）_状態はtask.todayかtask.done 
     [webkit] › tests/ac19-ac20-ac25-export-import.spec.mjs:91:1 › AC25_版番号が新しいファイルはerror.import.messageで拒み_履歴1件と診断と状態は変わらない 
@@ -3281,8 +3284,8 @@ Running 131 tests using 5 workers
     [webkit] › tests/ac21-ac22-home-screen.spec.mjs:58:1 › AC21_UAを偽装しないChromiumとWebKitでは案内が0回出る ───
     [webkit] › tests/ac21-ac22-home-screen.spec.mjs:70:1 › AC22_スタンドアロンで初めて開くと読み込みの案内が出て_再読み込みでも出て_ファイルを読み込むとAC-20の状態になる 
     [webkit] › tests/ac24-stats.spec.mjs:18:1 › AC24_統計の9つの値が期待どおりで_数値7つと日付1つは同じ文字が見え_真偽値はfirstDayCompleted.yesの文言が見える 
-    [webkit] › tests/ac26-language.spec.mjs:33:3 › AC-26 locale en-US › AC26_en-USではdiagnosis.startの文言が英語の文言ファイルと一致し_キーの差が0件 
-    [webkit] › tests/ac26-language.spec.mjs:40:3 › AC-26 locale ja-JP › AC26_ja-JPではdiagnosis.startの文言が日本語の文言ファイルと一致する 
+    [webkit] › tests/ac26-language.spec.mjs:39:3 › AC-26 locale en-US › AC26_en-USではdiagnosis.startの文言が英語の文言ファイルと一致し_キーの差が0件 
+    [webkit] › tests/ac26-language.spec.mjs:46:3 › AC-26 locale ja-JP › AC26_ja-JPではdiagnosis.startの文言が日本語の文言ファイルと一致する 
     [webkit] › tests/ac28-update.spec.mjs:17:1 › AC28_差し替え後2秒おきの再読み込み3回以内でdata-build-versionが新版になり_旧版に戻らず_履歴3件と診断と段階は同じ 
     [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:31:1 › AC31_診断済みで開くと操作0回でtask.todayが見え_題名と4要素と答えの欄と4つの申告が同じ画面にあり_重なる要素0件 
     [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:51:1 › AC31_今日の課題を完了済みなら操作0回でtask.doneが見え_重なる要素0件 
@@ -3290,4 +3293,4 @@ Running 131 tests using 5 workers
     [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:88:1 › AC32_200文字を入力してタブを閉じ新しいタブで開くと_同じdata-task-idで答えがそのまま入っている 
     [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:98:1 › AC32_翌日に開くと新しい課題の答えの欄は空で_前日の200文字は書き出しのnoneの行のanswerに残る 
 
-# 要約： 131 failed 　終了コード 1
+# 要約： 131 failed 　成功 0　飛ばし 0　終了コード 1

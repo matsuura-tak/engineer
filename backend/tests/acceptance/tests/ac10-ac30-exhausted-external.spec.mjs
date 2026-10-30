@@ -3,8 +3,11 @@
 import { test, expect } from '../helpers/fixtures.mjs';
 import * as app from '../helpers/app.mjs';
 import { injectSeed, exhaustedSeed, makeSeed, tasksOf } from '../helpers/seed.mjs';
+import { validate } from '../helpers/schema.mjs';
 
 const FIRST = '2026-09-01';
+const AREAS = ['backend', 'frontend', 'database', 'infra', 'testing', 'git'];
+const LEVELS = ['beginner', 'intermediate', 'advanced'];
 
 test('AC10_課題が尽きるとtask.exhaustedと文言とやり直しの操作が出て_同じ領域と段階でやり直すと同じ日に再びtask.exhausted', async ({ context, page, baseURL, request }, testInfo) => {
   const ja = await app.loadStrings(request, 'ja');
@@ -30,10 +33,19 @@ test('AC10_課題が尽きるとtask.exhaustedと文言とやり直しの操作�
 test('AC30_in_appを出し終えた翌日はexternalの課題が出て_印と要る道具が題名と同じ画面に見える', async ({ context, page, baseURL, request }, testInfo) => {
   const ja = await app.loadStrings(request, 'ja');
   const tasks = await app.loadTasks(request);
+  // 「該当なし」の枝が、壊れた課題集や空の課題集でも緑にならないための守り（tech-lead G2 r1 の要修正）：
+  // 課題集そのものが本物（tasks.schema.json に通り、AC-4 の量：126 件以上、18 組すべて 7 件以上）であることを先に確かめる。
+  const { ok, errors } = validate('tasks', tasks);
+  expect(ok, `tasks.schema.json：${errors}`).toBe(true);
+  expect(tasks.tasks.length, '課題集の件数（126 以上）').toBeGreaterThanOrEqual(126);
+  const counts = {};
+  for (const a of AREAS) for (const l of LEVELS) counts[`${a}/${l}`] = tasksOf(tasks, a, l).length;
+  for (const [combo, c] of Object.entries(counts)) expect(c, `組 ${combo} の件数（7 以上）`).toBeGreaterThanOrEqual(7);
+
   const externals = tasks.tasks.filter((t) => t.mode === 'external');
   if (externals.length === 0) {
-    // PRD AC-30 Given：本番の課題集に external が 0 件なら「該当なし」と記録して AC-29 で代える。
-    testInfo.annotations.push({ type: '該当なし', description: '課題集に external の課題が 0 件（AC-29 で代える）' });
+    // PRD AC-30 Given：本番の課題集に external が 0 件なら「該当なし」と記録して AC-29 で代える（G3 の報告では PASS ではなく「該当なし」と書く）。
+    testInfo.annotations.push({ type: '該当なし', description: `課題集 ${tasks.tasks.length} 件に external の課題が 0 件（AC-29 で代える）` });
     expect(externals).toHaveLength(0);
     return;
   }

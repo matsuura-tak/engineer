@@ -1,5 +1,6 @@
 // 受け入れテストの設定（ADR 0004、contracts/test-hooks.md「実行の環境（W-11）」）。
-// この設定だけで動く：`cd backend/tests/acceptance && npx playwright test`、または `cd backend && npx playwright test -c tests/acceptance`。
+// この設定だけで動く：`cd backend/tests/acceptance && npm ci && npx playwright install chromium webkit && npx playwright test`（contracts/test-hooks.md「実行の環境」）。
+// 依存（@playwright/test、@axe-core/playwright、ajv）はこのフォルダの package.json に置く（ADR 0004 の B）。`cd backend && npx playwright test -c tests/acceptance` の形は使わない。
 // projects は chromium と webkit の 2 つ。retries は 0（判定の実行で再試行を使わない）。
 import { defineConfig, devices } from '@playwright/test';
 import { fileURLToPath } from 'node:url';

@@ -4,7 +4,9 @@ import { test, expect } from '../helpers/fixtures.mjs';
 import * as app from '../helpers/app.mjs';
 import { validate } from '../helpers/schema.mjs';
 
-const KEYS = ['diagnosis.start.title', 'diagnosis.start.lead.1', 'diagnosis.start.lead.2', 'diagnosis.start.lead.3', 'diagnosis.start.begin', 'nav.settings', 'app.name'];
+// 画面に必ずあるキー（design 6 の S1：題名、説明 3 つ、主操作、ヘッダーのアプリ名と設定）。比べる対象はこれに限らず、
+// 画面にある data-testid のうち文言キーで差し込み（{…}）のないものすべて（tech-lead G2 r1 の提案）。
+const MUST_KEYS = ['diagnosis.start.title', 'diagnosis.start.lead.1', 'diagnosis.start.lead.2', 'diagnosis.start.lead.3', 'diagnosis.start.begin', 'nav.settings', 'app.name'];
 
 async function checkStart(page, baseURL, request, lang, testInfo) {
   const ja = await app.loadStrings(request, 'ja');
@@ -24,7 +26,12 @@ async function checkStart(page, baseURL, request, lang, testInfo) {
   await app.open(page, baseURL);
   await app.expectState(page, 'diagnosis.start');
   await expect(app.root(page)).toHaveAttribute('lang', lang);
-  for (const k of KEYS) await expect(app.tid(page, k), k).toHaveText(strings[k]);
+  // 描画されている要素だけ（identifiers.md 3「見える文字を持つ要素」。noscript や display:none の殻は除く）
+  const onScreen = await page.evaluate(() => [...document.querySelectorAll('[data-testid]')].filter((el) => el.getClientRects().length > 0).map((el) => el.getAttribute('data-testid')));
+  const keys = [...new Set(onScreen)].filter((k) => k in strings && !/\{/.test(strings[k]));
+  testInfo.annotations.push({ type: `比べたキー（${lang}）`, description: `${keys.length} 個：${keys.join(', ')}` });
+  expect(keys, '画面にある文言キー（差し込みなし）').toEqual(expect.arrayContaining(MUST_KEYS));
+  for (const k of keys) await expect(app.tid(page, k), k).toHaveText(strings[k]);
   await app.shot(page, testInfo, `AC26_diagnosis.start_${lang}`);
 }
 

@@ -1,6 +1,6 @@
 // AC-28：配布物を新しい版に差し替えると、オンラインで 3 回以内の読み込みで新しい版に切り替わり、履歴と診断は変わらない。
 // 手順は contracts/test-hooks.md「AC-28 の配布物の差し替え」。旧版と新版は backend/scripts/build.mjs の CLI で作る。
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { test, expect } from '../helpers/fixtures.mjs';
@@ -16,6 +16,14 @@ const NEW_TASK_ID = 'backend-intermediate-900';
 
 test('AC28_差し替え後2秒おきの再読み込み3回以内でdata-build-versionが新版になり_旧版に戻らず_履歴3件と診断と段階は同じ', async ({ browser }, testInfo) => {
   const tmp = mkdtempSync(path.join(os.tmpdir(), 'kyounoitte-ac28-'));
+  try {
+    await run(tmp, testInfo, browser);
+  } finally {
+    rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+async function run(tmp, testInfo, browser) {
   const oldDist = buildDist({ out: path.join(tmp, 'old'), version: OLD_VERSION });
   const oldTasks = JSON.parse(readFileSync(path.join(oldDist, 'data', 'tasks.json'), 'utf8'));
   const base = oldTasks.tasks.find((t) => t.id.startsWith('backend-intermediate-'));
@@ -80,4 +88,4 @@ test('AC28_差し替え後2秒おきの再読み込み3回以内でdata-build-ve
     await context.close();
     await server.close();
   }
-});
+}

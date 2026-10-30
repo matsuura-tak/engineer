@@ -12,8 +12,8 @@ export const PREFIX = '/engineer';
 
 const CONTENT_TYPES = {
   '.html': 'text/html; charset=utf-8',
-  '.js': 'text/javascript; charset=utf-8',
-  '.mjs': 'text/javascript; charset=utf-8',
+  '.js': 'text/javascript', // 契約（test-hooks.md「実行の環境」）どおり charset を付けない
+  '.mjs': 'text/javascript',
   '.css': 'text/css; charset=utf-8',
   '.json': 'application/json',
   '.webmanifest': 'application/manifest+json',
