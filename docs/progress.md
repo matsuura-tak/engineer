@@ -22,3 +22,4 @@
 - 2026-10-30 001-daily-learning G1 判定r1 design-reviewer FAIL（重大2：診断前の設定への道、状態の表の理由なし「なし」12）、tech-lead PASS（要修正2：答えの保存の間隔、診断途中の再読み込み）。designer に直させて design-reviewer r2 へ（docs/reviews/001-daily-learning-G1-design-reviewer-r1.md、docs/reviews/001-daily-learning-G1-tech-lead-r1.md）
 - 2026-10-30 001-daily-learning G1 判定r2 design-reviewer PASS（16/16、提案4）。tech-lead r1 PASS と合わせてステップ6通過。tech-lead に設計メモ・契約・ADR（ステップ7）を任せる。Takuma の D1〜D7 は返事待ち（docs/reviews/001-daily-learning-G1-design-reviewer-r2.md）
 - 2026-10-30 001-daily-learning G1 確認 pdm（読むだけ）：契約の段階の規則と統計の数え方は PRD と一致。firstOpenDate は「初回の診断の1問目を確定した日」に固定すべき（契約 data.md :18/:30/:38 の直しは tech-lead）。PRD 11 冒頭と 13 の母数に明記が要る。AC-8 に例を足すかは Takuma（D9、D10）
+- 2026-10-30 001-daily-learning G1 PASS design-reviewer r2 PASS、tech-lead r1 PASS、reviewer（設計）r1 PASS（要修正1：起動時の setItem の文の矛盾。提案6）。要修正と firstOpenDate の不整合は tech-lead が直す。Takuma の D1〜D10 は返事待ち（docs/reviews/001-daily-learning-G1-reviewer-r1.md）
