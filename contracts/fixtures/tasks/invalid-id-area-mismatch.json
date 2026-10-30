@@ -1,0 +1,44 @@
+{
+  "formatVersion": 1,
+  "tasks": [
+    {
+      "id": "frontend-beginner-001",
+      "area": "backend",
+      "level": "beginner",
+      "mode": "in_app",
+      "minutes": 10,
+      "title": "HTTP のステータスコードを 3 つ説明する",
+      "why": "API の失敗を正しく返せると、呼び出す側が直し方を決められます。",
+      "how": "`200`、`404`、`409` のそれぞれについて、どんなときに返すかを 1 文ずつ答えの欄に書きます。\n書けたら、`409` を返す具体的な場面を 1 つ足します。",
+      "goal": "3 つのコードの使い分けと、409 の場面が 1 つ書けている。",
+      "tools": []
+    },
+    {
+      "id": "backend-beginner-002",
+      "area": "backend",
+      "level": "beginner",
+      "mode": "external",
+      "minutes": 15,
+      "title": "curl で自分の API のヘッダーを見る",
+      "why": "レスポンスのヘッダーを読めると、キャッシュや認証の不具合を早く見つけられます。",
+      "how": "端末で `curl -sI` を自分の API の URL に付けて実行します。\n`Cache-Control` と `Content-Type` の値を答えの欄に写し、それぞれの意味を 1 文で書きます。",
+      "goal": "2 つのヘッダーの値と意味が書けている。",
+      "tools": [
+        "端末（ターミナル）",
+        "curl"
+      ]
+    },
+    {
+      "id": "git-advanced-001",
+      "area": "git",
+      "level": "advanced",
+      "mode": "in_app",
+      "minutes": 15,
+      "title": "rebase と merge のどちらで取り込むかを選ぶ",
+      "why": "チームの履歴の読みやすさは、取り込み方の決まりで大きく変わります。",
+      "how": "次の 2 案から 1 つ選び、理由を答えの欄に書きます。\n案 1：`main` を作業ブランチに merge する。\n案 2：作業ブランチを `main` に rebase する。",
+      "goal": "選んだ案と、もう一方を選ばない理由が 1 つずつ書けている。",
+      "tools": []
+    }
+  ]
+}

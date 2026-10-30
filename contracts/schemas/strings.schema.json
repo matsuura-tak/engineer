@@ -1,0 +1,719 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:kyounoitte:schema:strings:1",
+  "title": "画面の文言ファイル（backend/public/i18n/ja.json と en.json）",
+  "description": "平らなキーの JSON。ja と en はどちらもこのスキーマに通るので、キーの集合は必ず同じになる（AC-26）。キーの一覧と文の原本は design/001-daily-learning.md の 7。差し込みの書き方は contracts/strings.md。キーを足すときは、ここに足してから文言ファイルに足す。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "app.name",
+    "app.loading",
+    "app.noscript",
+    "nav.history",
+    "nav.settings",
+    "error.app.message",
+    "error.app.detail",
+    "error.app.reload",
+    "error.app.exportRaw",
+    "error.app.delete",
+    "error.app.storageUnavailable.message",
+    "error.app.storageUnavailable.detail",
+    "diagnosis.start.title",
+    "diagnosis.start.lead.1",
+    "diagnosis.start.lead.2",
+    "diagnosis.start.lead.3",
+    "diagnosis.start.begin",
+    "home.standalone.import",
+    "home.standalone.importButton",
+    "home.addToHomeScreen.title",
+    "home.addToHomeScreen.why",
+    "home.addToHomeScreen.steps.1",
+    "home.addToHomeScreen.steps.2",
+    "home.addToHomeScreen.steps.3",
+    "home.addToHomeScreen.steps.4",
+    "home.addToHomeScreen.close",
+    "diagnosis.progress",
+    "diagnosis.q1.legend",
+    "diagnosis.q2.legend",
+    "diagnosis.q3.legend",
+    "area.backend",
+    "area.frontend",
+    "area.database",
+    "area.infra",
+    "area.testing",
+    "area.git",
+    "level.beginner",
+    "level.beginner.desc",
+    "level.intermediate",
+    "level.intermediate.desc",
+    "level.advanced",
+    "level.advanced.desc",
+    "years.lt1",
+    "years.1to3",
+    "years.3to5",
+    "years.gte5",
+    "diagnosis.next",
+    "diagnosis.finish",
+    "diagnosis.back",
+    "diagnosis.cancel",
+    "error.diagnosis.required",
+    "error.storage.message",
+    "error.storage.retry",
+    "task.today.label",
+    "task.meta",
+    "task.external.badge",
+    "task.external.tools.label",
+    "task.why",
+    "task.how",
+    "task.goal",
+    "task.answer.label",
+    "task.answer.help",
+    "task.answer.saved",
+    "task.answer.limit",
+    "task.report.note",
+    "task.report.done",
+    "task.report.tooHard",
+    "task.report.tooEasy",
+    "task.report.noTime",
+    "task.rate.title",
+    "task.rate.question",
+    "task.rate.helpful",
+    "task.rate.notHelpful",
+    "task.rate.close",
+    "task.done.title",
+    "task.done.message",
+    "task.done.task",
+    "task.done.history",
+    "task.skipped.title",
+    "task.skipped.message",
+    "task.skipped.levelHint",
+    "task.skipped.history",
+    "task.exhausted.message",
+    "task.exhausted.detail",
+    "task.exhausted.redo",
+    "settings.title",
+    "settings.data.title",
+    "settings.data.note",
+    "settings.storage.notPersisted",
+    "settings.export",
+    "settings.export.done",
+    "settings.import.note",
+    "settings.import",
+    "error.import.message",
+    "error.import.reason.version",
+    "error.import.reason.schema",
+    "settings.import.confirm.title",
+    "settings.import.confirm.summary",
+    "settings.import.confirm.body",
+    "settings.import.confirm.ok",
+    "settings.import.confirm.cancel",
+    "settings.diagnosis.title",
+    "settings.diagnosis.current",
+    "settings.redo",
+    "settings.redo.note",
+    "settings.homeScreen.title",
+    "settings.homeScreen.open",
+    "settings.records.title",
+    "settings.stats.open",
+    "settings.history.open",
+    "settings.delete.title",
+    "settings.delete",
+    "settings.delete.confirm.title",
+    "settings.delete.confirm.body",
+    "settings.delete.confirm.ok",
+    "settings.delete.confirm.cancel",
+    "settings.version",
+    "settings.privacy",
+    "settings.stats.title",
+    "settings.stats.today",
+    "settings.stats.firstOpenDate",
+    "settings.stats.issued",
+    "settings.stats.completed",
+    "settings.stats.firstDayCompleted",
+    "settings.stats.firstDayCompleted.yes",
+    "settings.stats.firstDayCompleted.no",
+    "settings.stats.daysCompleted7d",
+    "settings.stats.helpful",
+    "settings.stats.rated",
+    "settings.stats.tooHard",
+    "settings.stats.noTime",
+    "settings.stats.note",
+    "settings.stats.back",
+    "history.title",
+    "history.empty",
+    "history.empty.action",
+    "history.row.answer",
+    "report.done",
+    "report.tooHard",
+    "report.tooEasy",
+    "report.noTime",
+    "report.none",
+    "helpful.yes",
+    "helpful.no",
+    "helpful.unanswered"
+  ],
+  "properties": {
+    "app.name": {
+      "$ref": "#/$defs/plain"
+    },
+    "app.loading": {
+      "$ref": "#/$defs/plain"
+    },
+    "app.noscript": {
+      "$ref": "#/$defs/plain"
+    },
+    "nav.history": {
+      "$ref": "#/$defs/plain"
+    },
+    "nav.settings": {
+      "$ref": "#/$defs/plain"
+    },
+    "error.app.message": {
+      "$ref": "#/$defs/plain"
+    },
+    "error.app.detail": {
+      "$ref": "#/$defs/plain"
+    },
+    "error.app.reload": {
+      "$ref": "#/$defs/plain"
+    },
+    "error.app.exportRaw": {
+      "$ref": "#/$defs/plain"
+    },
+    "error.app.delete": {
+      "$ref": "#/$defs/plain"
+    },
+    "error.app.storageUnavailable.message": {
+      "$ref": "#/$defs/plain"
+    },
+    "error.app.storageUnavailable.detail": {
+      "$ref": "#/$defs/plain"
+    },
+    "diagnosis.start.title": {
+      "$ref": "#/$defs/plain"
+    },
+    "diagnosis.start.lead.1": {
+      "$ref": "#/$defs/plain"
+    },
+    "diagnosis.start.lead.2": {
+      "$ref": "#/$defs/plain"
+    },
+    "diagnosis.start.lead.3": {
+      "$ref": "#/$defs/plain"
+    },
+    "diagnosis.start.begin": {
+      "$ref": "#/$defs/plain"
+    },
+    "home.standalone.import": {
+      "$ref": "#/$defs/plain"
+    },
+    "home.standalone.importButton": {
+      "$ref": "#/$defs/plain"
+    },
+    "home.addToHomeScreen.title": {
+      "$ref": "#/$defs/plain"
+    },
+    "home.addToHomeScreen.why": {
+      "$ref": "#/$defs/plain"
+    },
+    "home.addToHomeScreen.steps.1": {
+      "$ref": "#/$defs/plain"
+    },
+    "home.addToHomeScreen.steps.2": {
+      "$ref": "#/$defs/plain"
+    },
+    "home.addToHomeScreen.steps.3": {
+      "$ref": "#/$defs/plain"
+    },
+    "home.addToHomeScreen.steps.4": {
+      "$ref": "#/$defs/plain"
+    },
+    "home.addToHomeScreen.close": {
+      "$ref": "#/$defs/plain"
+    },
+    "diagnosis.progress": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{n[,}]"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{total[,}]"
+        }
+      ],
+      "description": "差し込み：{n}、{total}"
+    },
+    "diagnosis.q1.legend": {
+      "$ref": "#/$defs/plain"
+    },
+    "diagnosis.q2.legend": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{area[,}]"
+        }
+      ],
+      "description": "差し込み：{area}"
+    },
+    "diagnosis.q3.legend": {
+      "$ref": "#/$defs/plain"
+    },
+    "area.backend": {
+      "$ref": "#/$defs/plain"
+    },
+    "area.frontend": {
+      "$ref": "#/$defs/plain"
+    },
+    "area.database": {
+      "$ref": "#/$defs/plain"
+    },
+    "area.infra": {
+      "$ref": "#/$defs/plain"
+    },
+    "area.testing": {
+      "$ref": "#/$defs/plain"
+    },
+    "area.git": {
+      "$ref": "#/$defs/plain"
+    },
+    "level.beginner": {
+      "$ref": "#/$defs/plain"
+    },
+    "level.beginner.desc": {
+      "$ref": "#/$defs/plain"
+    },
+    "level.intermediate": {
+      "$ref": "#/$defs/plain"
+    },
+    "level.intermediate.desc": {
+      "$ref": "#/$defs/plain"
+    },
+    "level.advanced": {
+      "$ref": "#/$defs/plain"
+    },
+    "level.advanced.desc": {
+      "$ref": "#/$defs/plain"
+    },
+    "years.lt1": {
+      "$ref": "#/$defs/plain"
+    },
+    "years.1to3": {
+      "$ref": "#/$defs/plain"
+    },
+    "years.3to5": {
+      "$ref": "#/$defs/plain"
+    },
+    "years.gte5": {
+      "$ref": "#/$defs/plain"
+    },
+    "diagnosis.next": {
+      "$ref": "#/$defs/plain"
+    },
+    "diagnosis.finish": {
+      "$ref": "#/$defs/plain"
+    },
+    "diagnosis.back": {
+      "$ref": "#/$defs/plain"
+    },
+    "diagnosis.cancel": {
+      "$ref": "#/$defs/plain"
+    },
+    "error.diagnosis.required": {
+      "$ref": "#/$defs/plain"
+    },
+    "error.storage.message": {
+      "$ref": "#/$defs/plain"
+    },
+    "error.storage.retry": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.today.label": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{date[,}]"
+        }
+      ],
+      "description": "差し込み：{date}"
+    },
+    "task.meta": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{area[,}]"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{level[,}]"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{minutes[,}]"
+        }
+      ],
+      "description": "差し込み：{area}、{level}、{minutes}"
+    },
+    "task.external.badge": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.external.tools.label": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.why": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.how": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.goal": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.answer.label": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.answer.help": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.answer.saved": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.answer.limit": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{max[,}]"
+        }
+      ],
+      "description": "差し込み：{max}"
+    },
+    "task.report.note": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.report.done": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.report.tooHard": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.report.tooEasy": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.report.noTime": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.rate.title": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.rate.question": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.rate.helpful": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.rate.notHelpful": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.rate.close": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.done.title": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.done.message": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.done.task": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{title[,}]"
+        }
+      ],
+      "description": "差し込み：{title}"
+    },
+    "task.done.history": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.skipped.title": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.skipped.message": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.skipped.levelHint": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.skipped.history": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.exhausted.message": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.exhausted.detail": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.exhausted.redo": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.title": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.data.title": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.data.note": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.storage.notPersisted": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.export": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.export.done": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.import.note": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.import": {
+      "$ref": "#/$defs/plain"
+    },
+    "error.import.message": {
+      "$ref": "#/$defs/plain"
+    },
+    "error.import.reason.version": {
+      "$ref": "#/$defs/plain"
+    },
+    "error.import.reason.schema": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.import.confirm.title": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.import.confirm.summary": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{count[,}]"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{date[,}]"
+        }
+      ],
+      "description": "差し込み：{count}、{date}"
+    },
+    "settings.import.confirm.body": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.import.confirm.ok": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.import.confirm.cancel": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.diagnosis.title": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.diagnosis.current": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{area[,}]"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{level[,}]"
+        }
+      ],
+      "description": "差し込み：{area}、{level}"
+    },
+    "settings.redo": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.redo.note": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.homeScreen.title": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.homeScreen.open": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.records.title": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.open": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.history.open": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.delete.title": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.delete": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.delete.confirm.title": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.delete.confirm.body": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.delete.confirm.ok": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.delete.confirm.cancel": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.version": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{version[,}]"
+        }
+      ],
+      "description": "差し込み：{version}"
+    },
+    "settings.privacy": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.title": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.today": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{date[,}]"
+        }
+      ],
+      "description": "差し込み：{date}"
+    },
+    "settings.stats.firstOpenDate": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.issued": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.completed": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.firstDayCompleted": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.firstDayCompleted.yes": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.firstDayCompleted.no": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.daysCompleted7d": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.helpful": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.rated": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.tooHard": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.noTime": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.note": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.back": {
+      "$ref": "#/$defs/plain"
+    },
+    "history.title": {
+      "$ref": "#/$defs/plain"
+    },
+    "history.empty": {
+      "$ref": "#/$defs/plain"
+    },
+    "history.empty.action": {
+      "$ref": "#/$defs/plain"
+    },
+    "history.row.answer": {
+      "$ref": "#/$defs/plain"
+    },
+    "report.done": {
+      "$ref": "#/$defs/plain"
+    },
+    "report.tooHard": {
+      "$ref": "#/$defs/plain"
+    },
+    "report.tooEasy": {
+      "$ref": "#/$defs/plain"
+    },
+    "report.noTime": {
+      "$ref": "#/$defs/plain"
+    },
+    "report.none": {
+      "$ref": "#/$defs/plain"
+    },
+    "helpful.yes": {
+      "$ref": "#/$defs/plain"
+    },
+    "helpful.no": {
+      "$ref": "#/$defs/plain"
+    },
+    "helpful.unanswered": {
+      "$ref": "#/$defs/plain"
+    }
+  },
+  "$defs": {
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "plain": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S",
+      "not": {
+        "type": "string",
+        "pattern": "[{}]"
+      },
+      "description": "差し込みなし"
+    }
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "formatVersion": 2,
+  "app": "kyounoitte",
+  "firstOpenDate": "2026-11-01",
+  "diagnosis": {
+    "area": "backend",
+    "level": "intermediate",
+    "years": "1to3",
+    "completedOn": "2026-11-01"
+  },
+  "levels": {
+    "backend": "intermediate"
+  },
+  "current": {
+    "date": "2026-11-04",
+    "taskId": "backend-intermediate-004",
+    "area": "backend",
+    "level": "intermediate",
+    "mode": "in_app",
+    "answer": ""
+  },
+  "history": [
+    {
+      "date": "2026-11-01",
+      "taskId": "backend-intermediate-001",
+      "area": "backend",
+      "level": "intermediate",
+      "mode": "in_app",
+      "report": "done",
+      "answer": "インデックスは検索を速くするが、書き込みのたびに更新されるので、書き込みが多い表では増やしすぎない。",
+      "helpful": "helpful"
+    },
+    {
+      "date": "2026-11-02",
+      "taskId": "backend-intermediate-002",
+      "area": "backend",
+      "level": "intermediate",
+      "mode": "in_app",
+      "report": "done",
+      "answer": "",
+      "helpful": "not_helpful"
+    },
+    {
+      "date": "2026-11-03",
+      "taskId": "backend-intermediate-003",
+      "area": "backend",
+      "level": "intermediate",
+      "mode": "in_app",
+      "report": "done",
+      "answer": "",
+      "helpful": "unanswered"
+    }
+  ]
+}

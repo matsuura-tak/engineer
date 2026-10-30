@@ -1,0 +1,245 @@
+# 技術設計メモ 001-daily-learning：診断と今日の学習（今日の一手）
+
+- 書いた役：tech-lead　日付：2026-10-30
+- PRD：docs/prd/001-daily-learning.md（r5、AC-1〜AC-32）　デザイン：design/001-daily-learning.md（r2）　契約：contracts/（HTTP の API はないので OpenAPI はない。一覧は contracts/README.md）
+- 読み替え：型の「operationId」は「契約のファイルと項目」、「iOS」は「ブラウザ（Safari 17 以上、Chrome の最新 2 版）」に読み替える。spectral と oasdiff は使えないので、JSON Schema の検査と見本のテストで代える（指揮役の裁定 E2）。
+- 「Takuma の決定待ち」の印は、Takuma の返事で変われば直す前提で、推奨どおりに書いた箇所（一覧は 10）。
+
+## 1. 範囲、目標、非目標
+- 範囲：ブラウザだけで動く静的な Web アプリ（HTML、CSS、ES modules、Service Worker）と同梱の課題集。保存は localStorage のキー 1 つ。配布は GitHub Pages の `/engineer/`。受け入れテストは Playwright（Chromium と WebKit）。
+- 目標：PRD の 32 件の AC を、つなぎ口を本番に入れずに自動で確かめられる形で満たす。開いてから 2 秒、初回の転送量 150,000 バイト以下、外への送信 0 件。
+- 非目標：サーバー、アカウント、同期、Web Push、裏での更新、更新の知らせ、ブラウザの中でのコードの実行、計測の送信（PRD 10）。イベントの記録（8。Takuma の決定待ち E4）。
+
+## 2. 受け入れ条件の対応表
+operationId は全行「なし（端末のみ）」。代わりに「データ」の列に契約のファイルと項目を書く。テストはすべて backend/tests/acceptance/（verifier）。「2」は Chromium と WebKit の両方、「C」は Chromium だけ、「JSON」はブラウザを使わずに JSON を検査する。
+| AC | 画面（design/） | operationId | データ（契約のファイルと項目） | 確かめるテスト |
+|---|---|---|---|---|
+| AC-1 | S1 → S2 | なし（端末のみ） | identifiers.md：`diagnosis.progress` の `data-question-index`、`-total` | 受け入れ 2：3 問と切り替え 500 ms を 3 回 |
+| AC-2 | S2 → S3 | なし（端末のみ） | data.md の 5（組と選び方）、`data-task-area`、`-level` | 受け入れ 2：回答を変えた 3 通り |
+| AC-3 | S3、課題集 | なし（端末のみ） | schemas/tasks.schema.json（4 要素の `\S`、`minutes` 1〜15） | 受け入れ JSON（ajv）と S3 のスクリーンショット |
+| AC-4 | なし | なし（端末のみ） | tasks.json の件数、組ごとの件数、ID の重複（test-hooks.md の W-6） | 受け入れ JSON |
+| AC-5 | S3 → S4 → S5 | なし（端末のみ） | data.md の 2（申告で `current` を外し `history` に `done` の行、`helpful: unanswered`）、4 の 6-2 | 受け入れ 2：答える／再読み込み |
+| AC-6 | S3 | なし（端末のみ） | data.md の 4 の 6-1、5（ID は `history` と `current` にないもの） | 受け入れ 2：W-3 で翌日 |
+| AC-7 | S3 → S6、S10 | なし（端末のみ） | `history[].report`（`too_hard`、`too_easy`、`no_time`）、`history.row` の `data-report` | 受け入れ 2：3 通り |
+| AC-8 | S3 | なし（端末のみ） | data.md の 5（段階の規則）、`levels`、`history[].level`、fixtures/seeds/seed-ac8-* | 受け入れ 2：7 通り。単体：規則 |
+| AC-9 | S4 → S5、S10 | なし（端末のみ） | `history[].helpful`、`data-helpful` | 受け入れ 2：選ぶ／再読み込み |
+| AC-10 | S7 → S2 | なし（端末のみ） | data.md の 4 の 6-4、5（候補が 0 → S7、保存しない） | 受け入れ 2：seed で 7 件を出し終えた |
+| AC-11 | S2 | なし（端末のみ） | data.md の 2（1 問ごとに 1 回の setItem、起動時に setItem しない）、W-9 | 受け入れ 2：setItem の失敗の注入 |
+| AC-12 | S1〜S6 | なし（端末のみ） | test-hooks.md の W-12（送信の数え方）、CSP の `connect-src 'self'` | 受け入れ 2：オフライン |
+| AC-13 | S3 → S5、S8 | なし（端末のみ） | `device.persistRequested`、`device.persistGranted`、W-9 | 受け入れ 2：persist の拒否の注入 |
+| AC-14 | S8 → S2 → S3、S10 | なし（端末のみ） | data.md の 2（やり直しは終えるときに 1 回）、fixtures/seeds/seed-ac14-* | 受け入れ 2 |
+| AC-15 | S0 → S3 | なし（端末のみ） | `data-debug-load-ms`、W-11 の制限、budgets.md の 1 と 4 | 受け入れ C：5 回 |
+| AC-16 | S8 → ダイアログ → S1 | なし（端末のみ） | data.md の 7（`removeItem` だけ）、W-7 の印 | 受け入れ 2 |
+| AC-17 | S1、S3、S5、S7 | なし（端末のみ） | strings.md の 5（`<pre>` なし、`<code>` は折り返す）、tasks.schema.json の「```」の禁止 | 受け入れ 2：幅 320 |
+| AC-18 | S1 → S5 | なし（端末のみ） | identifiers.md（操作する要素の `data-testid`） | 受け入れ 2：キーボードだけ |
+| AC-19 | S8 | なし（端末のみ） | schemas/data.schema.json（書き出し＝保存。`device` を除く）、data.md の 7 | 受け入れ 2：ダウンロードを ajv で検査 |
+| AC-20 | S1 → S8 | なし（端末のみ） | data.md の 7（読み込みの流れ）、`firstOpenDate`、`history[].answer` | 受け入れ 2：setInputFiles、同じ固定の日付（W-3） |
+| AC-21 | S1、S8 | なし（端末のみ） | test-hooks.md の W-16（iOS Safari の判定）、`device.homeGuideClosed` | 受け入れ 2：偽装あり／なし |
+| AC-22 | S1 | なし（端末のみ） | W-16（スタンドアロンの判定）、data.md の 3（「なし」の間は毎回） | 受け入れ 2 |
+| AC-23 | S0 → S3 / S5 | なし（端末のみ） | contracts/service-worker.md、W-12、W-13 | 受け入れ 2：再読み込みと新しいタブ |
+| AC-24 | S9 | なし（端末のみ） | data.md の 9、identifiers.md の 4 の `data-stat-*`、fixtures/seeds/seed-ac24-stats.json | 受け入れ 2 |
+| AC-25 | S8 | なし（端末のみ） | data.md の 6 と 7（版を先に見る）、fixtures/data/invalid-newer-version.json | 受け入れ 2 |
+| AC-26 | S1 | なし（端末のみ） | schemas/strings.schema.json（145 キー必須、他を拒む）、strings.md の 2 | 受け入れ 2：locale ja-JP／en-US |
+| AC-27 | S1、S2、S3、S5、S7、S8 | なし（端末のみ） | contracts/dependencies.md（@axe-core/playwright 4.14.0） | 受け入れ 2：axe の JSON を証拠に |
+| AC-28 | S0、S8 | なし（端末のみ） | service-worker.md、`data-build-version`、test-hooks.md の「AC-28 の配布物の差し替え」 | 受け入れ 2：2 秒おき 3 回 |
+| AC-29 | なし | なし（端末のみ） | tasks.schema.json（`mode`、`tools`、in_app の URL の禁止）、組ごとの 20%（W-6） | 受け入れ JSON |
+| AC-30 | S3 | なし（端末のみ） | `data-task-mode`、`task.external.badge`、`task.external.tools.item`、data.md の 5 | 受け入れ 2：external と in_app |
+| AC-31 | S3、S5 | なし（端末のみ） | test-hooks.md の「AC-31 の重なる要素の数え方」、identifiers.md の 3（閉じたダイアログは DOM にない） | 受け入れ 2 |
+| AC-32 | S3、S8 | なし（端末のみ） | `current.answer`（300 ms、pagehide、visibilitychange）、data.md の 4 の 6-1（`none` の行に移す） | 受け入れ 2：新しいタブ、再読み込み、翌日 |
+
+## 3. 構成図
+システムコンテキストとコンテナを 1 枚にした。信頼の境界は 2 つ：origin の共有（同じアカウントの他の Pages と保存とキャッシュを共有する）と、端末のファイル（読み込むファイルは信頼しない）。
+
+```mermaid
+flowchart LR
+  user["利用者（人）：今日の課題を読み、答えを書き、申告する"]
+  takuma["Takuma（人）：配布物を公開する"]
+  actions["GitHub Actions（CI。Takuma が .github/ に作る）：backend/scripts/build.mjs で配布物を作り Pages に置く"]
+  pages["GitHub Pages と Fastly（静的ホスティング）：/engineer/ の配布物を gzip と max-age=600 で配る"]
+  file["端末のファイル（JSON）：書き出したデータ。読み込むときは信頼しない入力"]
+  subgraph origin["信頼の境界：origin matsuura-tak.github.io（同じアカウントの他の Pages と共有）"]
+    page["画面（HTML、CSS、ES modules。依存 0）：状態を決めて描き、保存し、書き出す"]
+    sw["Service Worker（sw.js）：配布物を先に取っておき、scope の GET をキャッシュから返す"]
+    cache["Cache Storage（kyounoitte-版）：配布物の写し"]
+    ls["localStorage（キー kyounoitte:data）：保存データ（JSON、formatVersion 1）"]
+    others["他の Pages（Takuma の他のリポジトリ）：同じ localStorage と Cache Storage が見える"]
+  end
+  takuma -->|"git push と Actions の実行（HTTPS）"| actions
+  actions -->|"配布物のアップロード（GitHub の API、HTTPS）"| pages
+  user -->|"URL を開く、タップ、キー入力（ブラウザの操作）"| page
+  page -->|"ナビゲーションと fetch の GET（HTTPS。SW が先に受ける）"| sw
+  sw -->|"キャッシュにないときだけ GET（HTTPS）"| pages
+  sw -->|"install で全ファイルを取り、fetch で読む（Cache API）"| cache
+  page -->|"getItem、setItem、removeItem（同期の Web Storage API）"| ls
+  page -->|"Blob と a download で書き出す（ファイル保存）"| file
+  user -->|"input type=file で選ぶ（ファイル選択。5 MB まで、スキーマで検査）"| page
+  others -.->|"読み書きできてしまう（同じ origin。決まりで防ぐ：ADR 0005）"| ls
+```
+- ブラウザの外に出る通信は、配布物の GET だけ（初回と、SW の更新の確認）。利用者のデータを送る矢印はない（AC-12、AC-23）。
+
+## 4. 契約の変更と互換性
+HTTP の operation はない。代わりに契約のファイルの一覧（すべて新規）：
+| 契約 | 足す / 変える | AC | 認証 | 作る POST の Idempotency-Key |
+|---|---|---|---|---|
+| schemas/tasks.schema.json | 足す | AC-3、AC-4、AC-29、AC-30 | 不要（端末のみ） | 対象外 |
+| schemas/data.schema.json | 足す | AC-5〜AC-11、AC-13、AC-14、AC-16、AC-19〜AC-25、AC-32 | 不要 | 対象外 |
+| schemas/strings.schema.json | 足す | AC-26 | 不要 | 対象外 |
+| data.md、strings.md、identifiers.md、test-hooks.md、service-worker.md、budgets.md | 足す | 全 AC | 不要 | 対象外 |
+| fixtures/（34 件）、tools/check-schemas.mjs | 足す | 上と同じ | 不要 | 対象外 |
+
+- spectral の出力：未検査（OpenAPI なし。指揮役の裁定 E2）。
+- oasdiff breaking の出力：未検査（OpenAPI なし）。main に契約はなく、すべて新規。
+- 代わりの検査：`node contracts/tools/check-schemas.mjs`（ajv 8.20.0 を入れたスクラッチパッドで実行。backend ができたら `cd backend && node ../contracts/tools/check-schemas.mjs`）。2026-10-30 の出力（全文）：
+```
+ajv 8.20.0（Ajv2020、strict）
+OK  メタスキーマ data.schema.json
+OK  組み立て data.schema.json
+OK  メタスキーマ strings.schema.json
+OK  組み立て strings.schema.json
+OK  メタスキーマ tasks.schema.json
+OK  組み立て tasks.schema.json
+OK  data/invalid-answer-too-long.json 期待：落ちる → 落ちた（data/current/answer must NOT have more than 2000 characters）
+OK  data/invalid-current-before-diagnosis.json 期待：落ちる → 落ちた（data/diagnosis must have required property 'completedOn' / data must match "then" schema）
+OK  data/invalid-done-without-helpful.json 期待：落ちる → 落ちた（data/history/2 must have required property 'helpful' / data/history/2 must match "then" schema）
+OK  data/invalid-extra-field.json 期待：落ちる → 落ちた（data must NOT have additional properties）
+OK  data/invalid-helpful-on-skipped.json 期待：落ちる → 落ちた（data/history/3 must NOT be valid / data/history/3 must match "else" schema）
+OK  data/invalid-newer-version.json 期待：落ちる → 落ちた（data/formatVersion must be equal to constant）
+OK  data/invalid-not-json.json 期待：落ちる → 落ちた（JSON.parse の失敗）
+OK  data/invalid-other-app.json 期待：落ちる → 落ちた（data/app must be equal to constant）
+OK  data/invalid-unknown-area.json 期待：落ちる → 落ちた（data/levels must NOT have additional properties）
+OK  data/invalid-utc-datetime.json 期待：落ちる → 落ちた（data/history/0/date must match pattern "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$"）
+OK  data/invalid-years-without-level.json 期待：落ちる → 落ちた（data/diagnosis must have required property 'completedOn' / data must match "then" schema / data/diagnosis must have property level when property years is presen）
+OK  data/v1/valid-all-fields.json 期待：通る → 通った
+OK  data/v1/valid-export-three-completed.json 期待：通る → 通った
+OK  data/v1/valid-guide-closed-only.json 期待：通る → 通った
+OK  data/v1/valid-in-progress.json 期待：通る → 通った
+OK  seeds/seed-ac14-three-completed.json 期待：通る → 通った
+OK  seeds/seed-ac24-stats.json 期待：通る → 通った
+OK  seeds/seed-ac8-intermediate-one-too-hard.json 期待：通る → 通った
+OK  strings/invalid-empty-value.json 期待：落ちる → 落ちた（data/nav.history must NOT have fewer than 1 characters / data/nav.history must match pattern "\S"）
+OK  strings/invalid-extra-key.json 期待：落ちる → 落ちた（data must NOT have additional properties）
+OK  strings/invalid-missing-key.json 期待：落ちる → 落ちた（data must have required property 'task.rate.close'）
+OK  strings/invalid-placeholder-missing.json 期待：落ちる → 落ちた（data/diagnosis.progress must match pattern "\{total[,}]"）
+OK  strings/invalid-unexpected-placeholder.json 期待：落ちる → 落ちた（data/nav.history must NOT be valid）
+OK  strings/valid-en.json 期待：通る → 通った
+OK  strings/valid-ja.json 期待：通る → 通った
+OK  tasks/invalid-blank-goal.json 期待：落ちる → 落ちた（data/tasks/0/goal must match pattern "\S"）
+OK  tasks/invalid-code-fence.json 期待：落ちる → 落ちた（data/tasks/2/how must NOT be valid）
+OK  tasks/invalid-external-no-tools.json 期待：落ちる → 落ちた（data/tasks/1/tools must NOT have fewer than 1 items / data/tasks/1 must match "then" schema）
+OK  tasks/invalid-id-area-mismatch.json 期待：落ちる → 落ちた（data/tasks/0/id must match pattern "^backend-" / data/tasks/0 must match "then" schema）
+OK  tasks/invalid-in-app-tools.json 期待：落ちる → 落ちた（data/tasks/0/tools must NOT have more than 0 items / data/tasks/0 must match "else" schema）
+OK  tasks/invalid-in-app-url.json 期待：落ちる → 落ちた（data/tasks/0/how must NOT be valid / data/tasks/0 must match "else" schema）
+OK  tasks/invalid-minutes-16.json 期待：落ちる → 落ちた（data/tasks/0/minutes must be <= 15）
+OK  tasks/invalid-unknown-mode.json 期待：落ちる → 落ちた（data/tasks/0/mode must be equal to one of the allowed values）
+OK  tasks/valid-sample.json 期待：通る → 通った
+見本 34 件、期待と違う結果 0 件
+exit=0
+```
+- 検査が空振りでないこと：スキーマの `formatVersion` の type を `strin` に壊すとメタスキーマの検査が false（`must be equal to one of the allowed values`）、未知のキーワード `minItemz` は strict で `unknown keyword` の例外（同じ日、スクラッチパッドで実行）。
+- 互換性を壊す変更：なし（新規）。以後の決まり：読み手が知らない項目か値を書く変更は `formatVersion` を上げる。古い版は 1 版ずつ移して読み、新しい版は拒む（ADR 0002、data.md の 6）。
+- 返す enum に値を足すとき：保存データのスキーマは知らない値を拒むので、値を足すことは版を上げることと同じ。古いアプリは「版が新しい」として `error.import.reason.version` か S0 error を出し、データを上書きしない。verifier に頼む項目：fixtures/data/v1/ の 4 件が今のアプリで読めること（読み込みで同じ状態になる）と、`formatVersion: 2` のファイルが拒まれること（AC-25）。
+- エラーと文言（problem+json の代わり）：
+| 起きること | 画面に出す文言キー |
+|---|---|
+| 起動時に保存先が使えない | `error.app.storageUnavailable.message`、`.detail` |
+| 起動時に保存データが読めない（壊れた、スキーマ違い、版が新しい） | `error.app.message`、`.detail`、`.reload`、`.exportRaw`、`.delete` |
+| 保存（setItem）の失敗 | `error.storage.message`、`error.storage.retry` |
+| 読み込むファイルの版が新しい | `error.import.message`、`error.import.reason.version` |
+| 読み込むファイルが壊れた、形が違う、5,000,000 バイトを超える | `error.import.message`、`error.import.reason.schema` |
+| 診断で選ばずに確定 | `error.diagnosis.required` |
+| 答えが 2,000 字に達した | `task.answer.limit` |
+
+## 5. データモデルと移行
+| エンティティ | 正しいデータの置き場所 | 個人情報か | 保存期間 | 消し方 |
+|---|---|---|---|---|
+| 保存データ（診断の回答、領域ごとの段階、今日の課題、履歴と答え、初めて開いた日、このブラウザの印）。形は data.schema.json | 端末（localStorage `kyounoitte:data`） | はい（自己評価、経験年数、学習の履歴、自由記述の答え。名前やメールは持たない） | 利用者が消すまで。Safari は 7 日使わないと消すことがある | 設定の「すべてのデータを削除」（`removeItem`）、ブラウザのサイトデータの削除 |
+| 書き出しファイル（`device` を除いた保存データ） | 端末のファイル（利用者が置いた場所） | はい（同上） | 利用者が消すまで | 利用者がファイルを消す |
+| 課題集 tasks.json、文言 ja.json と en.json | 配布物（GitHub Pages）と Cache Storage | いいえ | 版ごと。古い版のキャッシュは activate で消す | 新しい版の SW が消す |
+| 配信の記録（IP アドレス） | GitHub（アプリの外） | はい | GitHub の決まりによる | アプリからは消せない。プライバシーのページに書く（PRD 17） |
+
+- SwiftData の版：該当なし（Web）。代わりに `formatVersion` 1。移す手順は v1 なのでまだない（data.md の 6）。
+- 前の版の保存データを開けるかのテスト（verifier と backend-engineer に頼む項目）：contracts/fixtures/data/v1/ の 4 件を、単体テストで手書きの検査に通し、受け入れテストで読み込む。版を上げた後も消さずに読み続ける。
+- サーバーの DB：なし。
+
+## 6. 非機能の目標
+型の iOS の行は Web に読み替えた。API の行と電池の行は、サーバーと裏の処理がないので「配布物の更新」と「裏の処理」に置き換えた。
+| 項目 | 目標 | 測り方と時期 | 確かめる役 |
+|---|---|---|---|
+| 反応 | 診断の質問の切り替えは 500 ms 以内（AC-1）。申告から次の状態まで 500 ms 以内 | AC-1 の受け入れテストで 3 回。申告は AC-5 と AC-7 のテストで click から `data-state` が変わるまでを記録（G3） | verifier |
+| 起動 | 開いてから `task.today` まで 2,000 ms 以内（遅延 150 ms、下り 1.6 Mbps、CPU 4 倍）。見直しの線は 1,600 ms | AC-15 の `data-debug-load-ms` を Chromium で 5 回（G3）。公開後は G4 で Takuma が実機で計った値（PRD 13） | verifier |
+| オフライン（画面ごと） | 全画面が見られて操作できる（一度読み込んだ後）。再読み込みと新しいタブで 3,000 ms 以内に同じ状態。外への送信 0 件 | AC-12、AC-23 の受け入れテスト（setOffline、W-12 の数え方。G3） | verifier |
+| 転送量 | gzip 後の合計 150,000 バイト以下（内訳は budgets.md の 1） | `node scripts/check-budget.mjs dist`（G3）、公開後は本番に `curl --compressed` | verifier |
+| 配布物の更新 | 差し替えから 3 回以内の読み込みで新しい版（2 秒おき） | AC-28 の受け入れテスト（G3） | verifier |
+| 裏の処理（電池の代わり） | 常駐するタイマー 0 件（`setInterval` を使わない）。タイマーは答えの保存の 300 ms と、`app.loading` の 1 秒の CSS だけ | `grep -rn 'setInterval' backend/public` が 0 件（G2） | reviewer |
+| セキュリティ | CSP の meta が 1 つで budgets.md の 3 と一致。`innerHTML`、`outerHTML`、`insertAdjacentHTML`、`document.write`、`eval`、`new Function` が 0 件。HTTPS の転送（301） | `grep -c 'http-equiv="Content-Security-Policy"'` が 1 と単体テスト（G2）、上の語の grep が 0 件（G2）、公開後に `curl -sI http://matsuura-tak.github.io/engineer/` が 301（Takuma の決定待ち E3） | reviewer |
+| プライバシー | 利用者のデータの送信 0 件。`fetch` を呼ぶのは配布物の 3 つの JSON だけ。`sendBeacon`、`XMLHttpRequest`、`WebSocket` が 0 件 | AC-12、AC-23（G3）、`grep -rnE 'sendBeacon|XMLHttpRequest|WebSocket' backend/public` が 0 件で、`fetch(` の行が 3 つの JSON の読み込みだけ（G2、G4） | reviewer |
+| 保存の大きさ | 365 行、各 2,000 字の答えでも保存データは 1,000,000 字以下 | 単体テストで見本を作って長さを測る（G2） | backend-engineer |
+| アクセシビリティ | 幅 320 で横スクロール 0、フォーカスの枠 2 px 以上、axe の serious 以上 0 件 | AC-17、AC-18、AC-27（G3） | verifier |
+| 対応ブラウザ | Safari 17 以上と Chrome の最新 2 版。budgets.md の 5 の「使わない」機能が 0 件 | 受け入れテストを Chromium と WebKit で（G3）、`grep` で使わない機能を探す（G2）、実機の Safari（G4、Takuma） | reviewer、verifier |
+
+## 7. 脅威モデル
+- 何を作るか：守るものは、利用者の保存データ（自己評価、履歴、自由記述の答え）と、画面が正しい課題を出すこと。境界は 3 の図の 2 つ（origin の共有、読み込むファイル）。サーバー、認証、課金、外への送信はない。
+- それで十分か：残る大きな危険は origin の共有で、受け入れた（原因を作れるのは Takuma の他のリポジトリだけで、決まりと見直す条件で扱う。ADR 0005）。Safari 17〜25 では Trusted Types が効かないが、innerHTML の禁止は Chromium と WebKit の受け入れテストで機械で守られるので、配る前に見つかる。
+
+| STRIDE | 起きうること | 対応（減らす / なくす / 移す / 受け入れる） | 確かめるテストか確認 |
+|---|---|---|---|
+| なりすまし（S） | 同じ origin の他の Pages が、ルートの scope の SW で `/engineer/` の画面を偽る | 受け入れる＋減らす：Takuma の他の Pages にルートの SW を置かない決まりを RUNBOOK に書く。独自のドメインは見直す条件（ADR 0005） | RUNBOOK の確認（G4、reviewer） |
+| 改ざん（T） | 読み込むファイルや、拡張機能・他のページが localStorage を書き換える。通信の途中で配布物を書き換える | 減らす：読むたびに全体をスキーマで検査し、通らなければ止まる（部分は読まない）。5,000,000 バイトの上限。HTTPS（Enforce HTTPS は Takuma の決定待ち E3） | AC-25、fixtures/data/invalid-*、単体テスト（手書きの検査＝ajv）、公開後の curl |
+| 否認（R） | 申告や削除を「していない」と言う | 受け入れる：アカウントも利害のある取引もなく、記録は本人のブラウザの中だけ | なし（理由をここに書いた） |
+| 情報の漏れ（I） | 利用者のデータが外に送られる。同じ origin の他のページが読む。書き出したファイルが他人に渡る | なくす：外への送信の手段がない（CSP の `connect-src 'self'`、W-12 の 0 件）。受け入れる：origin の共有（上）とファイルの扱い（利用者の手元。設定の画面の文言で知らせる） | AC-12、AC-23、6 のプライバシーの grep |
+| サービスの妨害（D） | 巨大なファイルや、上限いっぱいの保存で画面が止まる。他のページが localStorage を使い切る | 減らす：読み込みは 5,000,000 バイトまで、答えは 2,000 字まで。QuotaExceededError は `error.storage.*` で知らせて入力を残す | AC-11、単体テスト（365 行で 1,000,000 字以下） |
+| 権限の格上げ（E） | 読み込むファイルや課題集の文字列から HTML を差し込んでスクリプトを動かす（XSS）。枠に入れて削除を押させる。テスト用の入口から他人のデータを消す | なくす：textContent だけ、CSP の `script-src 'self'` と Trusted Types、枠の中では始めない、本番につなぎ口を置かない（URL の引数を読まない） | 受け入れテストが Trusted Types の下で動く（innerHTML は例外になる）、test-hooks.md の末尾の grep（G2） |
+
+## 8. 観測と KPI イベント
+- 前提（Takuma の決定待ち E4）：PRD 15 のイベントは記録も送信もしない。アプリには何もしない `track(name, props)` の入口を 1 つだけ置き、各イベントの場所で呼ぶ（将来 B の計測を足す場所。中身は空で、保存も送信もしない）。理由：どの AC もイベントの記録を求めておらず、KPI は統計の画面（AC-24）と聞き取りで測る（PRD 13 の A）。
+- ログ：`console` に利用者のデータを出さない。エラーの種類だけを `console.error` に出してよい。
+- 性能：`data-debug-load-ms`（AC-15）だけ。MetricKit の代わりの仕組みは持たない（公開後に計り直す手段は v1 にない。PRD 13）。
+
+| PRD 15 のイベント | 送る場所 | 使う所 |
+|---|---|---|
+| Page Loaded | 送らない（track() の入口だけ。load_ms は `data-debug-load-ms`） | KPI の表示時間は G4 の実機の値 |
+| Diagnosis Started、Diagnosis Completed | 送らない（入口だけ） | 初日の完了率は統計の画面の first-day-completed |
+| Task Issued、Task Completed、Task Skipped、Task Rated | 送らない（入口だけ） | 完了率、役に立った率、難しすぎ・今日はできないの申告率は統計の画面の issued、completed、helpful、rated、too-hard、no-time。撤退基準も同じ値 |
+| Level Changed | 送らない（入口だけ） | なし（`levels` は書き出しで見られる） |
+| Storage Persist Answered | 送らない（`device.persistGranted` に保存。設定の注意に使う） | なし |
+| Home Screen Guide Closed | 送らない（`device.homeGuideClosed` に保存） | なし |
+| Data Exported、Data Imported、Data Deleted | 送らない（入口だけ） | 「データが消えた」は聞き取り（PRD 13） |
+
+## 9. 依存ライブラリの変更
+- 足す（すべて backend の devDependencies、本番には入らない）：@playwright/test 1.64.1、@axe-core/playwright 4.14.0、ajv 8.20.0。表は contracts/dependencies.md（版、ライセンス、公開日、代わりの標準、外す手間、ADR 0004）。
+- 解決の出力（2026-10-30、スクラッチパッド、node v24.22.1、npm 12.2.1）：`npm install --save-dev --save-exact …` の後の `npm ls --depth=0` → `@axe-core/playwright@4.14.0`、`@playwright/test@1.64.1`、`ajv@8.20.0`。`found 0 vulnerabilities`。
+- 動いた出力：受け入れテストの形の確認（`npx playwright test -c tests/acceptance` → `2 passed (1.8s)`）、CSP と Trusted Types の下での axe（`label:critical` を検出、Chromium 156、WebKit 27.2）、4 の check-schemas の出力。
+- 実行時の依存：0 件（ADR 0001）。
+
+## 10. ADR と未確認
+- この機能で書いた ADR：
+  - docs/adr/0001-web-foundation-no-build-es-modules.md（まとめない ES modules、依存 0、写して刻印するビルド、置き場所と package.json の scripts）
+  - docs/adr/0002-storage-localstorage-single-key.md（localStorage の 1 キー、formatVersion、ID を変えない、U-5〜U-8 と U-11）
+  - docs/adr/0003-service-worker-update.md（先に全部取る、skipWaiting、`cache: 'reload'`）
+  - docs/adr/0004-acceptance-test-setup.md（Playwright の 2 エンジン、設定はフォルダの中、axe、ajv、自作の静的サーバー）
+  - docs/adr/0005-csp-and-trust-boundaries.md（厳しい CSP と Trusted Types、枠の中では始めない、origin の共有）
+- Takuma の決定待ち（推奨どおりに書いた。返事で変われば直す）：
+  - E3 HTTPS の転送（Enforce HTTPS）は Takuma が Pages の設定で入れる：6 のセキュリティの行、7 の T、ADR 0005。
+  - E4 イベントは記録しない（`track()` の入口だけ）：1 の非目標、8。
+  - P4 / design U-13 ホーム画面のアイコンと manifest を置く：budgets.md の 1（10,000 バイトの枠）、service-worker.md の 3（FILES に入れる）、CSP の `img-src`、`manifest-src`。
+  - D1 主操作の色（青）：契約への影響なし（design/tokens.md だけ）。
+  - D2 日付は両言語とも ISO：strings.md の 3、identifiers.md の 4（見える文字と属性が同じ値）。
+  - D3 英語でもアプリ名は「今日の一手」：strings.md の 6。
+  - D4 完了画面に題名を 1 行残す（`task.done.task`）：strings.schema.json がこのキーを必須にしている。消すと決まればスキーマから外す。
+- 未確認の項目、確かめる方法、確かめる役：
+  - backend/package.json、build.mjs、check-budget.mjs、単体テスト、受け入れテストのコマンドは、まだ動かしていない（backend/ がない）。G2 で backend-engineer と verifier が動かし、出力を出す。
+  - localStorage の 1 origin あたりの上限（約 5 MB と言われる）：公式の数字を見つけていない。見直す条件で監視する（ADR 0002）。
+  - どのブラウザ設定で localStorage が例外になるか（S0 error の変種 (2)）：G4 で Takuma が実機で 1 つ試す（Safari の「すべての Cookie をブロック」）。
+  - LINE などのアプリ内ブラウザの UA と保存の行き先、iOS 実機のホーム画面の Web アプリでの書き出しと読み込み、persist() の 7 日の免除：G0 の承認で G4 に回した（未検証に数えない）。
+  - meta の CSP で frame-ancestors が効かないことの各ブラウザの挙動：確かめていない。枠の中で始めない作りなので結果に影響しない。
+
+## 確かめ（A）
+- [x] 2 の表に PRD の全 AC があり、空の欄がない（`grep -cE '^- AC-[0-9]+：' docs/prd/001-daily-learning.md` → 32、2 の表の行 → 32。2026-10-30 に実行）
+- [x] 3 の図のすべての要素に技術と責任が、すべての矢印に用途と通信方式がある
+- [x] 契約のすべての operation に operationId、成功とエラーの例、認証の要否、AC 番号がある。エラーは problem+json（読み替え：operation はない。各スキーマに正しい見本と壊した見本があり、description に AC 番号、エラーは 4 の文言の表）
+- [x] 4 に spectral と oasdiff の出力（または「未検査」と理由）がある。互換性を壊すなら ADR と大きな版の上げがある（未検査（OpenAPI なし）と、代わりの check-schemas の出力。新規なので壊す変更なし）
+- [x] 5 の全エンティティに置き場所、個人情報か、保存期間、消し方がある。モデルを変えたなら MigrationStage がある（新規。移す手順の決まりは data.md の 6）
+- [x] 6 のすべての行に数字と測り方がある
+- [x] 7 が STRIDE の6行か「新しい境界なし」のどちらか。受け入れた危険に理由がある
+- [x] 8 で、PRD 15 の全イベントに送る場所がある（13 件すべて「送らない」）
+- [x] 新しい依存に、解決とビルドの出力があり、dependencies.md の全列が埋まっている（ビルドの出力の代わりに、解決と、実際に動かしたテストの形の出力）
