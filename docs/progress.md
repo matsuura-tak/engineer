@@ -25,3 +25,4 @@
 - 2026-10-30 001-daily-learning G1 PASS design-reviewer r2 PASS、tech-lead r1 PASS、reviewer（設計）r1 PASS（要修正1：起動時の setItem の文の矛盾。提案6）。要修正と firstOpenDate の不整合は tech-lead が直す。Takuma の D1〜D10 は返事待ち（docs/reviews/001-daily-learning-G1-reviewer-r1.md）
 - 2026-10-30 001-daily-learning G1 要修正の反映 tech-lead（契約・ADR、firstOpenDate）52dc7bb、designer r3（提案4件、契約との整合）をコミット。残り：Takuma の D1〜D10 → pdm の PRD 直しと再承認 → verifier の受け入れテスト（9）
 - 2026-10-30 001-daily-learning G1 Takuma の決定 D1〜D10 すべて推奨どおり（docs/approvals/001-daily-learning-G0.md）。pdm に PRD r6（D6、D9、D10、段階の規則の文）を任せ、再承認へ
+- 2026-10-30 001-daily-learning G0 再承認 Takuma が PRD r6 を承認「承認します」（docs/approvals/001-daily-learning-G0.md）。designer r4（決定待ちの確定）をコミット。tech-lead に契約の印の確定と AC-8 の seed の文を直させ、verifier（9）へ
