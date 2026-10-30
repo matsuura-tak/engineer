@@ -1,6 +1,6 @@
 # デザイントークン（今日の一手。ブラウザだけで動く Web アプリ）
 
-- 書いた役：designer　日付：2026-10-30　初版（001-daily-learning で導入）。r2：G1 r1 の design-reviewer の指摘 3、5、10、11 を反映（color.overlay、リンクの最小幅、ホバーと押した瞬間、定義リストの使い所、ファイルの読み込みの部品）。r3：G1 r2 の design-reviewer の提案 1 を反映（4「リンク」の列挙にヘッダーのアプリ名 `app.name` を足した）
+- 書いた役：designer　日付：2026-10-30　初版（001-daily-learning で導入）。r2：G1 r1 の design-reviewer の指摘 3、5、10、11 を反映（color.overlay、リンクの最小幅、ホバーと押した瞬間、定義リストの使い所、ファイルの読み込みの部品）。r3：G1 r2 の design-reviewer の提案 1 を反映（4「リンク」の列挙にヘッダーのアプリ名 `app.name` を足した）。r4：Takuma の決定 D1（主操作の色は青。値は変えない）と D5（ホーム画面のアイコンの色）を受けて、1 にアイコンの 1 行
 - 使い方：画面の仕様（design/<機能名>.md）と実装（CSS カスタムプロパティ）は、ここにある名前だけを使う。色の値を直接書かない。
 - 単位：CSS px。文字と余白は実装では rem（16 px = 1 rem）にして、ブラウザの文字サイズ設定と拡大に追従させる（調査 R-16、R-26）。
 - 根拠：design/001-daily-learning-research.md の R 番号と、原則 B-1〜B-6（.claude/skills/craft-designer/SKILL.md）。コントラスト比は WCAG 2.2 の式で計算した（計算スクリプトの出力は design/001-daily-learning.md の 9 に転記）。
@@ -25,6 +25,7 @@
 | color.overlay | ダイアログの `::backdrop`（後ろの画面を暗くする。半透明はここだけ） | rgba(0,0,0,0.5) | rgba(0,0,0,0.5) | rgba(0,0,0,0.5) | rgba(0,0,0,0.5) | `--color-overlay` |
 
 - 地の色は1つだけ。カード、面、影、グラデーションは置かない（案A「一枚の紙」。B-2）。区切りは余白と 1 px の `color.border` の線だけ。
+- ホーム画面のアイコン（`./icon-180.png`。design/001-daily-learning.md の 8 と D-29）は color.bg と color.text のライトの値（#FFFFFF、#1F1F1F）だけで描く。PNG はダークモードや `prefers-contrast` に追従しないので、ライトの値を固定して使う唯一の場所。
 - color.overlay は `prefers-reduced-transparency: reduce` では不透明の color.bg にし、ダイアログの境目は枠（color.border）で見せる。地に重ねたときの比は design/001-daily-learning.md の 9（ライトは地の差 3.95:1、ダークは枠 5.92:1 で境目が見える）。
 - リンクは `color.action.primary` の文字に下線を必ず付ける（色だけで区別しない。WCAG 2.2 SC 1.4.1）。
 - `<meta name="color-scheme" content="light dark">` を置き、フォーム部品とスクロールバーもダークに追従させる（R-22）。

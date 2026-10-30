@@ -2,7 +2,7 @@
 
 - 対象の PRD：docs/prd/001-daily-learning.md（r5、G0 承認済み。AC-1〜AC-32）
 - 調査：design/001-daily-learning-research.md（この仕様より先に書いた。コミット 854cf47）。方向性は案A「一枚の紙」
-- 書いた役：designer　日付：2026-10-30（r3。r2 は G1 r1 の design-reviewer と tech-lead の指摘を反映。r3 は G1 r2 の design-reviewer の提案 1〜4 と、契約（contracts/data.md、identifiers.md）で確定した事項との整合。直した箇所の一覧は 11）
+- 書いた役：designer　日付：2026-10-30（r4。r2 は G1 r1 の design-reviewer と tech-lead の指摘を反映。r3 は G1 r2 の design-reviewer の提案 1〜4 と、契約（contracts/data.md、identifiers.md）で確定した事項との整合。r4 は Takuma の決定 D1〜D5（docs/approvals/001-daily-learning-G0.md 末尾、2026-10-30）で U-1〜U-4 と U-13 を確定にした。直した箇所の一覧は 11）
 - 図：design/001-daily-learning/screens.md（文字で描いた画面の図）
 - トークン：design/tokens.md（色、文字、余白。この仕様はトークンの名前だけを使う）
 - 原則の番号 B-1〜B-6 は .claude/skills/craft-designer/SKILL.md にある。
@@ -116,14 +116,14 @@ verifier はこの表から受け入れテストを書く。識別子の詳し�
 | D-1 初回は S1（説明 10 行以内と「診断を始める」1 つ）→ S2 ×3 → S3。2 回目以降は開いたら S3 / S5 / S6 / S7 で、説明も案内も挟まない | R-7（ルールの説明は 10 行未満）、R-2・R-3・R-4（競合は登録が先）、R-5（地図が先） | B-1、B-2。差をつける点 1 |
 | D-2 診断は 1 画面 1 問、進み具合「質問 n / 3」、ネイティブの radio、確定はボタン | R-8（one thing per page）、R-21（radio の操作） | https://www.w3.org/WAI/ARIA/apg/patterns/radio/ 、https://www.w3.org/WAI/WCAG22/Understanding/on-input.html |
 | D-3 S3 は題名を h1 にし、4 要素を h2 と段落で縦に並べ、申告 4 つは末尾。「完了」だけを塗りの主操作にし、他 3 つは枠の副操作 | R-6（1 日 1 つ）、R-16（320 px）、R-17（44 px） | B-1、B-2、B-3 |
-| D-4 S5 と S6 は次の課題もストリークも見せず、1 文で終える。S5 は完了した課題の題名を 1 行だけ残す（Job の「最近学んだことを言える」のため） | R-6（spend only three minutes）、PRD 10（ストリーク非採用） | B-2。差をつける点 2 |
+| D-4 S5 と S6 は次の課題もストリークも見せず、1 文で終える。S5 は完了した課題の題名を 1 行だけ残す（Job の「最近学んだことを言える」のため。Takuma の決定 D4、2026-10-30） | R-6（spend only three minutes）、PRD 10（ストリーク非採用） | B-2。差をつける点 2 |
 | D-5 答えの欄は課題の本文の下、申告の上に `<textarea>` を 1 つ。ラベルに「任意」。保存は最後の入力から 1 秒以内に黙って行い（pagehide と visibilitychange でも）、「保存しました」を `role="status"` で出す | R-19（status messages）、R-25（16 px）、R-26 | https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html 、B-1 |
 | D-6 外で行う課題の印は、題名の直下に文字だけの印「外で行う」と、「要る道具」の定義リスト。色もアイコンも使わない | R-7（色は意味にだけ）、R-15（枠は 3:1） | https://www.w3.org/WAI/WCAG22/Understanding/use-of-color.html 、B-5 |
 | D-7 空とエラーは「何が起きたか」+「次の一手のボタン」の 2 要素。読み込み中に「0 件」を出さない | R-9、R-10 | https://www.nngroup.com/articles/empty-state-interface-design/ 、B-1 |
 | D-8 エラーは問題の近く（入力欄の直下、ボタンの直上）に文字で出し、入力を保ち、やり直しのボタンを添える。エラーの知らせは `role="alert"` | R-10（near the element、preserve input）、R-19 | https://www.w3.org/WAI/WCAG22/Understanding/error-identification.html 、https://www.w3.org/WAI/ARIA/apg/patterns/alert/ |
 | D-9 取り消せない操作（全削除、読み込みの置き換え）は `<dialog>` で確認し、何が消えるかを文で見せる。初期フォーカスは「やめる」 | R-20 | https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/ 、https://www.w3.org/WAI/WCAG22/Understanding/error-prevention-legal-financial-data.html |
 | D-10 ホーム画面の案内（AC-21）は S1 の説明と「診断を始める」の間に、本文の一部として置く。ダイアログや固定のバナーにしない | R-18（固定のバナーがフォーカスを隠す）、R-24 | https://www.w3.org/WAI/WCAG22/Understanding/focus-not-obscured-minimum.html 、B-2 |
-| D-11 統計は 9 つの値を `<dl>` で縦に並べ、ラベルは PRD 13 の指標の語。グラフも色も使わない。日付は ISO 8601（YYYY-MM-DD）で、`data-stat-*` と見える文字を同じ値にする | R-16、案A（研究 7） | B-1、B-5 |
+| D-11 統計は 9 つの値を `<dl>` で縦に並べ、ラベルは PRD 13 の指標の語。グラフも色も使わない。日付は ISO 8601（YYYY-MM-DD）で、`data-stat-*` と見える文字を同じ値にする（Takuma の決定 D2、2026-10-30） | R-16、案A（研究 7） | B-1、B-5 |
 | D-12 ダークモードは OS の設定に従い、独自の切り替えを置かない。`color-scheme: light dark` | R-22 | https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme 、B-2 |
 | D-13 動きは「保存しました」と `app.loading` の不透明度だけ。`prefers-reduced-motion: reduce` で 0 ms | R-23 | https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion 、B-6 |
 | D-14 本文 16 px、行間 1.6、14 px 未満なし、書体はシステムの sans-serif 1 つ、文字の段階は 4 つ | R-26、R-25 | https://design.digital.go.jp/foundations/typography/ 、B-4 |
@@ -141,6 +141,7 @@ verifier はこの表から受け入れテストを書く。識別子の詳し�
 | D-26 S3 の申告（完了、難しすぎ、簡単すぎ、今日はできない）に数秒の取り消しを置かない。予防は事前の注記 `task.report.note` と、主操作（塗り）と副操作（枠）の形と文言の違い（D-3）で行う。理由：(1) AC-5 と AC-7 の Then は申告の直後にその日の状態が確定し「再読み込みしても変わらない」ことで、数秒の猶予はこの読み方を変える。(2) 取り消しの知らせとボタンは S4 / S6 に重ねる要素になり、B-2 と D-10（重ねない）に反する。(3) 申告は法的・金銭的な入力ではなく、間違いの影響は 1 日 1 件で、段階は同じ申告が 2 回続いたときだけ動く（AC-8）ので、1 回の押し間違いで段階は変わらない。(4) 毎日の主操作に確認を足すと「手早い」に反する（design-reviewer r1 の 7） | R-6（1 日 1 つ、3 分で終える）、R-10（予防の文は問題の近くに） | https://www.w3.org/WAI/WCAG22/Understanding/error-prevention-legal-financial-data.html 、B-2 |
 | D-27 ファイルの読み込みは S1 と S8 で同じ型：見える `<button>`（副操作の形。保存データなしの S8 では主操作の形）が、隠した `<input type="file">` の `click()` を呼ぶ。input は `tabindex="-1"` と `aria-hidden="true"` でフォーカスと読み上げの順から外し、フォーカスの枠と名前はボタンが持つ。テストは input に setInputFiles する（9） | R-17（押せる範囲）、R-15（フォーカスの枠） | https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/file 、https://www.w3.org/WAI/WCAG22/Understanding/focus-visible.html 、B-6 |
 | D-28 ホバーと押した瞬間の見た目は tokens 4 の決まりだけ（ホバーは下線、押した瞬間は塗りと文字の入れ替え）。新しい色も transition も足さない | R-15（枠と状態の 3:1）、R-7（色は意味にだけ） | https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html 、B-5 |
+| D-29 ホーム画面のアイコンと manifest を置く。アイコンは `apple-touch-icon` 180 × 180 px の PNG 1 枚（10,000 バイト以下）で、地は color.bg（ライト）1 色、中央に「一」1 字を color.text（ライト）。影、枠、グラデーション、別の色は使わない。manifest は `name` と `short_name`「今日の一手」、`display: standalone`、`start_url` と `scope` は `./`。形の詳細は 8（Takuma の決定 D5、2026-10-30） | R-24（iOS は `apple-touch-icon` 180 × 180 を読む）、R-7（色は意味にだけ） | https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariWebContent/ConfiguringWebApplications/ConfiguringWebApplications.html 、B-2、B-5 |
 
 ## 5. 画面ごとの状態
 該当しない状態は「なし」と理由。オフラインは全画面で通常と同じ（アプリは読み込み後に通信を使わない。AC-12。Service Worker で再読み込みも同じ：AC-23）。初めての訪問でキャッシュがないままオフラインのときは、ブラウザ自身のエラーページになり、アプリの画面はない（対応は範囲の外）。「一部だけ読めたとき」は、保存は 1 キーの JSON を全体で検査して通るか落ちるかの 2 択（部分の読み込みをしない。読み込むファイルも同じ）なので、S0 の error 以外は「なし」。「権限を断られたとき」は、求める権限が初めて S3 を出した直後の `persist()` だけ（7）なので、S3 と S8 以外は「なし」。design-reviewer r1 の 2 により、すべての「なし」に理由を書く。
@@ -191,11 +192,11 @@ verifier はこの表から受け入れテストを書く。識別子の詳し�
 | S10 | 行 | `history.title`、`<ol>` `history.list`、`<li>` `history.row`（`data-task-id`、`data-date`、`data-report`、`data-helpful`）、行の中：`history.row.date`、`history.row.taskTitle`、`report.done` / `.tooHard` / `.tooEasy` / `.noTime` / `.none`、`helpful.yes` / `.no` / `.unanswered`、`<details>` の `<summary>` `history.row.answer`、答えの本文 `history.row.answerText`、空：`history.empty`、`history.empty.action` | 「答えを見る」（details は開閉の状態も読む） |
 
 ## 7. 文言
-です・ます、絵文字と感嘆符なし、ボタンは動詞。英語は plain、direct、動詞始まり（調査 5）。プレースホルダーは `{name}` で、数の複数形は ICU の `{n, plural, one {…} other {…}}`（日本語は複数形がないので数だけ）。日付は ISO 8601（YYYY-MM-DD）を両言語で使う（`data-date`、`data-stat-first-open-date` と見える文字を同じ値にするため。AC-7、AC-24）。課題集の本文と `tools` は日本語のみ（PRD Q4）で、ここには含めない。この表が ja と en の文言ファイルの原本（AC-26 の「片方にしかないキー 0 件」）。文字がデータから来る要素の `data-testid`（`task.today.title`、`task.why.text`、`task.how.text`、`task.goal.text`、`task.external.tools.item`、`history.row.taskTitle`、`history.row.answerText`、`history.row.date`、`settings.stats.*.value`）は文言キーではなく、6 の表だけにある。
+です・ます、絵文字と感嘆符なし、ボタンは動詞。英語は plain、direct、動詞始まり（調査 5）。プレースホルダーは `{name}` で、数の複数形は ICU の `{n, plural, one {…} other {…}}`（日本語は複数形がないので数だけ）。日付は ISO 8601（YYYY-MM-DD）を両言語で使う（`data-date`、`data-stat-first-open-date` と見える文字を同じ値にするため。AC-7、AC-24。Takuma の決定 D2、2026-10-30）。アプリ名 `app.name` は英語表示でも「今日の一手」のまま（Takuma の決定 D3、2026-10-30）。課題集の本文と `tools` は日本語のみ（PRD Q4）で、ここには含めない。この表が ja と en の文言ファイルの原本（AC-26 の「片方にしかないキー 0 件」）。文字がデータから来る要素の `data-testid`（`task.today.title`、`task.why.text`、`task.how.text`、`task.goal.text`、`task.external.tools.item`、`history.row.taskTitle`、`history.row.answerText`、`history.row.date`、`settings.stats.*.value`）は文言キーではなく、6 の表だけにある。
 
 | キー | 日本語 | 英語 | 使う場所 |
 |---|---|---|---|
-| app.name | 今日の一手 | 今日の一手 | ヘッダー（英語の表記は 10） |
+| app.name | 今日の一手 | 今日の一手 | ヘッダー。英語表示でも「今日の一手」のまま（Takuma の決定 D3、2026-10-30。ローマ字や英語名は置かない） |
 | app.loading | 読み込んでいます | Loading | S0（1 秒後。HTML に「読み込んでいます / Loading」と日英を併記：tech-lead r1 P2） |
 | app.noscript | このページは JavaScript が必要です。ブラウザの設定で JavaScript を有効にしてください。 | This page needs JavaScript. Turn on JavaScript in your browser settings. | S0（HTML に日英を併記：tech-lead r1 P2） |
 | nav.history | 履歴 | History | ヘッダー |
@@ -365,9 +366,28 @@ verifier はこの表から受け入れテストを書く。識別子の詳し�
 - 差をつける点が表れている場所（調査 6）：
   1. 課題そのものがホーム画面：S3 の初期表示。ヘッダー（アプリ名と nav）の直下に `task.today.label` と h1 `task.today.title`、続けて `task.why`。読み込みが終わった瞬間に題名と「なぜ今これか」が最初の画面に入る（幅 320 px、文字 100% で、題名から「なぜ今これか」の 2 行目までが初期表示に収まるように、ヘッダーの高さを 56 px 以内にする）。
   2. 「今日はここまで」と言い切る終わりの画面：S5 の h1 `task.done.title` と `task.done.message` の 2 行と、小さなリンク 1 つ。S4 は 1 問だけで `task.rate.close` で抜けられる。
-- ホーム画面のアイコンと manifest（tech-lead r1 P4。U-13 として Takuma の決定待ち。置かない場合はこの項と U-13 を削る）：
-  - 置くもの：`apple-touch-icon`（180 × 180 px の PNG 1 枚、10 KB 以下）と `manifest.webmanifest`（`name` と `short_name` は「今日の一手」、`display: standalone`、`start_url` と `scope` は `./`、`icons` は同じ PNG 1 枚）。どちらも初回転送 150 KB の中に数える。iOS は manifest の icons を使わず `apple-touch-icon` を読む（R-24）。
-  - 絵柄の案（D-20「画面の中のアイコン 0 個」と案A「一枚の紙」に合う最小の案）：地は color.bg のライトの値（#FFFFFF）1 色、中央に文字「一」1 字を color.text のライトの値（#1F1F1F）、書体はシステムの sans-serif の 700、字の幅はアイコンの幅の 60%。角丸はシステムが付けるので描かない。影、枠、グラデーションなし。「一」はアプリ名「今日の一手」の 1 字で、性格語「ひとつ」（1 日 1 つ）をそのまま表す。ダークモードの別版は作らない（iOS のホーム画面アイコンは 1 枚）。
+- ホーム画面のアイコンと manifest（D-29。tech-lead r1 P4 → U-13 → Takuma の決定 D5、2026-10-30。実際の PNG と manifest は backend-engineer が作る）：
+  - ファイルと置き場所：アイコンは配布物のルートの `./icon-180.png`（元は backend/public/icon-180.png：ADR 0001 の表）、manifest は `./manifest.webmanifest`。どちらも service-worker.md の 3 の FILES に入れ、budgets.md の 1 の枠（アイコンとマニフェストで 10,000 バイト）に数える。CSP は `img-src 'self'` と `manifest-src 'self'` で足りる（budgets.md の 3）。
+  - HTML の `<head>`：`<link rel="apple-touch-icon" href="./icon-180.png">` と `<link rel="manifest" href="./manifest.webmanifest">`。`<meta name="apple-mobile-web-app-capable" content="yes">` は R-24 の作法どおり（AC-22 のスタンドアロンの判定に要る）。URL はすべて相対（budgets.md の 4）。
+  - アイコンの形：
+    - 寸法：180 × 180 px、PNG、1 枚だけ（iOS は manifest の `icons` を使わず `apple-touch-icon` を読む：R-24。167 × 167 の iPad 用は置かず、iOS に縮小させる）。大きさは 10,000 バイト以下（2 色の PNG なので 2 KB 前後の想定）。
+    - 色：地は color.bg のライトの値（#FFFFFF）1 色で全面。字は color.text のライトの値（#1F1F1F）。比は 16.48:1（9 の表の「color.text on color.bg」ライトの組と同じ）。この 2 色以外は使わない。影、枠、グラデーション、角丸は描かない（角丸は iOS が付ける。B-2）。ダークモードの別版は作らない（iOS のホーム画面のアイコンは 1 枚で、ホーム画面が暗くても白いタイルは読める）。
+    - 文字：「一」1 字（U+4E00）。アプリ名「今日の一手」の 1 字で、性格語「ひとつ」（1 日 1 つ）をそのまま表す。画面の中のアイコン 0 個（D-20）とは別で、これは OS のホーム画面に置く「名札」。
+    - 書体：tokens 2 と同じシステムの sans-serif（作る環境では Hiragino Sans、太さ 700。`font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif`）。字の横幅がアイコンの幅の 60%（108 px。±4 px の誤差は可）になる大きさにし、字の箱の中心をアイコンの中心（90, 90）に置く。横棒の太さは書体の 700 のまま（約 12〜18 px）で、太らせない。
+    - 作り方（backend-engineer。1 行）：依存に既にある Playwright の Chromium で、`<body>` を 180 × 180 px・地 #FFFFFF・中央に「一」だけの HTML（上の書体と色。`deviceScaleFactor: 1`）を `page.screenshot({ type: 'png', clip: { x: 0, y: 0, width: 180, height: 180 } })` で PNG にし、`node scripts/check-budget.mjs` で 10,000 バイト以下を確かめる。
+  - manifest（`./manifest.webmanifest`、`Content-Type: application/manifest+json`）の項目はこの 7 つだけ：
+
+    | 項目 | 値 | 理由 |
+    |---|---|---|
+    | `name` | 今日の一手 | D3（英語でも同じ名前）。英語版の manifest は作らない |
+    | `short_name` | 今日の一手 | 5 字なので `name` と同じ |
+    | `lang` | ja | 名前が日本語のため |
+    | `start_url` | ./ | 相対（budgets.md の 4）。クエリは付けない（D6：記録しない） |
+    | `scope` | ./ | SW の scope と同じ（service-worker.md の 1） |
+    | `display` | standalone | AC-22 の `display-mode: standalone`。Android の Chrome もここでスタンドアロンになる |
+    | `icons` | `[{ "src": "./icon-180.png", "sizes": "180x180", "type": "image/png" }]` | 同じ PNG 1 枚。他の寸法は置かない（150 KB の枠と B-2） |
+
+    `theme_color` と `background_color` は置かない。置くとライトの地の色が Android の起動画面とツールバーに固定され、ダークモード（tokens 1）と合わなくなるため。`description` も置かない（ストアに載せないので読む人がいない）。
   - 置くと変わること：Android の Chrome も「ホーム画面に追加」でスタンドアロンになり、S1 の `home.standalone.import` が出る（AC-22 の判定 `display-mode: standalone` に含まれる）。
 - 参考にした原則のページ（URL、2026-10-30 確認）：https://www.w3.org/WAI/WCAG22/Understanding/use-of-color.html 、https://www.w3.org/WAI/WCAG22/Understanding/on-input.html 、https://www.w3.org/WAI/WCAG22/Understanding/label-in-name.html 、https://www.w3.org/WAI/WCAG22/Understanding/error-identification.html 、https://www.w3.org/WAI/WCAG22/Understanding/error-prevention-legal-financial-data.html 、https://www.w3.org/WAI/WCAG22/Understanding/text-spacing.html 、https://www.w3.org/WAI/ARIA/apg/patterns/alert/ 、https://www.w3.org/WAI/ARIA/apg/patterns/landmarks/ 、https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-contrast 、https://developer.mozilla.org/en-US/docs/Web/CSS/@media/forced-colors 、https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/details 、https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/file（ファイルの読み込みの部品。D-27）、https://www.w3.org/WAI/WCAG22/Understanding/focus-visible.html（D-27）。調査にある R-14〜R-26 の URL も使う。HIG は本文が取れなかったので引用しない（調査 8 の末尾）。
 
@@ -413,11 +433,7 @@ verifier はこの表から受け入れテストを書く。識別子の詳し�
 | radio | システム色（`color-scheme` と `accent-color` に従う） | 同左 | 同左 |
 
 ## 10. 決まっていないこと
-Takuma か tech-lead に決めてほしいこと。仕様はここに書いた暫定で進める。
-- U-1（Takuma、見た目）：主操作の色を青（color.action.primary = #1D4ED8 / ダーク #8AB4F8）に置いた。性格語「静か」に合う無彩色寄りの 1 色として選んだが、ブランドとして別の色がよければ tokens.md の 1 行を変えるだけで済む（比は計算し直す）。
-- U-2（Takuma、見た目）：日付を両言語で ISO 8601（2026-11-01）にした。AC-24 の「見える文字と data-stat が同じ値」と `data-date` を一致させるため。日本語で「2026年11月1日」にしたい場合は、AC-24 の読み方（属性と見える文字の対応）を verifier と決め直す。
-- U-3（Takuma）：英語表示のときのアプリ名。`app.name` と文中の名前は英語でも「今日の一手」のまま置いた。ローマ字（Kyou no Itte）や英語名が要るか。
-- U-4（Takuma、見た目）：S5 に完了した課題の題名を 1 行残す（`task.done.task`）か、h1 と 1 文だけにするか。D-4 は残す側に置いた。
+Takuma か tech-lead に決めてほしいこと。仕様はここに書いた暫定で進める。U-1〜U-4 と U-13 は r4 で決まった（下の「決まったこと（r4 で閉じた）」）。番号は他の文書（docs/adr/features/001-daily-learning.md、docs/reviews/）が引くので欠番のまま残す。
 - U-5（tech-lead、PRD にない挙動）：保存データが形式に合わないときの S0 の error 状態（`error.app.*`。再読み込み、壊れたデータのファイル保存、削除）と、保存先が使えないときの変種（`error.app.storageUnavailable.*`。tech-lead r1 P1）。PRD の 10 の「保存の方式を後から変えてデータを失う」の手当てとして置いたが、PRD の AC にはない。tech-lead r1 の確定案は「採る。error にする条件は JSON.parse の失敗、スキーマ不一致、formatVersion が新しい、localStorage の例外」。確定は ADR。
 - U-6（tech-lead）：答えの欄の文字数の上限 `answer.max`（localStorage の容量の都合。`task.answer.limit` の {max}）。
 - U-7（tech-lead）：診断のやり直し（S8 → S2）の保存の仕方。初回は質問ごとに保存する（AC-11）が、やり直しの途中で「やめる」を押したときに元の診断が壊れないよう、やり直しは下書きに保存して「診断を終える」で確定する作りを求める。PRD の「回答は質問ごとに確定したときに保存する」は初回の規則として読んだ。
@@ -426,13 +442,28 @@ Takuma か tech-lead に決めてほしいこと。仕様はここに書いた�
 - U-10（verifier、PRD の読み方）：AC-21 の状態の説明（PRD 11 の冒頭）は案内を「重ねて出す」と書くが、AC-21 の Then は「画面に案内がある」で足りるので、R-18 と AC-31 に合わせて重ねずに本文の一部として置いた（D-10）。テストは `[data-testid="home.addToHomeScreen"]` の存在で見る。
 - U-11（verifier、識別子の名前）：PRD が仮に置いた `task-answer` を、他のキーと同じドット区切りの `task.answer` にした。tech-lead r1 の確定案も `task.answer`。確定は contracts/。
 - U-12（Takuma、見た目）：radio のラベル全体を 44 px の高さにし、q2 の段階に 1 行の説明（`level.*.desc`）を付けた。説明は自己評価のぶれを減らすためだが、PRD の 3 問の文面は pdm と Takuma が最終的に決める。
-- U-13（Takuma、見た目。tech-lead r1 P4）：ホーム画面のアイコン（`apple-touch-icon` 180 px の PNG、10 KB 以下）と manifest（`name`、`display: standalone`、`start_url` と `scope` は `./`）を置くか。置く場合の形と絵柄の案（白地に「一」1 字）は 8 に書いた。Takuma の決定待ち。置かない場合は 8 の項とこの U-13 を削り、iOS のアイコンはページの縮小画像のままになる。
+- 決まったこと（r4 で閉じた。Takuma の決定 D1〜D5、2026-10-30。docs/approvals/001-daily-learning-G0.md の末尾「G1 の途中で出た決定」。返事は「すべて推奨どおり」）：
+  - U-1 → D1：主操作の色は青（color.action.primary = ライト #1D4ED8 / ダーク #8AB4F8。tokens.md の 1）。変更なし。
+  - U-2 → D2：日付は両言語で ISO 8601（2026-11-01）。7 の前書きと D-11 に明記。AC-24 の読み方は変えない。
+  - U-3 → D3：英語表示でもアプリ名は「今日の一手」のまま。ローマ字や英語名は置かない。7 の `app.name` に明記。
+  - U-4 → D4：S5 に完了した課題の題名を 1 行残す（`task.done.task`）。D-4、5 の S5、screens.md の S5 のとおり。変更なし。
+  - U-13 → D5：ホーム画面のアイコン（白地に「一」1 字、180 px の PNG、10,000 バイト以下）と manifest を置く。確定の形は 8 と D-29。PNG は backend-engineer が作る。
 - 決まったこと（r2 で閉じた）：申告の取り消しは置かない（D-26）。ファイルの読み込みの部品は S1 と S8 で同じ型（D-27）。ホバーと押した瞬間は tokens 4（D-28）。ダイアログの背景は color.overlay（tokens 1）。
 - 決まったこと（r3 で閉じた。契約との整合）：
   - U-5、U-6、U-7、U-8、U-11 の確定先は contracts/（data.md、identifiers.md）と ADR。仕様の表記は契約と同じ（`answer.max` は 2000：data.md 10）。
   - `settings.stats.firstOpenDate`（「初めて開いた日」/「First opened」）の文言は変えない。契約 data.md 2 で値は「初回の診断の 1 問目を確定した日」になった（案内を閉じただけの日は数えない）が、(1) PRD 13 の指標と AC-24 の Given は「初めて開いた日」の語で書かれ、利用者が送る S9 のスクリーンショットをこの語で読む約束になっている。(2) 同じ語は `settings.stats.firstDayCompleted`（「初めて開いた日に完了したか」）と `settings.import.confirm.summary` にもあり、変えるなら 3 キーをそろえて PRD 13 の語も変えることになる。(3) D-1 の流れ（S1 → 診断）では、開いた日と 1 問目の日は同じ日で、違うのは案内を閉じて診断せずに去った人だけ。その人にとっても「使い始めた日」の意味で読める。英語「First opened」も同じ理由で残す。別の語（「始めた日」）がよければ Takuma の決定で 3 キーの文言だけを変える（キーと `data-stat-first-open-date` は変えない：ADR 0002）。
 
 ## 11. 変更の記録
+### G1 r3 → r4（Takuma の決定 D1〜D5。小さな直しだけ）
+| 決定 | 直した所 |
+|---|---|
+| D1（U-1。主操作の色は青） | 10 の「決まったこと（r4）」に移した。tokens.md の値は変えない |
+| D2（U-2。日付は ISO 8601） | 7 の前書きと 4 の D-11 に決定の印。10 に移した |
+| D3（U-3。英語でも「今日の一手」） | 7 の前書きと `app.name` の使う場所（「英語の表記は 10」を消した）。10 に移した |
+| D4（U-4。完了画面に題名 1 行） | 4 の D-4 に決定の印。10 に移した。5 の S5 と screens.md の S5 は変更なし |
+| D5（U-13。アイコンと manifest） | 4 に D-29 を足した。8 の項を確定の形に書き直した（ファイル名 `./icon-180.png` と `./manifest.webmanifest`、HTML の `<link>`、寸法、色のトークン名、文字、書体、幅 60%、作り方 1 行、manifest の 7 項目と置かない項目）。10 に移した。tokens.md の 1 に「アイコンは color.bg と color.text のライトの値だけ」の 1 行。確かめの 1 行目を D-1〜D-29 に |
+| 共通 | ヘッダーを r4 に。11 の r1 → r2 の P4 の行を「r4 で D5 として確定」に書き換えた（Takuma の判断を待つ旨の語をファイルから消すため）。文言キーの総数は 145 のまま。research は直していない |
+
 ### G1 r2 → r3（design-reviewer r2 の提案 1〜4 と、契約との整合）
 | 指摘 | 直した所 |
 |---|---|
@@ -465,14 +496,14 @@ design-reviewer r2 と tech-lead が追跡するための一覧。行番号は r
 | tech-lead P1（保存が使えない） | 1 の流れ、5 の S0、6 の S0、7 に `error.app.storageUnavailable.message` / `.detail` を追加（143 → 145 キー）、10 の U-5 |
 | tech-lead P2（殻の 2 文） | 5 の S0、7 の `app.loading` と `app.noscript` の使う場所（HTML に日英を併記。キーは残す） |
 | tech-lead P3（ダイアログ） | 2 の AC-31、3 のダイアログの行、5 のダイアログ 2 行（開くときに足し、閉じたら外す。数え方は契約） |
-| tech-lead P4（アイコンと manifest） | 8 の項と 10 の U-13（Takuma の決定待ち） |
+| tech-lead P4（アイコンと manifest） | 8 の項と 10 の U-13（r2 では Takuma に決めてもらう項として置いた。r4 で D5 として確定） |
 | tech-lead A（U-8、U-11 の確定案） | 10 の U-5、U-8、U-11 に確定案を書いた。仕様の表記は変えていない（確定案と同じ） |
 
 ## 確かめ（提出前に designer が印を付ける。design-reviewer はこれを信じずに確かめる）
-- [x] 調査が先にあり、決定表のすべての行に R-n と原則がある（R-n は調査に実在する）：D-1〜D-28。調査は 854cf47 でコミット済み
+- [x] 調査が先にあり、決定表のすべての行に R-n と原則がある（R-n は調査に実在する）：D-1〜D-29。調査は 854cf47 でコミット済み
 - [x] 全画面に、仕事、主操作1つ、使う標準部品がある（3 の表。S0〜S10 とダイアログ）
 - [x] 全画面の7つの状態が埋まっている（5 の表。「なし」のすべてに理由がある：r2 で数えて 0 件の理由なし）
 - [x] 押せる範囲が 44x44pt 以上（`app.name` と nav のリンクを含む）。コントラストが基準を満たし、独自の色の組に数字が3通りある（9 の表。文字と枠の組の最小は 5.33:1（color.border、ライト）。color.overlay を重ねた地とダイアログの組は 1.06:1 と 1.35:1 の値があるが、地か枠のどちらかで 3:1 以上になる設計で、表の注記のとおり）
 - [x] AX5 での並びと、VoiceOver の読み上げ順が書いてある（9）
-- [x] 性格語と差をつける点が、画面のどこに表れているか書いてある（8）
+- [x] 性格語と差をつける点が、画面のどこに表れているか書いてある（8。ホーム画面のアイコンの「一」は性格語「ひとつ」）
 - [x] 文言が日英そろい、テストで使う要素に accessibilityIdentifier（data-testid）がある（6、7）
