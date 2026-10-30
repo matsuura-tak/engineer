@@ -24,3 +24,4 @@
 - 2026-10-30 001-daily-learning G1 確認 pdm（読むだけ）：契約の段階の規則と統計の数え方は PRD と一致。firstOpenDate は「初回の診断の1問目を確定した日」に固定すべき（契約 data.md :18/:30/:38 の直しは tech-lead）。PRD 11 冒頭と 13 の母数に明記が要る。AC-8 に例を足すかは Takuma（D9、D10）
 - 2026-10-30 001-daily-learning G1 PASS design-reviewer r2 PASS、tech-lead r1 PASS、reviewer（設計）r1 PASS（要修正1：起動時の setItem の文の矛盾。提案6）。要修正と firstOpenDate の不整合は tech-lead が直す。Takuma の D1〜D10 は返事待ち（docs/reviews/001-daily-learning-G1-reviewer-r1.md）
 - 2026-10-30 001-daily-learning G1 要修正の反映 tech-lead（契約・ADR、firstOpenDate）52dc7bb、designer r3（提案4件、契約との整合）をコミット。残り：Takuma の D1〜D10 → pdm の PRD 直しと再承認 → verifier の受け入れテスト（9）
+- 2026-10-30 001-daily-learning G1 Takuma の決定 D1〜D10 すべて推奨どおり（docs/approvals/001-daily-learning-G0.md）。pdm に PRD r6（D6、D9、D10、段階の規則の文）を任せ、再承認へ
