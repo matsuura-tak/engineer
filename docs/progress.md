@@ -29,3 +29,4 @@
 - 2026-10-31 001-daily-learning G2（受け入れテスト）判定r1 reviewer PASS（要修正1：AC-2 の計測）、tech-lead FAIL（重大1：AC-18 の Tab が WebKit で止まらない。要修正4）。依存の置き場所は B（tests/acceptance の中）。tech-lead が契約・ADR・CLAUDE.md を直し、verifier がテストを直して tech-lead r2 へ（docs/reviews/001-daily-learning-G2-tests-reviewer-r1.md、docs/reviews/001-daily-learning-G2-tests-tech-lead-r1.md）
 - 2026-10-31 001-daily-learning G2（受け入れテスト）判定r2 tech-lead PASS（要修正1：時間の計り方）。reviewer r1 PASS と合わせて2体 PASS。要修正は契約に「時間の計り方」を足して verifier が直し、その後 push と下書き PR（docs/reviews/001-daily-learning-G2-tests-tech-lead-r2.md）
 - 2026-10-31 001-daily-learning 受け入れテスト r3（時間の計り方）をコミット 478ef41。push は Takuma が許可せず保留。PRD r7（pdm）をコミット。Takuma に push の方法、D8、r7 の再承認と Q11 を聞く
+- 2026-11-01 001-daily-learning G0 再承認 Takuma が PRD r7 を承認、Q11 は A。push と下書き PR は指揮役が実行（docs/approvals/001-daily-learning-G0.md）
