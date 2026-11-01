@@ -1,8 +1,8 @@
 # デザイン仕様 001-daily-learning：診断と今日の学習（今日の一手）
 
-- 対象の PRD：docs/prd/001-daily-learning.md（r5、G0 承認済み。AC-1〜AC-32）
+- 対象の PRD：docs/prd/001-daily-learning.md（r7、G0 承認済み（r7 は 2026-10-31 に再承認、Q11 は A）。AC-1〜AC-32）
 - 調査：design/001-daily-learning-research.md（この仕様より先に書いた。コミット 854cf47）。方向性は案A「一枚の紙」
-- 書いた役：designer　日付：2026-10-30（r4。r2 は G1 r1 の design-reviewer と tech-lead の指摘を反映。r3 は G1 r2 の design-reviewer の提案 1〜4 と、契約（contracts/data.md、identifiers.md）で確定した事項との整合。r4 は Takuma の決定 D1〜D5（docs/approvals/001-daily-learning-G0.md 末尾、2026-10-30）で U-1〜U-4 と U-13 を確定にした。直した箇所の一覧は 11）
+- 書いた役：designer　日付：2026-11-01（r5。r2 は G1 r1 の design-reviewer と tech-lead の指摘を反映。r3 は G1 r2 の design-reviewer の提案 1〜4 と、契約（contracts/data.md、identifiers.md）で確定した事項との整合。r4 は Takuma の決定 D1〜D5（docs/approvals/001-daily-learning-G0.md 末尾、2026-10-30）で U-1〜U-4 と U-13 を確定にした。r5 は PRD r7（AC-14 の Given と 2 通り目。Q11 は A）と契約の確定（contracts/budgets.md 6 の `<head>` 5 行、contracts/data.md 2 のやり直しを終えた後の行き先）に合わせた 2 点の小さな直し。直した箇所の一覧は 11）
 - 図：design/001-daily-learning/screens.md（文字で描いた画面の図）
 - トークン：design/tokens.md（色、文字、余白。この仕様はトークンの名前だけを使う）
 - 原則の番号 B-1〜B-6 は .claude/skills/craft-designer/SKILL.md にある。
@@ -70,7 +70,7 @@ verifier はこの表から受け入れテストを書く。識別子の詳し�
 | AC-11 | S2（エラー） | 2 問目で `diagnosis.next` → 保存の失敗 → `error.storage.message`、`error.storage.retry`。`data-question-index`=2 のまま、radio の `checked` が保たれる → `error.storage.retry` → 3 問目 |
 | AC-12 | S1〜S6 | オフラインで AC-1、AC-2、AC-5、AC-7、AC-9 と同じ操作。送信 0 件（画面は通常と同じ。5 のオフライン列） |
 | AC-13 | S3 → S5、S8 | persist() の拒否を注入 → 完了 → 再読み込み → `task.done`。S8 に `settings.storage.notPersisted` と `settings.export` |
-| AC-14 | S8 → S2 → S3、S10 | `settings.redo` → S2 → 別の領域 → `diagnosis.finish` → S3 の `data-task-area`。S10 の行が 3 件のまま |
+| AC-14 | 1 通り目：S7 → S8 → S2 → S3、S10。2 通り目：S3（今日の課題あり）→ S8 → S2 → S3（同じ課題）、翌日 S3 | 1 通り目（Given は `task.exhausted`。PRD r7）：S7 の `nav.settings` → S8 の `settings.redo` → S2 → 別の領域 → `diagnosis.finish` → S3 の `data-task-area` が新しい領域。S10 の行が 3 件のまま。2 通り目（PRD r7、Q11 は A）：S3（`task.today`。`data-task-id` を控える）の `nav.settings` → S8 の `settings.redo` → S2 → 別の領域 → `diagnosis.finish` → S3 のまま（状態 `task.today`、`data-task-id` がやり直しの前と同じ）。S10 の行が 3 件のまま。日付を翌日にして開く → S3 の `data-task-area` が新しい領域。行き先は 1 の S8 の「出していれば元の状態のまま。新しい診断は明日から効く」と契約 data.md 2（やり直しの診断の保存と終えた後の行き先）のとおり |
 | AC-15 | S0 → S3 | ルートの `data-debug-load-ms`（S3 を表示した時点で書く） |
 | AC-16 | S8 → ダイアログ → S1 | `settings.delete` → `[data-testid="settings.delete.confirm"]` の `settings.delete.confirm.ok` → 再読み込み → `diagnosis.start` |
 | AC-17 | S1、S3、S5、S7 | 幅 320 で scrollWidth、ellipsis 0 件（トークンの `overflow-wrap: anywhere`、ellipsis 不使用） |
@@ -368,7 +368,7 @@ verifier はこの表から受け入れテストを書く。識別子の詳し�
   2. 「今日はここまで」と言い切る終わりの画面：S5 の h1 `task.done.title` と `task.done.message` の 2 行と、小さなリンク 1 つ。S4 は 1 問だけで `task.rate.close` で抜けられる。
 - ホーム画面のアイコンと manifest（D-29。tech-lead r1 P4 → U-13 → Takuma の決定 D5、2026-10-30。実際の PNG と manifest は backend-engineer が作る）：
   - ファイルと置き場所：アイコンは配布物のルートの `./icon-180.png`（元は backend/public/icon-180.png：ADR 0001 の表）、manifest は `./manifest.webmanifest`。どちらも service-worker.md の 3 の FILES に入れ、budgets.md の 1 の枠（アイコンとマニフェストで 10,000 バイト）に数える。CSP は `img-src 'self'` と `manifest-src 'self'` で足りる（budgets.md の 3）。
-  - HTML の `<head>`：`<link rel="apple-touch-icon" href="./icon-180.png">` と `<link rel="manifest" href="./manifest.webmanifest">`。`<meta name="apple-mobile-web-app-capable" content="yes">` は R-24 の作法どおり（AC-22 のスタンドアロンの判定に要る）。URL はすべて相対（budgets.md の 4）。
+  - HTML の `<head>`（契約 budgets.md の 6 の 5 行と同じ。URL はすべて相対：budgets.md の 4）：`<title>今日の一手</title>`、`<meta name="apple-mobile-web-app-title" content="今日の一手">`、`<meta name="apple-mobile-web-app-capable" content="yes">`、`<link rel="apple-touch-icon" href="./icon-180.png">`、`<link rel="manifest" href="./manifest.webmanifest">`。`<title>` と `apple-mobile-web-app-title` の値は文言 `app.name`（ja と en で同じ「今日の一手」。D3）で、ホーム画面に置いたときの名前がアイコンの下に出る。`apple-mobile-web-app-capable` は R-24 の作法どおり（AC-22 のスタンドアロンの判定に要る）。`apple-mobile-web-app-title` は Apple の公式の文書で確かめていない（budgets.md の 6 の注のとおり。効かなくても `<title>` と manifest の `name` が同じ値なので結果は同じ）。
   - アイコンの形：
     - 寸法：180 × 180 px、PNG、1 枚だけ（iOS は manifest の `icons` を使わず `apple-touch-icon` を読む：R-24。167 × 167 の iPad 用は置かず、iOS に縮小させる）。大きさは 10,000 バイト以下（2 色の PNG なので 2 KB 前後の想定）。
     - 色：地は color.bg のライトの値（#FFFFFF）1 色で全面。字は color.text のライトの値（#1F1F1F）。比は 16.48:1（9 の表の「color.text on color.bg」ライトの組と同じ）。この 2 色以外は使わない。影、枠、グラデーション、角丸は描かない（角丸は iOS が付ける。B-2）。ダークモードの別版は作らない（iOS のホーム画面のアイコンは 1 枚で、ホーム画面が暗くても白いタイルは読める）。
@@ -454,6 +454,13 @@ Takuma か tech-lead に決めてほしいこと。仕様はここに書いた�
   - `settings.stats.firstOpenDate`（「初めて開いた日」/「First opened」）の文言は変えない。契約 data.md 2 で値は「初回の診断の 1 問目を確定した日」になった（案内を閉じただけの日は数えない）が、(1) PRD 13 の指標と AC-24 の Given は「初めて開いた日」の語で書かれ、利用者が送る S9 のスクリーンショットをこの語で読む約束になっている。(2) 同じ語は `settings.stats.firstDayCompleted`（「初めて開いた日に完了したか」）と `settings.import.confirm.summary` にもあり、変えるなら 3 キーをそろえて PRD 13 の語も変えることになる。(3) D-1 の流れ（S1 → 診断）では、開いた日と 1 問目の日は同じ日で、違うのは案内を閉じて診断せずに去った人だけ。その人にとっても「使い始めた日」の意味で読める。英語「First opened」も同じ理由で残す。別の語（「始めた日」）がよければ Takuma の決定で 3 キーの文言だけを変える（キーと `data-stat-first-open-date` は変えない：ADR 0002）。
 
 ## 11. 変更の記録
+### G2 r4 → r5（PRD r7 と契約の確定に合わせた 2 点。小さな直しだけ）
+| 元 | 直した所 |
+|---|---|
+| PRD r7 の AC-14（Given を `task.exhausted` に明記。2 通り目を追加。Q11 は A） | 2 の AC-14 の行を 2 通りに（1 通り目：S7 → S8 → S2 → S3。2 通り目：S3（今日の課題あり）→ S8 → S2 → S3 のまま同じ課題、翌日 S3 が新しい領域）。1 の流れの S8 の「診断をやり直す」の行（出していれば元の状態のまま。新しい診断は明日から効く）と契約 data.md 2（やり直しを終えた後の行き先）に矛盾はなく、1 は変えていない |
+| 契約 budgets.md の 6（`<head>` の 5 行） | 8 のアイコンと manifest の項の `<head>` に `<title>` と `apple-mobile-web-app-title`（値はどちらも「今日の一手」）を足し、契約の 5 行と同じにした。D-29 の本文は変えていない（`<head>` の詳細は 8 に委ねている） |
+| 共通 | ヘッダーを r5 に、対象の PRD を r7 に。文言キーの総数は 145 のまま。research、tokens.md、screens.md は直していない |
+
 ### G1 r3 → r4（Takuma の決定 D1〜D5。小さな直しだけ）
 | 決定 | 直した所 |
 |---|---|
