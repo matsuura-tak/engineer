@@ -30,3 +30,4 @@
 - 2026-10-31 001-daily-learning G2（受け入れテスト）判定r2 tech-lead PASS（要修正1：時間の計り方）。reviewer r1 PASS と合わせて2体 PASS。要修正は契約に「時間の計り方」を足して verifier が直し、その後 push と下書き PR（docs/reviews/001-daily-learning-G2-tests-tech-lead-r2.md）
 - 2026-10-31 001-daily-learning 受け入れテスト r3（時間の計り方）をコミット 478ef41。push は Takuma が許可せず保留。PRD r7（pdm）をコミット。Takuma に push の方法、D8、r7 の再承認と Q11 を聞く
 - 2026-11-01 001-daily-learning G0 再承認 Takuma が PRD r7 を承認、Q11 は A。push と下書き PR は指揮役が実行（docs/approvals/001-daily-learning-G0.md）
+- 2026-11-01 001-daily-learning 実装前の準備が完了 PR #4（下書き）。契約 Q11、テスト 133 本（red）、design r5 をコミット。Takuma の D8（app.json の backend_test）待ちで、入り次第 backend-engineer の実装（G2）へ
