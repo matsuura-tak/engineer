@@ -1,7 +1,7 @@
 # 技術設計メモ 001-daily-learning：診断と今日の学習（今日の一手）
 
 - 書いた役：tech-lead　日付：2026-10-30
-- PRD：docs/prd/001-daily-learning.md（r6、AC-1〜AC-32）　デザイン：design/001-daily-learning.md（r4）　契約：contracts/（HTTP の API はないので OpenAPI はない。一覧は contracts/README.md）
+- PRD：docs/prd/001-daily-learning.md（r7、AC-1〜AC-32）　デザイン：design/001-daily-learning.md（r4）　契約：contracts/（HTTP の API はないので OpenAPI はない。一覧は contracts/README.md）
 - 読み替え：型の「operationId」は「契約のファイルと項目」、「iOS」は「ブラウザ（Safari 17 以上、Chrome の最新 2 版）」に読み替える。spectral と oasdiff は使えないので、JSON Schema の検査と見本のテストで代える（指揮役の裁定 E2）。
 - Takuma の決定 D1〜D10（2026-10-30、すべて推奨どおり。docs/approvals/001-daily-learning-G0.md の末尾）を反映した。決定と反映先の一覧は 10。
 
@@ -27,7 +27,7 @@ operationId は全行「なし（端末のみ）」。代わりに「データ�
 | AC-11 | S2 | なし（端末のみ） | data.md の 2（1 問ごとに 1 回の setItem。保存データが「なし」か「診断の途中」の起動では setItem を呼ばない（AC-11 の注入はこの状態で行う）。「あり」の起動では data.md の 2 のとおり最大 1 回）、W-9 | 受け入れ 2：setItem の失敗の注入 |
 | AC-12 | S1〜S6 | なし（端末のみ） | test-hooks.md の W-12（送信の数え方）、W-13（オフラインにする前に SW の準備を待つ）、CSP の `connect-src 'self'` | 受け入れ 2：オフライン |
 | AC-13 | S3 → S5、S8 | なし（端末のみ） | `device.persistRequested`、`device.persistGranted`、W-9 | 受け入れ 2：persist の拒否の注入 |
-| AC-14 | S7 → S8 → S2 → S3、S10 | なし（端末のみ） | data.md の 2（やり直しは終えるときに 1 回）、4 の 6-4。seed は AC-10 と同じく本番の課題集から作る「出し終えた」履歴（過去 3 日の 3 件が `done`）。fixtures/seeds/seed-ac14-three-completed.json は Given を満たさない（test-hooks.md の W-7） | 受け入れ 2 |
+| AC-14 | 1 通り目：S7 → S8 → S2 → S3、S10。2 通り目：S3 → S8 → S2 → S3（同じ課題）、翌日 S3、S10 | なし（端末のみ） | 1 通り目：data.md の 2（やり直しは終えるときに 1 回、行き先）、4 の 6-4。seed は AC-10 と同じく本番の課題集から作る「出し終えた」履歴（直近 3 日の 3 件が `done`）。2 通り目：data.md の 2（今日の課題を出した後は `current` を書かない、行き先）、4 の 6-3（直後は同じ `data-task-id`）、翌日の 6-1 と 6-4（`data-task-area` が新しい領域）。seed は fixtures/seeds/seed-ac14-three-completed.json の形で 2026-11-04 に開く（test-hooks.md の W-7） | 受け入れ 2：2 通り |
 | AC-15 | S0 → S3 | なし（端末のみ） | `data-debug-load-ms`、W-11 の制限、budgets.md の 1 と 4 | 受け入れ C：5 回 |
 | AC-16 | S8 → ダイアログ → S1 | なし（端末のみ） | data.md の 7（`removeItem` だけ）、W-7 の印 | 受け入れ 2 |
 | AC-17 | S1、S3、S5、S7 | なし（端末のみ） | strings.md の 5（`<pre>` なし、`<code>` は折り返す）、tasks.schema.json の「```」の禁止 | 受け入れ 2：幅 320 |
@@ -305,3 +305,6 @@ G2（受け入れテスト）の tech-lead r1 と reviewer r1 で「契約、ADR
 - test-hooks.md：W-7 に AC-14 の seed（本番の課題集から作る出し終えた履歴。seed-ac14-three-completed.json は Given を満たさない）を足した。2 の AC-14 の行も直した。PRD の Given の書き方は pdm への問い（G2 tech-lead r1 の未解決 (2)）。
 - test-hooks.md の W-6 と budgets.md の 2：予算のテストの名前を `BUDGET2_` で始め、AC の表に混ぜないとした（G2 reviewer r1 の提案 4）。
 - test-hooks.md（G2 tech-lead r2）：「時間の計り方」の節を足した（AC-1、AC-2 はページの中で click の capture から MutationObserver まで、AC-23 はテスト側の `commit` と 20 ms おきの `expect.poll`。案 (b) は選ばない）。W-3、W-10 に参照を足し、「キーボードの移動キー」の Linux の未確認に WebKit のソースの裏付けを足した（最初の CI で確かめるのは残す）。
+
+PRD r7 と Takuma の Q11 の決定（A：AC-14 に 2 通り目を足す。2026-11-01）に合わせた（2026-11-01、tech-lead）。1 行に 1 つの変更。
+- Q11：test-hooks.md の W-7 の AC-14 を 2 通り（1 通り目は出し終えた履歴、2 通り目は seed-ac14-three-completed.json の形で開いて `task.today` を出してからやり直し、翌日に固定して開く）にし、data.md の 2 にやり直しを終えた後の行き先（4 の 6-2〜6-4 と同じ）を 1 項足した。2 の AC-14 の行を 2 通りにし、冒頭の PRD を r7 にした。

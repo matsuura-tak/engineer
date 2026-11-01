@@ -53,8 +53,12 @@ verifier G0 r3 の W-1〜W-16 を、名前と値まで決めたものです。�
 - seed の setItem は、W-9 の失敗の注入より先に登録する（失敗は印を立てた後の 1 回だけなので seed は落ちないが、順番も守る）。
 - AC-24 の seed は、時刻を固定する日（2026-11-06）の行を `history` に入れる。入れないと、開いたときにアプリがその日の課題を出し、`issued` が 1 増える（data.md の 4 の 6）。見本：fixtures/seeds/seed-ac24-stats.json。
 - AC-8 の seed の各行の `level` は、その課題が出たときの段階にする（PRD 11 の AC-8 の確かめ方、data.md の 5）。見本は fixtures/seeds/ の `seed-ac8-*`（3 件。対応は data.md の 5 の表）。9 通り目の seed だけは、`levels` が `intermediate` で古い 2 行の `level` が `advanced` になる。
-- AC-14 の seed は、AC-10 と同じく本番の課題集から作る「出し終えた」履歴にする（今の組の課題をすべて `history` に入れ、そのうち過去 3 日の 3 件を `done` にする）。PRD の Given「今日の課題はまだ出していない」は、data.md の 4 の 6-4 の下では、目標の組を出し終えた日（`task.exhausted`）にしか作れないため。固定の seed は置かない（課題集の中身に依存するため）。
-  - fixtures/seeds/seed-ac14-three-completed.json は、開くと今日の課題が出るので AC-14 の Given を満たさない。名前は残し、完了 3 件の履歴の見本として AC-5 などに使う。
+- AC-14 の seed は 2 通り（PRD r7 の AC-14 の確かめ方。Q11 は A）。
+  - 1 通り目（`task.exhausted` からやり直す）：出し終えた履歴（完了 3 件を含む）。AC-10 と同じく本番の課題集から作る（今の組の課題をすべて `history` に入れ、そのうち直近 3 日の 3 件を `done` にする）。PRD の Given「今日の課題はまだ出していない」は、data.md の 4 の 6-4 の下では、目標の組を出し終えた日（`task.exhausted`）にしか作れないため。固定の seed は置かない（課題集の中身に依存するため）。
+  - 2 通り目（`task.today` からやり直す）：fixtures/seeds/seed-ac14-three-completed.json の形（完了 3 件、最後の行は 2026-11-03、`current` なし）で開き、`task.today` とその `data-task-id` を確かめてからやり直す。時刻は最後の行より後の日（例 2026-11-04）に固定する（2026-11-03 に開くと 4 の 6-2 で `task.done` になる）。やり直しで選ぶ領域は seed の `backend` 以外にする。
+    - やり直しの直後：data.md の 2 の表（今日の課題を出した後のやり直しは `current` を書かない）と、終えた後の行き先（同じ 2）により、4 の 6-3 で `task.today` のままで `data-task-id` はやり直しの前と同じ。
+    - 翌日（例 2026-11-05）に固定して開く：4 の 6-1 で前日の課題が `report: "none"` の行に移り、6-4 で新しい `diagnosis.area` と `levels` の課題が出る（`data-task-area` が新しく選んだ領域）。完了した課題は 3 件のまま（`none` は完了でない。S10 の行は 4 行になる）。
+  - seed-ac14-three-completed.json は 1 通り目の Given を満たさない（開くと今日の課題が出る）。完了 3 件の履歴の見本として、AC-14 の 2 通り目のほか AC-5、AC-16 などにも使う。
 
 ## W-8 履歴の読み出し
 - S10 の `[data-testid="history.row"]` の `data-task-id`、`data-date`、`data-report`（`done`、`too_hard`、`too_easy`、`no_time`、`none`）、`data-helpful`（`done` の行だけ。`helpful`、`not_helpful`、`unanswered`）。
