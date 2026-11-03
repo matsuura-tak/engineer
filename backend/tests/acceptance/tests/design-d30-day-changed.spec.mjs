@@ -3,9 +3,11 @@
 // contracts/data.md の 4「画面を開いたまま日付が変わったとき」、contracts/identifiers.md の 3、contracts/test-hooks.md の W-3（読み込まずに setFixedTime を呼び直す）。
 // PRD の AC の Then にない要素（知らせ）を確かめるので、名前は `DESIGN_D30_`（AC 番号を付けず、G3 の AC の表には混ぜない。test-plan.md の 2 章）。
 // U-15（design 10、contracts/data.md 4「対象の外」、docs/approvals/delegation.md 2026-11-04）：初回の S2 では日付を確かめず、そのまま実行する。名前は `DESIGN_U15_`。
+// 知らせのある S3 の axe の監査は PRD AC-27 の Given（6 つの画面）の外なので、AC-27 のループに足さず、ここで `DESIGN_D30_` として行う（W-6、tech-lead G2 r3 の要修正）。
+import AxeBuilder from '@axe-core/playwright';
 import { test, expect } from '../helpers/fixtures.mjs';
 import * as app from '../helpers/app.mjs';
-import { injectSeed, loadContractFixture, makeSeed, tasksOf, addDays } from '../helpers/seed.mjs';
+import { injectSeed, loadContractFixture, makeSeed, tasksOf, addDays, injectStorageFailure, armStorageFailure } from '../helpers/seed.mjs';
 
 const SEED = 'seeds/seed-ac14-three-completed.json';
 const DAY = '2026-11-04';
@@ -29,6 +31,23 @@ async function expectDayChangedNotice(page, firstTestIdOfScreen, ja) {
     firstTestIdOfScreen,
   );
   expect(precedes, `task.dayChanged が ${firstTestIdOfScreen} より前にある`).toBe(true);
+}
+
+/** 知らせのある S3 を作る：seed-ac14 を 11-04 23:55 に開き、11-05 0:05 に固定して読み込まずに task.report.done（design 2 の表の下の手順、W-3）。前の課題と翌日の課題の素性を返す。 */
+async function openDayChangedToday(context, page, baseURL) {
+  await injectSeed(context, loadContractFixture(SEED));
+  await app.fixDate(page, DAY, '23:55:00');
+  await app.open(page, baseURL);
+  await app.expectState(page, 'task.today');
+  const task = await app.readTask(page);
+  await expect(app.tid(page, 'task.dayChanged')).toHaveCount(0);
+  await app.fixDate(page, NEXT, '00:05:00');
+  await app.tid(page, 'task.report.done').click();
+  await app.expectState(page, 'task.today');
+  const next = await app.readTask(page);
+  expect(next.id).not.toBe(task.id);
+  await expect(app.tid(page, 'task.dayChanged')).toHaveCount(1);
+  return { task, next };
 }
 
 test('DESIGN_D30_画面を開いたまま翌日になった後に完了を押すと_翌日のS3の先頭にtask.dayChangedが1件でフォーカスがあり_入力では消えず_次の操作と再読み込みで消える', async ({ context, page, baseURL, request }, testInfo) => {
@@ -159,4 +178,38 @@ test('DESIGN_U15_初回の診断の2問目を23時59分に出して0時1分に�
   expect(json.diagnosis).toMatchObject({ area: 'frontend', level: 'beginner', years: 'lt1', completedOn: '2026-11-04' });
   expect(json.current).toMatchObject({ date: '2026-11-04', taskId: task.id, answer: '' });
   expect(json.history).toEqual([]);
+});
+
+test('DESIGN_D30_知らせのあるS3で申告の保存が失敗してS3に留まっても_task.dayChangedは次の操作の始めに0件になりerror.storage.messageが出て_やり直すとtask.rate', async ({ context, page, baseURL }) => {
+  // identifiers.md 3「次の操作（ボタン、リンク、radio の確定、ファイルの選択）の始めに DOM から外します」を、画面を描き直さない操作で確かめる
+  // （data.md 2「保存に失敗したら、画面の中身はそのまま残し、その操作の近くに error.storage.message と error.storage.retry を出します」。reviewer G2 r3 の提案）。
+  // 上の 1 本目の「次の操作」は app.name（4 の判定をやり直して S3 を描き直す）なので、描き直しで知らせが消える実装も通る。この 1 本は描き直さない経路。
+  await injectStorageFailure(context);
+  const { next } = await openDayChangedToday(context, page, baseURL);
+
+  // 同じ日（11-05）の申告。その保存（setItem の次の 1 回）だけ失敗させる（W-9）
+  await armStorageFailure(page);
+  await app.tid(page, 'task.report.done').click();
+  await expect(app.tid(page, 'error.storage.message')).toBeVisible();
+  await expect(app.tid(page, 'error.storage.retry')).toHaveCount(1);
+  expect(await app.readState(page), '保存に失敗したので S3 のまま').toBe('task.today');
+  expect((await app.readTask(page)).id, '同じ課題のまま').toBe(next.id);
+  await expect(app.tid(page, 'task.dayChanged'), '次の操作の始めに知らせが消えている').toHaveCount(0);
+
+  // やり直すと同じ中身で保存され、完了の流れに進む
+  await app.tid(page, 'error.storage.retry').click();
+  await app.expectState(page, 'task.rate');
+  await expect(app.tid(page, 'error.storage.message')).toHaveCount(0);
+  await expect(app.tid(page, 'task.dayChanged')).toHaveCount(0);
+});
+
+test('DESIGN_D30_task.today.dayChanged_axe-coreでserious以上の違反が0件', async ({ context, page, baseURL }, testInfo) => {
+  // 知らせ task.dayChanged（role=status、color.warning の文字。design D-30）のある S3 の監査。PRD AC-27 の 6 画面の外なので AC27_ ではなく DESIGN_D30_（W-6）。
+  // 規則は AC-27 と同じ（wcag2a、wcag2aa、wcag21a、wcag21aa。serious 以上が 0 件）
+  await openDayChangedToday(context, page, baseURL);
+  const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
+  await testInfo.attach('axe_task.today.dayChanged.json', { body: JSON.stringify(results, null, 2), contentType: 'application/json' });
+  const serious = results.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
+  testInfo.annotations.push({ type: 'axe', description: `violations ${results.violations.length}（serious 以上 ${serious.length}）、passes ${results.passes.length}` });
+  expect(serious.map((v) => `${v.id}（${v.impact}）: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`), 'serious 以上の違反').toEqual([]);
 });

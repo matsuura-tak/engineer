@@ -61,6 +61,9 @@ test('AC13_persistを断られても完了と再読み込みでtask.done_履歴1
   await app.expectState(page, 'task.rate');
   await app.tid(page, 'task.rate.helpful').click();
   await app.expectState(page, 'task.done');
+  // 申告と評価（S3 → S4 → S5。保存 2 回）の後も、この文書での persist() の回数は 1 のまま（PRD 11 の冒頭「1回だけ」、W-9「初回の診断を終えた読み込みではちょうど 1 回」）。
+  // 上の expect.poll は「1 に届いた」ことしか見ないので、再読み込みの直前に「1 のまま」を見る（tech-lead G2 r3 の提案 1）
+  expect(await readPersistCalls(page), '申告と評価の後も persist() の回数は 1 のまま').toBe(1);
   await page.reload();
   await app.expectState(page, 'task.done');
 

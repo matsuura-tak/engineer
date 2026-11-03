@@ -1,4 +1,4 @@
-// G3 の証拠を撮る道具（verifier）。受け入れテストではない（tests/ の外で *.spec.mjs でもないので playwright test の対象外。本数は 145 のまま）。
+// G3 の証拠を撮る道具（verifier）。受け入れテストではない（tests/ の外で *.spec.mjs でもないので playwright test の対象外。本数は 153 のまま）。
 // design/001-daily-learning.md の 5（全画面・全状態）と contracts/identifiers.md の 2（data-state 12 値）・3（2 つのダイアログ）をそろえ、
 // 通常の状態はライト、ダーク、大きい文字（ax5 の読み替え）、英語の 4 通り、ほかはライトで撮る。撮った画面ごとに axe-core（AC-27 と同じタグ）も流す。
 //

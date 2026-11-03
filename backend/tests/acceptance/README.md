@@ -29,11 +29,11 @@ npx playwright test                      # 判定の実行。再試行は 0（re
 | server/static-server.mjs | テスト用の静的サーバー（node の組み込みだけ。gzip、`Cache-Control: max-age=600`、Content-Type、`/engineer` → `/engineer/` の 301、404、実行中の差し替え `setRoot`） |
 | helpers/fixtures.mjs | worker ごとのサーバーと baseURL |
 | helpers/app.mjs | 画面の操作と読み出し（data-testid、data-state、履歴の行、書き出し、送信の数え方 W-12、SW の準備 W-13、時間の計り方 `armTiming` / `readInterval`、キーボードの移動キー：WebKit は Alt+Tab、それ以外は Tab） |
-| helpers/seed.mjs | seed の投入（W-7）、保存の失敗の注入と永続化の拒否の注入（`persist()` と `persisted()` の両方。W-9）、保存データの印の読み出し（`readStoredData`。W-9）、standalone と UA の偽装（W-16）、課題集から「出し終えた」履歴を作る |
+| helpers/seed.mjs | seed の投入（W-7）、保存の失敗の注入と永続化の拒否の注入（`persist()` と `persisted()` の両方。W-9）、`persisted()` の遅延注入（`injectPersistedStub`、`readPersistedSettled`。W-9「S8 の待つ上限」）、保存データの印の読み出し（`readStoredData`。`getItem` 1 回で読み data.schema.json に通す。W-9）、standalone と UA の偽装（W-16）、課題集から「出し終えた」履歴を作る |
 | helpers/schema.mjs | contracts/schemas を ajv（2020-12、strict）で検査 |
 | helpers/build.mjs | build.mjs の CLI を呼ぶ（AC-28 の旧版と新版） |
 | seeds/ | この機能の seed（contracts/fixtures/seeds/ にない分。すべて data.schema.json に通る） |
-| tests/*.spec.mjs | 受け入れテスト。テスト名は `AC<番号>_<結果>`。budgets.md 2 の予算の 1 本だけ `BUDGET2_`（AC ではない。W-6）。design r6 の「AC にない状態」（D-30 の知らせ `task.dayChanged`、U-15）は tests/design-d30-day-changed.spec.mjs の `DESIGN_D30_` / `DESIGN_U15_`（AC ではない。G3 の AC の表に混ぜない） |
+| tests/*.spec.mjs | 受け入れテスト。テスト名は `AC<番号>_<結果>`。budgets.md 2 の予算の 1 本だけ `BUDGET2_`（AC ではない。W-6）。design r6 の「AC にない状態」（D-30 の知らせ `task.dayChanged`、U-15）は tests/design-d30-day-changed.spec.mjs の `DESIGN_D30_` / `DESIGN_U15_`、契約 data.md 11 の S8 の待つ上限と待つ間の操作（D-31）は tests/design-d31-persisted-wait.spec.mjs の `DESIGN_D31_`（どれも AC ではない。G3 の AC の表に混ぜない。W-6） |
 
 ## 守っていること
 - 要素は contracts/identifiers.md の `data-testid` と `data-*` でだけ探す。表示の文字では探さない（文字は文言ファイル i18n/*.json の値と比べる）。

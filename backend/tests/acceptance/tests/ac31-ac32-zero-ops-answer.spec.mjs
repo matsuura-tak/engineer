@@ -140,3 +140,31 @@ test('AC32_画面を開いたまま翌日になった後に読み込まずに完
   expect(rows[0]).toMatchObject({ date: '2026-11-04', report: 'none', answer: ANSWER_200 });
   expect(json.current).toMatchObject({ date: '2026-11-05', taskId: next.id, answer: '' });
 });
+
+test('AC32_200文字を入力して保存を待たずに画面を開いたまま翌日になった後に完了を押すと_前日の200文字は書き出しのnoneの行のanswerに残り翌日の課題の答えの欄は空', async ({ context, page, baseURL }, testInfo) => {
+  // AC-32 の Then「前日の 200 文字は書き出しファイルの前日の課題の行の answer に残っている」を、保存の合図 task.answer.saved を待たずに日付をまたぐ経路で確かめる
+  // （契約 data.md 4 の 1：答えの保存のタイマーを止め、欄の値をメモリに持ち、6-1 の移しと 6-4 の今日の課題と 1 回の保存にまとめる。tech-lead G2 r3 の提案 2）。
+  // 保存のタイマー（300 ms）が先に動いても none の行の answer は同じ値なので、どちらの順でも結果は変わらない。
+  await injectSeed(context, loadContractFixture(SEED));
+  await app.fixDate(page, '2026-11-04', '23:59:00');
+  await app.open(page, baseURL);
+  await app.expectState(page, 'task.today');
+  const task = await app.readTask(page);
+  expect([...ANSWER_200]).toHaveLength(200);
+  await app.tid(page, 'task.answer').fill(ANSWER_200);
+  // 保存を待たずに日付を進めて（W-3）完了を押す
+  await app.fixDate(page, '2026-11-05', '00:01:00');
+  await app.tid(page, 'task.report.done').click();
+  await app.expectState(page, 'task.today');
+  const next = await app.readTask(page);
+  expect(next.id).not.toBe(task.id);
+  await expect(app.tid(page, 'task.answer')).toHaveValue('');
+
+  await app.goSettings(page);
+  const { json } = await app.exportJson(page);
+  const rows = json.history.filter((r) => r.taskId === task.id);
+  testInfo.annotations.push({ type: '前日の行', description: JSON.stringify(rows.map((r) => ({ ...r, answer: `${r.answer.length} 文字` }))) });
+  expect(rows, '前日の課題の行は none の 1 行だけ').toHaveLength(1);
+  expect(rows[0]).toMatchObject({ date: '2026-11-04', report: 'none', answer: ANSWER_200 });
+  expect(json.current).toMatchObject({ date: '2026-11-05', taskId: next.id, answer: '' });
+});

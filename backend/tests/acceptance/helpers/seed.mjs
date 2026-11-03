@@ -89,12 +89,45 @@ export async function readPersistCalls(page) {
 }
 
 /**
- * 保存データ（localStorage のキー `kyounoitte:data`。data.md の 1）を読んで JSON に通す。なければ null。
- * 書き出しに含まれない `device` の印（`persistRequested`。W-9「確かめるのは、上の回数、保存データの印、S8 の表示」）を見るためだけに使う。
+ * 保存データ（localStorage のキー `kyounoitte:data`。data.md の 1）を `getItem` 1 回で読み、JSON に通し、data.schema.json に通してから返す。なければ null。
+ * 書き出しに含まれない `device` の印（`persistRequested`。W-9「保存データの印の読み方」）を見るためだけに使う。setItem も removeItem もしない。
+ * スキーマに通らなければ例外（形の崩れも見つける。W-9「読んだ値は contracts/schemas/data.schema.json に ajv で通してよい」）。
  */
 export async function readStoredData(page) {
   const raw = await page.evaluate((key) => localStorage.getItem(key), STORAGE_KEY);
-  return raw === null ? null : JSON.parse(raw);
+  return raw === null ? null : assertValid('data', JSON.parse(raw), `localStorage['${STORAGE_KEY}']`);
+}
+
+/**
+ * S8 の待つ上限の確かめ（data.md の 11「待つ上限は 1,000 ms」、W-9「S8 の待つ上限を確かめるときは…」、design D-31）：
+ * `StorageManager.prototype.persisted` を、delayMs が null なら返らない約束、数値なら setTimeout で delayMs 遅らせて value を返す約束にする。
+ * `persist()` は触らない（回数を数えるテストは AC-13 の injectPersistDenied）。
+ * 約束が決まった回数はテスト側の変数（globalThis。アプリは読まない）に数え、「答えが返った後」を sleep ではなく状態の変化として待てるようにする。
+ * W-3 の setFixedTime の下でもタイマーは動く。
+ */
+export const PERSISTED_SETTLED_FLAG = '__acceptancePersistedSettled';
+
+export async function injectPersistedStub(context, { delayMs, value = false }) {
+  await context.addInitScript(
+    ({ flag, delayMs, value }) => {
+      if (typeof StorageManager !== 'undefined') {
+        StorageManager.prototype.persisted = function () {
+          return new Promise((resolve) => {
+            if (delayMs === null) return;
+            setTimeout(() => {
+              globalThis[flag] = (globalThis[flag] ?? 0) + 1;
+              resolve(value);
+            }, delayMs);
+          });
+        };
+      }
+    },
+    { flag: PERSISTED_SETTLED_FLAG, delayMs, value },
+  );
+}
+
+export async function readPersistedSettled(page) {
+  return page.evaluate((flag) => globalThis[flag] ?? 0, PERSISTED_SETTLED_FLAG);
 }
 
 /** navigator.standalone の偽装（AC-21、AC-22、W-16）。 */
