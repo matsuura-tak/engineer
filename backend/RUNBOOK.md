@@ -17,7 +17,7 @@
 ### アイコンを作り直すとき（scripts/make-icon.mjs）
 - 手で 1 回だけ動かす道具。ビルド（build.mjs）、`npm test`、CI では動かさない。配るのは生成物の `public/icon-180.png` だけで、スクリプトは配布物に入らない（build.mjs は public/ だけを写す）。
 - 依存は受け入れテストのフォルダ（tests/acceptance/）の Playwright を `createRequire` で借りる。backend/package.json には足さない（contracts/dependencies.md の「入る package.json」は受け入れテストのフォルダ）。そのため、受け入れテストのフォルダの依存が変わると動かなくなることがある。
-- 手順：`cd tests/acceptance && npm ci && npx playwright install chromium && cd ../.. && node scripts/make-icon.mjs`。作り直したら `node --test tests/unit/build.test.mjs` で、PNG の署名、IHDR の 180×180、10,000 バイト以下（contracts/budgets.md の 6）を確かめる。
+- 手順：`cd tests/acceptance && npm ci && npx playwright install chromium && cd ../.. && node scripts/make-icon.mjs`。作り直したら `node --test tests/unit/build.test.mjs` で、PNG の署名、IHDR の 180×180、4,000 バイト以下（contracts/budgets.md の 6。2026-11-04 に 10,000 から下げた）を確かめる。
 - 作り直すのは、design/001-daily-learning.md の 8 のアイコンの指定が変わったときだけ。
 
 ## 3. 配布（Takuma）
@@ -46,7 +46,7 @@
 
 ## 7. アラートと外部サービス
 - アラート：なし（サーバーも計測もない。v1 はイベントを記録しない：PRD 15、D6）。
-- 外部サービス：GitHub Pages だけ。月額 0 円。GitHub Pages の上限（公開するサイトは 1 GB まで、帯域は月 100 GB の soft limit。https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits 、2026-11-03 に確認）に対し、配布物は gzip 後で約 65 KB（2026-11-04 の check-budget で 64,770 バイト）。初回の読み込みだけなら月 100 GB は約 160 万回分。請求の設定はない（無料）。
+- 外部サービス：GitHub Pages だけ。月額 0 円。GitHub Pages の上限（公開するサイトは 1 GB まで、帯域は月 100 GB の soft limit。https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits 、2026-11-03 に確認）に対し、配布物は gzip 後で約 65 KB（2026-11-04 の check-budget で 65,135 バイト）。初回の読み込みだけなら月 100 GB は約 160 万回分。請求の設定はない（無料）。
 - 利用者からの報告で気づく症状と対処：
   | 症状 | まず見る所 | 対処 |
   |---|---|---|
@@ -55,3 +55,4 @@
   | 課題が出ない（task.exhausted） | その領域と段階の課題の数 | 課題集を足した版を配る（AC-28） |
   | 「日付が変わったため、直前の操作は無効になりました」が出て、完了や評価が記録されていない | 仕様どおりか（画面を開いたまま日付が変わった後の最初の操作は実行しない。contracts/data.md の 4、design の D-30） | 不具合ではない。前の課題は履歴の「申告なし」の行にあり、書きかけの答えもそこに残る。サポートのページで説明する（pdm） |
   | 設定に「このブラウザは保存の永続化を許可しませんでした」が出る | 設定を開くたびに `navigator.storage.persisted()` の今の値で決まる（保存した値は使わない。data.md の 11）。`persist()` は保存データごとに 1 回だけ求め、求め直さない | 利用者に「ファイルに書き出す」を勧める。Safari はホーム画面に追加すると通りやすい。データが消えた報告が続くなら、求め直す案を tech-lead と pdm に上げる（data.md の 11 の「見直す条件」） |
+  | 設定を押してから画面が変わるまでに間がある（最大で約 1 秒） | 仕様どおりか（設定の画面は `persisted()` の答えを待ってから描く。待つ上限は 1,000 ms で、超えたら注意なしで描く。待つ間は前の画面がそのまま使え、その間に別のボタンを押すとそちらが優先されて設定の画面は出ない。data.md の 11） | 1 秒を大きく超えて設定の画面が出ないなら不具合。ブラウザと版を聞き、`navigator.storage.persisted()` が返るかを開発者ツールで確かめて tech-lead に上げる |

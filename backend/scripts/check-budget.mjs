@@ -1,8 +1,8 @@
 // 転送量の予算（contracts/budgets.md の 1 と 6）。node の組み込みだけで動く。
 //   node scripts/check-budget.mjs <配布物のフォルダ>
 // 各ファイルを zlib.gzipSync(buf, { level: 9 }) にした大きさの合計が 150,000 バイト以下なら終了コード 0、超えたら 1。
-// 内訳の枠（殻 26,000、文言 8,000、アイコンと manifest 10,000、課題集 106,000）は表に出す。budgets.md の 1 のとおり、
-// 枠を超えても合計を守れば通す（どれかを超えるときは他を減らして合計を守る）。icon-180.png は生の大きさも 10,000 バイト以下（6）。
+// 内訳の枠（殻 32,000、文言 8,000、アイコンと manifest 4,000、課題集 106,000。2026-11-04 の枠の見直し）は表に出す。budgets.md の 1 のとおり、
+// 枠を超えても合計を守れば通す（どれかを超えるときは他を減らして合計を守る）。icon-180.png は生の大きさも 4,000 バイト以下（6）。
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -10,11 +10,11 @@ import { gzipSync } from 'node:zlib';
 import { listFiles } from './build.mjs';
 
 export const TOTAL_LIMIT = 150_000;
-export const ICON_RAW_LIMIT = 10_000;
+export const ICON_RAW_LIMIT = 4_000;
 export const GROUPS = [
-  { name: '殻（HTML、CSS、JS、sw.js）', limit: 26_000, match: (f) => /\.(html|css|js)$/.test(f) },
+  { name: '殻（HTML、CSS、JS、sw.js）', limit: 32_000, match: (f) => /\.(html|css|js)$/.test(f) },
   { name: '文言（ja.json、en.json）', limit: 8_000, match: (f) => f.startsWith('i18n/') },
-  { name: 'アイコンと manifest', limit: 10_000, match: (f) => f === 'icon-180.png' || f === 'manifest.webmanifest' },
+  { name: 'アイコンと manifest', limit: 4_000, match: (f) => f === 'icon-180.png' || f === 'manifest.webmanifest' },
   { name: '課題集 tasks.json', limit: 106_000, match: (f) => f === 'data/tasks.json' },
 ];
 

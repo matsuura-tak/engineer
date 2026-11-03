@@ -8,7 +8,7 @@ import { download, readImport } from './files.js';
 import { errorScreen, startScreen, questionScreen, importer } from './view-start.js';
 import { todayScreen, rateScreen, doneScreen, skippedScreen, exhaustedScreen, dayChangedNotice } from './view-task.js';
 import { settingsScreen, statsScreen, historyScreen, confirmDialog } from './view-settings.js';
-import { canRequestPersist, requestPersist, readNotPersisted } from './persist.js';
+import { canRequestPersist, requestPersist, drawWhenPersistedKnown } from './persist.js';
 
 const root = document.documentElement;
 const TASK_STATES = new Set(['task.today', 'task.done', 'task.skipped', 'task.exhausted']);
@@ -34,7 +34,7 @@ const app = {
   day: '', // 画面を描いた日（端末の日付）
   checkDay: false,
   notice: null, // task.dayChanged
-  seq: 0, // render の回数
+  seq: 0, // 操作と render の回数（S8 の待ちを捨てる。data.md の 11）
   draft: null, // やり直しの診断の下書き（メモリだけ。U-7）
   dialog: null,
   answer: null, // S3 の答えの欄 { view, timer, shown }
@@ -65,6 +65,7 @@ function isIosSafari() {
 function act(fn) {
   return (ev) => {
     if (ev && typeof ev.preventDefault === 'function' && ev.type !== 'change') ev.preventDefault();
+    app.seq += 1;
     clearNotice();
     if (app.checkDay && today() !== app.day) {
       dayChanged();
@@ -317,10 +318,9 @@ function startRedo(origin) {
   showQuestion(1, true, { focus: true });
 }
 
+// 下書きは S8 を描くときに render が捨てる（data.md の 11）
 function cancelRedo() {
-  const origin = app.draft?.origin;
-  app.draft = null;
-  if (origin === 'settings') showSettings({ focus: true });
+  if (app.draft?.origin === 'settings') showSettings({ focus: true });
   else route({ focus: true });
 }
 
@@ -500,10 +500,7 @@ function showSettings(opts = {}) {
     return;
   }
   const seq = app.seq;
-  readNotPersisted(navigator.storage).then((notPersisted) => {
-    if (seq !== app.seq) return;
-    drawSettings(notPersisted, opts);
-  });
+  drawWhenPersistedKnown(navigator.storage, () => seq === app.seq, (notPersisted) => drawSettings(notPersisted, opts));
 }
 
 function drawSettings(notPersisted, opts) {

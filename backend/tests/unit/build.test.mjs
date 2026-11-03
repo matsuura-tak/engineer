@@ -6,7 +6,7 @@ import { spawnSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
 import { build, listFiles } from '../../scripts/build.mjs';
-import { measure, TOTAL_LIMIT } from '../../scripts/check-budget.mjs';
+import { measure, TOTAL_LIMIT, GROUPS, ICON_RAW_LIMIT } from '../../scripts/check-budget.mjs';
 import { BACKEND_DIR, contractCodeBlocks } from './helpers.mjs';
 
 const tmp = () => mkdtempSync(path.join(os.tmpdir(), 'kyounoitte-unit-'));
@@ -36,6 +36,13 @@ test('配布物は gzip 後の合計 150,000 バイト以下（contracts/budgets
   const m = measure(out);
   assert.ok(m.ok, m.problems.join(' / '));
   assert.ok(m.total <= TOTAL_LIMIT, `合計 ${m.total}`);
+});
+
+test('内訳の枠は budgets.md の 1（2026-11-04 の枠の見直し）：殻 32,000、文言 8,000、アイコンと manifest 4,000、課題集 106,000 で合計 150,000。アイコンの生は 4,000（6）', () => {
+  assert.deepEqual(GROUPS.map((g) => g.limit), [32_000, 8_000, 4_000, 106_000]);
+  assert.equal(GROUPS.reduce((s, g) => s + g.limit, 0), TOTAL_LIMIT);
+  assert.equal(TOTAL_LIMIT, 150_000);
+  assert.equal(ICON_RAW_LIMIT, 4_000);
 });
 
 test('版の形が違うと終了コード 1 で、出力を作らない', () => {
@@ -142,13 +149,13 @@ describe('配布物が契約の文字列と同じ（contracts/budgets.md の 3�
     assert.deepStrictEqual(actual, expected);
   });
 
-  test('アイコン：icon-180.png の先頭 8 バイトが PNG の署名、IHDR が 180×180、10,000 バイト以下', () => {
+  test('アイコン：icon-180.png の先頭 8 バイトが PNG の署名、IHDR が 180×180、4,000 バイト以下', () => {
     const info = pngInfo(readFileSync(path.join(out, 'icon-180.png')));
     assert.equal(info.signature, true, '先頭 8 バイトが 89 50 4E 47 0D 0A 1A 0A でない');
     assert.equal(info.ihdr, 'IHDR', '最初のチャンクが IHDR でない');
     assert.equal(info.width, 180);
     assert.equal(info.height, 180);
-    assert.ok(info.bytes <= 10000, `${info.bytes} バイト`);
+    assert.ok(info.bytes <= 4000, `${info.bytes} バイト`);
   });
 
   test('<head>：index.html の <head> に budgets.md の 6 の 5 行が 1 行ずつそのままある', () => {

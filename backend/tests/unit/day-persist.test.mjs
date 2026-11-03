@@ -6,7 +6,7 @@ import path from 'node:path';
 import * as R from '../../public/js/rules.js';
 import { openStore, save, KEY } from '../../public/js/store.js';
 import { validateData } from '../../public/js/validate.js';
-import { canRequestPersist, requestPersist, readNotPersisted } from '../../public/js/persist.js';
+import { canRequestPersist, requestPersist, readNotPersisted, drawWhenPersistedKnown, PERSISTED_WAIT_MS } from '../../public/js/persist.js';
 import { BACKEND_DIR, FIXTURES_DIR, fakeStorage, readJsonFile } from './helpers.mjs';
 
 const TASKS = readJsonFile(path.join(BACKEND_DIR, 'public', 'data', 'tasks.json')).tasks;
@@ -212,4 +212,132 @@ test('S8 の注意：persisted() が false のときだけ出す。true、ない
   assert.equal(await readNotPersisted(undefined), false);
   assert.equal(await readNotPersisted({ persisted: () => { throw new Error('x'); } }), false);
   assert.equal(await readNotPersisted({ persisted: () => Promise.reject(new Error('x')) }), false);
+});
+
+/** setTimeout と clearTimeout の代わり。fire(id) で上限に達したことにする。 */
+function fakeTimers() {
+  const timers = new Map();
+  const cleared = [];
+  let next = 1;
+  return {
+    timers,
+    cleared,
+    setTimeout(fn, ms) {
+      const id = next++;
+      timers.set(id, { fn, ms });
+      return id;
+    },
+    clearTimeout(id) {
+      cleared.push(id);
+      timers.delete(id);
+    },
+    fire(id) {
+      const t = timers.get(id);
+      timers.delete(id);
+      t.fn();
+    },
+  };
+}
+
+/** 外から答えを決められる persisted()。 */
+function deferredPersisted() {
+  const d = { calls: 0 };
+  d.sm = {
+    persisted: () => {
+      d.calls += 1;
+      return new Promise((resolve) => {
+        d.resolve = resolve;
+      });
+    },
+  };
+  return d;
+}
+
+const tick = () => new Promise((r) => setTimeout(r, 0));
+
+test('S8 の待つ上限：既定は 1,000 ms で、上限までに答えが決まらなければ false（注意を出さない。data.md の 11）', async () => {
+  assert.equal(PERSISTED_WAIT_MS, 1000);
+  const ft = fakeTimers();
+  const d = deferredPersisted();
+  let result = 'pending';
+  readNotPersisted(d.sm, { timers: ft }).then((v) => {
+    result = v;
+  });
+  assert.equal(d.calls, 1);
+  assert.equal(ft.timers.size, 1);
+  const [[id, t]] = [...ft.timers];
+  assert.equal(t.ms, 1000);
+  await tick();
+  assert.equal(result, 'pending', '上限の前は決まらない');
+  ft.fire(id);
+  await tick();
+  assert.equal(result, false, '上限に達したら false');
+  // 後から false が返っても結果は変わらない
+  d.resolve(false);
+  await tick();
+  assert.equal(result, false);
+});
+
+// timeout：上限の仕組みが壊れたら、待ち続けずに落とす
+test('S8 の待つ上限：返らない persisted() でも本物のタイマーで上限の後に false', { timeout: 2000 }, async () => {
+  const started = Date.now();
+  const v = await readNotPersisted({ persisted: () => new Promise(() => {}) }, { limitMs: 30 });
+  assert.equal(v, false);
+  assert.ok(Date.now() - started >= 25, `${Date.now() - started} ms`);
+});
+
+test('S8 の待つ上限：上限の前に答えが決まったらタイマーを消す（答え false、true、例外のどれでも）', async () => {
+  for (const [persisted, expected] of [
+    [async () => false, true],
+    [async () => true, false],
+    [() => Promise.reject(new Error('x')), false],
+    [() => { throw new Error('x'); }, false],
+  ]) {
+    const ft = fakeTimers();
+    const v = await readNotPersisted({ persisted }, { timers: ft });
+    assert.equal(v, expected);
+    assert.equal(ft.timers.size, 0, 'タイマーが残らない');
+    assert.deepEqual(ft.cleared, [1], '置いたタイマーを消した');
+  }
+});
+
+test('S8 の待ち：待つ間に次の操作が始まったら描かない。後の待ちだけが描く（data.md の 11、reviewer G2 r3 の要修正）', async () => {
+  // main.js と同じ形：act() が seq を 1 増やし、showSettings がその値を覚える
+  const app = { seq: 0 };
+  const act = (fn) => () => {
+    app.seq += 1;
+    fn();
+  };
+  const drawn = [];
+  const waits = [];
+  const showSettings = (label) => {
+    const d = deferredPersisted();
+    const ft = fakeTimers();
+    const seq = app.seq;
+    waits.push({ d, ft });
+    drawWhenPersistedKnown(d.sm, () => seq === app.seq, (np) => drawn.push([label, np]), { timers: ft });
+  };
+  act(() => showSettings('1 回目のやめる'))();
+  act(() => {})(); // 待つ間の「次へ」（画面を移す操作）
+  waits[0].d.resolve(false);
+  await tick();
+  assert.deepEqual(drawn, [], '答えが返っても遅れて S8 を描かない');
+
+  act(() => showSettings('2 回目のやめる'))();
+  act(() => {})(); // 画面を移さない操作（必須のエラー）でも捨てる
+  waits[1].ft.fire(1);
+  await tick();
+  assert.deepEqual(drawn, [], '上限に達しても描かない');
+
+  act(() => showSettings('3 回目のやめる'))();
+  act(() => showSettings('4 回目のやめる'))(); // もう一度 S8 へ移る操作
+  waits[2].d.resolve(false);
+  waits[3].d.resolve(true);
+  await tick();
+  assert.deepEqual(drawn, [['4 回目のやめる', false]], '後の待ちだけが描く');
+
+  act(() => showSettings('5 回目のやめる'))();
+  waits[4].d.resolve(false);
+  await tick();
+  assert.deepEqual(drawn.at(-1), ['5 回目のやめる', true], '操作がなければ答えで描く');
 });
