@@ -1,0 +1,22 @@
+# チャーター：画面を開いたまま日付が変わった後の最初の操作（D-30、data.md 4）。知らせ、フォーカス、保存の回数、答えの行き先、別のタブ、ダイアログ、保存の失敗、U-15
+1. 11-04 23:55 に backend-intermediate-004、答えを書きかけ → 00:05 に「完了」→ data-state=task.today、task.dayChanged=1 件、activeElement=task.dayChanged、scrollY=0、新しい課題=backend-intermediate-005、欄=""、setItem=1 回（操作の中）、task.rate に進まない=true
+   保存：history=4[2026-11-01:bi-001:done/helpful, 2026-11-02:bi-002:done/helpful, 2026-11-03:bi-003:done/not_helpful, 2026-11-04:bi-004:none/ans="23 時 55 分に書きかけ"] current=2026-11-05:backend-intermediate-005/ans="" diag=backend/intermediate levels={"backend":"intermediate"}
+png: R3_01_dayChanged_after_done.png
+2. 翌日の欄に入力 → task.dayChanged=1 件（入力では消えない）
+3. nav.history → data-state=history、行=4、none の行の data-report=1 件
+4. app.name → S3、task.dayChanged=0 件（同じ日なので出ない）、欄="翌日の答え"
+5. S8 のまま日付が変わり nav.history → data-state=task.today、task.dayChanged=1 件（nav.history の操作は実行されず S3 に着く：契約 4「その操作はせず」）、保存：history=4[2026-11-01:bi-001:done/helpful, 2026-11-02:bi-002:done/helpful, 2026-11-03:bi-003:done/not_helpful, 2026-11-04:bi-004:none] current=2026-11-05:backend-intermediate-005/ans="" diag=backend/intermediate levels={"backend":"intermediate"}
+6. app.name → S3、task.dayChanged=0 件（移した操作は 5 で済み、6 は同じ日）
+7. 削除の確認を開いたまま日付が変わり「削除する」→ data-state=task.today、ダイアログ=0 件、task.dayChanged=1 件、保存データ=ある（削除されていない）：history=4[2026-11-01:bi-001:done/helpful, 2026-11-02:bi-002:done/helpful, 2026-11-03:bi-003:done/not_helpful, 2026-11-04:bi-004:none] current=2026-11-05:backend-intermediate-005/ans="" diag=backend/intermediate levels={"backend":"intermediate"}
+png: R3_02_dialog_delete_after_midnight.png
+8. 読み込みの確認を開いたまま日付が変わり「置き換える」→ data-state=task.today、ダイアログ=0 件、task.dayChanged=1 件、firstOpenDate=2026-11-01（seed の 2026-11-01 のままなら置き換えていない）、history=4[2026-11-01:bi-001:done/helpful, 2026-11-02:bi-002:done/helpful, 2026-11-03:bi-003:done/not_helpful, 2026-11-04:bi-004:none] current=2026-11-05:backend-intermediate-005/ans="" diag=backend/intermediate levels={"backend":"intermediate"}
+9. タブ A（11-04、答え書きかけ）を開いたまま、タブ B を 11-05 に開く → B の課題=backend-intermediate-005、保存：history=4[2026-11-01:bi-001:done/helpful, 2026-11-02:bi-002:done/helpful, 2026-11-03:bi-003:done/not_helpful, 2026-11-04:bi-004:none/ans="タブ A の書きかけ"] current=2026-11-05:backend-intermediate-005/ans="" diag=backend/intermediate levels={"backend":"intermediate"}
+10. タブ A で「完了」→ A の課題=backend-intermediate-005（B と同じ=true）、知らせ=1、保存：history=4[2026-11-01:bi-001:done/helpful, 2026-11-02:bi-002:done/helpful, 2026-11-03:bi-003:done/not_helpful, 2026-11-04:bi-004:none/ans="タブ A の書きかけ"] current=2026-11-05:backend-intermediate-005/ans="" diag=backend/intermediate levels={"backend":"intermediate"}
+11. タブ B が 11-05 の課題を完了（S5）した後、タブ A（11-04 の S3）で「難しすぎ」→ A の data-state=task.done、task.dayChanged=0 件（S5 では出さない：契約 4 の 4）、保存：history=5[2026-11-01:bi-001:done/helpful, 2026-11-02:bi-002:done/helpful, 2026-11-03:bi-003:done/not_helpful, 2026-11-04:bi-004:none, 2026-11-05:bi-005:done/unanswered] current=なし diag=backend/intermediate levels={"backend":"intermediate"}
+png: R3_03_tabA_arrives_done_no_notice.png
+12. 日付が変わった後の「完了」で保存（移し + 翌日の課題）が失敗 → data-state=task.today、課題=backend-intermediate-005、task.dayChanged=1 件、error.storage.message=1、retry=1、保存（失敗したので前のまま）：history=3[2026-11-01:bi-001:done/helpful, 2026-11-02:bi-002:done/helpful, 2026-11-03:bi-003:done/not_helpful] current=2026-11-04:backend-intermediate-004/ans="失敗の前の答え" diag=backend/intermediate levels={"backend":"intermediate"}
+png: R3_04_dayChanged_save_failed.png
+13. retry → setItem=1 回、error=0、task.dayChanged=0 件、保存：history=4[2026-11-01:bi-001:done/helpful, 2026-11-02:bi-002:done/helpful, 2026-11-03:bi-003:done/not_helpful, 2026-11-04:bi-004:none/ans="失敗の前の答え"] current=2026-11-05:backend-intermediate-005/ans="" diag=backend/intermediate levels={"backend":"intermediate"}
+14. 最後の課題を開いたまま翌日に「今日はできない」→ data-state=task.exhausted、task.dayChanged=1 件、activeElement=task.dayChanged、保存：current=なし、最後の行="none"
+15. S7 から やり直しの S2 の 2 問目で翌々日 → 「次へ」→ data-state=task.exhausted、task.dayChanged=1 件、diagnosis=backend/intermediate（下書きを捨て元のまま）、history=7
+png: R3_05_exhausted_redo_after_midnight.png

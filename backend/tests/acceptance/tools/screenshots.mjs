@@ -33,6 +33,8 @@ function mergeTsv(file, header, rows, keyOf) {
   writeFileSync(file, [header, ...existing, ...rows.map((r) => r.join('\t'))].join('\n') + '\n');
 }
 const WAIT = 10_000;
+/** ダイアログの ax5 でのフォーカスの記録（dialog-ax5-focus.tsv）。 */
+const dialogLines = [];
 const PHONE = { width: 390, height: 844 };
 const NARROW = { width: 320, height: 568 };
 const iphone = devices['iPhone 15'];
@@ -44,6 +46,12 @@ async function waitState(page, state) {
 }
 async function waitVisible(page, id) {
   await tid(page, id).waitFor({ state: 'visible', timeout: WAIT });
+}
+/** 不透明度で現れる知らせ（task.answer.saved、settings.export.done：design 9 の reduced-motion の対象）は、計算済みの opacity が 1 になるまで待ってから撮る・監査する。
+ *  途中の半透明で axe が文字色を地と混ぜて計ると（例：#1B6E3A が #40855a に見え 4.44:1）、本当の色（6.29:1）と違う結果になる。 */
+async function waitOpaque(page, id) {
+  await waitVisible(page, id);
+  await page.waitForFunction((i) => { const el = document.querySelector(`[data-testid="${i}"]`); return !!el && getComputedStyle(el).opacity === '1'; }, id, { timeout: WAIT });
 }
 async function rawStorage(context, value) {
   await context.addInitScript(({ key, mark, value }) => {
@@ -73,7 +81,7 @@ const AC24 = () => loadContractFixture('seeds/seed-ac24-stats.json');
 // 画面と状態の一覧。normal: true は 4 通り（light、dark、ax5、en）で撮る。narrow: true は幅 320 でも撮る。
 // 各 run は (context, page, env) で画面を作り、最後に期待する data-state を返す（確かめに使う）。
 const SCENARIOS = [
-  { name: 'S0_loading', ac: '—（design 5 S0）', normal: false, state: 'loading',
+  { name: 'S0_loading', ac: '—（design 5 S0 通常 = loading）', normal: true, state: 'loading',
     async run(context, page, env) {
       await context.route('**/js/*.js', (r) => r.abort());
       await page.goto(env.baseURL);
@@ -113,7 +121,7 @@ const SCENARIOS = [
     } },
   { name: 'S1_diagnosis.start', ac: 'AC-1、AC-26', normal: true, narrow: true, state: 'diagnosis.start',
     async run(context, page, env) { await open(page, env.baseURL, '2026-11-04'); await waitState(page, 'diagnosis.start'); } },
-  { name: 'S1_addToHomeScreen', ac: 'AC-21', state: 'diagnosis.start', ua: 'iphone',
+  { name: 'S1_addToHomeScreen', ac: 'AC-21', state: 'diagnosis.start', ua: 'iphone', extra: ['en'] /* design 9：home.addToHomeScreen.steps.4 の長い英語 */,
     async run(context, page, env) {
       await injectStandalone(context, false);
       await open(page, env.baseURL, '2026-11-04');
@@ -205,7 +213,7 @@ const SCENARIOS = [
       const id = await tid(page, 'task.today').getAttribute('data-task-id');
       if (id !== 'backend-beginner-005') throw new Error(`期待した課題でない：${id}`);
     } },
-  { name: 'S3_task.today_external', ac: 'AC-30', state: 'task.today',
+  { name: 'S3_task.today_external', ac: 'AC-30', state: 'task.today', extra: ['en'] /* design 9：task.external.badge「Outside the browser」 */,
     async run(context, page, env) {
       const { seed, nextDate } = exhaustedSeed(env.tasks, { area: 'git', level: 'advanced', firstOpenDate: '2026-09-01', only: 'in_app' });
       await injectSeed(context, seed);
@@ -216,7 +224,7 @@ const SCENARIOS = [
     async run(context, page, env) {
       await injectSeed(context, AC14()); await open(page, env.baseURL, '2026-11-04'); await waitState(page, 'task.today');
       await tid(page, 'task.answer').fill('N+1 はループの中で 1 件ずつ取りに行くこと。JOIN か IN でまとめる。');
-      await waitVisible(page, 'task.answer.saved');
+      await waitOpaque(page, 'task.answer.saved');
     } },
   { name: 'S3_answer_limit', ac: '—（design 5 S3：answer.max）', state: 'task.today',
     async run(context, page, env) {
@@ -256,7 +264,7 @@ const SCENARIOS = [
     } },
   { name: 'S5_task.done', ac: 'AC-5、AC-31', normal: true, state: 'task.done',
     async run(context, page, env) { await injectSeed(context, AC14()); await open(page, env.baseURL, '2026-11-03'); await waitState(page, 'task.done'); } },
-  { name: 'S6_task.skipped_too_hard', ac: 'AC-7（levelHint あり）', state: 'task.skipped',
+  { name: 'S6_task.skipped_too_hard', ac: 'AC-7（levelHint あり）', normal: true, state: 'task.skipped',
     async run(context, page, env) {
       await injectSeed(context, AC14()); await open(page, env.baseURL, '2026-11-04'); await waitState(page, 'task.today');
       await tid(page, 'task.report.tooHard').click(); await waitState(page, 'task.skipped'); await waitVisible(page, 'task.skipped.levelHint');
@@ -277,7 +285,7 @@ const SCENARIOS = [
       const { seed, nextDate } = exhaustedSeed(env.tasks, { area: 'backend', level: 'intermediate', firstOpenDate: '2026-09-01' });
       await injectSeed(context, seed); await open(page, env.baseURL, nextDate); await waitState(page, 'task.exhausted');
     } },
-  { name: 'S7_task.exhausted_dayChanged', ac: '—（design 5 S7、D-30：操作で日付をまたいだ知らせ）', state: 'task.exhausted',
+  { name: 'S7_task.exhausted_dayChanged', ac: '—（design 5 S7、D-30：操作で日付をまたいだ知らせ）', normal: true, state: 'task.exhausted',
     async run(context, page, env) {
       const list = tasksOf(env.tasks, 'backend', 'intermediate');
       const firstOpenDate = '2026-09-01';
@@ -319,7 +327,7 @@ const SCENARIOS = [
       await tid(page, 'nav.settings').click(); await waitState(page, 'settings');
       const [dl] = await Promise.all([page.waitForEvent('download', { timeout: WAIT }), tid(page, 'settings.export').click()]);
       await dl.path();
-      await waitVisible(page, 'settings.export.done');
+      await waitOpaque(page, 'settings.export.done');
     } },
   { name: 'S8_import_error_version', ac: 'AC-25', state: 'settings',
     async run(context, page, env) {
@@ -335,7 +343,7 @@ const SCENARIOS = [
       await tid(page, 'settings.import.file').setInputFiles(contractFixturePath('data/invalid-unknown-area.json'));
       await waitVisible(page, 'error.import.reason.schema');
     } },
-  { name: 'S8_homeScreen_guide', ac: 'AC-21', state: 'settings', ua: 'iphone',
+  { name: 'S8_homeScreen_guide', ac: 'AC-21', state: 'settings', ua: 'iphone', extra: ['en'] /* design 9：settings.homeScreen.open「Show how to add to the Home Screen」 */,
     async run(context, page, env) {
       await injectStandalone(context, false);
       await open(page, env.baseURL, '2026-11-04'); await waitState(page, 'diagnosis.start');
@@ -344,17 +352,25 @@ const SCENARIOS = [
       await tid(page, 'settings.homeScreen.open').click();
       await waitVisible(page, 'home.addToHomeScreen.steps.4');
     } },
-  { name: 'dialog_settings.import.confirm', ac: 'AC-20', normal: true, state: 'settings',
+  // ダイアログ 2 つ：run で S8 まで進み、文字を 200%（ax5）にした後に openDialog で開く（design-reviewer G3 r1 の 2：利用者が見るとおり、大きい文字のままダイアログを開く）。
+  // 撮るのは表示域だけ（fullPage でない）。ax5 では初期フォーカスの「やめる」が表示域に見え、移動キーで「削除する／置き換える」に届くかを記録する（dialog: に ok と cancel の id）。
+  { name: 'dialog_settings.import.confirm', ac: 'AC-20', normal: true, state: 'settings', viewportOnly: true,
+    dialog: { id: 'settings.import.confirm', ok: 'settings.import.confirm.ok', cancel: 'settings.import.confirm.cancel' },
     async run(context, page, env) {
       await injectSeed(context, AC14()); await open(page, env.baseURL, '2026-11-04'); await waitState(page, 'task.today');
       await tid(page, 'nav.settings').click(); await waitState(page, 'settings');
+    },
+    async openDialog(page) {
       await tid(page, 'settings.import.file').setInputFiles(contractFixturePath('data/v1/valid-export-three-completed.json'));
       await waitVisible(page, 'settings.import.confirm');
     } },
-  { name: 'dialog_settings.delete.confirm', ac: 'AC-16', normal: true, state: 'settings',
+  { name: 'dialog_settings.delete.confirm', ac: 'AC-16', normal: true, state: 'settings', viewportOnly: true,
+    dialog: { id: 'settings.delete.confirm', ok: 'settings.delete.confirm.ok', cancel: 'settings.delete.confirm.cancel' },
     async run(context, page, env) {
       await injectSeed(context, AC14()); await open(page, env.baseURL, '2026-11-04'); await waitState(page, 'task.today');
       await tid(page, 'nav.settings').click(); await waitState(page, 'settings');
+    },
+    async openDialog(page) {
       await tid(page, 'settings.delete').click();
       await waitVisible(page, 'settings.delete.confirm');
     } },
@@ -421,21 +437,50 @@ async function capture(browserName, browser, scenario, variantName, env, rows, a
       await page.evaluate(() => { document.documentElement.style.fontSize = '200%'; });
       await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
     }
+    // ダイアログは文字の大きさを決めた後に開く（利用者が見るとおり）
+    if (scenario.openDialog) await scenario.openDialog(page);
     row.state = await page.locator('html').getAttribute('data-state');
     row.lang = await page.locator('html').getAttribute('lang');
     row.fontSize = await page.evaluate(() => getComputedStyle(document.documentElement).fontSize);
     row.scrollWidth = await page.evaluate(() => `${document.documentElement.scrollWidth}/${document.documentElement.clientWidth}`);
     if (row.state !== scenario.state) { row.result = 'state-mismatch'; }
     mkdirSync(path.dirname(file), { recursive: true });
-    await page.screenshot({ path: file, fullPage: true });
+    await page.screenshot({ path: file, fullPage: !scenario.viewportOnly });
+    if (scenario.dialog && v.bigText) {
+      // 初期フォーカスの「やめる」が表示域に見えるか、移動キーで ok に届き、届いた ok が表示域に見えるか（design-reviewer G3 r1 の 2）
+      const next = browserName === 'webkit' ? 'Alt+Tab' : 'Tab';
+      const rectOf = (id) => page.evaluate((id) => {
+        const el = document.querySelector(`[data-testid="${id}"]`); if (!el) return null;
+        const r = el.getBoundingClientRect();
+        return { top: Math.round(r.top), bottom: Math.round(r.bottom), vh: window.innerHeight, visible: r.top >= 0 && r.bottom <= window.innerHeight };
+      }, id);
+      const activeId = () => page.evaluate(() => document.activeElement?.getAttribute('data-testid') ?? document.activeElement?.tagName ?? null);
+      const initial = await activeId(); const cancelRect = await rectOf(scenario.dialog.cancel);
+      let okId = null; let pressed = 0;
+      for (; pressed < 6 && okId !== scenario.dialog.ok; pressed++) { await page.keyboard.press(next); okId = await activeId(); }
+      const okRect = await rectOf(scenario.dialog.ok);
+      const tabFile = file.replace(/\.png$/, '_tabOk.png');
+      await page.screenshot({ path: tabFile, fullPage: false });
+      const ok = initial === scenario.dialog.cancel && cancelRect?.visible && okId === scenario.dialog.ok && okRect?.visible;
+      const line = `${browserName}\t${scenario.name}\t${variantName}\tinitialFocus=${initial}\tcancel=${JSON.stringify(cancelRect)}\t${next}×${pressed}→${okId}\tok=${JSON.stringify(okRect)}\t${ok ? 'ok' : 'NG'}\t${path.relative(OUT, tabFile)}`;
+      dialogLines.push(line); console.log(`  dialog ${line}`);
+      if (!ok) { row.result = 'dialog-focus'; row.error = line; }
+    }
     if (variantName === 'light' || variantName === 'w320') {
       const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
       const axeFile = path.join(OUT, 'axe', `${browserName}_${scenario.name}_${variantName}.json`);
       mkdirSync(path.dirname(axeFile), { recursive: true });
-      writeFileSync(axeFile, JSON.stringify({ violations: results.violations, incomplete: results.incomplete.map((i) => ({ id: i.id, impact: i.impact, nodes: i.nodes.length })), passes: results.passes.length }, null, 2));
+      // incomplete（axe が判定できなかったもの）は、ノードの target と理由を残す（design-reviewer G3 r1 の 7）
+      const incomplete = results.incomplete.map((i) => ({ id: i.id, impact: i.impact, description: i.description, help: i.help,
+        nodes: i.nodes.map((n) => ({ target: n.target, html: n.html.slice(0, 300), failureSummary: n.failureSummary ?? null,
+          reasons: [...n.any, ...n.all, ...n.none].map((c) => ({ id: c.id, message: c.message, data: c.data ?? null })) })) }));
+      writeFileSync(axeFile, JSON.stringify({ url: results.url, state: row.state, violations: results.violations, incomplete, passes: results.passes.length }, null, 2));
       axeRows.push({ browser: browserName, scenario: scenario.name, variant: variantName, state: row.state,
         violations: results.violations.length, serious: results.violations.filter((x) => ['serious', 'critical'].includes(x.impact)).length,
-        ids: results.violations.map((x) => `${x.id}(${x.impact}×${x.nodes.length})`).join(' '), passes: results.passes.length, file: path.relative(OUT, axeFile) });
+        ids: results.violations.map((x) => `${x.id}(${x.impact}×${x.nodes.length})`).join(' '), passes: results.passes.length,
+        incomplete: incomplete.reduce((n, i) => n + i.nodes.length, 0),
+        incompleteIds: incomplete.map((i) => `${i.id}(${i.impact}×${i.nodes.length}:${i.nodes.map((n) => n.target.join(' ')).join('|')})`).join(' '),
+        file: path.relative(OUT, axeFile) });
     }
   } catch (e) {
     row.result = 'error'; row.error = String(e.message ?? e).split('\n')[0].slice(0, 300);
@@ -460,8 +505,8 @@ async function main() {
       for (const sc of SCENARIOS) {
         if (ONLY && !ONLY.test(sc.name)) continue;
         const variants = browserName === 'chromium'
-          ? (sc.narrowOnly ? ['w320'] : [...(sc.normal ? ['light', 'dark', 'ax5', 'en'] : ['light']), ...(sc.narrow && !sc.narrowOnly ? ['w320'] : [])])
-          : (sc.narrowOnly ? ['w320'] : ['light']);
+          ? (sc.narrowOnly ? ['w320'] : [...(sc.normal ? ['light', 'dark', 'ax5', 'en'] : ['light']), ...(sc.extra ?? []), ...(sc.narrow && !sc.narrowOnly ? ['w320'] : [])])
+          : (sc.narrowOnly ? ['w320'] : ['light', ...(sc.dialog ? ['ax5'] : [])]);
         for (const vn of variants) await capture(browserName, browser, sc, vn, env, rows, axeRows);
       }
       await browser.close();
@@ -472,10 +517,11 @@ async function main() {
   }
   mergeTsv(path.join(OUT, 'index.tsv'), 'file\tbrowser\tviewport\tvariant\tscenario\tac\texpectedState\tstate\tlang\trootFontSize\tscrollWidth/clientWidth\tresult\terror',
     rows.map((r) => [r.file, r.browser, r.viewport, r.variant, r.scenario, r.ac, r.expectedState, r.state, r.lang, r.fontSize, r.scrollWidth, r.result, r.error]), (c) => c[0]);
-  mergeTsv(path.join(OUT, 'axe', 'axe-summary.tsv'), 'browser\tscenario\tvariant\tstate\tviolations\tserious+\tids\tpasses\tfile',
-    axeRows.map((r) => [r.browser, r.scenario, r.variant, r.state, r.violations, r.serious, r.ids, r.passes, r.file]), (c) => c[8]);
+  mergeTsv(path.join(OUT, 'axe', 'axe-summary.tsv'), 'browser\tscenario\tvariant\tstate\tviolations\tserious+\tids\tpasses\tincomplete\tincompleteIds\tfile',
+    axeRows.map((r) => [r.browser, r.scenario, r.variant, r.state, r.violations, r.serious, r.ids, r.passes, r.incomplete, r.incompleteIds, r.file]), (c) => c[10]);
+  if (dialogLines.length) mergeTsv(path.join(OUT, 'dialog-ax5-focus.tsv'), 'browser\tscenario\tvariant\tinitialFocus\tcancelRect\tkeys→active\tokRect\tresult\ttabOkFile', dialogLines.map((l) => l.split('\t')), (c) => `${c[0]}/${c[1]}`);
   const bad = rows.filter((r) => r.result !== 'ok');
-  console.log(`\n撮った：${rows.length} 枚（問題 ${bad.length}）。axe：${axeRows.length} 画面、違反のある画面 ${axeRows.filter((r) => r.violations > 0).length}`);
+  console.log(`\n撮った：${rows.length} 枚（問題 ${bad.length}）。axe：${axeRows.length} 画面、違反のある画面 ${axeRows.filter((r) => r.violations > 0).length}、incomplete のノード ${axeRows.reduce((n, r) => n + r.incomplete, 0)}`);
   process.exit(bad.length ? 1 : 0);
 }
 main().catch((e) => { console.error(e); process.exit(2); });

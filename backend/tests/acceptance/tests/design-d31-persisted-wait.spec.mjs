@@ -106,3 +106,46 @@ test('DESIGN_D31_S8から入ったやり直しのS2でdiagnosis.cancelの直後�
   await expect(app.tid(page, 'settings.storage.notPersisted')).toHaveCount(1);
   expect(errors, 'pageerror').toEqual([]);
 });
+
+test('DESIGN_D31_S8から入ったやり直しのS2でdiagnosis.cancelの直後に未選択のままdiagnosis.nextを押すと_error.diagnosis.requiredが出て1問目のままで_答えが返った後も遅れてS8は描かれず_もう一度やめると後の待ちだけがS8を描く', async ({ context, page, baseURL }, testInfo) => {
+  // data.md 11「その操作が画面を移さないとき（必須のエラー、保存の失敗の表示）も同じです」：待つ間の操作が S2 を描き直さない（必須のエラーを出すだけ）ときも、
+  // 前の「やめる」の待ちは捨てられ、遅れて S8 を描かない。上の 2 本目は「次へ」が 2 問目を描くので、描き直しで捨てる実装でも通る。この 1 本は描き直さない操作で確かめる。
+  const DELAY_MS = 800;
+  await injectPersistedStub(context, { delayMs: DELAY_MS, value: false });
+  await injectSeed(context, seedWithPersistRequested());
+  const errors = collectPageErrors(page);
+  await app.fixDate(page, DAY);
+  await app.open(page, baseURL);
+  await app.expectState(page, 'task.today');
+  await app.armTiming(page);
+
+  await app.goSettings(page);
+  await expect.poll(() => readPersistedSettled(page), { timeout: app.WAIT_MS }).toBe(1);
+  await app.tid(page, 'settings.redo').click();
+  await app.expectState(page, 'diagnosis.question');
+  const progress = app.tid(page, 'diagnosis.progress');
+  await expect(progress).toHaveAttribute('data-question-index', '1');
+
+  // 「やめる」（S8 へ移る操作。persisted() を待つ）の直後に、何も選ばずに「次へ」→ 必須のエラー（画面を移さない操作）
+  await app.tid(page, 'diagnosis.cancel').click();
+  await app.tid(page, 'diagnosis.next').click();
+  await expect(app.tid(page, 'error.diagnosis.required')).toHaveCount(1);
+  await expect(progress).toHaveAttribute('data-question-index', '1');
+
+  // 1 回目の「やめる」の答え（800 ms 後）が返った後も S2 の 1 問目のままで、エラーも残る（遅れて S8 を描かない）
+  await expect.poll(() => readPersistedSettled(page), { timeout: app.WAIT_MS }).toBe(2);
+  expect(await app.readState(page), '1 回目の「やめる」の答えが返った後も S2 のまま').toBe('diagnosis.question');
+  await expect(progress).toHaveAttribute('data-question-index', '1');
+  await expect(app.tid(page, 'error.diagnosis.required')).toHaveCount(1);
+  await expect(app.tid(page, 'settings.title')).toHaveCount(0);
+
+  // もう一度「やめる」：後の操作の待ちだけが S8 を描く（区間は stub の遅れ以上）
+  await app.tid(page, 'diagnosis.cancel').click();
+  await app.expectState(page, 'settings');
+  const waited = await app.readInterval(page, { startTestId: 'diagnosis.cancel', state: 'settings' });
+  testInfo.annotations.push({ type: '2 回目の「やめる」から S8 まで（ms）', description: `${waited}（stub の答えは ${DELAY_MS} ms 後）` });
+  expect(waited, '2 回目の「やめる」の答えで描かれた').toBeGreaterThanOrEqual(DELAY_MS);
+  expect(await readPersistedSettled(page)).toBe(3);
+  await expect(app.tid(page, 'settings.storage.notPersisted')).toHaveCount(1);
+  expect(errors, 'pageerror').toEqual([]);
+});

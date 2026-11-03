@@ -1,4 +1,6 @@
 {
+  "url": "http://127.0.0.1:62941/engineer/",
+  "state": "diagnosis.start",
   "violations": [],
   "incomplete": [],
   "passes": 17
