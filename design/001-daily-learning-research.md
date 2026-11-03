@@ -1,7 +1,7 @@
 # デザイン調査 001-daily-learning：診断と今日の学習（今日の一手）
 
 - 対象の PRD：docs/prd/001-daily-learning.md（r5、G0 承認済み）
-- 書いた役：designer　日付：2026-10-30
+- 書いた役：designer　日付：2026-10-30（R-27〜R-31 は 2026-11-03 に、G3 r1 の design-reviewer の指摘を直すために足した。仕様 r6 より先に書いた。R-1〜R-26 と 1〜7 は変えていない）
 - この文書は仕様（design/001-daily-learning.md）より先に書く。仕様の決定は、8 の R 番号を根拠に引く。
 - 見られなかったもの、開けなかったページは「見ていない」と書く。推測で埋めない。
 - 読み替え：このアプリは iOS アプリではなく、ブラウザだけで動く Web アプリ（静的 HTML/CSS/JS、GitHub Pages、サーバーなし、ログインなし）。型の「App Store の評価」は「公開されている評価や利用者数」、「権限の求め方」は「通知や保存の許可（`navigator.storage.persist()`、Web Push）とアカウント登録の求め方」に読み替えた。原則の根拠は HIG に加えて WCAG 2.2 と WAI-ARIA APG の URL を使う（PRD の AC-27 は axe-core の WCAG 2.1 AA 監査）。HIG の2ページ（Design principles、Accessibility）は開いたが本文が取れなかったので、HIG の文言は引用しない（8 の末尾）。
@@ -134,6 +134,11 @@
 | R-24 | Apple「Configuring Web Applications」（アーカイブ）。「Set the apple-mobile-web-app-capable meta tag to yes to turn on standalone mode」、スタンドアロンでは「there is no browser URL text field at the top of the screen or button bar at the bottom of the screen」、判定は「window.navigator.standalone read-only Boolean JavaScript property」、`apple-touch-icon` の例は 180×180（iPhone Retina）と 167×167（iPad Retina）、起動画像は「By default, a screenshot of the web application the last time it was launched is used」、`apple-touch-startup-image` で差し替え | https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariWebContent/ConfiguringWebApplications/ConfiguringWebApplications.html | 2026-10-30 |
 | R-25 | iOS Safari の入力欄の拡大。「16px or larger, Safari on iOS will focus into the input normally」、「15px or less」では入力欄にズームする。対策は「make the font big enough」 | https://css-tricks.com/16px-or-larger-text-prevents-ios-form-zoom/ | 2026-10-30 |
 | R-26 | デジタル庁デザインシステム タイポグラフィ。「本文やUIにおいては16 CSS px以上が基準値となります」「14 CSS px未満の大きさの使用は原則として許容されません」「本文テキストの行ボックスの高さ（行高）はフォントサイズに対して少なくとも1.5倍を維持することを推奨します」、行間は 150% が「本文の行間としては最低限度」、160%・170% が一般の本文向け。書体は「Noto Sans JP」と「Noto Sans Mono」。line-height は単位なしの数で書く | https://design.digital.go.jp/foundations/typography/ | 2026-10-30 |
+| R-27 | NN/g の 10 のユーザビリティ原則（1994-04-24、2024-01-30 に見直し）。1「Visibility of system status」：「The design should always keep users informed about what is going on」。8「Aesthetic and minimalist design」：「Interfaces should not contain information that is irrelevant or rarely needed」。9「Help users recognize, diagnose, and recover from errors」：「Error messages should be expressed in plain language (no error codes), precisely indicate the problem」、直し方を建設的に示す。G3 r1 の design-reviewer の指摘 3（日付が変わった後の操作に知らせがない）と提案 8（出続ける注意は効き目が薄れる）の根拠 | https://www.nngroup.com/articles/ten-usability-heuristics/ | 2026-11-03 |
+| R-28 | MDN `tabindex`。負の値は「the element is not reachable via sequential keyboard navigation」だが、「can be focused with JavaScript (by calling the focus() method)」。「may be useful for elements that should not be navigated to directly using the Tab key, but need to have keyboard focus set to them」。操作の後に差し替わった画面の知らせへフォーカスを移す手段（読み上げと、画面の先頭へのスクロールを兼ねる）。`<dialog>` には付けない | https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Global_attributes/tabindex | 2026-11-03 |
+| R-29 | web.dev「Persistent storage」。Chromium は確認を出さずに判断し、「if a site is considered important, the persistent storage permission is automatically granted」。基準は「How high is the level of site engagement?」「Has the site been installed or bookmarked?」「Has the site been granted permission to show notifications?」。「If the request was denied, it can be requested again later and will be evaluated using the same heuristics」。今の状態は「Calling navigator.storage.persisted() returns a Promise that resolves with a boolean」。Firefox は「prompts the user with a UI popup」（確認が出る）。Safari の挙動の記述はない（15.2 で対応とだけ） | https://web.dev/articles/persistent-storage | 2026-11-03 |
+| R-30 | NN/g「The Principle of Common Region」（2020-07-12）。「items within a boundary are perceived as a group」で、同じ性質か働きを持つと受け取られる。枠や地の色の箱は構造を早く見せるが、使いすぎると散らかるので、多くの場合は余白だけで足りる。枠で囲むのは「閉じる」で消える範囲を示す案内 1 か所だけに限る根拠 | https://www.nngroup.com/articles/common-region/ | 2026-11-03 |
+| R-31 | MDN `StorageManager.persisted()`。「returns a Promise that resolves to true if your site's storage bucket is persistent」。Baseline「Widely available」「has been available across browsers since December 2021」（対応ブラウザの版の表は取れなかった。Safari 17 で使えるかは実機で未確認） | https://developer.mozilla.org/en-US/docs/Web/API/StorageManager/persisted | 2026-11-03 |
 
 ### 8.1 決めたいことごとの示唆（仕様に渡す。決定そのものは design/001-daily-learning.md で行う）
 | 決めたいこと（1 の番号） | 示唆 | 根拠 |
@@ -158,7 +163,7 @@
 - Noto Sans JP の Web フォントの転送量（確かめていない）。
 
 ## 確かめ（提出前に designer が印を付ける。design-reviewer はこれを信じずに確かめる）
-- [x] R が5つ以上あり、どれにも出典 URL と確認日がある（R-1〜R-26、すべて 2026-10-30）
+- [x] R が5つ以上あり、どれにも出典 URL と確認日がある（R-1〜R-26 は 2026-10-30、R-27〜R-31 は 2026-11-03）
 - [x] 競合を2つ以上と、手本を1つ調べた。不満は引用と URL 付き（競合4本：Enki、Mimo、Exercism、roadmap.sh。手本：Wordle）
 - [x] ターゲットは「仮説」と書き、根拠に R 番号がある
 - [x] 性格語ごとに「意味しないこと」がある

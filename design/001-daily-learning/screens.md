@@ -1,7 +1,7 @@
 # 画面の図（文字）001-daily-learning
 
 design/001-daily-learning.md の補助。幅 320 CSS px（AC-17 の条件）での並びを文字で描く。
-`[ ]` は副操作のボタン（枠）、`[[ ]]` は主操作のボタン（塗り）、`<u>…</u>` はリンク（下線）。縦の線 `|` は本文の列の左右の線（space.4 の余白の内側）。色は付けない。
+`[ ]` は副操作のボタン（枠）、`[[ ]]` は主操作のボタン（塗り）、`<u>…</u>` はリンク（下線）。縦の線 `|` は本文の列の左右の線（space.4 の余白の内側）。`┌ ┐ └ ┘` は 1 px の枠（案内とダイアログ、入力欄）。色は付けない。r6（2026-11-03）：S1 の案内を枠で描き、S3 に「日付が変わった後」の図を足し、S8 と S10 の注記を直した（design-reviewer G3 r1 の 3、4、8、11）。
 
 ## S1 diagnosis.start（iOS の Safari、非スタンドアロン、閉じた印なし）
 ```
@@ -15,18 +15,20 @@ design/001-daily-learning.md の補助。幅 320 CSS px（AC-17 の条件）で�
 | 登録はありません。入力したデータは…    |
 | 難しすぎ・簡単すぎの申告が 2 回続くと…  |
 |                                        |
-| ホーム画面に追加してから始めることをお  |   section home.addToHomeScreen（h2、color.warning）
-| すすめします                           |
-| Safari は 7 日間使わないと…           |   .why
-| 1. 画面の下（iPad では上）の共有ボタン…|   .steps（ol）
-| 2. 「ホーム画面に追加」を選び…         |
-| 3. ホーム画面の「今日の一手」を開いて… |
-| 4. すでに Safari で診断した場合：…     |
-| [ 閉じる ]                             |   .close（44 px）
+| ┌────────────────────────────────────┐ |   section home.addToHomeScreen（案内。四方 1 px の枠 color.border。tokens 4「案内」）
+| │ ホーム画面に追加してから始めること │ |   h2 .title（color.warning）
+| │ をおすすめします                   │ |
+| │ Safari は 7 日間使わないと…       │ |   .why
+| │ 1. 画面の下（iPad では上）の共有… │ |   .steps（ol）
+| │ 2. 「ホーム画面に追加」を選び…     │ |
+| │ 3. ホーム画面の「今日の一手」を…   │ |
+| │ 4. すでに Safari で診断した場合：… │ |
+| │ [ 閉じる ]                         │ |   .close（副操作。幅は枠の内側いっぱい：tokens 4 のボタンの幅の規則）
+| └────────────────────────────────────┘ |
 |                                        |
 | [[ 診断を始める ]]                     |   主操作（列いっぱい、44 px 以上）
 ```
-スタンドアロン表示のとき：説明の直後に `home.standalone.import` の文と `[ ファイルを読み込む ]`（見えるボタン `home.standalone.importButton`。隠した `<input type="file">` `home.standalone.importFile` の `click()` を呼ぶ。S8 と同じ型）が入り、ホーム画面の案内は出ない。
+スタンドアロン表示のとき：説明の直後に `home.standalone.import` の文と `[ ファイルを読み込む ]`（見えるボタン `home.standalone.importButton`。隠した `<input type="file">` `home.standalone.importFile` の `click()` を呼ぶ。S8 と同じ型）が、同じ枠の案内（section `home.standalone`）として入り、ホーム画面の案内は出ない。
 
 ## S0 error（保存先が使えない。tech-lead r1 P1）
 ```
@@ -99,6 +101,18 @@ design/001-daily-learning.md の補助。幅 320 CSS px（AC-17 の条件）で�
 ```
 初期表示（幅 320、文字 100%）に、ヘッダー、ラベル、題名、meta、「なぜ今これか」の 2 行目までが入る（差をつける点 1）。
 
+### S3 task.today（画面を開いたまま日付が変わった後の最初の操作の直後。D-30）
+```
+| 今日の一手                 履歴  設定 |
+|                                        |
+| 日付が変わったため、直前の操作は無効に |   task.dayChanged（p role=status tabindex=-1。text.body、color.warning。フォーカスはここに移り、画面の先頭が見える）
+| なりました。前の課題は履歴にあります。 |
+|                                        |
+| 今日の課題 2026-10-31                  |   task.today.label（以下は通常の S3 と同じ。答えの欄は空）
+| …翌日の課題の題名…                     |   h1
+```
+出るのは「操作」で翌日の S3（か S7）に着いたときだけ（読み込みでは出ない）。次の操作（ボタン、リンク）か再読み込みで消える。textarea への入力では消えない。S7 では h1 `task.exhausted.message` の上に同じ知らせ。
+
 ## S4 task.rate
 ```
 | 今日の一手                 履歴  設定 |
@@ -131,7 +145,7 @@ S6 task.skipped は h1 と文が変わり、too_hard / too_easy のときだけ 
 | データ                                 |   h2
 | 入力したデータはこのブラウザの中だけに  |   settings.data.note
 | 保存され、外には送りません。…          |
-| このブラウザは保存の永続化を許可しませ  |   settings.storage.notPersisted（color.warning。断られたときだけ）
+| このブラウザは保存の永続化を許可しませ  |   settings.storage.notPersisted（color.warning。S8 を出すたびに persisted() を読み、false のときだけ：D-31）
 | んでした。…ファイルに書き出しておいて  |
 | ください。                              |
 | [[ ファイルに書き出す ]]               |   主操作
@@ -233,7 +247,7 @@ S6 task.skipped は h1 と文が変わり、too_hard / too_easy のときだけ 
 | 2026-10-30                             |   li（data-date、data-task-id、data-report=done、data-helpful=helpful）
 | …課題の題名…                           |
 | 完了 ・ 役に立った                     |   report.done、helpful.yes（文字。色なし）
-| ▸ 答えを見る                           |   details > summary（答えがあるときだけ）
+| ▸ 答えを見る                           |   details > summary（答えがあるときだけ。印 ▸ の左端を列の左の線にそろえる：tokens 4「開閉」）
 | ────────────────────────────────────── |   区切り（1 px、color.border）
 ```
 空：`まだ履歴はありません。課題を申告すると、ここに残ります。` と `[[ 今日の課題へ ]]`。

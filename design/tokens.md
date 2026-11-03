@@ -1,6 +1,6 @@
 # デザイントークン（今日の一手。ブラウザだけで動く Web アプリ）
 
-- 書いた役：designer　日付：2026-10-30　初版（001-daily-learning で導入）。r2：G1 r1 の design-reviewer の指摘 3、5、10、11 を反映（color.overlay、リンクの最小幅、ホバーと押した瞬間、定義リストの使い所、ファイルの読み込みの部品）。r3：G1 r2 の design-reviewer の提案 1 を反映（4「リンク」の列挙にヘッダーのアプリ名 `app.name` を足した）。r4：Takuma の決定 D1（主操作の色は青。値は変えない）と D5（ホーム画面のアイコンの色）を受けて、1 にアイコンの 1 行
+- 書いた役：designer　日付：2026-10-30　初版（001-daily-learning で導入）。r2：G1 r1 の design-reviewer の指摘 3、5、10、11 を反映（color.overlay、リンクの最小幅、ホバーと押した瞬間、定義リストの使い所、ファイルの読み込みの部品）。r3：G1 r2 の design-reviewer の提案 1 を反映（4「リンク」の列挙にヘッダーのアプリ名 `app.name` を足した）。r4：Takuma の決定 D1（主操作の色は青。値は変えない）と D5（ホーム画面のアイコンの色）を受けて、1 にアイコンの 1 行。r5（2026-11-03）：G3 r1 の design-reviewer の指摘 4〜6 と提案 9、11 を受けて、1 に案内の枠の例外と color.warning の使い所、4 にボタンの幅の規則が及ぶ範囲、リンクと summary の左端、入力欄のエラーの枠、「案内」と「開閉」の行。値は変えていない
 - 使い方：画面の仕様（design/<機能名>.md）と実装（CSS カスタムプロパティ）は、ここにある名前だけを使う。色の値を直接書かない。
 - 単位：CSS px。文字と余白は実装では rem（16 px = 1 rem）にして、ブラウザの文字サイズ設定と拡大に追従させる（調査 R-16、R-26）。
 - 根拠：design/001-daily-learning-research.md の R 番号と、原則 B-1〜B-6（.claude/skills/craft-designer/SKILL.md）。コントラスト比は WCAG 2.2 の式で計算した（計算スクリプトの出力は design/001-daily-learning.md の 9 に転記）。
@@ -20,11 +20,11 @@
 | color.border | 副操作のボタン、入力欄、印、区切りの枠 | #6B6B6B | #8C8C8C | #000000 | #FFFFFF | `--color-border` |
 | color.focus | キーボードのフォーカスの枠 | #1D4ED8 | #8AB4F8 | #0B3B9E | #A8C7FA | `--color-focus` |
 | color.success | 成功の知らせの文字（「保存しました」） | #1B6E3A | #7FD39A | #0E4D28 | #A6E3B5 | `--color-success` |
-| color.warning | 注意の文字（永続化を断られた、ホーム画面の案内の見出し） | #7A4A00 | #F2C35B | #5A3600 | #F7D98B | `--color-warning` |
+| color.warning | 注意の文字（永続化を断られた、ホーム画面の案内の見出し、答えの上限、日付が変わった知らせ） | #7A4A00 | #F2C35B | #5A3600 | #F7D98B | `--color-warning` |
 | color.error | エラーの文字と枠、取り消せない操作のボタンの文字 | #B42318 | #F28B82 | #8A1A12 | #F7B1AB | `--color-error` |
 | color.overlay | ダイアログの `::backdrop`（後ろの画面を暗くする。半透明はここだけ） | rgba(0,0,0,0.5) | rgba(0,0,0,0.5) | rgba(0,0,0,0.5) | rgba(0,0,0,0.5) | `--color-overlay` |
 
-- 地の色は1つだけ。カード、面、影、グラデーションは置かない（案A「一枚の紙」。B-2）。区切りは余白と 1 px の `color.border` の線だけ。
+- 地の色は1つだけ。カード、面、影、グラデーションは置かない（案A「一枚の紙」。B-2）。区切りは余白と 1 px の `color.border` の線だけ。例外は 4 の「案内」1 つ：「閉じる」で消える範囲を示すために四方を 1 px の `color.border` で囲む（塗りと影はない。R-30）。これ以外に四方を囲む箱は作らない。
 - ホーム画面のアイコン（`./icon-180.png`。design/001-daily-learning.md の 8 と D-29）は color.bg と color.text のライトの値（#FFFFFF、#1F1F1F）だけで描く。PNG はダークモードや `prefers-contrast` に追従しないので、ライトの値を固定して使う唯一の場所。
 - color.overlay は `prefers-reduced-transparency: reduce` では不透明の color.bg にし、ダイアログの境目は枠（color.border）で見せる。地に重ねたときの比は design/001-daily-learning.md の 9（ライトは地の差 3.95:1、ダークは枠 5.92:1 で境目が見える）。
 - リンクは `color.action.primary` の文字に下線を必ず付ける（色だけで区別しない。WCAG 2.2 SC 1.4.1）。
@@ -73,11 +73,11 @@
 
 | 部品 | 形 |
 |---|---|
-| ボタン（主操作） | `<button>`。塗り color.action.primary、文字 color.action.onPrimary、text.body の太さ 600、高さ 44 px 以上、内側 space.3 と space.4、角 size.radius。幅は列いっぱい（幅 480 px 未満）か内容に合わせる（480 px 以上） |
+| ボタン（主操作） | `<button>`。塗り color.action.primary、文字 color.action.onPrimary、text.body の太さ 600、高さ 44 px 以上、内側 space.3 と space.4、角 size.radius。幅は列いっぱい（幅 480 px 未満）か内容に合わせる（480 px 以上）。この幅の規則は `<button>` のすべて（主操作、副操作、取り消せない操作）に、どの入れ物（申告の群、設定の節、案内の中、エラーの直下）にあっても同じに当てる（design-reviewer G3 r1 の 5） |
 | ボタン（副操作） | `<button>`。塗りなし、枠 size.border の color.border、文字 color.text。寸法は主操作と同じ |
 | ボタン（取り消せない操作） | `<button>`。塗りなし、枠 color.error、文字 color.error。確認ダイアログの「削除する」「置き換える」と、設定の「すべてのデータを削除」 |
-| リンク | `<a>`。文字 color.action.primary、下線あり（太さ 1 px）。文字だけでは押せる範囲が 44 px に満たないので、単独で置くとき（ヘッダーのアプリ名 `app.name`、nav、「履歴を見る」、「統計を見る」、「設定に戻る」、「プライバシーについて」）は `display: inline-block`、上下に space.3 の内側、左右に space.2 の内側、`min-width: 44px` で 44 × 44 px 以上にする（R-17。design-reviewer r1 の 5）。文中のリンクはこの機能にはない |
-| 入力欄（textarea） | `<textarea>`。枠 color.border、角 size.radius、文字 text.body、内側 space.3、`rows="6"`、幅は列いっぱい。縦だけ伸ばせる |
+| リンク | `<a>`。文字 color.action.primary、下線あり（太さ 1 px）。文字だけでは押せる範囲が 44 px に満たないので、単独で置くとき（ヘッダーのアプリ名 `app.name`、nav、「履歴を見る」、「統計を見る」、「設定に戻る」、「プライバシーについて」）は `display: inline-block`、上下に space.3 の内側、左右に space.2 の内側、`min-width: 44px` で 44 × 44 px 以上にする（R-17。design-reviewer r1 の 5）。行の先頭に単独で置くときは、左の内側 space.2 の分を負の margin-left（`calc(-1 * space.2)`）で戻し、文字の左端を列の左の線にそろえる（ヘッダーの `app.name` と同じ扱い。design-reviewer G3 r1 の 4）。文中のリンクはこの機能にはない |
+| 入力欄（textarea） | `<textarea>`。枠 color.border、角 size.radius、文字 text.body、内側 space.3、`rows="6"`、幅は列いっぱい。縦だけ伸ばせる。エラーのとき（直下に `error.storage.message` が出ている間）は枠を size.border.strong の color.error にし、`aria-describedby` に補助文とエラーの文の両方を入れる。エラーが消えたら戻す。`aria-invalid` は付けない（値が不正なのではなく保存の失敗のため。design-reviewer G3 r1 の 6） |
 | 選択肢（radio） | ネイティブの `<input type="radio">` と `<label>`。ラベル全体を押せる範囲にし、高さ 44 px 以上、選択肢の間 space.2。`accent-color: var(--color-action-primary)` |
 | ダイアログ | ネイティブの `<dialog>` を `showModal()` で開く（開くときに DOM に足し、閉じたら外す）。幅は min(列の幅, 480 px)、内側 space.5、枠 size.border の color.border、地 color.bg。背景は `::backdrop` を color.overlay にする（design-reviewer r1 の 11） |
 | 印（badge） | `<span>` の文字と枠だけ。枠 size.border の color.text、内側 space.1 と space.2、角 size.radius。色は付けない |
@@ -85,6 +85,8 @@
 | 定義リスト（統計、要る道具） | `<dl>`。`<dt>` は text.heading、`<dd>` は text.body。常に縦に積む（横並びにしない。R-16）。S9 の 9 つの値と、S3 の `task.external.tools` に使う |
 | 見出しと段落（課題の 4 要素） | `<h2>`（text.heading）と `<p>`（text.body）。`task.why` / `task.how` / `task.goal` の見出しと本文。定義リストにはしない（読み上げソフトの見出し移動のため。design-reviewer r1 の 3） |
 | ファイルの読み込み | 見える `<button>`（副操作の形。保存データなしの S8 では主操作の形）が、隠した `<input type="file">` の `click()` を呼ぶ。input は視覚的に隠し（1 px、`clip-path: inset(50%)`。`display: none` にしない）、`tabindex="-1"` と `aria-hidden="true"`。フォーカスの枠と名前はボタンが持つ（design/001-daily-learning.md の 9。design-reviewer r1 の 4） |
+| 案内（notice） | `<section aria-labelledby>`。`home.addToHomeScreen`（S1、S8）と `home.standalone`（S1）。四方を size.border の color.border で囲み、角 size.radius、内側 space.4、上下の外側 space.5。塗り、影、アイコンはない。枠は「閉じる」で消える（または読み込みで置き換わる）範囲を示すためで、1 の例外（R-30。design-reviewer G3 r1 の 11）。中の h2 は text.heading で、`home.addToHomeScreen.title` だけ color.warning |
+| 開閉（details / summary） | ネイティブの `<details>` と `<summary>`（S10 の答え）。summary は text.body、高さ 44 px 以上、上下 space.3 と左右 space.2 の内側。行の先頭に置くので、リンクと同じ負の margin-left で、見える左端（開閉の印）を列の左の線にそろえる（design-reviewer G3 r1 の 4） |
 
 ### ホバーと押した瞬間（design-reviewer r1 の 10）
 新しい色を足さない。変えるのは下線と、既にある 2 色の入れ替えだけ。切り替えに transition を付けない（5）。
