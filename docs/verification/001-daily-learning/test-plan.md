@@ -236,6 +236,7 @@ contracts/ にないつなぎ口はない。r1 で「未解決」に書いた食
 | global-setup が backend/dist を上書き（tech-lead 提案） | global-setup.mjs：`mkdtemp` の一時フォルダにビルドし、teardown（返す関数）で消す。paths.mjs の `DIST_DIR` を外した。README も | craft-verifier（受け入れテストのフォルダの外を書き換えない）。ADR 0004 |
 | AC-28 の一時フォルダを消していない（tech-lead 提案） | ac28-update.spec.mjs：本体を `run()` に移し、`finally` で `rmSync` | 同上 |
 | `.js` の Content-Type（tech-lead 提案） | server/static-server.mjs：`.js` と `.mjs` を `text/javascript`（charset なし） | test-hooks.md「実行の環境」の表 |
+| AC-20 が実装と関係なく ENOENT で落ちる（backend-engineer の報告。G3 の前に verifier が再現：evidence/ac20-enoent-before-fix.log） | helpers/app.mjs の `exportJson`：`download.path()` のファイルはコンテキストを閉じると Playwright 1.64.1 が消すので、`download.saveAs` でそのテストの出力フォルダ（test-results/<テスト>/exports/）に byte 単位で複製し、その複製を `file` として返す。読み込ませるファイルは書き出したものの複製で、中身は書き直さない。spec と期待する値は変えていない。確かめ：evidence/ac20-after-fix.log（6 本合格）、ac20-after-fix-x5.log（5 回とも 6 本合格）、npm-test-after-ac20-fix.log（133 本合格、終了コード 0） | PRD AC-20 Given「保存データがないブラウザで、AC-19 のファイル（版番号が今の版）がある」。test-hooks.md W-9「書き出し：`page.waitForEvent('download')` で 1 件」「読み込み：隠した input に `setInputFiles`」。Then は変えていない |
 
 取り込まなかったもの（理由）：
 - W-9「次の 1 回」の文言、AC-31 の祖先の除外：tech-lead が契約の方を直した（f339a95）。テストはもとから直した契約の形なので変更なし。

@@ -1,0 +1,80 @@
+npm notice run npx
+npm notice run 'playwright' test ac19-ac20-ac25 --reporter=line
+
+Running 6 tests using 5 workers
+
+[1/6] [chromium] › tests/ac19-ac20-ac25-export-import.spec.mjs:48:1 › AC20_保存データのないブラウザで読み込むと_診断と段階が同じで履歴3件（answerも同じ）_状態はtask.todayかtask.done
+[2/6] [webkit] › tests/ac19-ac20-ac25-export-import.spec.mjs:12:1 › AC19_書き出すとJSONが1つダウンロードされ_診断_段階_履歴3件（50文字のanswer）_初めて開いた日_版番号を含む
+[3/6] [webkit] › tests/ac19-ac20-ac25-export-import.spec.mjs:48:1 › AC20_保存データのないブラウザで読み込むと_診断と段階が同じで履歴3件（answerも同じ）_状態はtask.todayかtask.done
+[4/6] [chromium] › tests/ac19-ac20-ac25-export-import.spec.mjs:12:1 › AC19_書き出すとJSONが1つダウンロードされ_診断_段階_履歴3件（50文字のanswer）_初めて開いた日_版番号を含む
+[5/6] [chromium] › tests/ac19-ac20-ac25-export-import.spec.mjs:91:1 › AC25_版番号が新しいファイルはerror.import.messageで拒み_履歴1件と診断と状態は変わらない
+  1) [chromium] › tests/ac19-ac20-ac25-export-import.spec.mjs:48:1 › AC20_保存データのないブラウザで読み込むと_診断と段階が同じで履歴3件（answerも同じ）_状態はtask.todayかtask.done 
+
+    Error: ENOENT: no such file or directory, stat '/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/.playwright-artifacts-1/9182f60e-ce9c-4067-98c0-1812dcfef919'
+
+      65 |   await app.goSettings(pageB);
+      66 |   await expect(app.tid(pageB, 'settings.export')).toHaveCount(0);
+    > 67 |   await app.tid(pageB, 'settings.import.file').setInputFiles(exported.file);
+         |   ^
+      68 |   await expect(app.tid(pageB, 'settings.import.confirm')).toHaveCount(0);
+      69 |   await expect(app.tid(pageB, 'error.import.message')).toHaveCount(0);
+      70 |   await expect(app.root(pageB)).toHaveAttribute('data-state', /^task\.(today|done)$/, { timeout: app.WAIT_MS });
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac19-ac20-ac25-export-import.spec.mjs:67:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac19-ac20-ac25-export-impo-34c78-同じ）-状態はtask-todayかtask-done-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac19-ac20-ac25-export-impo-34c78-同じ）-状態はtask-todayかtask-done-chromium/test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac19-ac20-ac25-export-impo-34c78-同じ）-状態はtask-todayかtask-done-chromium/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac19-ac20-ac25-export-impo-34c78-同じ）-状態はtask-todayかtask-done-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac19-ac20-ac25-export-impo-34c78-同じ）-状態はtask-todayかtask-done-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[6/6] [webkit] › tests/ac19-ac20-ac25-export-import.spec.mjs:91:1 › AC25_版番号が新しいファイルはerror.import.messageで拒み_履歴1件と診断と状態は変わらない
+  2) [webkit] › tests/ac19-ac20-ac25-export-import.spec.mjs:48:1 › AC20_保存データのないブラウザで読み込むと_診断と段階が同じで履歴3件（answerも同じ）_状態はtask.todayかtask.done 
+
+    Error: ENOENT: no such file or directory, stat '/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/.playwright-artifacts-4/7594178a-4b65-4472-b0b9-02b671abf860'
+
+      65 |   await app.goSettings(pageB);
+      66 |   await expect(app.tid(pageB, 'settings.export')).toHaveCount(0);
+    > 67 |   await app.tid(pageB, 'settings.import.file').setInputFiles(exported.file);
+         |   ^
+      68 |   await expect(app.tid(pageB, 'settings.import.confirm')).toHaveCount(0);
+      69 |   await expect(app.tid(pageB, 'error.import.message')).toHaveCount(0);
+      70 |   await expect(app.root(pageB)).toHaveAttribute('data-state', /^task\.(today|done)$/, { timeout: app.WAIT_MS });
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac19-ac20-ac25-export-import.spec.mjs:67:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac19-ac20-ac25-export-impo-34c78-同じ）-状態はtask-todayかtask-done-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac19-ac20-ac25-export-impo-34c78-同じ）-状態はtask-todayかtask-done-webkit/test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac19-ac20-ac25-export-impo-34c78-同じ）-状態はtask-todayかtask-done-webkit/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac19-ac20-ac25-export-impo-34c78-同じ）-状態はtask-todayかtask-done-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac19-ac20-ac25-export-impo-34c78-同じ）-状態はtask-todayかtask-done-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  2 failed
+    [chromium] › tests/ac19-ac20-ac25-export-import.spec.mjs:48:1 › AC20_保存データのないブラウザで読み込むと_診断と段階が同じで履歴3件（answerも同じ）_状態はtask.todayかtask.done 
+    [webkit] › tests/ac19-ac20-ac25-export-import.spec.mjs:48:1 › AC20_保存データのないブラウザで読み込むと_診断と段階が同じで履歴3件（answerも同じ）_状態はtask.todayかtask.done 
+  4 passed (3.9s)
+EXIT=1

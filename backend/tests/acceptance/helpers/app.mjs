@@ -1,6 +1,6 @@
 // 画面を操作し、読むための共通の関数。要素は contracts/identifiers.md の data-testid でだけ探す。
 // 待つのは状態（data-state）や要素の変化だけ。待ち時間の定数は WAIT_MS の 1 か所。
-import { expect } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 
 export const WAIT_MS = 10_000;
 
@@ -168,12 +168,23 @@ export async function readHistoryRows(page) {
   return out;
 }
 
-/** 設定の「書き出し」でダウンロードした JSON を読む（W-9）。設定の画面にいること。 */
+/**
+ * 設定の「書き出し」でダウンロードした JSON を読む（W-9）。設定の画面にいること。
+ * 戻り値の file は、ダウンロードしたファイルを `download.saveAs` でそのテストの出力フォルダ（test-results/<テスト>/exports/）に
+ * byte 単位で複製したもの。`download.path()` のファイルはコンテキストを閉じると Playwright が消すので（AC-20 は書き出し元の
+ * コンテキストを閉じてから別のコンテキストに読み込ませる）、閉じても残る複製を返す。中身は書き直さない（JSON に通すのは検査のためだけ）。
+ */
+let exportSeq = 0;
 export async function exportJson(page) {
   const [download] = await Promise.all([page.waitForEvent('download', { timeout: WAIT_MS }), tid(page, 'settings.export').click()]);
-  const file = await download.path();
-  const { readFileSync } = await import('node:fs');
-  return { json: JSON.parse(readFileSync(file, 'utf8')), file, suggestedFilename: download.suggestedFilename() };
+  const suggestedFilename = download.suggestedFilename();
+  const { readFileSync, mkdirSync } = await import('node:fs');
+  const { join } = await import('node:path');
+  const dir = test.info().outputPath('exports');
+  mkdirSync(dir, { recursive: true });
+  const file = join(dir, `${++exportSeq}-${suggestedFilename || 'export.json'}`);
+  await download.saveAs(file);
+  return { json: JSON.parse(readFileSync(file, 'utf8')), file, suggestedFilename };
 }
 
 /** 文言ファイル（W-14）。 */
