@@ -1,0 +1,64 @@
+# セッション R1（chromium、2026-11-03T14:24:08.688Z、配布物 2026-11-30.1）
+1. nav.settings → 設定
+  data-state=settings
+2. 同じ日のファイル（valid-export-three-completed.json）を読み込む → 確認ダイアログ
+  summary=「ファイルの中身：履歴 3 件、初めて開いた日 2026-11-01」 初期フォーカス=settings.import.confirm.cancel
+  R1_02_confirm_sameday.png
+  data-state=settings
+3. やめる → データが 1 文字も変わらない
+  変わらない=true、フォーカス=settings.import
+  data-state=settings
+4. 同じファイルをもう一度読み込んで置き換える → 結合されない
+  history=3（ファイル 3）、firstOpenDate=2026-11-01（ファイル 2026-11-01）、current={"date":"2026-11-04","taskId":"backend-intermediate-004","area":"backend","level":"intermediate","mode":"in_app","answer":""}、device={"persistRequested":true,"persistGranted":false}
+  R1_04_after_replace_sameday.png
+  data-state=task.today
+5. 違う日（firstOpenDate 2026-10-01、git/advanced、履歴 1 件）のファイルを読み込んで置き換える
+  summary=「ファイルの中身：履歴 1 件、初めて開いた日 2026-10-01」
+  firstOpenDate=2026-10-01、diagnosis={"area":"git","level":"advanced","years":"gte5","completedOn":"2026-10-01"}、levels={"git":"advanced"}、history=1、state=task.today、task=git-advanced-002
+  data-state=task.today
+6. 統計で初めて開いた日を見る
+  first-open-date=2026-10-01 issued=2 completed=1
+  data-state=settings
+7. current と device を含むファイル（valid-all-fields.json）を読み込む
+  ファイル：current={"date":"2026-11-04","taskId":"backend-intermediate-004","area":"backend","level":"intermediate","mode":"in_app","answer":""} device={"homeGuideClosed":true,"persistRequested":true,"persistGranted":false} history=5
+  保存：current={"date":"2026-11-04","taskId":"backend-intermediate-004","area":"backend","level":"intermediate","mode":"in_app","answer":""} device={"persistRequested":true,"persistGranted":false} history=5 state=task.today
+  R1_07_after_allfields.png
+  data-state=task.today
+8. 空の history（診断済み、履歴 0 件）のファイルを読み込む
+  出たもの=settings.import.confirm
+  summary=「ファイルの中身：履歴 0 件、初めて開いた日 2026-11-02」
+  history=0 diagnosis={"area":"infra","level":"beginner","years":"1to3","completedOn":"2026-11-02"} state=task.today
+  data-state=task.today
+9. 5,000,001 バイトのファイル（正しい JSON を空白で埋めた）を読み込む → 読まずに拒む
+  出たもの=error.import.message,error.import.reason.schema（461 ms）、データ変わらない=true
+  R1_09_big_file.png
+  data-state=settings
+10. 4,999,999 バイト（境界の内側）→ 読んで確認が出る
+  出たもの=settings.import.confirm
+  data-state=settings
+11. JSON でない のファイルを読み込む → 拒む
+  出たもの=error.import.message,error.import.reason.schema、データ変わらない=true、alert の role=alert
+  data-state=settings
+12. 他のアプリ のファイルを読み込む → 拒む
+  出たもの=error.import.message,error.import.reason.schema、データ変わらない=true、alert の role=alert
+  data-state=settings
+13. 余分な項目 のファイルを読み込む → 拒む
+  出たもの=error.import.message,error.import.reason.schema、データ変わらない=true、alert の role=alert
+  data-state=settings
+14. UTC の日時 のファイルを読み込む → 拒む
+  出たもの=error.import.message,error.import.reason.schema、データ変わらない=true、alert の role=alert
+  data-state=settings
+15. 「なし」（firstOpenDate がない） のファイルを読み込む → 拒む
+  出たもの=error.import.message,error.import.reason.schema、データ変わらない=true、alert の role=alert
+  data-state=settings
+16. 空のファイル のファイルを読み込む → 拒む
+  出たもの=error.import.message,error.import.reason.schema、データ変わらない=true、alert の role=alert
+  data-state=settings
+17. formatVersion 0 のファイルを読み込む → 拒む
+  出たもの=error.import.message,error.import.reason.schema、データ変わらない=true、alert の role=alert
+  data-state=settings
+18. 診断の途中（valid-in-progress）のブラウザで読み込む → 確認なしで置き換わる
+  保存データなしの S8：export=0 redo=0 delete=0 import=1
+  state=task.today 出たもの=なし history=3
+  data-state=settings
+# 操作 18 件、2 秒、疑問/不具合候補 0 件

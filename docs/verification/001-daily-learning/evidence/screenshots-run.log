@@ -1,0 +1,148 @@
+# date: 2026-11-03 23:20:09 +0900
+# commit: e13d68f1a91e14a0f5303847768063473277ec54
+# cmd: node tools/screenshots.mjs --out docs/verification/001-daily-learning/evidence/screenshots --browser both
+ok             chromium light S0_loading 
+ok             chromium light S0_error_invalidData 
+ok             chromium light S0_error_notJson 
+ok             chromium light S0_error_storageUnavailable 
+ok             chromium light S0_error_dialog_delete 
+ok             chromium light S1_diagnosis.start 
+ok             chromium dark  S1_diagnosis.start 
+ok             chromium ax5   S1_diagnosis.start 
+ok             chromium en    S1_diagnosis.start 
+ok             chromium w320  S1_diagnosis.start 
+ok             chromium light S1_addToHomeScreen 
+ok             chromium light S1_standalone_import 
+ok             chromium light S1_standalone_import_error 
+ok             chromium light S2_question_1 
+ok             chromium dark  S2_question_1 
+ok             chromium ax5   S2_question_1 
+ok             chromium en    S2_question_1 
+ok             chromium light S2_question_2 
+ok             chromium light S2_question_3 
+ok             chromium light S2_error_required 
+ok             chromium light S2_error_storage 
+ok             chromium light S2_resume_inProgress 
+ok             chromium light S2_redo_fromSettings 
+ok             chromium light S3_task.today 
+ok             chromium dark  S3_task.today 
+ok             chromium ax5   S3_task.today 
+ok             chromium en    S3_task.today 
+ok             chromium w320  S3_task.today_backend-beginner-005 
+ok             chromium light S3_task.today_external 
+ok             chromium light S3_answer_saved 
+ok             chromium light S3_answer_limit 
+ok             chromium light S3_error_storage_answer 
+ok             chromium light S3_error_storage_report 
+ok             chromium light S4_task.rate 
+ok             chromium dark  S4_task.rate 
+ok             chromium ax5   S4_task.rate 
+ok             chromium en    S4_task.rate 
+ok             chromium light S4_error_storage 
+ok             chromium light S5_task.done 
+ok             chromium dark  S5_task.done 
+ok             chromium ax5   S5_task.done 
+ok             chromium en    S5_task.done 
+ok             chromium light S6_task.skipped_too_hard 
+ok             chromium light S6_task.skipped_too_easy 
+ok             chromium light S6_task.skipped_no_time 
+ok             chromium light S7_task.exhausted 
+ok             chromium dark  S7_task.exhausted 
+ok             chromium ax5   S7_task.exhausted 
+ok             chromium en    S7_task.exhausted 
+ok             chromium light S8_settings 
+ok             chromium dark  S8_settings 
+ok             chromium ax5   S8_settings 
+ok             chromium en    S8_settings 
+ok             chromium light S8_settings_noData 
+ok             chromium light S8_settings_inProgress 
+ok             chromium light S8_settings_notPersisted 
+ok             chromium light S8_export_done 
+ok             chromium light S8_import_error_version 
+ok             chromium light S8_import_error_schema 
+ok             chromium light S8_homeScreen_guide 
+ok             chromium light dialog_settings.import.confirm 
+ok             chromium light dialog_settings.delete.confirm 
+ok             chromium light S9_settings.stats 
+ok             chromium dark  S9_settings.stats 
+ok             chromium ax5   S9_settings.stats 
+ok             chromium en    S9_settings.stats 
+ok             chromium light S9_settings.stats_zero 
+ok             chromium light S10_history 
+ok             chromium dark  S10_history 
+ok             chromium ax5   S10_history 
+ok             chromium en    S10_history 
+ok             chromium light S10_history_answerOpen 
+ok             chromium light S10_history_empty 
+ok             webkit   light S0_loading 
+ok             webkit   light S0_error_invalidData 
+ok             webkit   light S0_error_notJson 
+ok             webkit   light S0_error_storageUnavailable 
+ok             webkit   light S0_error_dialog_delete 
+ok             webkit   light S1_diagnosis.start 
+ok             webkit   light S1_addToHomeScreen 
+ok             webkit   light S1_standalone_import 
+ok             webkit   light S1_standalone_import_error 
+ok             webkit   light S2_question_1 
+ok             webkit   light S2_question_2 
+ok             webkit   light S2_question_3 
+ok             webkit   light S2_error_required 
+ok             webkit   light S2_error_storage 
+ok             webkit   light S2_resume_inProgress 
+ok             webkit   light S2_redo_fromSettings 
+ok             webkit   light S3_task.today 
+ok             webkit   w320  S3_task.today_backend-beginner-005 
+ok             webkit   light S3_task.today_external 
+ok             webkit   light S3_answer_saved 
+ok             webkit   light S3_answer_limit 
+ok             webkit   light S3_error_storage_answer 
+ok             webkit   light S3_error_storage_report 
+ok             webkit   light S4_task.rate 
+ok             webkit   light S4_error_storage 
+ok             webkit   light S5_task.done 
+ok             webkit   light S6_task.skipped_too_hard 
+ok             webkit   light S6_task.skipped_too_easy 
+ok             webkit   light S6_task.skipped_no_time 
+ok             webkit   light S7_task.exhausted 
+ok             webkit   light S8_settings 
+ok             webkit   light S8_settings_noData 
+ok             webkit   light S8_settings_inProgress 
+ok             webkit   light S8_settings_notPersisted 
+ok             webkit   light S8_export_done 
+ok             webkit   light S8_import_error_version 
+ok             webkit   light S8_import_error_schema 
+ok             webkit   light S8_homeScreen_guide 
+ok             webkit   light dialog_settings.import.confirm 
+ok             webkit   light dialog_settings.delete.confirm 
+ok             webkit   light S9_settings.stats 
+ok             webkit   light S9_settings.stats_zero 
+ok             webkit   light S10_history 
+ok             webkit   light S10_history_answerOpen 
+ok             webkit   light S10_history_empty 
+
+撮った：118 枚（問題 0）。axe：91 画面、違反のある画面 0
+# exit: 0
+# S0_loading の撮り直し（opacity 1 を待つ）2026-11-03 23:25:37 +0900
+# cmd: node tools/screenshots.mjs --out docs/verification/001-daily-learning/evidence/screenshots --browser both --only '^S0_loading$'
+ok             chromium light S0_loading 
+ok             webkit   light S0_loading 
+
+撮った：2 枚（問題 0）。axe：2 画面、違反のある画面 0
+# exit: 0
+# ダイアログ 2 つと S0 error を 4 通りで撮り直し 2026-11-03 23:26:21 +0900
+# cmd: node tools/screenshots.mjs --out docs/verification/001-daily-learning/evidence/screenshots --browser chromium --only '^(dialog_|S0_error_invalidData)'
+ok             chromium light S0_error_invalidData 
+ok             chromium dark  S0_error_invalidData 
+ok             chromium ax5   S0_error_invalidData 
+ok             chromium en    S0_error_invalidData 
+ok             chromium light dialog_settings.import.confirm 
+ok             chromium dark  dialog_settings.import.confirm 
+ok             chromium ax5   dialog_settings.import.confirm 
+ok             chromium en    dialog_settings.import.confirm 
+ok             chromium light dialog_settings.delete.confirm 
+ok             chromium dark  dialog_settings.delete.confirm 
+ok             chromium ax5   dialog_settings.delete.confirm 
+ok             chromium en    dialog_settings.delete.confirm 
+
+撮った：12 枚（問題 0）。axe：3 画面、違反のある画面 0
+# exit: 0

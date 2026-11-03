@@ -1,0 +1,128 @@
+file	browser	viewport	variant	scenario	ac	expectedState	state	lang	rootFontSize	scrollWidth/clientWidth	result	error
+S0_error_notJson_light.png	chromium	390x844@2	light	S0_error_notJson	—（design 5 S0 エラー (1)）	error	error	ja	16px	390/390	ok	
+S0_error_storageUnavailable_light.png	chromium	390x844@2	light	S0_error_storageUnavailable	—（design 5 S0 エラー (2)）	error	error	ja	16px	390/390	ok	
+S0_error_dialog_delete_light.png	chromium	390x844@2	light	S0_error_dialog_delete	—（design 5 S0 エラー (1) → settings.delete.confirm）	error	error	ja	16px	390/390	ok	
+S1_diagnosis.start_light.png	chromium	390x844@2	light	S1_diagnosis.start	AC-1、AC-26	diagnosis.start	diagnosis.start	ja	16px	390/390	ok	
+S1_diagnosis.start_dark.png	chromium	390x844@2	dark	S1_diagnosis.start	AC-1、AC-26	diagnosis.start	diagnosis.start	ja	16px	390/390	ok	
+S1_diagnosis.start_ax5.png	chromium	390x844@2	ax5	S1_diagnosis.start	AC-1、AC-26	diagnosis.start	diagnosis.start	ja	32px	390/390	ok	
+S1_diagnosis.start_en.png	chromium	390x844@2	en	S1_diagnosis.start	AC-1、AC-26	diagnosis.start	diagnosis.start	en	16px	390/390	ok	
+S1_diagnosis.start_w320.png	chromium	320x568@2	w320	S1_diagnosis.start	AC-1、AC-26	diagnosis.start	diagnosis.start	ja	16px	320/320	ok	
+S1_addToHomeScreen_light.png	chromium	390x844@2	light	S1_addToHomeScreen	AC-21	diagnosis.start	diagnosis.start	ja	16px	390/390	ok	
+S1_standalone_import_light.png	chromium	390x844@2	light	S1_standalone_import	AC-22	diagnosis.start	diagnosis.start	ja	16px	390/390	ok	
+S1_standalone_import_error_light.png	chromium	390x844@2	light	S1_standalone_import_error	AC-22、AC-25（design 5 S1 エラー）	diagnosis.start	diagnosis.start	ja	16px	390/390	ok	
+S2_question_1_light.png	chromium	390x844@2	light	S2_question_1	AC-1	diagnosis.question	diagnosis.question	ja	16px	390/390	ok	
+S2_question_1_dark.png	chromium	390x844@2	dark	S2_question_1	AC-1	diagnosis.question	diagnosis.question	ja	16px	390/390	ok	
+S2_question_1_ax5.png	chromium	390x844@2	ax5	S2_question_1	AC-1	diagnosis.question	diagnosis.question	ja	32px	390/390	ok	
+S2_question_1_en.png	chromium	390x844@2	en	S2_question_1	AC-1	diagnosis.question	diagnosis.question	en	16px	390/390	ok	
+S2_question_2_light.png	chromium	390x844@2	light	S2_question_2	AC-1	diagnosis.question	diagnosis.question	ja	16px	390/390	ok	
+S2_question_3_light.png	chromium	390x844@2	light	S2_question_3	AC-1	diagnosis.question	diagnosis.question	ja	16px	390/390	ok	
+S2_error_required_light.png	chromium	390x844@2	light	S2_error_required	—（design 5 S2 エラー (1)）	diagnosis.question	diagnosis.question	ja	16px	390/390	ok	
+S2_error_storage_light.png	chromium	390x844@2	light	S2_error_storage	AC-11	diagnosis.question	diagnosis.question	ja	16px	390/390	ok	
+S2_resume_inProgress_light.png	chromium	390x844@2	light	S2_resume_inProgress	—（design 5 S2 通常：途中の再開）	diagnosis.question	diagnosis.question	ja	16px	390/390	ok	
+S2_redo_fromSettings_light.png	chromium	390x844@2	light	S2_redo_fromSettings	AC-14（diagnosis.cancel あり）	diagnosis.question	diagnosis.question	ja	16px	390/390	ok	
+S3_task.today_light.png	chromium	390x844@2	light	S3_task.today	AC-2、AC-31	task.today	task.today	ja	16px	390/390	ok	
+S3_task.today_dark.png	chromium	390x844@2	dark	S3_task.today	AC-2、AC-31	task.today	task.today	ja	16px	390/390	ok	
+S3_task.today_ax5.png	chromium	390x844@2	ax5	S3_task.today	AC-2、AC-31	task.today	task.today	ja	32px	390/390	ok	
+S3_task.today_en.png	chromium	390x844@2	en	S3_task.today	AC-2、AC-31	task.today	task.today	en	16px	390/390	ok	
+S3_task.today_backend-beginner-005_w320.png	chromium	320x568@2	w320	S3_task.today_backend-beginner-005	AC-17（長いインラインコード）	task.today	task.today	ja	16px	320/320	ok	
+S3_task.today_external_light.png	chromium	390x844@2	light	S3_task.today_external	AC-30	task.today	task.today	ja	16px	390/390	ok	
+S3_answer_saved_light.png	chromium	390x844@2	light	S3_answer_saved	AC-32	task.today	task.today	ja	16px	390/390	ok	
+S3_answer_limit_light.png	chromium	390x844@2	light	S3_answer_limit	—（design 5 S3：answer.max）	task.today	task.today	ja	16px	390/390	ok	
+S3_error_storage_answer_light.png	chromium	390x844@2	light	S3_error_storage_answer	—（design 5 S3 エラー (1)）	task.today	task.today	ja	16px	390/390	ok	
+S3_error_storage_report_light.png	chromium	390x844@2	light	S3_error_storage_report	—（design 5 S3 エラー (2)）	task.today	task.today	ja	16px	390/390	ok	
+S4_task.rate_light.png	chromium	390x844@2	light	S4_task.rate	AC-5、AC-9	task.rate	task.rate	ja	16px	390/390	ok	
+S4_task.rate_dark.png	chromium	390x844@2	dark	S4_task.rate	AC-5、AC-9	task.rate	task.rate	ja	16px	390/390	ok	
+S4_task.rate_ax5.png	chromium	390x844@2	ax5	S4_task.rate	AC-5、AC-9	task.rate	task.rate	ja	32px	390/390	ok	
+S4_task.rate_en.png	chromium	390x844@2	en	S4_task.rate	AC-5、AC-9	task.rate	task.rate	en	16px	390/390	ok	
+S4_error_storage_light.png	chromium	390x844@2	light	S4_error_storage	—（design 5 S4 エラー）	task.rate	task.rate	ja	16px	390/390	ok	
+S5_task.done_light.png	chromium	390x844@2	light	S5_task.done	AC-5、AC-31	task.done	task.done	ja	16px	390/390	ok	
+S5_task.done_dark.png	chromium	390x844@2	dark	S5_task.done	AC-5、AC-31	task.done	task.done	ja	16px	390/390	ok	
+S5_task.done_ax5.png	chromium	390x844@2	ax5	S5_task.done	AC-5、AC-31	task.done	task.done	ja	32px	390/390	ok	
+S5_task.done_en.png	chromium	390x844@2	en	S5_task.done	AC-5、AC-31	task.done	task.done	en	16px	390/390	ok	
+S6_task.skipped_too_hard_light.png	chromium	390x844@2	light	S6_task.skipped_too_hard	AC-7（levelHint あり）	task.skipped	task.skipped	ja	16px	390/390	ok	
+S6_task.skipped_too_easy_light.png	chromium	390x844@2	light	S6_task.skipped_too_easy	AC-7	task.skipped	task.skipped	ja	16px	390/390	ok	
+S6_task.skipped_no_time_light.png	chromium	390x844@2	light	S6_task.skipped_no_time	AC-7（levelHint なし）	task.skipped	task.skipped	ja	16px	390/390	ok	
+S7_task.exhausted_light.png	chromium	390x844@2	light	S7_task.exhausted	AC-10	task.exhausted	task.exhausted	ja	16px	390/390	ok	
+S7_task.exhausted_dark.png	chromium	390x844@2	dark	S7_task.exhausted	AC-10	task.exhausted	task.exhausted	ja	16px	390/390	ok	
+S7_task.exhausted_ax5.png	chromium	390x844@2	ax5	S7_task.exhausted	AC-10	task.exhausted	task.exhausted	ja	32px	390/390	ok	
+S7_task.exhausted_en.png	chromium	390x844@2	en	S7_task.exhausted	AC-10	task.exhausted	task.exhausted	en	16px	390/390	ok	
+S8_settings_light.png	chromium	390x844@2	light	S8_settings	AC-13、AC-19、AC-28	settings	settings	ja	16px	390/390	ok	
+S8_settings_dark.png	chromium	390x844@2	dark	S8_settings	AC-13、AC-19、AC-28	settings	settings	ja	16px	390/390	ok	
+S8_settings_ax5.png	chromium	390x844@2	ax5	S8_settings	AC-13、AC-19、AC-28	settings	settings	ja	32px	390/390	ok	
+S8_settings_en.png	chromium	390x844@2	en	S8_settings	AC-13、AC-19、AC-28	settings	settings	en	16px	390/390	ok	
+S8_settings_noData_light.png	chromium	390x844@2	light	S8_settings_noData	—（design 5 S8 空）	settings	settings	ja	16px	390/390	ok	
+S8_settings_inProgress_light.png	chromium	390x844@2	light	S8_settings_inProgress	—（design 5 S8 空：診断の途中）	settings	settings	ja	16px	390/390	ok	
+S8_settings_notPersisted_light.png	chromium	390x844@2	light	S8_settings_notPersisted	AC-13	settings	settings	ja	16px	390/390	ok	
+S8_export_done_light.png	chromium	390x844@2	light	S8_export_done	AC-19	settings	settings	ja	16px	390/390	ok	
+S8_import_error_version_light.png	chromium	390x844@2	light	S8_import_error_version	AC-25	settings	settings	ja	16px	390/390	ok	
+S8_import_error_schema_light.png	chromium	390x844@2	light	S8_import_error_schema	—（design 5 S8 エラー (1)）	settings	settings	ja	16px	390/390	ok	
+S8_homeScreen_guide_light.png	chromium	390x844@2	light	S8_homeScreen_guide	AC-21	settings	settings	ja	16px	390/390	ok	
+S9_settings.stats_light.png	chromium	390x844@2	light	S9_settings.stats	AC-24	settings.stats	settings.stats	ja	16px	390/390	ok	
+S9_settings.stats_dark.png	chromium	390x844@2	dark	S9_settings.stats	AC-24	settings.stats	settings.stats	ja	16px	390/390	ok	
+S9_settings.stats_ax5.png	chromium	390x844@2	ax5	S9_settings.stats	AC-24	settings.stats	settings.stats	ja	32px	390/390	ok	
+S9_settings.stats_en.png	chromium	390x844@2	en	S9_settings.stats	AC-24	settings.stats	settings.stats	en	16px	390/390	ok	
+S9_settings.stats_zero_light.png	chromium	390x844@2	light	S9_settings.stats_zero	AC-24（design 5 S9 空）	settings.stats	settings.stats	ja	16px	390/390	ok	
+S10_history_light.png	chromium	390x844@2	light	S10_history	AC-5、AC-19	history	history	ja	16px	390/390	ok	
+S10_history_dark.png	chromium	390x844@2	dark	S10_history	AC-5、AC-19	history	history	ja	16px	390/390	ok	
+S10_history_ax5.png	chromium	390x844@2	ax5	S10_history	AC-5、AC-19	history	history	ja	32px	390/390	ok	
+S10_history_en.png	chromium	390x844@2	en	S10_history	AC-5、AC-19	history	history	en	16px	390/390	ok	
+S10_history_answerOpen_light.png	chromium	390x844@2	light	S10_history_answerOpen	AC-19、AC-32	history	history	ja	16px	390/390	ok	
+S10_history_empty_light.png	chromium	390x844@2	light	S10_history_empty	AC-16（design 5 S10 空）	history	history	ja	16px	390/390	ok	
+webkit/S0_error_invalidData_light.png	webkit	390x844@2	light	S0_error_invalidData	—（design 5 S0 エラー (1)）	error	error	ja	16px	390/390	ok	
+webkit/S0_error_notJson_light.png	webkit	390x844@2	light	S0_error_notJson	—（design 5 S0 エラー (1)）	error	error	ja	16px	390/390	ok	
+webkit/S0_error_storageUnavailable_light.png	webkit	390x844@2	light	S0_error_storageUnavailable	—（design 5 S0 エラー (2)）	error	error	ja	16px	390/390	ok	
+webkit/S0_error_dialog_delete_light.png	webkit	390x844@2	light	S0_error_dialog_delete	—（design 5 S0 エラー (1) → settings.delete.confirm）	error	error	ja	16px	390/390	ok	
+webkit/S1_diagnosis.start_light.png	webkit	390x844@2	light	S1_diagnosis.start	AC-1、AC-26	diagnosis.start	diagnosis.start	ja	16px	390/390	ok	
+webkit/S1_addToHomeScreen_light.png	webkit	390x844@2	light	S1_addToHomeScreen	AC-21	diagnosis.start	diagnosis.start	ja	16px	390/390	ok	
+webkit/S1_standalone_import_light.png	webkit	390x844@2	light	S1_standalone_import	AC-22	diagnosis.start	diagnosis.start	ja	16px	390/390	ok	
+webkit/S1_standalone_import_error_light.png	webkit	390x844@2	light	S1_standalone_import_error	AC-22、AC-25（design 5 S1 エラー）	diagnosis.start	diagnosis.start	ja	16px	390/390	ok	
+webkit/S2_question_1_light.png	webkit	390x844@2	light	S2_question_1	AC-1	diagnosis.question	diagnosis.question	ja	16px	390/390	ok	
+webkit/S2_question_2_light.png	webkit	390x844@2	light	S2_question_2	AC-1	diagnosis.question	diagnosis.question	ja	16px	390/390	ok	
+webkit/S2_question_3_light.png	webkit	390x844@2	light	S2_question_3	AC-1	diagnosis.question	diagnosis.question	ja	16px	390/390	ok	
+webkit/S2_error_required_light.png	webkit	390x844@2	light	S2_error_required	—（design 5 S2 エラー (1)）	diagnosis.question	diagnosis.question	ja	16px	390/390	ok	
+webkit/S2_error_storage_light.png	webkit	390x844@2	light	S2_error_storage	AC-11	diagnosis.question	diagnosis.question	ja	16px	390/390	ok	
+webkit/S2_resume_inProgress_light.png	webkit	390x844@2	light	S2_resume_inProgress	—（design 5 S2 通常：途中の再開）	diagnosis.question	diagnosis.question	ja	16px	390/390	ok	
+webkit/S2_redo_fromSettings_light.png	webkit	390x844@2	light	S2_redo_fromSettings	AC-14（diagnosis.cancel あり）	diagnosis.question	diagnosis.question	ja	16px	390/390	ok	
+webkit/S3_task.today_light.png	webkit	390x844@2	light	S3_task.today	AC-2、AC-31	task.today	task.today	ja	16px	390/390	ok	
+webkit/S3_task.today_backend-beginner-005_w320.png	webkit	320x568@2	w320	S3_task.today_backend-beginner-005	AC-17（長いインラインコード）	task.today	task.today	ja	16px	320/320	ok	
+webkit/S3_task.today_external_light.png	webkit	390x844@2	light	S3_task.today_external	AC-30	task.today	task.today	ja	16px	390/390	ok	
+webkit/S3_answer_saved_light.png	webkit	390x844@2	light	S3_answer_saved	AC-32	task.today	task.today	ja	16px	390/390	ok	
+webkit/S3_answer_limit_light.png	webkit	390x844@2	light	S3_answer_limit	—（design 5 S3：answer.max）	task.today	task.today	ja	16px	390/390	ok	
+webkit/S3_error_storage_answer_light.png	webkit	390x844@2	light	S3_error_storage_answer	—（design 5 S3 エラー (1)）	task.today	task.today	ja	16px	390/390	ok	
+webkit/S3_error_storage_report_light.png	webkit	390x844@2	light	S3_error_storage_report	—（design 5 S3 エラー (2)）	task.today	task.today	ja	16px	390/390	ok	
+webkit/S4_task.rate_light.png	webkit	390x844@2	light	S4_task.rate	AC-5、AC-9	task.rate	task.rate	ja	16px	390/390	ok	
+webkit/S4_error_storage_light.png	webkit	390x844@2	light	S4_error_storage	—（design 5 S4 エラー）	task.rate	task.rate	ja	16px	390/390	ok	
+webkit/S5_task.done_light.png	webkit	390x844@2	light	S5_task.done	AC-5、AC-31	task.done	task.done	ja	16px	390/390	ok	
+webkit/S6_task.skipped_too_hard_light.png	webkit	390x844@2	light	S6_task.skipped_too_hard	AC-7（levelHint あり）	task.skipped	task.skipped	ja	16px	390/390	ok	
+webkit/S6_task.skipped_too_easy_light.png	webkit	390x844@2	light	S6_task.skipped_too_easy	AC-7	task.skipped	task.skipped	ja	16px	390/390	ok	
+webkit/S6_task.skipped_no_time_light.png	webkit	390x844@2	light	S6_task.skipped_no_time	AC-7（levelHint なし）	task.skipped	task.skipped	ja	16px	390/390	ok	
+webkit/S7_task.exhausted_light.png	webkit	390x844@2	light	S7_task.exhausted	AC-10	task.exhausted	task.exhausted	ja	16px	390/390	ok	
+webkit/S8_settings_light.png	webkit	390x844@2	light	S8_settings	AC-13、AC-19、AC-28	settings	settings	ja	16px	390/390	ok	
+webkit/S8_settings_noData_light.png	webkit	390x844@2	light	S8_settings_noData	—（design 5 S8 空）	settings	settings	ja	16px	390/390	ok	
+webkit/S8_settings_inProgress_light.png	webkit	390x844@2	light	S8_settings_inProgress	—（design 5 S8 空：診断の途中）	settings	settings	ja	16px	390/390	ok	
+webkit/S8_settings_notPersisted_light.png	webkit	390x844@2	light	S8_settings_notPersisted	AC-13	settings	settings	ja	16px	390/390	ok	
+webkit/S8_export_done_light.png	webkit	390x844@2	light	S8_export_done	AC-19	settings	settings	ja	16px	390/390	ok	
+webkit/S8_import_error_version_light.png	webkit	390x844@2	light	S8_import_error_version	AC-25	settings	settings	ja	16px	390/390	ok	
+webkit/S8_import_error_schema_light.png	webkit	390x844@2	light	S8_import_error_schema	—（design 5 S8 エラー (1)）	settings	settings	ja	16px	390/390	ok	
+webkit/S8_homeScreen_guide_light.png	webkit	390x844@2	light	S8_homeScreen_guide	AC-21	settings	settings	ja	16px	390/390	ok	
+webkit/dialog_settings.import.confirm_light.png	webkit	390x844@2	light	dialog_settings.import.confirm	AC-20	settings	settings	ja	16px	390/390	ok	
+webkit/dialog_settings.delete.confirm_light.png	webkit	390x844@2	light	dialog_settings.delete.confirm	AC-16	settings	settings	ja	16px	390/390	ok	
+webkit/S9_settings.stats_light.png	webkit	390x844@2	light	S9_settings.stats	AC-24	settings.stats	settings.stats	ja	16px	390/390	ok	
+webkit/S9_settings.stats_zero_light.png	webkit	390x844@2	light	S9_settings.stats_zero	AC-24（design 5 S9 空）	settings.stats	settings.stats	ja	16px	390/390	ok	
+webkit/S10_history_light.png	webkit	390x844@2	light	S10_history	AC-5、AC-19	history	history	ja	16px	390/390	ok	
+webkit/S10_history_answerOpen_light.png	webkit	390x844@2	light	S10_history_answerOpen	AC-19、AC-32	history	history	ja	16px	390/390	ok	
+webkit/S10_history_empty_light.png	webkit	390x844@2	light	S10_history_empty	AC-16（design 5 S10 空）	history	history	ja	16px	390/390	ok
+S0_loading_light.png	chromium	390x844@2	light	S0_loading	—（design 5 S0）	loading	loading	ja	16px	390/390	ok	
+webkit/S0_loading_light.png	webkit	390x844@2	light	S0_loading	—（design 5 S0）	loading	loading	ja	16px	390/390	ok
+S0_error_invalidData_light.png	chromium	390x844@2	light	S0_error_invalidData	—（design 5 S0 エラー (1)）	error	error	ja	16px	390/390	ok	
+S0_error_invalidData_dark.png	chromium	390x844@2	dark	S0_error_invalidData	—（design 5 S0 エラー (1)）	error	error	ja	16px	390/390	ok	
+S0_error_invalidData_ax5.png	chromium	390x844@2	ax5	S0_error_invalidData	—（design 5 S0 エラー (1)）	error	error	ja	32px	390/390	ok	
+S0_error_invalidData_en.png	chromium	390x844@2	en	S0_error_invalidData	—（design 5 S0 エラー (1)）	error	error	en	16px	390/390	ok	
+dialog_settings.import.confirm_light.png	chromium	390x844@2	light	dialog_settings.import.confirm	AC-20	settings	settings	ja	16px	390/390	ok	
+dialog_settings.import.confirm_dark.png	chromium	390x844@2	dark	dialog_settings.import.confirm	AC-20	settings	settings	ja	16px	390/390	ok	
+dialog_settings.import.confirm_ax5.png	chromium	390x844@2	ax5	dialog_settings.import.confirm	AC-20	settings	settings	ja	32px	390/390	ok	
+dialog_settings.import.confirm_en.png	chromium	390x844@2	en	dialog_settings.import.confirm	AC-20	settings	settings	en	16px	390/390	ok	
+dialog_settings.delete.confirm_light.png	chromium	390x844@2	light	dialog_settings.delete.confirm	AC-16	settings	settings	ja	16px	390/390	ok	
+dialog_settings.delete.confirm_dark.png	chromium	390x844@2	dark	dialog_settings.delete.confirm	AC-16	settings	settings	ja	16px	390/390	ok	
+dialog_settings.delete.confirm_ax5.png	chromium	390x844@2	ax5	dialog_settings.delete.confirm	AC-16	settings	settings	ja	32px	390/390	ok	
+dialog_settings.delete.confirm_en.png	chromium	390x844@2	en	dialog_settings.delete.confirm	AC-16	settings	settings	en	16px	390/390	ok	

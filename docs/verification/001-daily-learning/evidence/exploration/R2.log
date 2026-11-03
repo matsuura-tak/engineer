@@ -1,0 +1,47 @@
+# セッション R2（chromium、2026-11-03T14:24:11.489Z、配布物 2026-11-30.1）
+1. 2026-11-02 backend 中級、前日 too_hard → 今日も too_hard（2 回連続）
+  task=backend-intermediate-002 level=intermediate levels={"backend":"intermediate"} hint=0
+  task=null level=null levels={"backend":"beginner"} hint=1
+  data-state=task.skipped
+2. 2026-11-03 翌日 → backend は beginner
+  task=backend-beginner-001 level=beginner levels={"backend":"beginner"} hint=0
+  data-state=task.today
+3. 同じ日に設定からやり直して git/advanced（今日の課題は出ている → 今日は変わらない）
+  task=backend-beginner-001 level=beginner levels={"backend":"beginner","git":"advanced"} hint=0
+  diagnosis={"area":"git","level":"advanced","years":"gte5","completedOn":"2026-11-03"}
+  data-state=task.today
+4. 2026-11-04 git/advanced の課題 → too_hard
+  task=git-advanced-001 level=advanced levels={"backend":"beginner","git":"advanced"} hint=0
+  task=null level=null levels={"backend":"beginner","git":"advanced"} hint=1
+  data-state=task.skipped
+5. 2026-11-05 git too_hard 2 回目
+  task=git-advanced-002 level=advanced levels={"backend":"beginner","git":"advanced"} hint=0
+  task=null level=null levels={"backend":"beginner","git":"intermediate"} hint=1
+  data-state=task.skipped
+6. 2026-11-06 翌日 → git は intermediate、backend は beginner のまま（領域ごとに独立）
+  task=git-intermediate-001 level=intermediate levels={"backend":"beginner","git":"intermediate"} hint=0
+  task=null level=null levels={"backend":"beginner","git":"intermediate"} hint=1
+  data-state=task.skipped
+7. 2026-11-07 交互 too_hard
+  task=git-intermediate-002 level=intermediate levels={"backend":"beginner","git":"intermediate"} hint=0
+  task=null level=null levels={"backend":"beginner","git":"intermediate"} hint=1
+  data-state=task.skipped
+8. 2026-11-08 交互 too_easy
+  task=git-intermediate-003 level=intermediate levels={"backend":"beginner","git":"intermediate"} hint=0
+  data-state=task.skipped
+9. 2026-11-09 交互の後も intermediate のまま。none（申告なし）の日 1
+  task=git-intermediate-004 level=intermediate levels={"backend":"beginner","git":"intermediate"} hint=0
+  data-state=task.today
+10. 2026-11-10 none の日 2
+  task=git-intermediate-005 level=intermediate levels={"backend":"beginner","git":"intermediate"} hint=0
+  data-state=task.today
+11. 2026-11-11 none ×2 の後に too_easy
+  task=git-intermediate-006 level=intermediate levels={"backend":"beginner","git":"intermediate"} hint=0
+  history の末尾 3 行=[["2026-11-08","too_easy",""],["2026-11-09","none","申告しない日"],["2026-11-10","none",""]]
+  data-state=task.skipped
+12. 2026-11-12 → 直前の交互（11-08 too_easy）とで 2 回連続？ none を挟んでも数えないか
+  task=git-advanced-003 level=advanced levels={"backend":"beginner","git":"advanced"} hint=0
+  11-08 too_easy、11-09 none、11-10 none、11-11 too_easy → 今日の git の段階=advanced（data.md 5：none は数えず流れも切らない なら advanced）
+  R2_12_history.png
+  data-state=history
+# 操作 12 件、302 秒、疑問/不具合候補 0 件
