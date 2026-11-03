@@ -64,8 +64,11 @@ export async function armStorageFailure(page) {
 }
 
 /**
- * 永続化の拒否の注入（AC-13、W-9）。呼ばれた回数をテスト側の変数（globalThis。アプリは読まない）に数え、
- * 拒否の注入が実際に効いた（アプリが persist() を 1 回呼んだ）ことを確かめられるようにする。回数は読み込みごと（ページの globalThis）。
+ * 永続化の拒否の注入（AC-13、W-9、data.md の 11）：`persist()` と `persisted()` の両方を false にする。
+ * S8 の注意 `settings.storage.notPersisted` は S8 を描くたびに `persisted()` で決まる（design D-31）ので、`persist()` だけでは
+ * エンジンの既定の `persisted()` の値で結果が変わる。
+ * `persist()` が呼ばれた回数はテスト側の変数（globalThis。アプリは読まない）に数え、拒否の注入が実際に効いたこと
+ * （初回の診断を終えた読み込みでちょうど 1 回、同じ日の再読み込みと翌日の S3 では 0 回）を確かめられるようにする。回数は読み込みごと（ページの globalThis）。
  */
 export const PERSIST_CALLS_FLAG = '__acceptancePersistCalls';
 
@@ -76,12 +79,22 @@ export async function injectPersistDenied(context) {
         globalThis[flag] = (globalThis[flag] ?? 0) + 1;
         return false;
       };
+      StorageManager.prototype.persisted = async () => false;
     }
   }, PERSIST_CALLS_FLAG);
 }
 
 export async function readPersistCalls(page) {
   return page.evaluate((flag) => globalThis[flag] ?? 0, PERSIST_CALLS_FLAG);
+}
+
+/**
+ * 保存データ（localStorage のキー `kyounoitte:data`。data.md の 1）を読んで JSON に通す。なければ null。
+ * 書き出しに含まれない `device` の印（`persistRequested`。W-9「確かめるのは、上の回数、保存データの印、S8 の表示」）を見るためだけに使う。
+ */
+export async function readStoredData(page) {
+  const raw = await page.evaluate((key) => localStorage.getItem(key), STORAGE_KEY);
+  return raw === null ? null : JSON.parse(raw);
 }
 
 /** navigator.standalone の偽装（AC-21、AC-22、W-16）。 */

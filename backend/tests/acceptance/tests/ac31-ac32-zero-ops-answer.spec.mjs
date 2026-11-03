@@ -103,11 +103,40 @@ test('AC32_翌日に開くと新しい課題の答えの欄は空で_前日の20
   const next = await app.readTask(page);
   expect(next.id).not.toBe(task.id);
   await expect(app.tid(page, 'task.answer')).toHaveValue('');
+  // 読み込みで着いた翌日の S3 には、日付が変わった知らせはない（identifiers.md 3、design D-30：知らせは操作で日付をまたいだときだけ）
+  await expect(app.tid(page, 'task.dayChanged')).toHaveCount(0);
 
   await app.goSettings(page);
   const { json } = await app.exportJson(page);
   const row = json.history.find((r) => r.taskId === task.id);
   testInfo.annotations.push({ type: '前日の行', description: JSON.stringify({ ...row, answer: `${row?.answer?.length} 文字` }) });
   expect(row).toMatchObject({ date: '2026-11-04', report: 'none', answer: ANSWER_200 });
+  expect(json.current).toMatchObject({ date: '2026-11-05', taskId: next.id, answer: '' });
+});
+
+test('AC32_画面を開いたまま翌日になった後に読み込まずに完了を押すと_完了は記録されず翌日の課題の答えの欄は空で_前日の200文字は書き出しのnoneの行のanswerに残る', async ({ context, page, baseURL }, testInfo) => {
+  // PRD 11 の冒頭「日付をまたいだ申告はできない」（AC-32 を参照）、AC-32 の Then の翌日の部分。契約 data.md 4「画面を開いたまま日付が変わったとき」、W-3（読み込まずに setFixedTime を呼び直す）
+  const task = await typeAnswer(context, page, baseURL);
+  await app.fixDate(page, '2026-11-05', '00:05:00');
+  await app.tid(page, 'task.report.done').click();
+  // 完了は実行されず、翌日の課題が S3 に出る（task.rate に進まない）
+  await app.expectState(page, 'task.today');
+  const next = await app.readTask(page);
+  expect(next.id).not.toBe(task.id);
+  await expect(app.tid(page, 'task.answer')).toHaveValue('');
+  await app.shot(page, testInfo, 'AC32_task.today_after_day_changed_by_operation');
+
+  // 再読み込みしても翌日の課題のままで、答えの欄は空（前日の答えが翌日の current.answer に入っていない）
+  await page.reload();
+  await app.expectState(page, 'task.today');
+  expect((await app.readTask(page)).id).toBe(next.id);
+  await expect(app.tid(page, 'task.answer')).toHaveValue('');
+
+  await app.goSettings(page);
+  const { json } = await app.exportJson(page);
+  const rows = json.history.filter((r) => r.taskId === task.id);
+  testInfo.annotations.push({ type: '前日の行', description: JSON.stringify(rows.map((r) => ({ ...r, answer: `${r.answer.length} 文字` }))) });
+  expect(rows, '前日の課題の行は none の 1 行だけ（done の行がない）').toHaveLength(1);
+  expect(rows[0]).toMatchObject({ date: '2026-11-04', report: 'none', answer: ANSWER_200 });
   expect(json.current).toMatchObject({ date: '2026-11-05', taskId: next.id, answer: '' });
 });

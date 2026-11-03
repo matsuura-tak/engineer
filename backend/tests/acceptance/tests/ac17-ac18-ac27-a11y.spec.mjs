@@ -1,6 +1,6 @@
 // AC-17：幅 320 CSS px で文言が切れず横スクロールが出ない。AC-18：キーボードだけで診断から完了まで。
 // AC-18 の移動キーは contracts/test-hooks.md「キーボードの移動キー」：WebKit は Alt+Tab / Alt+Shift+Tab、それ以外は Tab / Shift+Tab（helpers/app.mjs の navKeys）。
-// AC-27：axe-core（WCAG 2.1 AA）で serious 以上の違反が 0 件（6 つの画面）。
+// AC-27：axe-core（WCAG 2.1 AA）で serious 以上の違反が 0 件（6 つの画面 + S3 の変種 task.today.dayChanged）。
 import AxeBuilder from '@axe-core/playwright';
 import { test, expect } from '../helpers/fixtures.mjs';
 import * as app from '../helpers/app.mjs';
@@ -50,6 +50,17 @@ const SCREENS = {
     await app.open(page, baseURL);
     await app.expectState(page, 'task.today');
     await app.goSettings(page);
+  },
+  // S3 の変種：画面を開いたまま日付が変わった後の最初の操作で着いた S3（知らせ task.dayChanged あり。design D-30、data.md 4、W-3）
+  'task.today.dayChanged': async ({ context, page, baseURL }) => {
+    await injectSeed(context, loadContractFixture(SEED));
+    await app.fixDate(page, '2026-11-04', '23:55:00');
+    await app.open(page, baseURL);
+    await app.expectState(page, 'task.today');
+    await app.fixDate(page, '2026-11-05', '00:05:00');
+    await app.tid(page, 'task.report.done').click();
+    await app.expectState(page, 'task.today');
+    await expect(app.tid(page, 'task.dayChanged')).toHaveCount(1);
   },
 };
 
@@ -158,7 +169,8 @@ test('AC18_移動キー(Tab系)とEnter_Spaceだけで診断から完了まで�
 });
 
 // ---- AC-27 ----
-for (const state of ['diagnosis.start', 'diagnosis.question', 'task.today', 'task.done', 'task.exhausted', 'settings']) {
+// PRD の 6 画面に、S3 の変種（日付が変わった知らせ task.dayChanged のある task.today。design D-30、role=status の要素と color.warning の文字）を 1 つ足す
+for (const state of ['diagnosis.start', 'diagnosis.question', 'task.today', 'task.done', 'task.exhausted', 'settings', 'task.today.dayChanged']) {
   test(`AC27_${state}_axe-coreでserious以上の違反が0件`, async ({ context, page, baseURL, request }, testInfo) => {
     await SCREENS[state]({ context, page, baseURL, request });
     const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();

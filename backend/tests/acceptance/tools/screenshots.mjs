@@ -1,4 +1,4 @@
-// G3 の証拠を撮る道具（verifier）。受け入れテストではない（tests/ の外で *.spec.mjs でもないので playwright test の対象外。本数は 133 のまま）。
+// G3 の証拠を撮る道具（verifier）。受け入れテストではない（tests/ の外で *.spec.mjs でもないので playwright test の対象外。本数は 145 のまま）。
 // design/001-daily-learning.md の 5（全画面・全状態）と contracts/identifiers.md の 2（data-state 12 値）・3（2 つのダイアログ）をそろえ、
 // 通常の状態はライト、ダーク、大きい文字（ax5 の読み替え）、英語の 4 通り、ほかはライトで撮る。撮った画面ごとに axe-core（AC-27 と同じタグ）も流す。
 //
@@ -18,7 +18,7 @@ import { buildDist } from '../helpers/build.mjs';
 import { DIST_VERSION, STORAGE_KEY, SEEDED_MARK } from '../helpers/paths.mjs';
 import {
   injectSeed, injectStorageFailure, armStorageFailure, injectPersistDenied, injectStandalone,
-  loadSeed, loadContractFixture, contractFixturePath, exhaustedSeed, makeSeed, tasksOf,
+  loadSeed, loadContractFixture, contractFixturePath, exhaustedSeed, makeSeed, tasksOf, addDays,
 } from '../helpers/seed.mjs';
 
 const args = Object.fromEntries(process.argv.slice(2).map((a, i, arr) => (a.startsWith('--') ? [a.slice(2), arr[i + 1]] : [])).filter((x) => x.length));
@@ -188,6 +188,14 @@ const SCENARIOS = [
     } },
   { name: 'S3_task.today', ac: 'AC-2、AC-31', normal: true, state: 'task.today',
     async run(context, page, env) { await injectSeed(context, AC14()); await open(page, env.baseURL, '2026-11-04'); await waitState(page, 'task.today'); } },
+  { name: 'S3_task.today_dayChanged', ac: '—（design 5 S3、D-30：操作で日付をまたいだ知らせ）', normal: true, state: 'task.today',
+    async run(context, page, env) {
+      await injectSeed(context, AC14()); await open(page, env.baseURL, '2026-11-04'); await waitState(page, 'task.today');
+      await tid(page, 'task.answer').fill('23 時 55 分に書きかけ'); await waitVisible(page, 'task.answer.saved');
+      await page.clock.setFixedTime(jst('2026-11-05', '00:05:00'));
+      await tid(page, 'task.report.done').click(); await waitState(page, 'task.today'); await waitVisible(page, 'task.dayChanged');
+      if ((await tid(page, 'task.answer').inputValue()) !== '') throw new Error('翌日の答えの欄が空でない');
+    } },
   { name: 'S3_task.today_backend-beginner-005', ac: 'AC-17（長いインラインコード）', narrow: true, narrowOnly: true, state: 'task.today',
     async run(context, page, env) {
       const seed = makeSeed({ area: 'backend', level: 'beginner', firstOpenDate: '2026-10-31',
@@ -269,6 +277,17 @@ const SCENARIOS = [
       const { seed, nextDate } = exhaustedSeed(env.tasks, { area: 'backend', level: 'intermediate', firstOpenDate: '2026-09-01' });
       await injectSeed(context, seed); await open(page, env.baseURL, nextDate); await waitState(page, 'task.exhausted');
     } },
+  { name: 'S7_task.exhausted_dayChanged', ac: '—（design 5 S7、D-30：操作で日付をまたいだ知らせ）', state: 'task.exhausted',
+    async run(context, page, env) {
+      const list = tasksOf(env.tasks, 'backend', 'intermediate');
+      const firstOpenDate = '2026-09-01';
+      const seed = makeSeed({ area: 'backend', level: 'intermediate', firstOpenDate,
+        rows: list.slice(0, -1).map((t) => ({ taskId: t.id, report: 'done', mode: t.mode, helpful: 'helpful' })) });
+      const day = addDays(firstOpenDate, list.length - 1);
+      await injectSeed(context, seed); await open(page, env.baseURL, day); await waitState(page, 'task.today');
+      await page.clock.setFixedTime(jst(addDays(day, 1), '00:05:00'));
+      await tid(page, 'task.report.done').click(); await waitState(page, 'task.exhausted'); await waitVisible(page, 'task.dayChanged');
+    } },
   { name: 'S8_settings', ac: 'AC-13、AC-19、AC-28', normal: true, state: 'settings',
     async run(context, page, env) {
       await injectSeed(context, AC14()); await open(page, env.baseURL, '2026-11-04'); await waitState(page, 'task.today');
@@ -288,7 +307,7 @@ const SCENARIOS = [
     } },
   { name: 'S8_settings_notPersisted', ac: 'AC-13', state: 'settings',
     async run(context, page, env) {
-      await injectPersistDenied(context);
+      await injectPersistDenied(context); // persist() と persisted() の両方を false にする（W-9、design D-31）
       await open(page, env.baseURL, '2026-11-04'); await waitState(page, 'diagnosis.start');
       await diagnose(page, { area: 'testing', level: 'beginner' }); await waitState(page, 'task.today');
       await tid(page, 'nav.settings').click(); await waitState(page, 'settings');
