@@ -14,6 +14,12 @@
 4. `node scripts/check-budget.mjs dist`（gzip 後の合計 150,000 バイト以下で終了コード 0）
 5. 出力の dist/ だけを配る（dist/ はコミットしない）
 
+### アイコンを作り直すとき（scripts/make-icon.mjs）
+- 手で 1 回だけ動かす道具。ビルド（build.mjs）、`npm test`、CI では動かさない。配るのは生成物の `public/icon-180.png` だけで、スクリプトは配布物に入らない（build.mjs は public/ だけを写す）。
+- 依存は受け入れテストのフォルダ（tests/acceptance/）の Playwright を `createRequire` で借りる。backend/package.json には足さない（contracts/dependencies.md の「入る package.json」は受け入れテストのフォルダ）。そのため、受け入れテストのフォルダの依存が変わると動かなくなることがある。
+- 手順：`cd tests/acceptance && npm ci && npx playwright install chromium && cd ../.. && node scripts/make-icon.mjs`。作り直したら `node --test tests/unit/build.test.mjs` で、PNG の署名、IHDR の 180×180、10,000 バイト以下（contracts/budgets.md の 6）を確かめる。
+- 作り直すのは、design/001-daily-learning.md の 8 のアイコンの指定が変わったときだけ。
+
 ## 3. 配布（Takuma）
 - 前提：Pages の配布の仕組み（.github/ のワークフロー）はまだない（2026-11-03 時点で .github/workflows は ios.yml、org-check.yml、org-guard.yml だけ）。作るのは Takuma（設計メモ 3 の図：Actions で build.mjs を動かし Pages に置く）。
 - 手順：2 の 1〜4 が通った dist/ を `/engineer/` に置く。版は毎回新しくする（sw.js のキャッシュ名が版から作られるので、版が同じだと利用者に届かない）。

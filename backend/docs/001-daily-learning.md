@@ -60,6 +60,7 @@ Idempotency-Key、ページング、RFC 9457 は対象外（HTTP の API がな�
 - 指標、アラート：v1 はイベントを記録しない（PRD 15、D6。main.js の `track()` は入口だけで何もしない）。
 - 回数の上限、外部サービスの費用：外部サービスなし。月額 0 円（GitHub Pages の無料枠。帯域の目安は RUNBOOK の 7）。
 - 大きさの上限：答えは 2,000 字（textarea の maxlength と検査）、読み込むファイルは 5,000,000 バイト、history は 20,000 行まで。
+- 手で動かす道具：scripts/make-icon.mjs（public/icon-180.png を作る）。手で 1 回だけ動かす道具で、ビルドと CI では動かさない。依存は受け入れテストのフォルダ（tests/acceptance/node_modules）の Playwright を借りる（backend/package.json には足さない）。手順は RUNBOOK の 2「アイコンを作り直すとき」。G2 reviewer r1 の提案への対応（2026-11-03）。
 
 ## 8. 実行したコマンドと出力（2026-11-03、macOS、node v24.22.1）
 - `cd backend && npm ci && npm run check:contracts` → `見本 41 件、期待と違う結果 0 件`、終了コード 0。
@@ -69,7 +70,7 @@ Idempotency-Key、ページング、RFC 9457 は対象外（HTTP の API がな�
 - `node scripts/build.mjs --out <一時フォルダ>/dist --version 2026-11-03.1 && node scripts/check-budget.mjs <一時フォルダ>/dist` → 殻 24,084 / 26,000、文言 6,510 / 8,000、アイコンと manifest 2,173 / 10,000、課題集 30,193 / 106,000、合計（gzip 後）62,960 / 150,000、OK、終了コード 0。
 - 禁止の API：`grep -rnE 'innerHTML|outerHTML|insertAdjacentHTML|eval\(|new Function|toISOString|import\(' public/` → 0 件。
 - インラインのスタイルとイベント属性：`grep -rnE 'style=|<style|[[:space:]]on[a-z]+=' public/` → public/ の HTML、CSS、JS では 0 件（tasks.json の課題の本文に `style={{ margin: 8 }}` の文字が 1 か所あるが、課題の文で textContent で出す）。index.html の `<script>` は `src="./js/main.js"` の 1 つだけ。
-- CSP：index.html の meta は contracts/budgets.md の 3 の文字列と同じ（grep で 1 件一致）。
+- CSP：index.html の meta は contracts/budgets.md の 3 の文字列と同じ。2026-11-03 の追記からは build.test の単体テストで、budgets.md の節から読んだ文字列と配布物の content を比べる（下の「G2 r1 の要修正の直し」）。
 - 保存先：`grep -rnE 'localStorage|sessionStorage|indexedDB|document\.cookie' public/js public/sw.js` → main.js の `window.localStorage` の 1 か所だけ（キーは store.js の `kyounoitte:data` だけ）。
 - テストのつなぎ口、URL の引数：`grep -rnE 'location\.(search|hash)|URLSearchParams|__test|window\.__|testHook' public/` → 0 件。
 - ネットワーク：fetch は main.js の fetchJson（`./i18n/<lang>.json` と `./data/tasks.json`、同じ origin）と sw.js のキャッシュの取り損ねだけ。
@@ -80,10 +81,31 @@ Idempotency-Key、ページング、RFC 9457 は対象外（HTTP の API がな�
 - 320px：作業用の Playwright のスクリプト（受け入れテストのフォルダの node_modules を読むだけ。backend/ には置いていない）で、配布物をビルドし、幅 320、deviceScaleFactor 2 で backend-beginner-005、frontend-beginner-007、database-beginner-002 を出して測った。Chromium と WebKit の 6 通りとも `scrollWidth=320`、画面からはみ出した `code` は 0 件。効いているのは app.css の `code { overflow-wrap: anywhere; }`（195 行目）と本文の `overflow-wrap: anywhere`（106 行目）。
 - 未検査：gitleaks、squawk、oasdiff、schemathesis はこの端末に入っていない（`which` で見つからない）。squawk、oasdiff、schemathesis は対象外（DB と API がない）。gitleaks は代わりに上の grep だけ。
 
+### G2 r1 の要修正の直し（2026-11-03、macOS、node v24.22.1）
+docs/reviews/001-daily-learning-G2-code-reviewer-r1.md の要修正（契約と ADR 0001 が「単体テストで確かめる」と書く 4 点）に単体テストを足した。契約の文字列はテストに写さず、tests/unit/helpers.mjs の `contractCodeBlocks(file, number)` が contracts/budgets.md の「## 3.」「## 6.」の節のコードブロックをそのつど読む。
+
+| 指摘 | テスト（ファイル：名前） | 契約 |
+|---|---|---|
+| (1) | build.test：CSP：index.html の meta は 1 つだけで、content が budgets.md の 3 の文字列と 1 文字も違わない | budgets.md の 3、ADR 0001 |
+| (2) | build.test：manifest：manifest.webmanifest を JSON.parse した値が budgets.md の 6 の JSON と深く等しい | budgets.md の 6 |
+| (2) | build.test：アイコン：icon-180.png の先頭 8 バイトが PNG の署名、IHDR が 180×180、10,000 バイト以下 | budgets.md の 6 |
+| (2) | build.test：<head>：index.html の <head> に budgets.md の 6 の 5 行が 1 行ずつそのままある | budgets.md の 6 |
+| (3) | validate.test：365 行 × 答え 2,000 字の保存データは JSON の長さが 1,000,000 字以下で、検査（手書きと ajv）を通り、1 回の setItem で入る | data.md の 10、ADR 0001 |
+| (4) | i18n-files.test：差し込みのあるキーは ja と en のどちらも strings.md の表の 10 個だけ | strings.md の 1、3 |
+| (4) | i18n-files.test：差し込みの 10 キーを ja.json の実物で format() に通すと、差し込みが全部埋まり { と } が残らない | strings.md の 3、ADR 0001 |
+| (4) | i18n-files.test：差し込みの 10 キーを en.json の実物で format() に通すと、差し込みが全部埋まり { と } が残らない | strings.md の 3、ADR 0001 |
+| (4) | i18n-files.test：en の plural（task.meta の minutes、settings.import.confirm.summary の count）は 1 と 2 以上で形が変わり、どちらも埋まる | strings.md の 3 |
+
+- 365 行の見本の長さ：791,179 字（答えは「あ」× 2,000、current にも 2,000 字、levels は 6 領域すべて）。
+- わざと壊すと落ちることの確かめ：スクラッチパッドに backend/ と contracts/ を写し、写しを 1 か所ずつ壊して該当のテストファイルを流した（リポジトリのファイルは壊していない）。CSP の 1 文字（`kyounoitte-sw` → `kyounoitte-sW`）、CSP の meta を 2 つ、契約の側の CSP に空白 1 つ、manifest に `theme_color`、manifest の sizes を 192x192、PNG の幅を 181、PNG の署名の 2 バイト目、`<head>` から apple-touch-icon の行を消す、manifest の行を `<body>` に移す、validate.js の history の上限を 300、store.js の保存を整形、en の `{version}` を `{ver}`、ja の task.meta から `{minutes}` を消す、i18n.js の `#` の置き換えを消す、ja の app.name に `{x}` を足す、答えを `"` × 2,000 にする（1,523,179 字）。どれも狙ったテストが落ち（終了コード 1）、壊さない写しでは全部通った。
+- `cd backend && node --test 'tests/unit/**/*.test.mjs'` → `tests 94 / pass 94 / fail 0`（前の 85 件 + 9 件）、終了コード 0。
+- `cd backend && npm ci && npm test` → 契約の検査 `見本 41 件、期待と違う結果 0 件`、単体 `tests 94 / pass 94 / fail 0`、受け入れ `133 passed (45.5s)`、終了コード 0。
+
 ## 9. 未確認のこと
-1. AC20 の受け入れテストの不具合：tests/ac19-ac20-ac25-export-import.spec.mjs の 57 行目で `context.close()` を呼んでから、67 行目で書き出したファイル `exported.file`（`download.path()` の一時ファイル）を読み込ませている。Playwright はダウンロードを作ったコンテキストを閉じるとそのファイルを消すので、ENOENT で落ちる。Playwright 1.64.1 で確認した（閉じる前は存在、閉じた後は存在しない）。テストの写しを作業用フォルダに作り、閉じる前にファイルを別の場所へ複製する 1 行だけを足して流すと、Chromium と WebKit の 2 本とも通った（実装は AC20 を満たす）。受け入れテストは verifier の範囲なので直していない。
+1. （解決済み。verifier が a7fc7e9 で、閉じる前にファイルを複製する形に直し、受け入れは 133 passed）AC20 の受け入れテストの不具合：tests/ac19-ac20-ac25-export-import.spec.mjs の 57 行目で `context.close()` を呼んでから、67 行目で書き出したファイル `exported.file`（`download.path()` の一時ファイル）を読み込ませている。Playwright はダウンロードを作ったコンテキストを閉じるとそのファイルを消すので、ENOENT で落ちる。Playwright 1.64.1 で確認した（閉じる前は存在、閉じた後は存在しない）。テストの写しを作業用フォルダに作り、閉じる前にファイルを別の場所へ複製する 1 行だけを足して流すと、Chromium と WebKit の 2 本とも通った（実装は AC20 を満たす）。受け入れテストは verifier の範囲なので直していない。
 2. Linux の CI で WebKit の OS のライブラリが要るか（ADR 0004）：macOS でだけ動かした。
 3. GitHub Pages が `.webmanifest` に返す Content-Type：公開後に確かめる（設計メモ 10）。
+4. 保存データの長さの見積もり（data.md の 10）：「2,000 字の答え × 365 行で 1,000,000 字以下」は、JSON で 1 字のままの文字（日本語や英字）なら成り立つ（791,179 字）。答えが改行や `"` ばかりだと JSON の中で 2 字になり 1,523,179 字、制御文字（U+0001 など）だと `\u0001` の 6 字になり 4,451,179 字で、どれも検査は通る。容量を超えたときは保存の失敗（data.md の 2）として扱われ、前のデータは残る。契約の文の読み方は tech-lead に確かめる（報告の未解決）。
 
 ## チェックリスト（craft-backend-engineer の 6）
 - [x] 対応表の行の数が、技術設計メモの 4 の表の operation の数と同じ。→ API の operation は 0。代わりに AC-1〜AC-32 をすべて 1 の表に並べた。

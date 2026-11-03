@@ -4,7 +4,9 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { readDocument, validateData, CURRENT_VERSION, ANSWER_MAX } from '../../public/js/validate.js';
-import { ajvValidator, walk, FIXTURES_DIR, readJsonFile } from './helpers.mjs';
+import { ymdShift } from '../../public/js/dates.js';
+import { save, KEY } from '../../public/js/store.js';
+import { ajvValidator, walk, FIXTURES_DIR, readJsonFile, fakeStorage } from './helpers.mjs';
 
 const ajv = ajvValidator('data');
 const files = [...walk(path.join(FIXTURES_DIR, 'data')), ...walk(path.join(FIXTURES_DIR, 'seeds'))];
@@ -89,4 +91,47 @@ test('__proto__ を含むファイルでも Object.prototype を汚さない', (
   const r = readDocument('{"__proto__":{"polluted":true},"formatVersion":1,"app":"kyounoitte","diagnosis":{},"levels":{},"history":[]}');
   assert.equal({}.polluted, undefined);
   assert.equal(r.ok, false, '__proto__ は知らない項目として落ちる');
+});
+
+// contracts/data.md の 10「大きさ」：365 行すべてに 2,000 字の答えがあっても 1,000,000 字以下（ADR 0001。G2 reviewer r1 の要修正）。
+test('365 行 × 答え 2,000 字の保存データは JSON の長さが 1,000,000 字以下で、検査（手書きと ajv）を通り、1 回の setItem で入る', () => {
+  const start = new Date(2025, 10, 4);
+  const answer = 'あ'.repeat(ANSWER_MAX); // UTF-16 で 2,000 単位、コードポイントでも 2,000（data.md の 10、textarea の maxlength）
+  assert.equal(answer.length, 2000);
+  const levels = ['beginner', 'intermediate', 'advanced'];
+  const history = Array.from({ length: 365 }, (_, i) => {
+    const level = levels[i % 3];
+    return {
+      date: ymdShift(start, i),
+      taskId: `backend-${level}-${String((i % 7) + 1).padStart(3, '0')}`,
+      area: 'backend',
+      level,
+      mode: 'in_app',
+      report: 'done',
+      answer,
+      helpful: 'not_helpful',
+    };
+  });
+  const data = {
+    formatVersion: CURRENT_VERSION,
+    app: 'kyounoitte',
+    firstOpenDate: history[0].date,
+    diagnosis: { area: 'backend', level: 'intermediate', years: '1to3', completedOn: history[0].date },
+    levels: { backend: 'intermediate', frontend: 'beginner', database: 'advanced', infra: 'beginner', testing: 'intermediate', git: 'advanced' },
+    current: { date: ymdShift(start, 365), taskId: 'backend-intermediate-008', area: 'backend', level: 'intermediate', mode: 'in_app', answer },
+    history,
+    device: { homeGuideClosed: true, persistRequested: true, persistGranted: false },
+  };
+  assert.equal(new Set(history.map((r) => r.date)).size, 365, '日付は 365 通り');
+  assert.equal(history.at(-1).date, '2026-11-03');
+  const text = JSON.stringify(data);
+  assert.ok(text.length <= 1_000_000, `JSON の長さ ${text.length} 字`);
+  assert.deepEqual(validateData(data), []);
+  assert.equal(ajv(data), true, JSON.stringify(ajv.errors?.slice(0, 3)));
+  const r = readDocument(text);
+  assert.equal(r.ok, true, (r.errors ?? []).join(' / '));
+  const storage = fakeStorage();
+  assert.equal(save(storage, r.data), true);
+  assert.deepEqual(storage.calls, ['setItem']);
+  assert.equal(storage.map.get(KEY).length, text.length);
 });

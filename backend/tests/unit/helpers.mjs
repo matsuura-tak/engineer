@@ -56,3 +56,31 @@ export function fakeStorage(initial = {}, { throwOn = [] } = {}) {
     },
   };
 }
+
+/**
+ * 契約の Markdown（contracts/<file>）の見出し `## <number>.` の節から、コードブロックの中身を順に返す。
+ * 契約の文字列をテストに写さず、契約そのものと比べるため（contracts/budgets.md の 3、6）。
+ * 字下げされたコードブロック（箇条書きの中）は、開きの ``` と同じ字下げを各行から取り除く。
+ * @returns {{ lang: string, text: string }[]}
+ */
+export function contractCodeBlocks(file, number) {
+  const md = readFileSync(path.join(CONTRACTS_DIR, file), 'utf8');
+  const start = md.search(new RegExp(`^## ${number}\\. `, 'm'));
+  if (start < 0) throw new Error(`contracts/${file} に「## ${number}.」の節がない`);
+  const rest = md.slice(start + 3);
+  const next = rest.search(/^## /m);
+  const section = next < 0 ? rest : rest.slice(0, next);
+  const blocks = [];
+  const re = /^( *)```([a-z]*)\n([\s\S]*?)\n\1```$/gm;
+  let m;
+  while ((m = re.exec(section)) !== null) {
+    const indent = m[1];
+    const text = m[3]
+      .split('\n')
+      .map((line) => (line.startsWith(indent) ? line.slice(indent.length) : line))
+      .join('\n');
+    blocks.push({ lang: m[2], text });
+  }
+  if (blocks.length === 0) throw new Error(`contracts/${file} の「## ${number}.」の節にコードブロックがない`);
+  return blocks;
+}
