@@ -69,8 +69,9 @@ verifier G0 r3 の W-1〜W-16 を、名前と値まで決めたものです。�
 - 保存の失敗（AC-11）：addInitScript で `Storage.prototype.setItem` を包み、テストが印（ページの `globalThis` に置くテスト側の変数。アプリは読まない）を立てた後の次の 1 回だけ `new DOMException('injected', 'QuotaExceededError')` を投げる。投げたら印を下ろす。アプリは保存 1 回につき setItem を 1 回だけ呼ぶ。保存データが「なし」か「診断の途中」の起動では setItem を呼ばない（AC-11 の注入はこの状態で行う）。「あり」の起動では data.md の 2 のとおり最大 1 回（診断の 2 問目の確定はちょうど 1 回の setItem）。
 - 永続化の拒否（AC-13）：addInitScript で `StorageManager.prototype.persist = async () => false` と `StorageManager.prototype.persisted = async () => false` の両方を入れる（data.md の 11）。
   - S8 の注意 `settings.storage.notPersisted` は、S8 を描くたびに `persisted()` を読んで決まる。`persist()` だけを注入すると、エンジンの既定の `persisted()` の値で結果が変わる。
-  - アプリは `persist()` を、今日の課題を出した直後の S3 の後に、`persisted()` が false のときだけ呼ぶ（1 日に 1 回まで）。初回の診断を終えた読み込みではちょうど 1 回、同じ日の再読み込み（`task.done`）では 0 回。
-  - 結果は保存しない（`device.persistRequested` と `persistGranted` を書かない）。確かめるのは、上の回数と S8 の表示。
+  - アプリは `persist()` を、保存データで初めて今日の課題を出した後の S3 で 1 回だけ呼ぶ（`device.persistRequested` が true なら呼ばない。求め直さない。data.md の 11）。初回の診断を終えた読み込みではちょうど 1 回。その後は 0 回（同じ日の再読み込みの `task.done`、日付を進めて翌日の課題が出た S3 も 0 回）。
+  - 初回の診断を終える保存（3 問目の確定。setItem 1 回）に `device.persistRequested: true` が入る。`device.persistGranted` は書かれない。確かめるのは、上の回数、保存データの印、S8 の表示。
+  - 印のない「あり」の seed で開くと、その起動で今日の課題を出したとき（data.md の 4 の 6-4）に 1 回呼ぶ。回数を数えるテストは初回の診断から始めるか、seed に `device: { "persistRequested": true }` を入れる。
 - 書き出し：`page.waitForEvent('download')` で 1 件。中身は data.schema.json に通り、`device` を含まない。版の項目は `formatVersion`、今の値は 1。AC-25 のファイルは `formatVersion: 2` にする（fixtures/data/invalid-newer-version.json が見本）。
 - 読み込み：隠した input（`settings.import.file`、`home.standalone.importFile`）に `setInputFiles`。
 

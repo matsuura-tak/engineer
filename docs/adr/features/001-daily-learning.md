@@ -26,7 +26,7 @@ operationId は全行「なし（端末のみ）」。代わりに「データ�
 | AC-10 | S7 → S2 | なし（端末のみ） | data.md の 4 の 6-4、5（候補が 0 → S7、保存しない） | 受け入れ 2：seed で 7 件を出し終えた |
 | AC-11 | S2 | なし（端末のみ） | data.md の 2（1 問ごとに 1 回の setItem。保存データが「なし」か「診断の途中」の起動では setItem を呼ばない（AC-11 の注入はこの状態で行う）。「あり」の起動では data.md の 2 のとおり最大 1 回）、W-9 | 受け入れ 2：setItem の失敗の注入 |
 | AC-12 | S1〜S6 | なし（端末のみ） | test-hooks.md の W-12（送信の数え方）、W-13（オフラインにする前に SW の準備を待つ）、CSP の `connect-src 'self'` | 受け入れ 2：オフライン |
-| AC-13 | S3 → S5、S8 | なし（端末のみ） | data.md の 11（今日の課題を出した直後に `persisted()` が false なら `persist()`。S8 は描くたびに `persisted()`。結果は保存しない）、W-9 | 受け入れ 2：`persist()` と `persisted()` の拒否の注入 |
+| AC-13 | S3 → S5、S8 | なし（端末のみ） | data.md の 11（印 `device.persistRequested` がないときに今日の課題を出す保存へ印を含め、その S3 の後に `persist()` を 1 回。求め直さない。S8 は描くたびに `persisted()`。結果は保存しない）、W-9 | 受け入れ 2：`persist()` と `persisted()` の拒否の注入。呼ぶ回数（初回 1 回、以後 0 回）と保存の印 |
 | AC-14 | 1 通り目：S7 → S8 → S2 → S3、S10。2 通り目：S3 → S8 → S2 → S3（同じ課題）、翌日 S3、S10 | なし（端末のみ） | 1 通り目：data.md の 2（やり直しは終えるときに 1 回、行き先）、4 の 6-4。seed は AC-10 と同じく本番の課題集から作る「出し終えた」履歴（直近 3 日の 3 件が `done`）。2 通り目：data.md の 2（今日の課題を出した後は `current` を書かない、行き先）、4 の 6-3（直後は同じ `data-task-id`）、翌日の 6-1 と 6-4（`data-task-area` が新しい領域）。seed は fixtures/seeds/seed-ac14-three-completed.json の形で 2026-11-04 に開く（test-hooks.md の W-7） | 受け入れ 2：2 通り |
 | AC-15 | S0 → S3 | なし（端末のみ） | `data-debug-load-ms`、W-11 の制限、budgets.md の 1 と 4 | 受け入れ C：5 回 |
 | AC-16 | S8 → ダイアログ → S1 | なし（端末のみ） | data.md の 7（`removeItem` だけ）、W-7 の印 | 受け入れ 2 |
@@ -220,7 +220,7 @@ firstOpenDate 2026-02-30（P1） → true
 | Diagnosis Started、Diagnosis Completed | 送らない（入口だけ） | 初日の完了率は統計の画面の first-day-completed |
 | Task Issued、Task Completed、Task Skipped、Task Rated | 送らない（入口だけ） | 完了率、役に立った率、難しすぎ・今日はできないの申告率は統計の画面の issued、completed、helpful、rated、too-hard、no-time。撤退基準も同じ値 |
 | Level Changed | 送らない（入口だけ） | なし（`levels` は書き出しで見られる） |
-| Storage Persist Answered | 送らない（保存もしない。設定の注意は `persisted()` で今の状態を読む：data.md の 11） | なし |
+| Storage Persist Answered | 送らない（`track()` の入口だけ。結果は保存しない。求めた印 `device.persistRequested` だけを今日の課題を出す保存に含める。設定の注意は `persisted()` で今の状態を読む：data.md の 11） | なし |
 | Home Screen Guide Closed | 送らない（`device.homeGuideClosed` に保存） | なし |
 | Data Exported、Data Imported、Data Deleted | 送らない（入口だけ） | 「データが消えた」は聞き取り（PRD 13） |
 
@@ -256,7 +256,7 @@ firstOpenDate 2026-02-30（P1） → true
   - meta の CSP で frame-ancestors が効かないことの各ブラウザの挙動：確かめていない。枠の中で始めない作りなので結果に影響しない。
   - `apple-mobile-web-app-title` を iOS がホーム画面の名前に使うこと：Apple の公式の文書で見つけていない（Safari HTML Reference の meta の一覧にない）。`<title>` と manifest の `name` が同じ値なので結果は変わらない。G4 に Takuma が実機で名前を見る（budgets.md の 6）。
   - GitHub Pages が `.webmanifest` に返す `Content-Type`：公開後に curl で確かめる（G4。budgets.md の 6）。
-  - `persist()` の確認の表示：Firefox は確認を出す（web.dev）が、断った答えを覚えるかは公式の文書で見つけていない。Safari 17 が確認を出さないことも公式の文書にない。Firefox は対応ブラウザの外。Safari は G4 で Takuma が実機で見る（data.md の 11）。
+  - `persist()` の確認の表示：Firefox は確認を出す（web.dev）。求めるのは保存データごとに 1 回だけ（data.md の 11）なので、出ても 1 回。Safari 17 が確認を出さないことは公式の文書にない。Firefox は対応ブラウザの外。Safari は G4 で Takuma が実機で見る。
 
 ## 確かめ（A）
 - [x] 2 の表に PRD の全 AC があり、空の欄がない（`grep -cE '^- AC-[0-9]+：' docs/prd/001-daily-learning.md` → 32、2 の表の行 → 32。2026-10-30 に実行）
@@ -327,13 +327,7 @@ design r6（05cdd4a）と design-reviewer G3 r1 の指摘 3、6、8 に合わせ
 - spike（リポジトリの外、@playwright/test 1.64.1。127.0.0.1 の新しいコンテキスト）：注入なしの `persisted()`、`persist()`、もう一度 `persisted()` は Chromium 156 と WebKit 27.2 のどちらも `false`、`false`、`false`。注入しなくても S8 の注意が出るので、seed で「あり」にした S8 のスクリーンショットにも注意が写る。
 
 決めたこと（designer に任された 3 つ。2026-11-04、tech-lead）：
-- U-14（`persist()` を求め直すか）：求め直す。今日の課題を出した直後の S3 の後に、`persisted()` が false のときだけ。今日の課題は 1 日に 1 回しか出ないので、新しい項目なしで 1 日 1 回までになる。designer の案（`device.persistRequestedOn` で 1 日 1 回）と回数は同じで、保存データの形を変えない（`formatVersion` は 1 のまま）。
-  - 理由：Chrome は断った要求を後で同じ基準で評価し直し、確認を出さない（https://web.dev/articles/persistent-storage ）。毎日使う人ほど通りやすく、守る価値の高いデータほど守れる。結果を保存しないので、「あり」の起動で setItem が最大 1 回という決まり（data.md の 2）も崩れない。今の実装は結果を非同期に保存していた。
-  - v1 のうちに形を変えてよいか：公開前で利用者のデータはないので、変えてもよかった。ただ、変えない案で同じ回数にできるので、変えない。
-  - いちばん強い反論：Firefox は確認を出す（web.dev）。断った答えを覚えるかを公式の文書で確かめられていない。覚えないなら、Firefox で毎日開く人には、毎日 1 回確認が出る。確認が出るブラウザを見分ける方法はない（UA で見分けるのは避ける）。
-  - それでも選んだ理由：Firefox は対応ブラウザの外。確認が出ても 1 日 1 回までで、断っても使える（AC-13）。
-  - 見直す条件：G4 か Takuma の FB で「確認が毎日出る」と分かったら、初回の 1 回だけに戻す（`device.persistRequested` を書く形に戻すだけで、データの形は変わらない）。
-  - PRD との食い違い（未解決）：PRD 11 の冒頭（169 行）は「初めて表示した後に 1 回だけ求める」。この決定は PRD の 1 行の直し（pdm）を前提にする。直さないなら、上の「戻す」形にする（data.md の 11 の末尾）。
+- U-14（`persist()` を求め直すか）：この時点の案は「求め直す（今日の課題を出した直後の S3 の後に、`persisted()` が false のときだけ。1 日 1 回まで）」だった。PRD 11 の冒頭（1 回だけ）との食い違いが残り、指揮役の決定（2026-11-04、docs/approvals/delegation.md）で取り下げた。今の形は下の「U-14 を PRD どおりに戻した」にある。
 - U-15（S1 と S2 にも日付の確かめが及ぶ件）：保存データが「なし」と「診断の途中」の画面と S0 error では確かめず、操作をそのまま実行する（data.md の 4 の「対象の外」）。
   - 理由：これらの画面には移す課題がない。日付を使う保存（`firstOpenDate`、`completedOn`、今日の課題）は実行した時点の今日で書くので、日付が変わってから操作したときと結果が同じ。捨てると、知らせもないまま radio の確定が 1 回消え、S0 error では「再読み込み」が 1 回効かない。
   - いちばん強い反論：決まりが保存データの区分で変わり、規則が 1 つでなくなる。やり直しの S2（「あり」）は捨て、初回の S2 は捨てないので、見た目が同じ画面で振る舞いが違う。
@@ -342,4 +336,14 @@ design r6（05cdd4a）と design-reviewer G3 r1 の指摘 3、6、8 に合わせ
   - 理由：`aria-invalid` は「入れた値がアプリの期待する形に合わない」ことを示す状態。値を検査した結果として付ける（https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-invalid ）。ここのエラーは保存先の失敗（QuotaExceededError）で、答えの値は正しい。付けると、スクリーンリーダーが「無効な入力」と読み、利用者に直す必要のない答えを直させる。エラーの文は `role="alert"` ですぐ読まれ、欄に戻ると `aria-describedby` で読まれるので、赤い枠の意味は文字でも伝わる（WCAG 2.2 SC 1.3.1、1.4.1）。
   - いちばん強い反論：赤い枠は「この欄がエラー」という見た目の状態で、目で見る人と同じ状態を、支援技術はプログラムで受け取れない（describedby は説明で、状態ではない）。reviewer と axe はこの組み合わせを見落としと見る場合がある。
   - それでも選んだ理由：状態として渡すと、意味（値が不正）がずれる。説明の文で渡す方が正しい。見直す条件：axe か G4 の VoiceOver の確認で、エラーの文が欄から読まれないと分かったら。
-- この 3 つと D-30 の契約は、自分では合格にしない。reviewer に反論を出してもらう（特に U-15 の区分による違いと、U-14 の Firefox）。
+- この 3 つと D-30 の契約は、自分では合格にしない。reviewer に反論を出してもらう（特に U-15 の区分による違い）。
+
+U-14 を PRD どおりに戻した（指揮役の決定 2026-11-04「求め直さない」。tech-lead）。1 行に 1 つの変更。
+- U-14 は指揮役の決定で求め直さない形にした。data.md の 11：`persist()` は保存データで初めて今日の課題を出した後の S3 で 1 回だけ。印 `device.persistRequested: true` は、印がないときに今日の課題（`current`）を作る保存（初回とやり直しの診断を終える、起動時と日付が変わった後と読み込みの後の 6-4）に含める。先に `persisted()` を調べない。結果（`persistGranted`）は書かない。S8 の注意は D-31 のまま（描くたびに `persisted()`、ない・例外なら出さない）。
+- 元の契約（fcddc81 の前）との違い：元は「結果が返る」で `persistRequested` と `persistGranted` を別の保存で書いた。印のない「あり」のデータ（前の実装のデータ、印のない seed）の起動では 6-4 の保存と結果の保存で 2 回になり、data.md の 2 の「あり」の起動で最大 1 回と食い違う。非同期の保存は AC-11 の注入（印の後の次の 1 回）とも重なりうる。印を 6-4 などの保存に含め、結果を書かないことで setItem の回数を変えずに PRD の「1 回だけ」を守る。`persistGranted` は読む所がない（S8 は `persisted()`、イベントは記録しない：D6）。
+- data.md の 2：表の 3 行（初回とやり直しの診断を終える、起動時の保存）に印を足し、表の下の文を「印は別の保存にしない。結果は保存しない」に直した。11 を書き直した（時機、条件、失敗と削除と読み込みのときの印、結果、理由、失うものと見直す条件、未確認）。PRD との食い違いの項は消した（食い違いがなくなった）。
+- data.schema.json：`persistRequested` と `persistGranted` の description を直した（形は変えない。`formatVersion` は 1 のまま）。
+- test-hooks.md の W-9：AC-13 の呼ぶ回数（初回の診断を終えた読み込みで 1 回、以後 0 回）、保存の印、印のない seed の扱いを書いた。注入は `persist()` と `persisted()` の両方を false のまま。
+- ADR 0002 の「一緒に決めたこと」の persist の項、2 の AC-13 の行、8 の Storage Persist Answered の行、10 の Firefox の未確認を直した。
+- いちばん強い反論：Chrome は断った要求を後で評価し直すので、毎日求めれば後で通る人がいる（https://web.dev/articles/persistent-storage ）。1 回だけでは、初回に断られた人は v1 の間ずっと永続にならない。それでも選ぶ理由：PRD と design の D-23 が 1 回で、確認が毎日出るブラウザ（Firefox）を作らない。断られた人には S8 の注意と書き出しがある（AC-13）。見直す条件は data.md の 11。
+- 検査：`cd backend && npm run -s check:contracts` → 末尾 `見本 41 件、期待と違う結果 0 件`、終了コード 0（2026-11-04、ajv 8.20.0。description だけの変更なので合否は前と同じ）。

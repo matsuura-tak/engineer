@@ -319,11 +319,11 @@
         },
         "persistRequested": {
           "type": "boolean",
-          "description": "前の実装（2026-11-03 まで）が書いた印。読めるように残す。アプリは書かず、どの判定にも使わない（contracts/data.md の 2 と 11）"
+          "description": "navigator.storage.persist() を求めた印。印がないときに今日の課題（current）を作る保存に true を含め、その S3 を描いた後に persist() を 1 回呼ぶ。true なら求め直さない（PRD 11 の冒頭。contracts/data.md の 2 と 11。AC-13）"
         },
         "persistGranted": {
           "type": "boolean",
-          "description": "前の実装（2026-11-03 まで）が書いた persist() の結果。読めるように残す。アプリは書かず、設定の注意にも使わない（注意は navigator.storage.persisted() で決める：contracts/data.md の 11。AC-13）"
+          "description": "前の実装が書いた persist() の結果。読めるように残す。アプリは書かず、設定の注意にも使わない（注意は S8 を描くたびに navigator.storage.persisted() で決める：contracts/data.md の 11。AC-13）"
         }
       },
       "dependentRequired": {

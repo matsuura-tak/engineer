@@ -7,7 +7,7 @@
 ## 概要
 - 何のアプリか：「今日の一手」。3 問の自己診断に答えると、毎日 15 分で終わる学習の課題が 1 つ出る、ブラウザだけで動く Web アプリ（サーバーなし、登録なし）。データはブラウザの中だけ。
 - 使う人：すでにコードを書いている実務 1〜5 年目のエンジニア（docs/prd/product.md）。
-- いまの段階：001-daily-learning の G2（実装）。実装と受け入れテストが入り、`npm test` が通る（2026-11-03）。公開先は https://matsuura-tak.github.io/engineer/（GitHub Pages）。
+- いまの段階：001-daily-learning の G3（design-reviewer r1 の直し中）。design r6 に合わせて契約を更新した（2026-11-04。日付が変わった知らせ D-30、永続化の注意 D-31、U-14 は求め直さない）。実装と受け入れテストはこれから追従する。公開先は https://matsuura-tak.github.io/engineer/（GitHub Pages）。
 
 ## ビルド/テストのコマンド
 .claude/org/app.json の commands と同じものを書きます。CI は app.json の方を使います。
