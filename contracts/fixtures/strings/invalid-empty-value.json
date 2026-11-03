@@ -52,6 +52,7 @@
   "error.diagnosis.required": "選択肢を 1 つ選んでください。",
   "error.storage.message": "保存できませんでした。入力はそのまま残っています。",
   "error.storage.retry": "もう一度保存する",
+  "task.dayChanged": "The date changed, so your last action was not applied. The previous task is in your history.",
   "task.today.label": "今日の課題 {date}",
   "task.meta": "{area} / {level} / 所要時間 {minutes} 分",
   "task.external.badge": "外で行う",

@@ -59,6 +59,7 @@
     "error.diagnosis.required",
     "error.storage.message",
     "error.storage.retry",
+    "task.dayChanged",
     "task.today.label",
     "task.meta",
     "task.external.badge",
@@ -335,6 +336,10 @@
     },
     "error.storage.retry": {
       "$ref": "#/$defs/plain"
+    },
+    "task.dayChanged": {
+      "$ref": "#/$defs/plain",
+      "description": "S3、S7。画面を開いたまま日付が変わった後の最初の操作で着いたときだけ出す（contracts/data.md の 4。design の D-30）"
     },
     "task.today.label": {
       "allOf": [

@@ -24,6 +24,7 @@ verifier G0 r3 の W-1〜W-16 を、名前と値まで決めたものです。�
 ## W-3 時刻
 - `page.clock.setFixedTime(…)`（Date と new Date だけを固定し、タイマーは動く）と、コンテキストの `timezoneId: 'Asia/Tokyo'`。`page.clock.install()` は使わない（答えの保存の 300 ms のタイマーが止まるため）。
 - 日付を進めるときは `setFixedTime` を新しい日時で呼び直してから読み込む。
+- 画面を開いたまま日付を進めるとき（data.md の 4 の「画面を開いたまま日付が変わったとき」、identifiers.md の 3 の `task.dayChanged`）は、`setFixedTime` を呼び直し、読み込まずに操作する。アプリは操作のたびに `new Date()` を読むので、これで足りる（探索 R3 の 2 で確かめた）。
 - AC-15 では時刻を固定しない（performance を上書きしないため）。
 - setFixedTime の下では、ページの `performance` は Playwright の置き換えになり、`Date.now()` は止まる。AC-1、AC-2、AC-23 の秒数は「時間の計り方」の節のとおりに計る。
 - SW は時刻を使わない（service-worker.md の 5）ので、SW の中に時刻が効かなくても結果は変わらない。
@@ -66,7 +67,10 @@ verifier G0 r3 の W-1〜W-16 を、名前と値まで決めたものです。�
 
 ## W-9 失敗と拒否の注入、書き出しの形
 - 保存の失敗（AC-11）：addInitScript で `Storage.prototype.setItem` を包み、テストが印（ページの `globalThis` に置くテスト側の変数。アプリは読まない）を立てた後の次の 1 回だけ `new DOMException('injected', 'QuotaExceededError')` を投げる。投げたら印を下ろす。アプリは保存 1 回につき setItem を 1 回だけ呼ぶ。保存データが「なし」か「診断の途中」の起動では setItem を呼ばない（AC-11 の注入はこの状態で行う）。「あり」の起動では data.md の 2 のとおり最大 1 回（診断の 2 問目の確定はちょうど 1 回の setItem）。
-- 永続化の拒否（AC-13）：addInitScript で `StorageManager.prototype.persist = async () => false`。アプリは `navigator.storage.persist()` を、`task.today` を初めて描いた後に 1 回だけ呼ぶ（`device.persistRequested` が true なら呼ばない）。
+- 永続化の拒否（AC-13）：addInitScript で `StorageManager.prototype.persist = async () => false` と `StorageManager.prototype.persisted = async () => false` の両方を入れる（data.md の 11）。
+  - S8 の注意 `settings.storage.notPersisted` は、S8 を描くたびに `persisted()` を読んで決まる。`persist()` だけを注入すると、エンジンの既定の `persisted()` の値で結果が変わる。
+  - アプリは `persist()` を、今日の課題を出した直後の S3 の後に、`persisted()` が false のときだけ呼ぶ（1 日に 1 回まで）。初回の診断を終えた読み込みではちょうど 1 回、同じ日の再読み込み（`task.done`）では 0 回。
+  - 結果は保存しない（`device.persistRequested` と `persistGranted` を書かない）。確かめるのは、上の回数と S8 の表示。
 - 書き出し：`page.waitForEvent('download')` で 1 件。中身は data.schema.json に通り、`device` を含まない。版の項目は `formatVersion`、今の値は 1。AC-25 のファイルは `formatVersion: 2` にする（fixtures/data/invalid-newer-version.json が見本）。
 - 読み込み：隠した input（`settings.import.file`、`home.standalone.importFile`）に `setInputFiles`。
 

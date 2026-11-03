@@ -13,7 +13,7 @@ PRD 12（速さ、配布、対応ブラウザ）と AC-15、AC-17 を、作り�
 | 部分 | 上限（gzip 後のバイト） | 根拠 |
 |---|---|---|
 | 殻（HTML、CSS、すべての JS、sw.js） | 26,000 | spike の殻は約 15,800 バイト（60 KB の代わりの JS を含む） |
-| 文言（ja.json と en.json の 2 つ） | 8,000 | 約 6,500。fixtures/strings の 145 キーの見本を `JSON.stringify` で詰めて `zlib.gzipSync(level 9)` にすると 3,501 + 2,969 = 6,470（node v24.22.1）。同じものを Apple の gzip 487.40.2 の `gzip -9` にすると 3,453 + 2,987 = 6,440（2026-10-30） |
+| 文言（ja.json と en.json の 2 つ） | 8,000 | 約 6,600。fixtures/strings の 146 キーの見本を `JSON.stringify` で詰めて `zlib.gzipSync(level 9)` にすると 3,554 + 3,016 = 6,570（node v24.22.1）。同じものを Apple の gzip 487.40.2 の `gzip -9` にすると 3,516 + 3,047 = 6,563（2026-11-04。145 キーのときは 2026-10-30 に 6,470 と 6,440） |
 | ホーム画面のアイコン `icon-180.png` と `manifest.webmanifest`（Takuma の決定 D5。6） | 10,000 | 180 × 180 の 2 色の PNG 1 枚（design 8 の想定は 2 KB 前後）と、7 項目の JSON（約 200 バイト） |
 | 課題集 tasks.json | 106,000 | 252 件 × 平均 600 字の合成で 106,113（spike） |
 
@@ -59,7 +59,7 @@ default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img
 | `URL.parse` | 18 | `new URL` と try |
 | `<dialog closedby>` | なし（iOS） | Escape は `cancel` イベント |
 
-- 使ってよい（同じ互換データで Safari 17 以下）：ES modules、`<link rel="modulepreload">`（17）、`<dialog>` と `showModal`（15.4）、`StorageManager.persist`（15.2）、`Blob.text`（14）、`Intl.PluralRules`（13）、`Set.prototype.union`（17）、`URL.canParse`（17）、`structuredClone`（15.4）、`:has()`（15.4）、`overflow-wrap: anywhere`（15.4）、`display-mode` のメディアクエリ（13）。
+- 使ってよい（同じ互換データで Safari 17 以下）：ES modules、`<link rel="modulepreload">`（17）、`<dialog>` と `showModal`（15.4）、`StorageManager.persist` と `persisted`（15.2。persisted は https://github.com/mdn/browser-compat-data の api/StorageManager.json で 2026-11-04 に確認）、`Blob.text`（14）、`Intl.PluralRules`（13）、`Set.prototype.union`（17）、`URL.canParse`（17）、`structuredClone`（15.4）、`:has()`（15.4）、`overflow-wrap: anywhere`（15.4）、`display-mode` のメディアクエリ（13）。
 - 効かなくても困らないもの：`accent-color`（Safari 26.2）は radio がシステムの色になるだけ。`prefers-reduced-transparency`（Safari にない）は半透明のままになるだけ。
 - reviewer は G2 で、上の「使わない」を grep で探します。
 

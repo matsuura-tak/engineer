@@ -319,11 +319,11 @@
         },
         "persistRequested": {
           "type": "boolean",
-          "description": "navigator.storage.persist() を 1 回呼んだ"
+          "description": "前の実装（2026-11-03 まで）が書いた印。読めるように残す。アプリは書かず、どの判定にも使わない（contracts/data.md の 2 と 11）"
         },
         "persistGranted": {
           "type": "boolean",
-          "description": "persist() の結果。false なら設定に settings.storage.notPersisted（AC-13）"
+          "description": "前の実装（2026-11-03 まで）が書いた persist() の結果。読めるように残す。アプリは書かず、設定の注意にも使わない（注意は navigator.storage.persisted() で決める：contracts/data.md の 11。AC-13）"
         }
       },
       "dependentRequired": {

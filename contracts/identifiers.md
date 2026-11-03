@@ -21,11 +21,11 @@
 | `error` | S0 error | 2 つの変種は要素で見分ける：読めない＝`error.app.message`、保存先が使えない＝`error.app.storageUnavailable.message` |
 | `diagnosis.start` | S1 | 案内 `home.addToHomeScreen` と `home.standalone` は状態を変えない |
 | `diagnosis.question` | S2 | 初回もやり直しも同じ値 |
-| `task.today` | S3 | |
+| `task.today` | S3 | 日付が変わった知らせの有無は `task.dayChanged` の件数で見る（3）。値は増やさない |
 | `task.rate` | S4 | 保存しない一時の状態。再読み込みすると `task.done` |
 | `task.done` | S5 | |
 | `task.skipped` | S6 | |
-| `task.exhausted` | S7 | |
+| `task.exhausted` | S7 | 同上 |
 | `settings` | S8 | ダイアログ `settings.import.confirm`、`settings.delete.confirm` は状態を変えない |
 | `settings.stats` | S9 | |
 | `history` | S10 | |
@@ -34,11 +34,17 @@
 
 ## 3. data-testid
 決まり：
-- 見える文字を持つ要素の `data-testid` は、その文字の文言キーと同じです。文言キーは 145 個で、一覧は 6 にあります（機械で読める原本は schemas/strings.schema.json の `required`）。
+- 見える文字を持つ要素の `data-testid` は、その文字の文言キーと同じです。文言キーは 146 個で、一覧は 6 にあります（機械で読める原本は schemas/strings.schema.json の `required`）。
 - radio は `<input type="radio">` に `data-testid` を付けます（`area.*`、`level.beginner`／`level.intermediate`／`level.advanced`、`years.*`）。`value` は 5 の ID です。ラベルの文字に別の `data-testid` は付けません。`level.*.desc` はラベルの中の説明の要素に付けます。
 - 出さない要素は DOM に置きません（`hidden` 属性や CSS で隠すだけにしない）。例：`in_app` の課題では `task.external.badge` が 0 件。閉じたダイアログも DOM から外します。例外は、見た目だけ隠したファイルの input（`home.standalone.importFile`、`settings.import.file`）です。
 - 1 つの状態の中で、同じ `data-testid` は 1 つだけです。例外は繰り返す行（`history.row` とその中の要素、`task.external.tools.item`）です。
 - `settings.privacy` は、リンク先が決まるまで（design の U-9）DOM に置きません。
+- `task.dayChanged`（S3、S7。design の D-30）は、画面を開いたまま日付が変わった後の最初の操作で着いたときだけ DOM に置きます（data.md の 4）。
+  - 要素は `<p role="status" tabindex="-1">` です。文書順で、`<main>` の中の他のどの `data-testid` の要素よりも前に置きます（S3 は `task.today.label` の上、S7 は `task.exhausted.message` の上）。
+  - 描いた直後に `document.activeElement` になります。
+  - それ以外（読み込みで着いた S3 / S7、ほかのすべての画面）では 0 件です。
+  - 次の操作（ボタン、リンク、radio の確定、ファイルの選択）の始めに DOM から外します。答えの欄への入力では外しません。
+  - `data-state` は `task.today` / `task.exhausted` のままです。知らせの有無は、この要素の件数で見ます。
 
 文字を持たない要素の `data-testid`（30 個。文言キーではない）：
 | data-testid | 要素 | 画面 |
@@ -103,7 +109,7 @@
 
 - PRD の W-8 案の `completed` は使いません。申告の「完了」は `done` です（AC-32 の `none` と、design の `report.done` に合わせた。tech-lead G1 r1 の A）。
 
-## 6. 文言キー（145 個。すべて data-testid としても使う）
+## 6. 文言キー（146 個。すべて data-testid としても使う）
 - app（3）：`app.name`、`app.loading`、`app.noscript`
 - nav（2）：`nav.history`、`nav.settings`
 - error（13）：`error.app.message`、`error.app.detail`、`error.app.reload`、`error.app.exportRaw`、`error.app.delete`、`error.app.storageUnavailable.message`、`error.app.storageUnavailable.detail`、`error.diagnosis.required`、`error.storage.message`、`error.storage.retry`、`error.import.message`、`error.import.reason.version`、`error.import.reason.schema`
@@ -112,7 +118,7 @@
 - area（6）：`area.backend`、`area.frontend`、`area.database`、`area.infra`、`area.testing`、`area.git`
 - level（6）：`level.beginner`、`level.beginner.desc`、`level.intermediate`、`level.intermediate.desc`、`level.advanced`、`level.advanced.desc`
 - years（4）：`years.lt1`、`years.1to3`、`years.3to5`、`years.gte5`
-- task（32）：`task.today.label`、`task.meta`、`task.external.badge`、`task.external.tools.label`、`task.why`、`task.how`、`task.goal`、`task.answer.label`、`task.answer.help`、`task.answer.saved`、`task.answer.limit`、`task.report.note`、`task.report.done`、`task.report.tooHard`、`task.report.tooEasy`、`task.report.noTime`、`task.rate.title`、`task.rate.question`、`task.rate.helpful`、`task.rate.notHelpful`、`task.rate.close`、`task.done.title`、`task.done.message`、`task.done.task`、`task.done.history`、`task.skipped.title`、`task.skipped.message`、`task.skipped.levelHint`、`task.skipped.history`、`task.exhausted.message`、`task.exhausted.detail`、`task.exhausted.redo`
+- task（33）：`task.dayChanged`、`task.today.label`、`task.meta`、`task.external.badge`、`task.external.tools.label`、`task.why`、`task.how`、`task.goal`、`task.answer.label`、`task.answer.help`、`task.answer.saved`、`task.answer.limit`、`task.report.note`、`task.report.done`、`task.report.tooHard`、`task.report.tooEasy`、`task.report.noTime`、`task.rate.title`、`task.rate.question`、`task.rate.helpful`、`task.rate.notHelpful`、`task.rate.close`、`task.done.title`、`task.done.message`、`task.done.task`、`task.done.history`、`task.skipped.title`、`task.skipped.message`、`task.skipped.levelHint`、`task.skipped.history`、`task.exhausted.message`、`task.exhausted.detail`、`task.exhausted.redo`
 - settings（45）：`settings.title`、`settings.data.title`、`settings.data.note`、`settings.storage.notPersisted`、`settings.export`、`settings.export.done`、`settings.import.note`、`settings.import`、`settings.import.confirm.title`、`settings.import.confirm.summary`、`settings.import.confirm.body`、`settings.import.confirm.ok`、`settings.import.confirm.cancel`、`settings.diagnosis.title`、`settings.diagnosis.current`、`settings.redo`、`settings.redo.note`、`settings.homeScreen.title`、`settings.homeScreen.open`、`settings.records.title`、`settings.stats.open`、`settings.history.open`、`settings.delete.title`、`settings.delete`、`settings.delete.confirm.title`、`settings.delete.confirm.body`、`settings.delete.confirm.ok`、`settings.delete.confirm.cancel`、`settings.version`、`settings.privacy`、`settings.stats.title`、`settings.stats.today`、`settings.stats.firstOpenDate`、`settings.stats.issued`、`settings.stats.completed`、`settings.stats.firstDayCompleted`、`settings.stats.firstDayCompleted.yes`、`settings.stats.firstDayCompleted.no`、`settings.stats.daysCompleted7d`、`settings.stats.helpful`、`settings.stats.rated`、`settings.stats.tooHard`、`settings.stats.noTime`、`settings.stats.note`、`settings.stats.back`
 - history（4）：`history.title`、`history.empty`、`history.empty.action`、`history.row.answer`
 - report（5）：`report.done`、`report.tooHard`、`report.tooEasy`、`report.noTime`、`report.none`

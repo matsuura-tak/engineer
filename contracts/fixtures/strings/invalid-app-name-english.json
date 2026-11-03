@@ -52,6 +52,7 @@
   "error.diagnosis.required": "Choose one option.",
   "error.storage.message": "Could not save. Your input is still here.",
   "error.storage.retry": "Save again",
+  "task.dayChanged": "The date changed, so your last action was not applied. The previous task is in your history.",
   "task.today.label": "Today's task {date}",
   "task.meta": "{area} / {level} / {minutes, plural, one {# minute} other {# minutes}}",
   "task.external.badge": "Outside the browser",

@@ -1,7 +1,7 @@
 # 技術設計メモ 001-daily-learning：診断と今日の学習（今日の一手）
 
 - 書いた役：tech-lead　日付：2026-10-30
-- PRD：docs/prd/001-daily-learning.md（r7、AC-1〜AC-32）　デザイン：design/001-daily-learning.md（r4）　契約：contracts/（HTTP の API はないので OpenAPI はない。一覧は contracts/README.md）
+- PRD：docs/prd/001-daily-learning.md（r7、AC-1〜AC-32）　デザイン：design/001-daily-learning.md（r6）　契約：contracts/（HTTP の API はないので OpenAPI はない。一覧は contracts/README.md）
 - 読み替え：型の「operationId」は「契約のファイルと項目」、「iOS」は「ブラウザ（Safari 17 以上、Chrome の最新 2 版）」に読み替える。spectral と oasdiff は使えないので、JSON Schema の検査と見本のテストで代える（指揮役の裁定 E2）。
 - Takuma の決定 D1〜D10（2026-10-30、すべて推奨どおり。docs/approvals/001-daily-learning-G0.md の末尾）を反映した。決定と反映先の一覧は 10。
 
@@ -26,7 +26,7 @@ operationId は全行「なし（端末のみ）」。代わりに「データ�
 | AC-10 | S7 → S2 | なし（端末のみ） | data.md の 4 の 6-4、5（候補が 0 → S7、保存しない） | 受け入れ 2：seed で 7 件を出し終えた |
 | AC-11 | S2 | なし（端末のみ） | data.md の 2（1 問ごとに 1 回の setItem。保存データが「なし」か「診断の途中」の起動では setItem を呼ばない（AC-11 の注入はこの状態で行う）。「あり」の起動では data.md の 2 のとおり最大 1 回）、W-9 | 受け入れ 2：setItem の失敗の注入 |
 | AC-12 | S1〜S6 | なし（端末のみ） | test-hooks.md の W-12（送信の数え方）、W-13（オフラインにする前に SW の準備を待つ）、CSP の `connect-src 'self'` | 受け入れ 2：オフライン |
-| AC-13 | S3 → S5、S8 | なし（端末のみ） | `device.persistRequested`、`device.persistGranted`、W-9 | 受け入れ 2：persist の拒否の注入 |
+| AC-13 | S3 → S5、S8 | なし（端末のみ） | data.md の 11（今日の課題を出した直後に `persisted()` が false なら `persist()`。S8 は描くたびに `persisted()`。結果は保存しない）、W-9 | 受け入れ 2：`persist()` と `persisted()` の拒否の注入 |
 | AC-14 | 1 通り目：S7 → S8 → S2 → S3、S10。2 通り目：S3 → S8 → S2 → S3（同じ課題）、翌日 S3、S10 | なし（端末のみ） | 1 通り目：data.md の 2（やり直しは終えるときに 1 回、行き先）、4 の 6-4。seed は AC-10 と同じく本番の課題集から作る「出し終えた」履歴（直近 3 日の 3 件が `done`）。2 通り目：data.md の 2（今日の課題を出した後は `current` を書かない、行き先）、4 の 6-3（直後は同じ `data-task-id`）、翌日の 6-1 と 6-4（`data-task-area` が新しい領域）。seed は fixtures/seeds/seed-ac14-three-completed.json の形で 2026-11-04 に開く（test-hooks.md の W-7） | 受け入れ 2：2 通り |
 | AC-15 | S0 → S3 | なし（端末のみ） | `data-debug-load-ms`、W-11 の制限、budgets.md の 1 と 4 | 受け入れ C：5 回 |
 | AC-16 | S8 → ダイアログ → S1 | なし（端末のみ） | data.md の 7（`removeItem` だけ）、W-7 の印 | 受け入れ 2 |
@@ -39,13 +39,13 @@ operationId は全行「なし（端末のみ）」。代わりに「データ�
 | AC-23 | S0 → S3 / S5 | なし（端末のみ） | contracts/service-worker.md、W-12、W-13 | 受け入れ 2：再読み込みと新しいタブ |
 | AC-24 | S9 | なし（端末のみ） | data.md の 9、identifiers.md の 4 の `data-stat-*`、fixtures/seeds/seed-ac24-stats.json | 受け入れ 2 |
 | AC-25 | S8 | なし（端末のみ） | data.md の 6 と 7（版を先に見る）、fixtures/data/invalid-newer-version.json | 受け入れ 2 |
-| AC-26 | S1 | なし（端末のみ） | schemas/strings.schema.json（145 キー必須、他を拒む）、strings.md の 2 | 受け入れ 2：locale ja-JP／en-US |
+| AC-26 | S1 | なし（端末のみ） | schemas/strings.schema.json（146 キー必須、他を拒む）、strings.md の 2 | 受け入れ 2：locale ja-JP／en-US |
 | AC-27 | S1、S2、S3、S5、S7、S8 | なし（端末のみ） | contracts/dependencies.md（@axe-core/playwright 4.14.0） | 受け入れ 2：axe の JSON を証拠に |
 | AC-28 | S0、S8 | なし（端末のみ） | service-worker.md、`data-build-version`、test-hooks.md の「AC-28 の配布物の差し替え」 | 受け入れ 2：2 秒おき 3 回 |
 | AC-29 | なし | なし（端末のみ） | tasks.schema.json（`mode`、`tools`、in_app の URL の禁止）、組ごとの 20%（W-6） | 受け入れ JSON |
 | AC-30 | S3 | なし（端末のみ） | `data-task-mode`、`task.external.badge`、`task.external.tools.item`、data.md の 5 | 受け入れ 2：external と in_app |
 | AC-31 | S3、S5 | なし（端末のみ） | test-hooks.md の「AC-31 の重なる要素の数え方」、identifiers.md の 3（閉じたダイアログは DOM にない） | 受け入れ 2 |
-| AC-32 | S3、S8 | なし（端末のみ） | `current.answer`（300 ms、pagehide、visibilitychange）、data.md の 4 の 6-1（`none` の行に移す） | 受け入れ 2：新しいタブ、再読み込み、翌日 |
+| AC-32 | S3、S8 | なし（端末のみ） | `current.answer`（300 ms、pagehide、visibilitychange）、data.md の 4 の 6-1（`none` の行に移す）と「画面を開いたまま日付が変わったとき」（前日の答えは `none` の行に、新しい `current.answer` は空） | 受け入れ 2：新しいタブ、再読み込み、翌日。画面を開いたままの翌日は G3 の「AC にない状態」（design 2 の表の下） |
 
 ## 3. 構成図
 システムコンテキストとコンテナを 1 枚にした。信頼の境界は 2 つ：origin の共有（同じアカウントの他の Pages と保存とキャッシュを共有する）と、端末のファイル（読み込むファイルは信頼しない）。
@@ -220,7 +220,7 @@ firstOpenDate 2026-02-30（P1） → true
 | Diagnosis Started、Diagnosis Completed | 送らない（入口だけ） | 初日の完了率は統計の画面の first-day-completed |
 | Task Issued、Task Completed、Task Skipped、Task Rated | 送らない（入口だけ） | 完了率、役に立った率、難しすぎ・今日はできないの申告率は統計の画面の issued、completed、helpful、rated、too-hard、no-time。撤退基準も同じ値 |
 | Level Changed | 送らない（入口だけ） | なし（`levels` は書き出しで見られる） |
-| Storage Persist Answered | 送らない（`device.persistGranted` に保存。設定の注意に使う） | なし |
+| Storage Persist Answered | 送らない（保存もしない。設定の注意は `persisted()` で今の状態を読む：data.md の 11） | なし |
 | Home Screen Guide Closed | 送らない（`device.homeGuideClosed` に保存） | なし |
 | Data Exported、Data Imported、Data Deleted | 送らない（入口だけ） | 「データが消えた」は聞き取り（PRD 13） |
 
@@ -256,6 +256,7 @@ firstOpenDate 2026-02-30（P1） → true
   - meta の CSP で frame-ancestors が効かないことの各ブラウザの挙動：確かめていない。枠の中で始めない作りなので結果に影響しない。
   - `apple-mobile-web-app-title` を iOS がホーム画面の名前に使うこと：Apple の公式の文書で見つけていない（Safari HTML Reference の meta の一覧にない）。`<title>` と manifest の `name` が同じ値なので結果は変わらない。G4 に Takuma が実機で名前を見る（budgets.md の 6）。
   - GitHub Pages が `.webmanifest` に返す `Content-Type`：公開後に curl で確かめる（G4。budgets.md の 6）。
+  - `persist()` の確認の表示：Firefox は確認を出す（web.dev）が、断った答えを覚えるかは公式の文書で見つけていない。Safari 17 が確認を出さないことも公式の文書にない。Firefox は対応ブラウザの外。Safari は G4 で Takuma が実機で見る（data.md の 11）。
 
 ## 確かめ（A）
 - [x] 2 の表に PRD の全 AC があり、空の欄がない（`grep -cE '^- AC-[0-9]+：' docs/prd/001-daily-learning.md` → 32、2 の表の行 → 32。2026-10-30 に実行）
@@ -313,3 +314,32 @@ PRD r7 と Takuma の Q11 の決定（A：AC-14 に 2 通り目を足す。2026-
 - contracts/dependencies.md に「推移的な依存」の節（扱いの決まり、確かめ方 3 つ、lockfile の 7 件の表）を足し、CLAUDE.md の段階を G2（実装）に、コマンドの「未確認」を backend/ で動かした結果に直した（受け入れテストは 133 本）。
 - contracts/data.md の 10：「365 行 × 2,000 字で 1,000,000 字以下」は答えが日本語か英数字のときだけ成り立つので、字の種類ごとの長さの表、Chromium と WebKit で測った localStorage の上限、上限を超えたときの動きに書き直した（backend-engineer の G2 の報告）。6 の「保存の大きさ」と 7 の D の行の 1,000,000 字も同じ前提で読む。ADR 0001 の「確かめたこと」に backend/ で確認した追記を足した（G2 reviewer r1 の提案）。
 - ADR 0002：U-6、検討した案の (a) と (b)、反論への答え、確かめたことの上限の数字を data.md の 10 に合わせ（答えが日本語か英数字のときの前提、測った上限）、見直す条件に「上限に届いたあとの扱いは v1 で手当てせず 002 以降」（指揮役の決定、docs/approvals/delegation.md）を足した。10 の未確認の localStorage の上限の行も測った値に直した。
+
+design r6（05cdd4a）と design-reviewer G3 r1 の指摘 3、6、8 に合わせた（2026-11-04、tech-lead）。1 行に 1 つの変更。
+- 指摘 3（D-30）：strings.schema.json の required と properties に `task.dayChanged`（差し込みなし）を足し、146 キーにした。fixtures/strings の 8 件すべてに同じキーを足した（invalid の 6 件は、元の 1 つの理由だけで落ちる形のまま）。文は design 7 と一字一句同じ（node で比べた）。
+- 指摘 3：identifiers.md の 3（146 個、`task.dayChanged` の要素、置き場所、フォーカス、0 件になる画面、消える時機）、2 の `task.today` と `task.exhausted` の備考（data-state は増やさない）、6（task は 33）を直した。strings.md の 1、README.md、この 2 の AC-26 の行も 146 にした。
+- 指摘 3：budgets.md の 1 の文言の行を 146 キーで測り直した（zlib 3,554 + 3,016 = 6,570、`gzip -9` 3,516 + 3,047 = 6,563。上限 8,000 は不変）。
+- 指摘 3：data.md の 4 の「画面を開いたまま日付が変わったとき」を書き直した（対象の画面、手順 1〜4、結果、例 2 つ、対象の外）。data.md の 2 に「やり直しの判定も最大 1 回で、書きかけの答えを含める」を足した。ADR 0002 の「結果」も同じ。2 の AC-32 の行に参照を足した。
+- 前日の答えが翌日の `current.answer` に入る件（探索 R3 の 2）：原因は、日付の変わり目の判定の後に描く S3 の `render()` が、捨てていない前日の答えの欄を `flushAnswer()` で新しい `current` に保存すること（main.js の 63〜66 行と 110 行）。data.md の 4 の手順 1（欄の値はメモリの `current.answer` に入れ、欄はそこで捨てる）で、実装がこの順にしか書けないようにした。
+- 同じ節の手順 2：判定は保存を `getItem` で読み直してから行う（初めの案の「メモリの保存データで判定」をやめた。2026-11-04）。メモリで判定して保存すると、別のタブが後から保存した翌日の課題や申告を上書きして消すため。読んだ `current` が画面の課題（`date` と `taskId`）と同じときだけ、捨てた欄の値をその `answer` にする。setItem の回数は変わらない。
+- 指摘 8（D-31）：data.md に 11（求める時機、手順、S8 の注意、理由、未確認）を足した。2 の表から「`persist()` の結果が返る」の行を外し、結果を保存しないことと、`device.persistRequested`、`persistGranted` を読むだけにすることを書いた。data.schema.json の 2 つの description を直した（形は変えない）。test-hooks.md の W-9 を `persist()` と `persisted()` の両方の注入にし、W-3 に「開いたまま日付を進める」を足した。8 の表と 2 の AC-13 の行、10 の未確認を直した。ADR 0002 の「一緒に決めたこと」に 1 項足した。
+- 検査：`cd backend && npm run check:contracts` → `見本 41 件、期待と違う結果 0 件`、終了コード 0（2026-11-04、ajv 8.20.0。strings の 8 件はすべて期待どおり）。足したキーが要ることの確かめ：valid-ja.json から `task.dayChanged` を消すと `must have required property 'task.dayChanged'`、`{date}` を入れると `data/task.dayChanged must NOT be valid`。今の backend/public/i18n/ja.json と en.json は `must have required property 'task.dayChanged'` で落ちる（backend-engineer が足すまで、単体テスト i18n-files.test.mjs の 1 本が落ちる：94 本中 93 本が通る）。
+- spike（リポジトリの外、@playwright/test 1.64.1。127.0.0.1 の新しいコンテキスト）：注入なしの `persisted()`、`persist()`、もう一度 `persisted()` は Chromium 156 と WebKit 27.2 のどちらも `false`、`false`、`false`。注入しなくても S8 の注意が出るので、seed で「あり」にした S8 のスクリーンショットにも注意が写る。
+
+決めたこと（designer に任された 3 つ。2026-11-04、tech-lead）：
+- U-14（`persist()` を求め直すか）：求め直す。今日の課題を出した直後の S3 の後に、`persisted()` が false のときだけ。今日の課題は 1 日に 1 回しか出ないので、新しい項目なしで 1 日 1 回までになる。designer の案（`device.persistRequestedOn` で 1 日 1 回）と回数は同じで、保存データの形を変えない（`formatVersion` は 1 のまま）。
+  - 理由：Chrome は断った要求を後で同じ基準で評価し直し、確認を出さない（https://web.dev/articles/persistent-storage ）。毎日使う人ほど通りやすく、守る価値の高いデータほど守れる。結果を保存しないので、「あり」の起動で setItem が最大 1 回という決まり（data.md の 2）も崩れない。今の実装は結果を非同期に保存していた。
+  - v1 のうちに形を変えてよいか：公開前で利用者のデータはないので、変えてもよかった。ただ、変えない案で同じ回数にできるので、変えない。
+  - いちばん強い反論：Firefox は確認を出す（web.dev）。断った答えを覚えるかを公式の文書で確かめられていない。覚えないなら、Firefox で毎日開く人には、毎日 1 回確認が出る。確認が出るブラウザを見分ける方法はない（UA で見分けるのは避ける）。
+  - それでも選んだ理由：Firefox は対応ブラウザの外。確認が出ても 1 日 1 回までで、断っても使える（AC-13）。
+  - 見直す条件：G4 か Takuma の FB で「確認が毎日出る」と分かったら、初回の 1 回だけに戻す（`device.persistRequested` を書く形に戻すだけで、データの形は変わらない）。
+  - PRD との食い違い（未解決）：PRD 11 の冒頭（169 行）は「初めて表示した後に 1 回だけ求める」。この決定は PRD の 1 行の直し（pdm）を前提にする。直さないなら、上の「戻す」形にする（data.md の 11 の末尾）。
+- U-15（S1 と S2 にも日付の確かめが及ぶ件）：保存データが「なし」と「診断の途中」の画面と S0 error では確かめず、操作をそのまま実行する（data.md の 4 の「対象の外」）。
+  - 理由：これらの画面には移す課題がない。日付を使う保存（`firstOpenDate`、`completedOn`、今日の課題）は実行した時点の今日で書くので、日付が変わってから操作したときと結果が同じ。捨てると、知らせもないまま radio の確定が 1 回消え、S0 error では「再読み込み」が 1 回効かない。
+  - いちばん強い反論：決まりが保存データの区分で変わり、規則が 1 つでなくなる。やり直しの S2（「あり」）は捨て、初回の S2 は捨てないので、見た目が同じ画面で振る舞いが違う。
+  - それでも選んだ理由：やり直しの S2 の確定は今日の課題の有無に効く（data.md の 2）。日付をまたいだら前の日の課題を移す必要があり、PRD 11 の冒頭の決まりがそのまま当たる。初回の S2 には当たる対象がない。区分の定義は data.md の 3 のものを使い、新しい定義は足さない。
+- aria-invalid（エラーの間の textarea。design-reviewer の指摘 6 の「直す方向」と designer の判断の違い）：付けない（designer の判断のまま）。枠（size.border.strong、color.error）と `aria-describedby`（補助文とエラーの文）だけにする。
+  - 理由：`aria-invalid` は「入れた値がアプリの期待する形に合わない」ことを示す状態。値を検査した結果として付ける（https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-invalid ）。ここのエラーは保存先の失敗（QuotaExceededError）で、答えの値は正しい。付けると、スクリーンリーダーが「無効な入力」と読み、利用者に直す必要のない答えを直させる。エラーの文は `role="alert"` ですぐ読まれ、欄に戻ると `aria-describedby` で読まれるので、赤い枠の意味は文字でも伝わる（WCAG 2.2 SC 1.3.1、1.4.1）。
+  - いちばん強い反論：赤い枠は「この欄がエラー」という見た目の状態で、目で見る人と同じ状態を、支援技術はプログラムで受け取れない（describedby は説明で、状態ではない）。reviewer と axe はこの組み合わせを見落としと見る場合がある。
+  - それでも選んだ理由：状態として渡すと、意味（値が不正）がずれる。説明の文で渡す方が正しい。見直す条件：axe か G4 の VoiceOver の確認で、エラーの文が欄から読まれないと分かったら。
+- この 3 つと D-30 の契約は、自分では合格にしない。reviewer に反論を出してもらう（特に U-15 の区分による違いと、U-14 の Firefox）。

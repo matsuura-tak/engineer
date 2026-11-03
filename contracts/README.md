@@ -7,7 +7,7 @@ tech-lead だけが書きます。変えるときは足すだけにし、読み�
 |---|---|
 | schemas/tasks.schema.json | 課題集の形（JSON Schema 2020-12） |
 | schemas/data.schema.json | 保存データ＝書き出しファイル＝seed の形 |
-| schemas/strings.schema.json | 文言ファイルの形と 145 個のキー |
+| schemas/strings.schema.json | 文言ファイルの形と 146 個のキー |
 | data.md | 保存の決まり、起動時の行き先の判定順、課題の選び方と段階の規則、統計の数え方 |
 | strings.md | 言語の決め方、差し込み、本文の出し方 |
 | identifiers.md | data-state、data-testid、data-* の名前と値 |
