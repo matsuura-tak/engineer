@@ -1,0 +1,9 @@
+{
+  "name": "今日の一手",
+  "short_name": "今日の一手",
+  "lang": "ja",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "icons": [{ "src": "./icon-180.png", "sizes": "180x180", "type": "image/png" }]
+}

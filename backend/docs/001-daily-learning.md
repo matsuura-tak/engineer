@@ -1,0 +1,97 @@
+# 実装ノート：001-daily-learning（今日の一手）
+
+- 書いた役：backend-engineer　日付：2026-11-03（ステップ 13。前の backend-engineer の作りかけを引き継いで検査し、単体テスト、この文書、RUNBOOK を足した）
+- 入力：docs/prd/001-daily-learning.md（r7）、design/001-daily-learning.md（r5）、contracts/（data、strings、identifiers、test-hooks、service-worker、budgets、dependencies、schemas、fixtures、tools）、docs/adr/0001〜0005、docs/adr/features/001-daily-learning.md、docs/verification/001-daily-learning/test-plan.md
+- 形：サーバーなしの静的な Web アプリ（ADR 0001）。HTTP の API、DB、認証、外部サービスはない。手引きの API と DB 向けの節は、当てはまらない理由を書いて「対象外」にした。
+
+## 1. 契約との対応表
+contracts/openapi.yaml はない（API がない）。代わりに、AC ごとに実装の場所とテストを並べる。受け入れテストは backend/tests/acceptance/tests/ のファイル名、単体テストは backend/tests/unit/ のファイル名。
+
+| AC | 中身 | 実装の場所 | 受け入れテスト | 単体テスト |
+|---|---|---|---|---|
+| AC-1、AC-2 | 3 問の診断と、直後の 1 件目 | js/view-start.js（startScreen、questionScreen）、js/main.js（showStart、showQuestion、onAnswer）、js/rules.js（answerInitial、finishInitial） | ac01-ac02-diagnosis | rules（診断：1 問目で firstOpenDate…） |
+| AC-3、AC-4、AC-29 | 課題集の形、件数、in_app の割合 | public/data/tasks.json（= docs/prd/001-daily-learning/tasks.v1.json）、scripts/lib/tasks-check.mjs、scripts/build.mjs | ac03-ac04-ac29-tasks-json | tasks-check |
+| AC-5、AC-6、AC-7、AC-9 | 申告、同じ課題を出さない、役に立ったの評価、1 日 1 回 | js/view-task.js（todayScreen、rateScreen、doneScreen、skippedScreen）、js/main.js（onReport、showRate）、js/rules.js（pickTask、reportTask、rateTask、startOfDay） | ac05-ac06-ac07-ac09-report | rules（pickTask…、完了の申告は…） |
+| AC-8 | 段階の規則（2 回連続） | js/rules.js（applyLevelRule、reportTask） | ac08-level-rule | rules（AC-8 の 9 通り、契約の seed 3 件、翌日から効く） |
+| AC-10、AC-30 | 課題が尽きた、外で行う印 | js/view-task.js（exhaustedScreen、todayScreen の external の部分）、js/rules.js（startOfDay） | ac10-ac30-exhausted-external | rules（課題を出し尽くすと…） |
+| AC-11、AC-13 | 回答ごとの保存、保存先が使えない、壊れたデータ | js/store.js、js/main.js（decide、commit、showError、retryStartupSave）、js/view-start.js（errorScreen、storageError） | ac11-ac13-storage | store |
+| AC-12、AC-23 | 送信 0 件、オフラインの再読み込み | public/sw.js、js/main.js（scheduleServiceWorker、fetchJson は同じ origin の配布物だけ） | ac12-ac23-offline | build（FILES の一致） |
+| AC-14、AC-16 | 診断のやり直し、全部の削除 | js/main.js（startRedo、cancelRedo、openDeleteConfirm）、js/rules.js（finishRedo）、js/store.js（removeAll） | ac14-ac16-redo-delete | store（removeAll）、rules |
+| AC-15 | 遅い回線で 2 秒 | index.html の modulepreload と preload、js/main.js（data-debug-load-ms） | ac15-load-time（Chromium だけ） | build（modulepreload の一致は build.mjs が検査） |
+| AC-17、AC-18、AC-27 | 320px、200%、axe | public/app.css、js/dom.js | ac17-ac18-ac27-a11y | — |
+| AC-19、AC-20、AC-25 | 書き出し、読み込み、新しい版を拒む | js/files.js（download、readImport）、js/rules.js（exportOf、importReplacement）、js/main.js（onImportFile、replaceWith、openImportConfirm） | ac19-ac20-ac25-export-import | validate、i18n-files（読み込み）、rules（書き出しは device を除き…） |
+| AC-21、AC-22 | ホーム画面の案内、スタンドアロンの読み込みの案内 | js/main.js（isIosSafari、isStandalone、showStart）、js/view-start.js（guideSection、importer） | ac21-ac22-home-screen | — |
+| AC-24 | 統計の 9 つの値 | js/rules.js（stats）、js/view-settings.js（statsScreen）、js/main.js（showStats） | ac24-stats | rules（統計の 9 つの値、直近 7 暦日） |
+| AC-26 | 日英の文言 | public/i18n/ja.json と en.json、js/i18n.js | ac26-language | i18n-files |
+| AC-28 | 新しい版に 3 回以内で切り替わる | public/sw.js（skipWaiting、clients.claim、古い kyounoitte- のキャッシュを消す）、scripts/build.mjs（版の書き込み） | ac28-update | build |
+| AC-31、AC-32 | 操作 0 回で今日の課題、書きかけの答え | js/main.js（route、showToday、saveAnswer、flushAnswer）、js/rules.js（setAnswer、startOfDay） | ac31-ac32-zero-ops-answer | rules（日付が変わると…答えも残る） |
+
+## 2. 認可の表と交差テスト
+対象外。サーバーも利用者のアカウントもない。データは利用者のブラウザの localStorage（キー `kyounoitte:data`）にだけあり、他人の行という概念がない。信頼の境界は 2 つ（docs/adr/features/001-daily-learning.md の 3）で、次のように扱った。
+- 読み込むファイル（信頼しない）：JSON.parse → 版 → 手書きの検査（validate.js。知らない項目を拒む許可リスト）を通ったものだけを使う。5,000,000 バイトを超えたら読まない。表示はすべて textContent（innerHTML などは 0 件。8 の grep）。単体テスト：validate（知らない項目…、__proto__…）、i18n-files（読み込み：…）。
+- 同じ origin の他の Pages：同じ localStorage と Cache Storage が見える。アプリは自分のキーと `kyounoitte-` で始まるキャッシュにしか触らない（store.test の removeAll、sw.js の activate）。他の Pages にルートの SW を置かない決まりは RUNBOOK の 6。
+
+## 3. データの変更
+DB のマイグレーションはない（squawk、up と down のログは対象外）。保存データの形は contracts/data.md の v1（`formatVersion: 1`）で、移す手順はまだない（v1 が最初の版）。新しい版のファイルは拒む（AC-25）。形を変えるときは formatVersion を上げ、古い版を読んで移す手順を足す（data.md の 6）。contracts/fixtures/data/v1/ の見本は validate.test が読み続ける。
+
+## 4. 互換性
+oasdiff は対象外（OpenAPI がない）。古い版のアプリとの関係は次のとおり。
+- 新しい版を配ると、SW が古い版のキャッシュを消して 3 回以内の読み込みで切り替わる（AC-28、受け入れテストで確認）。保存データは残る。
+- 課題の ID は消さず使い回さない（identifiers.md の 5）。tasks-check.test が tasks.json の ID の重複 0 件と 126 件を確かめる。
+
+## 5. 失敗の扱い
+Idempotency-Key、ページング、RFC 9457 は対象外（HTTP の API がない）。代わりに次を決めた。
+- 保存は 1 回の setItem。失敗（容量、使えない）は false を返し、前のデータのまま（store.test の save）。起動時の保存の失敗は `error.storage.message` と再試行（main.js の retryStartupSave）。
+- 壊れたデータは消さず、`error.app.exportRaw` で元の文字列のまま保存できる（store.test：読むだけで消さない）。
+- 読み込みの失敗は 2 種類だけ：`error.import.reason.version` と `error.import.reason.schema`（data.md の 7）。
+- 配布物（i18n と tasks.json）を読めないときは console に名前だけを出して止まる（中身を出さない）。
+
+## 6. 個人データと削除の地図
+| 置き場所 | 中身 | 消し方 | 確かめ |
+|---|---|---|---|
+| localStorage `kyounoitte:data` | 診断、段階、履歴、答えの本文、初めて開いた日、device の印 | 設定の「すべて削除」（AC-16）：removeItem だけ | 受け入れ ac14-ac16-redo-delete、store.test の removeAll |
+| 書き出したファイル | 上から device を除いたもの | 利用者の端末の上。アプリは消せない（PRD と support のページで知らせる。pdm の範囲） | — |
+| Cache Storage `kyounoitte-<版>` | 配布物だけ（個人データなし） | 新しい版の activate で古い版を消す | ac28-update |
+| GitHub Pages の接続記録 | IP アドレス（GitHub が持つ） | アプリからは消せない。PRD 1 の紹介文とプライバシーのページで知らせる | — |
+サーバーに送る個人データは 0 件（AC-12 の受け入れテストで送信 0 件）。
+
+## 7. 運用
+- ログ：本番のコードは console.error を 1 か所だけ使い、エラーの名前（`e.name`）だけを出す。利用者の答えや保存データを出さない。
+- 指標、アラート：v1 はイベントを記録しない（PRD 15、D6。main.js の `track()` は入口だけで何もしない）。
+- 回数の上限、外部サービスの費用：外部サービスなし。月額 0 円（GitHub Pages の無料枠。帯域の目安は RUNBOOK の 7）。
+- 大きさの上限：答えは 2,000 字（textarea の maxlength と検査）、読み込むファイルは 5,000,000 バイト、history は 20,000 行まで。
+
+## 8. 実行したコマンドと出力（2026-11-03、macOS、node v24.22.1）
+- `cd backend && npm ci && npm run check:contracts` → `見本 41 件、期待と違う結果 0 件`、終了コード 0。
+- `cd backend && node --test 'tests/unit/**/*.test.mjs'` → `tests 85 / pass 85 / fail 0`。
+- `cd backend/tests/acceptance && npm ci && npx playwright install chromium webkit && npx playwright test --reporter=line` → `131 passed / 2 failed`。落ちたのは AC20 の 2 本（chromium、webkit）だけ。理由は 9 の 1。
+- `cd backend && npm ci && npm test` → 契約の検査 41 件 OK、単体 85 件 OK、受け入れ 131 passed / 2 failed（AC20）で終了コード 1。
+- `node scripts/build.mjs --out <一時フォルダ>/dist --version 2026-11-03.1 && node scripts/check-budget.mjs <一時フォルダ>/dist` → 殻 24,084 / 26,000、文言 6,510 / 8,000、アイコンと manifest 2,173 / 10,000、課題集 30,193 / 106,000、合計（gzip 後）62,960 / 150,000、OK、終了コード 0。
+- 禁止の API：`grep -rnE 'innerHTML|outerHTML|insertAdjacentHTML|eval\(|new Function|toISOString|import\(' public/` → 0 件。
+- インラインのスタイルとイベント属性：`grep -rnE 'style=|<style|[[:space:]]on[a-z]+=' public/` → public/ の HTML、CSS、JS では 0 件（tasks.json の課題の本文に `style={{ margin: 8 }}` の文字が 1 か所あるが、課題の文で textContent で出す）。index.html の `<script>` は `src="./js/main.js"` の 1 つだけ。
+- CSP：index.html の meta は contracts/budgets.md の 3 の文字列と同じ（grep で 1 件一致）。
+- 保存先：`grep -rnE 'localStorage|sessionStorage|indexedDB|document\.cookie' public/js public/sw.js` → main.js の `window.localStorage` の 1 か所だけ（キーは store.js の `kyounoitte:data` だけ）。
+- テストのつなぎ口、URL の引数：`grep -rnE 'location\.(search|hash)|URLSearchParams|__test|window\.__|testHook' public/` → 0 件。
+- ネットワーク：fetch は main.js の fetchJson（`./i18n/<lang>.json` と `./data/tasks.json`、同じ origin）と sw.js のキャッシュの取り損ねだけ。
+- JS のファイル：public/js が 11 個と sw.js の合わせて 12 個（15 個まで）。
+- data-state：identifiers.md の 2 の 12 値がすべてコードにある。data-testid：契約は文言キー 145 と文字なし 30 の 175 個。コードに文字列のまま書かれた 91 個はすべて契約にあり（契約にない名前は 0 件）、残りは `area.${v}`、`settings.stats.${key}.value` のような組み立てで作る。`settings.privacy` は契約どおり DOM に置かない。
+- 依存：package-lock.json は ajv 8.20.0 と、ajv の依存の fast-deep-equal 3.1.3、fast-uri 3.1.9、json-schema-traverse 1.0.0、require-from-string 2.0.2。contracts/dependencies.md の行は ajv 8.20.0（依存は ajv が持ち込むもの）。
+- 鍵の混入：`grep -rnE 'service_role|SERVICE_ROLE' backend/public backend/scripts` → 0 件。
+- 320px：作業用の Playwright のスクリプト（受け入れテストのフォルダの node_modules を読むだけ。backend/ には置いていない）で、配布物をビルドし、幅 320、deviceScaleFactor 2 で backend-beginner-005、frontend-beginner-007、database-beginner-002 を出して測った。Chromium と WebKit の 6 通りとも `scrollWidth=320`、画面からはみ出した `code` は 0 件。効いているのは app.css の `code { overflow-wrap: anywhere; }`（195 行目）と本文の `overflow-wrap: anywhere`（106 行目）。
+- 未検査：gitleaks、squawk、oasdiff、schemathesis はこの端末に入っていない（`which` で見つからない）。squawk、oasdiff、schemathesis は対象外（DB と API がない）。gitleaks は代わりに上の grep だけ。
+
+## 9. 未確認のこと
+1. AC20 の受け入れテストの不具合：tests/ac19-ac20-ac25-export-import.spec.mjs の 57 行目で `context.close()` を呼んでから、67 行目で書き出したファイル `exported.file`（`download.path()` の一時ファイル）を読み込ませている。Playwright はダウンロードを作ったコンテキストを閉じるとそのファイルを消すので、ENOENT で落ちる。Playwright 1.64.1 で確認した（閉じる前は存在、閉じた後は存在しない）。テストの写しを作業用フォルダに作り、閉じる前にファイルを別の場所へ複製する 1 行だけを足して流すと、Chromium と WebKit の 2 本とも通った（実装は AC20 を満たす）。受け入れテストは verifier の範囲なので直していない。
+2. Linux の CI で WebKit の OS のライブラリが要るか（ADR 0004）：macOS でだけ動かした。
+3. GitHub Pages が `.webmanifest` に返す Content-Type：公開後に確かめる（設計メモ 10）。
+
+## チェックリスト（craft-backend-engineer の 6）
+- [x] 対応表の行の数が、技術設計メモの 4 の表の operation の数と同じ。→ API の operation は 0。代わりに AC-1〜AC-32 をすべて 1 の表に並べた。
+- [ ] 交差テストの数が、ID を受け取るエンドポイントの数以上。→ 対象外（エンドポイントなし、利用者は 1 人）。
+- [ ] 3章のテストのうち当てはまるものが、本物の DB で通ったログがある。→ 対象外（DB なし）。当てはまる「割り当てすぎ」（知らない項目を拒む）、「上限」（答え 2,000 字、ファイル 5MB）、「削除」は単体テストと受け入れテストで通った（8）。
+- [x] schemathesis、oasdiff、squawk、advisors、gitleaks の出力がある（使わない道具は「対象外」と理由）。→ 8 の最後の行。gitleaks は未検査。
+- [ ] マイグレーションの up、down、up のログがあり、列を消す変更は最低対応版より後になっている。→ 対象外（マイグレーションなし。保存の形は formatVersion で扱う。3）。
+- [x] 削除の地図の行ごとに、テストか RUNBOOK の手作業の手順がある。→ 6 と RUNBOOK の 5。
+- [x] 環境変数の名前が RUNBOOK にあり、値はコードにもログにもない。→ 本番の環境変数は 0 個。テストの KYOUNOITTE_DIST だけ RUNBOOK の 1 に書いた。
+- [x] 外部サービスごとに、月額の見積もりと、利用上限か請求アラートがある。→ 外部サービスは GitHub Pages だけ（無料）。RUNBOOK の 7。
+- [x] 報告の「自己点検」に API1 から API10 の10行がある。
