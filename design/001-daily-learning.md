@@ -22,7 +22,7 @@
    │     ├ iOS の Safari でスタンドアロンでない、かつ閉じた印がない
    │     │     → S1 に案内 home.addToHomeScreen（閉じると印を保存して二度と出ない）
    │     └ 「診断を始める」→ S2 ×3（1 / 3 → 2 / 3 → 3 / 3）→ 「診断を終える」
-   │            → S3 task.today（1 件目）。初めて S3 を出した直後に navigator.storage.persist() を 1 回だけ呼ぶ（画面には何も出ない。求め直すかは U-14）。S8 の注意は、S8 を出すたびに navigator.storage.persisted() で今の状態を読んで決める（D-31）
+   │            → S3 task.today（1 件目）。初めて S3 を出した直後に navigator.storage.persist() を 1 回だけ呼ぶ（画面には何も出ない。後の日に求め直さない：U-14 で決定、契約 data.md 11）。S8 の注意は、S8 を出すたびに navigator.storage.persisted() で今の状態を読んで決める（D-31）
    ├ 診断の途中（初回の診断で、回答が 1〜2 問だけ保存されている。契約 data.md 3：「あり」ではなく `diagnosis.area` がある）→ S2 のまだ答えていない最初の質問。保存した回答は radio に戻す（tech-lead r1 M2）。nav は初回の S2 と同じ（「設定」だけ）
    ├ 保存データあり、今日まだ課題を出していない
    │     ├ 出せる課題がある → S3 task.today
@@ -147,7 +147,7 @@ AC にない状態（PRD 11 の冒頭の規則「日付をまたいだ申告は�
 | D-28 ホバーと押した瞬間の見た目は tokens 4 の決まりだけ（ホバーは下線、押した瞬間は塗りと文字の入れ替え）。新しい色も transition も足さない | R-15（枠と状態の 3:1）、R-7（色は意味にだけ） | https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html 、B-5 |
 | D-29 ホーム画面のアイコンと manifest を置く。アイコンは `apple-touch-icon` 180 × 180 px の PNG 1 枚（10,000 バイト以下）で、地は color.bg（ライト）1 色、中央に「一」1 字を color.text（ライト）。影、枠、グラデーション、別の色は使わない。manifest は `name` と `short_name`「今日の一手」、`display: standalone`、`start_url` と `scope` は `./`。形の詳細は 8（Takuma の決定 D5、2026-10-30） | R-24（iOS は `apple-touch-icon` 180 × 180 を読む）、R-7（色は意味にだけ） | https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariWebContent/ConfiguringWebApplications/ConfiguringWebApplications.html 、B-2、B-5 |
 | D-30 画面を開いたまま日付が変わった後の最初の操作（ボタン、リンク、radio の確定。契約 data.md 4）は実行せず（PRD 11 の冒頭。指揮役の決定 2026-11-03：docs/approvals/delegation.md）、着いた翌日の S3（か S7）の `<main>` の先頭に知らせ `task.dayChanged`（`<p role="status" tabindex="-1">`、text.body、color.warning）を 1 つ出し、フォーカスをそこへ移す（画面の先頭までスクロールする）。文は「日付が変わった」「直前の操作は無効」「前の課題は履歴にある」の 3 点で、どの操作（申告、評価、nav、アプリ名）の後でも同じ 1 キー。履歴へのリンクは足さない（ヘッダーの `nav.history` が 1 タップで届く。B-2）。読み込みで翌日に着いたときは出さない（AC-6 の通常の経路）。次の操作か再読み込みで消え、保存しない。着いた先が S1 / S2（保存データなし、診断の途中）のときは出さない（履歴に移る課題がない） | R-27（1 状態の可視化、9 問題を正確に示す）、R-28（`tabindex="-1"` でフォーカスを移す）、R-19（status）、R-10（エラーの見た目にしない、責めない） | https://www.nngroup.com/articles/ten-usability-heuristics/ 、https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html 、B-1、B-2 |
-| D-31 S8 の `settings.storage.notPersisted` は、S8 を描くたびに `navigator.storage.persisted()` で今の状態を読み、`false` のときだけ出す。保存した `device.persistGranted` は表示の判定に使わない（古くなる。指揮役の決定 2026-11-03）。`persisted()` がない、または例外のときは出さない（「許可しませんでした」と言い切れないため）。`persist()` を求め直すかは U-14 | R-29（断られた要求は後で評価し直される。`persisted()` で今の状態）、R-27（8 出続ける注意は効き目が薄れる）、R-31 | https://web.dev/articles/persistent-storage 、B-1 |
+| D-31 S8 の `settings.storage.notPersisted` は、S8 を描くたびに `navigator.storage.persisted()` で今の状態を読み、`false` のときだけ出す。保存した `device.persistGranted` は表示の判定に使わない（古くなる。指揮役の決定 2026-11-03）。`persisted()` がない、または例外のときは出さない（「許可しませんでした」と言い切れないため）。`persist()` は後の日に求め直さない（U-14 で決定。指揮役の決定 2026-11-04、契約 data.md 11） | R-29（断られた要求は後で評価し直される。`persisted()` で今の状態）、R-27（8 出続ける注意は効き目が薄れる）、R-31 | https://web.dev/articles/persistent-storage 、B-1 |
 | D-32 `task.answer.limit`（上限に達した）は color.warning、`role="status"`。入力が受け付けられなくなった理由を伝える注意で、エラーではない（入力は保たれ、直す操作もない）。8 の色の一覧に足す | R-10（Warnings should not look like errors）、R-19 | https://www.nngroup.com/articles/error-messages-scoring-rubric/ 、B-5 |
 | D-33 案内（`home.addToHomeScreen`、`home.standalone`）は四方を 1 px の color.border で囲む（塗りと影はない）。理由：「閉じる」（または読み込み）で消える範囲を見せるためで、余白だけでは「閉じる」が何を消すかが見えない。これが tokens 1「箱を置かない」の唯一の例外で、他の場所には広げない | R-30（境界の中は一群と受け取られる。使いすぎると散らかる）、R-18（重ねずに本文の一部として置く） | https://www.nngroup.com/articles/common-region/ 、B-1、B-2 |
 
@@ -353,7 +353,7 @@ AC にない状態（PRD 11 の冒頭の規則「日付をまたいだ申告は�
 | helpful.unanswered | 未回答 | Not rated | S10 |
 
 権限と確認の求め方：
-- 保存の永続化（`navigator.storage.persist()`）：画面で理由を説明する事前の画面は置かない。初めて S3 を表示した直後に 1 回だけ呼ぶ（PRD 11 の冒頭）。ブラウザは多くの場合に確認を出さずに決める。S8 を出すたびに `navigator.storage.persisted()` で今の状態を読み、永続でなければ `settings.storage.notPersisted` と「ファイルに書き出す」を置き、報酬で釣らない（D-31）。求め直すかは U-14。
+- 保存の永続化（`navigator.storage.persist()`）：画面で理由を説明する事前の画面は置かない。初めて S3 を表示した直後に 1 回だけ呼ぶ（PRD 11 の冒頭）。ブラウザは多くの場合に確認を出さずに決める。S8 を出すたびに `navigator.storage.persisted()` で今の状態を読み、永続でなければ `settings.storage.notPersisted` と「ファイルに書き出す」を置き、報酬で釣らない（D-31）。後の日に求め直さない（U-14 で決定。契約 data.md 11）。
 - ファイルの読み込み：見えるボタンが隠した `<input type="file">` の `click()` を呼び、ブラウザ標準の選択ダイアログだけを使う（9）。取り消したら何もしない。
 - 通知、位置情報、カメラ：使わない。
 
@@ -443,7 +443,7 @@ AC にない状態（PRD 11 の冒頭の規則「日付をまたいだ申告は�
 | radio | システム色（`color-scheme` と `accent-color` に従う） | 同左 | 同左 |
 
 ## 10. 決まっていないこと
-Takuma か tech-lead に決めてほしいこと。仕様はここに書いた暫定で進める。U-1〜U-4 と U-13 は r4 で決まった（下の「決まったこと（r4 で閉じた）」）。番号は他の文書（docs/adr/features/001-daily-learning.md、docs/reviews/）が引くので欠番のまま残す。
+Takuma か tech-lead に決めてほしいこと。仕様はここに書いた暫定で進める。U-1〜U-4 と U-13 は r4 で、U-14 は 2026-11-04 に決まった（下の「決まったこと」）。番号は他の文書（docs/adr/features/001-daily-learning.md、docs/reviews/）が引くので欠番のまま残す。
 - U-5（tech-lead、PRD にない挙動）：保存データが形式に合わないときの S0 の error 状態（`error.app.*`。再読み込み、壊れたデータのファイル保存、削除）と、保存先が使えないときの変種（`error.app.storageUnavailable.*`。tech-lead r1 P1）。PRD の 10 の「保存の方式を後から変えてデータを失う」の手当てとして置いたが、PRD の AC にはない。tech-lead r1 の確定案は「採る。error にする条件は JSON.parse の失敗、スキーマ不一致、formatVersion が新しい、localStorage の例外」。確定は ADR。
 - U-6（tech-lead）：答えの欄の文字数の上限 `answer.max`（localStorage の容量の都合。`task.answer.limit` の {max}）。
 - U-7（tech-lead）：診断のやり直し（S8 → S2）の保存の仕方。初回は質問ごとに保存する（AC-11）が、やり直しの途中で「やめる」を押したときに元の診断が壊れないよう、やり直しは下書きに保存して「診断を終える」で確定する作りを求める。PRD の「回答は質問ごとに確定したときに保存する」は初回の規則として読んだ。
@@ -452,7 +452,10 @@ Takuma か tech-lead に決めてほしいこと。仕様はここに書いた�
 - U-10（verifier、PRD の読み方）：AC-21 の状態の説明（PRD 11 の冒頭）は案内を「重ねて出す」と書くが、AC-21 の Then は「画面に案内がある」で足りるので、R-18 と AC-31 に合わせて重ねずに本文の一部として置いた（D-10）。テストは `[data-testid="home.addToHomeScreen"]` の存在で見る。
 - U-11（verifier、識別子の名前）：PRD が仮に置いた `task-answer` を、他のキーと同じドット区切りの `task.answer` にした。tech-lead r1 の確定案も `task.answer`。確定は contracts/。
 - U-12（Takuma、見た目）：radio のラベル全体を 44 px の高さにし、q2 の段階に 1 行の説明（`level.*.desc`）を付けた。説明は自己評価のぶれを減らすためだが、PRD の 3 問の文面は pdm と Takuma が最終的に決める。
-- U-14（tech-lead。design-reviewer G3 r1 の 8、指揮役の決定 2026-11-03）：後の S3 で `navigator.storage.persist()` を求め直すか。S8 の注意を今の状態で決めること（D-31）とは別の問い。designer の意見：求め直す。(1) Chrome は利用の度合い、インストール、ブックマークで判断し、断った要求は後で同じ基準で評価し直す（R-29）。毎日使う人ほど通りやすくなるので、守る価値の高いデータほど守れる。(2) Chrome と Safari では確認が出ないので、画面は変わらず P-2 に響かない。(3) 回数は 1 日 1 回まで：その日の最初の S3 を描いた直後、`persisted()` が false のときだけ呼ぶ。上限の記録に `device` の日付が 1 つ要る（例 `device.persistRequestedOn`）ので、契約 data.md の形に関わる。(4) 画面は変えない（知らせは出さない。通ったら S8 の注意が消えるだけ）。いちばん強い反論：Firefox は確認を出す（R-29）ので、対応ブラウザ外とはいえ毎日確認が出る人が生まれ、確認が出るブラウザを見分ける手段はない。代案：今のまま初回の 1 回だけにし、D-31 で注意だけを正しくする。決めるのは tech-lead（ADR）。
+- 決まったこと（U-14。2026-11-04 に閉じた。design-reviewer G3 r1 の 8 から出た問い）：後の S3 で `navigator.storage.persist()` を求め直すか。
+  - 決定：求め直さない。PRD 11 の冒頭のとおり、初めて今日の課題（`task.today`）を出した後に 1 回だけ呼ぶ（D-23）。S8 の注意 `settings.storage.notPersisted` は、S8 を開くたびに `navigator.storage.persisted()` で今の状態を読んで決める（D-31）。指揮役（Takuma から承認を委任）の決定 2026-11-04：docs/approvals/delegation.md。契約の形は contracts/data.md の 11（呼ぶ条件は、今日の課題を作る保存のときに `device.persistRequested` が true でないこと。印はその保存に含め、結果は保存しない）。
+  - 理由：PRD を変えずに済む。注意が出続ける問題（提案 8）は D-31 で解ける。Firefox のように確認を出すブラウザで毎日確認が出るおそれがない。
+  - 選ばなかった案（designer の意見：1 日 1 回まで求め直す）：その日の最初の S3 を描いた直後、`persisted()` が false のときだけ呼ぶ。Chrome は断った要求を利用の度合い、インストール、ブックマークで後に評価し直す（R-29）ので、毎日使う人ほど通りやすく、守る価値の高いデータほど守れる。画面は変えない（通ったら S8 の注意が消えるだけ）。退けた理由は、上限の記録に `device` の日付（例 `device.persistRequestedOn`）が要り契約の形が変わること、Firefox は確認を出す（R-29）ので毎日確認が出る人が生まれ、確認が出るブラウザを見分ける手段がないこと。見直す条件は contracts/data.md 11 の末尾（公開後に「データが消えた」の報告があり、そのブラウザで `persisted()` が false のとき）。
 - U-15（tech-lead。D-30 の周辺）：契約 data.md 4 の「操作のたびに今日を計算し直し…その操作はせず」は S1 と S2 にも及ぶ。初回の診断の途中（S2）で日付が変わると radio の確定が 1 回捨てられ、画面には何も出ない（探索 R3 の 6 で例外が出た場面）。履歴に移る課題がないので D-30 の知らせは出さない。捨てずに実行してよいか（保存データが「なし」「途中」のときは日付に依らない）は契約の側で決める。
 - 決まったこと（r4 で閉じた。Takuma の決定 D1〜D5、2026-10-30。docs/approvals/001-daily-learning-G0.md の末尾「G1 の途中で出た決定」。返事は「すべて推奨どおり」）：
   - U-1 → D1：主操作の色は青（color.action.primary = ライト #1D4ED8 / ダーク #8AB4F8。tokens.md の 1）。変更なし。
@@ -466,6 +469,7 @@ Takuma か tech-lead に決めてほしいこと。仕様はここに書いた�
   - `settings.stats.firstOpenDate`（「初めて開いた日」/「First opened」）の文言は変えない。契約 data.md 2 で値は「初回の診断の 1 問目を確定した日」になった（案内を閉じただけの日は数えない）が、(1) PRD 13 の指標と AC-24 の Given は「初めて開いた日」の語で書かれ、利用者が送る S9 のスクリーンショットをこの語で読む約束になっている。(2) 同じ語は `settings.stats.firstDayCompleted`（「初めて開いた日に完了したか」）と `settings.import.confirm.summary` にもあり、変えるなら 3 キーをそろえて PRD 13 の語も変えることになる。(3) D-1 の流れ（S1 → 診断）では、開いた日と 1 問目の日は同じ日で、違うのは案内を閉じて診断せずに去った人だけ。その人にとっても「使い始めた日」の意味で読める。英語「First opened」も同じ理由で残す。別の語（「始めた日」）がよければ Takuma の決定で 3 キーの文言だけを変える（キーと `data-stat-first-open-date` は変えない：ADR 0002）。
 
 ## 11. 変更の記録
+- 2026-11-04（r6 のまま。U-14 を閉じた）：指揮役の決定「persist() を求め直さない」（docs/approvals/delegation.md、contracts/data.md 11）に合わせ、1 の流れの persist の行、4 の D-31、7 の権限の文から「求め直すかは U-14」を消し、10 の U-14 を「決まったこと」にした（designer の 1 日 1 回の案は「選ばなかった案」として残す）。画面、文言、トークンは変えていない。
 ### G3 r5 → r6（design-reviewer G3 r1 の指摘 3、提案 8〜11 と、指摘 4〜6 の文の明確化。指揮役の決定 2026-11-03：docs/approvals/delegation.md）
 | 指摘 | 直した所 |
 |---|---|
