@@ -34,3 +34,4 @@
 - 2026-11-01 001-daily-learning 課題集 v1 の下書き 126 件（docs/prd/001-daily-learning/tasks.v1.json。スキーマ通過、external 7 件、gzip 約 30KB）。Takuma の全件確認待ち（tasks-review.md）。D8 も待ち
 - 2026-11-03 001-daily-learning Takuma が承認をこのプロジェクトで指揮役に委任。課題集 v1 を採用、T1〜T3 は推奨どおり。D8 は未だが実装（G2）を始める（docs/approvals/delegation.md）
 - 2026-11-03 001-daily-learning 実装をコミット（1398191）。AC20 のテストの直し（verifier、a7fc7e9）。npm test 終了コード 0（契約 41、単体 85/85、受け入れ 133/133）。CLAUDE.md と依存の決まり（tech-lead）。次は push、CI、reviewer（コード）
+- 2026-11-03 001-daily-learning G2（コード）reviewer r1 PASS（要修正：単体テスト 4 点）→ 直し 7660d5f → r2 PASS。契約の長さの文は tech-lead が直した（24dcd46、3add898）。CI は org-check と org-guard が緑。backend 用のワークフローと app.json の backend_test が空のため backend のテストは CI で動いていない（Takuma の D8 と .github 待ち）。手元の npm test 終了コード 0 を証拠に G3 へ進む（docs/reviews/001-daily-learning-G2-code-reviewer-r2.md）
