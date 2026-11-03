@@ -12,11 +12,18 @@ PRD 12（速さ、配布、対応ブラウザ）と AC-15、AC-17 を、作り�
 
 | 部分 | 上限（gzip 後のバイト） | 根拠 |
 |---|---|---|
-| 殻（HTML、CSS、すべての JS、sw.js） | 26,000 | spike の殻は約 15,800 バイト（60 KB の代わりの JS を含む） |
+| 殻（HTML、CSS、すべての JS、sw.js） | 32,000 | 2026-11-04 に 26,000 から上げた（下の「枠の見直し」）。内訳は JS（sw.js を含む）の上限 26,000 と、HTML と CSS の 6,000。G2 r3 の実装で 25,794（JS 22,135、CSS 2,794、HTML 865）。最初の根拠は spike の殻の約 15,800 バイト（60 KB の代わりの JS を含む） |
 | 文言（ja.json と en.json の 2 つ） | 8,000 | 約 6,600。fixtures/strings の 146 キーの見本を `JSON.stringify` で詰めて `zlib.gzipSync(level 9)` にすると 3,554 + 3,016 = 6,570（node v24.22.1）。同じものを Apple の gzip 487.40.2 の `gzip -9` にすると 3,516 + 3,047 = 6,563（2026-11-04。145 キーのときは 2026-10-30 に 6,470 と 6,440） |
-| ホーム画面のアイコン `icon-180.png` と `manifest.webmanifest`（Takuma の決定 D5。6） | 10,000 | 180 × 180 の 2 色の PNG 1 枚（design 8 の想定は 2 KB 前後）と、7 項目の JSON（約 200 バイト） |
+| ホーム画面のアイコン `icon-180.png` と `manifest.webmanifest`（Takuma の決定 D5。6） | 4,000 | 2026-11-04 に 10,000 から下げた（下の「枠の見直し」）。180 × 180 の 2 色の PNG 1 枚（design 8 の想定は 2 KB 前後。実物は生 2,107 バイト）と、7 項目の JSON（生 231 バイト）。G2 r3 の実装で 2 つの gzip 後の合計 2,173 |
 | 課題集 tasks.json | 106,000 | 252 件 × 平均 600 字の合成で 106,113（spike） |
 
+- 枠の見直し（2026-11-04、tech-lead。reviewer G2 r3 の提案と指揮役の決定。合計 150,000 は変えない）：
+  - 前の枠：殻 26,000、文言 8,000、アイコンと manifest 10,000、課題集 106,000（合計 150,000）。今の枠：殻 32,000、文言 8,000、アイコンと manifest 4,000、課題集 106,000（合計 150,000）。
+  - なぜ：殻の残りが 206 バイトで、次の文言や処理の追加で必ず枠を超える。殻の 26,000 は JS だけの見直しの線（ADR 0001 の見直す条件「JS の gzip 後の合計が 26,000 バイトを超える」）と同じ数で、HTML と CSS（いま 3,659）の分を見ていなかった。殻を「JS 26,000 ＋ HTML と CSS 6,000」にして、ADR 0001 の線と食い違わないようにした。
+  - どこから：アイコンと manifest の枠（実物 2,173 で 7,827 の余り）から 6,000 を移した。4,000 は実物の約 1.8 倍で、2 色の PNG の作り直し（design 8 の作り方）の揺れを見込む。
+  - 動かさなかった枠：課題集の 106,000 は 2 の「1 件の本文の平均 600 字以下」の 252 件版から決めた値（spike で 106,113）で、下げると 2 の上限（pdm の下書きの約束）も下げることになる。文言の 8,000 は 146 キーで 6,610 で、残りの 1,390 は新しい文言のために残す。
+  - 守ること：JS が 26,000 を超えたら、殻の枠の中でも ADR 0001 の見直す条件に当たる（ビルドの道具を足すかを決め直す）。殻の枠を超えそうになったら、先に文言の余りを移すかを tech-lead が決め、課題集の枠からは取らない。
+  - 合わせて直したもの：6 のアイコンの生の大きさの上限も 4,000 にした（gzip しても PNG はほとんど縮まないため、生の上限が枠より大きいと枠が意味を持たない）。design/001-daily-learning.md の D-29、8、10 の「10,000 バイト以下」は designer が直す（G2 r3 の後の報告）。
 - 初めての訪問では SW が同じファイルを `cache: 'reload'` でもう一度取るので、実際の通信は最大でこの 2 倍です。SW の登録は最初の画面を描いた後なので、AC-15 の 2 秒には入りません（service-worker.md の 1）。
 
 ## 2. 課題集の長さ（pdm が下書きを始める前に知らせる。指揮役の裁定 E5）
@@ -65,7 +72,7 @@ default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img
 
 ## 6. ホーム画面のアイコンと manifest（Takuma の決定 D5。design/001-daily-learning.md の 8 と D-29）
 - ファイル（元は `backend/public/`、配布物のルートに置く。backend-engineer が作る）：
-  - `./icon-180.png`：180 × 180 px の PNG 1 枚。ファイルの大きさ（生）も 10,000 バイト以下。色、字、書体、作り方は design の 8。
+  - `./icon-180.png`：180 × 180 px の PNG 1 枚。ファイルの大きさ（生）も 4,000 バイト以下（2026-11-04 に 10,000 から下げた。1 の「枠の見直し」）。色、字、書体、作り方は design の 8。
   - `./manifest.webmanifest`：配るときの `Content-Type` は `application/manifest+json`。テスト用のサーバーはこの値を返します（test-hooks.md の「実行の環境」）。GitHub Pages が返す値は未確認で、公開後に `curl -sI https://matsuura-tak.github.io/engineer/manifest.webmanifest` で確かめます（G4）。
   - どちらも service-worker.md の 3 の FILES に入れ、1 の表の「ホーム画面のアイコンと manifest」の枠に数えます。
 - manifest の中身は、次の 7 項目だけです（JSON。項目の順は問わない。これ以外の項目を置かない）：
@@ -95,6 +102,6 @@ default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img
   - `apple-mobile-web-app-capable` は Apple の Safari HTML Reference にある（https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariHTMLRef/Articles/MetaTags.html 、2026-10-30 確認）。`apple-mobile-web-app-title` は Apple の公式の文書で見つけていない（未確認）。効かなくても、iOS は `<title>` か manifest の `name` を使い、どれも同じ値なので結果は同じです。
 - CSP（3）との整合：manifest は `manifest-src 'self'`、アイコンは `img-src 'self'` で許されます。どちらも同じ origin の相対 URL なので、CSP の文字列は変えません。
 - 確かめ方：
-  - 単体テスト（backend-engineer。G2）：配布物の `manifest.webmanifest` を `JSON.parse` した値が上の JSON と深く等しい。`icon-180.png` の先頭 8 バイトが PNG の印、IHDR の幅と高さ（16〜23 バイト目）が 180 と 180、大きさが 10,000 バイト以下。`index.html` の `<head>` に上の 5 行がある。
+  - 単体テスト（backend-engineer。G2）：配布物の `manifest.webmanifest` を `JSON.parse` した値が上の JSON と深く等しい。`icon-180.png` の先頭 8 バイトが PNG の印、IHDR の幅と高さ（16〜23 バイト目）が 180 と 180、大きさが 4,000 バイト以下。`index.html` の `<head>` に上の 5 行がある。
   - 受け入れテスト（verifier）：テスト用のサーバーから `./manifest.webmanifest` と `./icon-180.png` が 200 と上の `Content-Type` で返り、一度読み込んだ後はオフラインでも Service Worker から返る（AC-12、AC-23 の範囲。どの AC の Then にもないので、足すかは verifier の判断）。
   - 実機（G4、Takuma）：iOS の Safari の「ホーム画面に追加」で、名前が「今日の一手」、アイコンが白地に「一」。

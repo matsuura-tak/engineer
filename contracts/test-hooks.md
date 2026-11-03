@@ -43,6 +43,7 @@ verifier G0 r3 の W-1〜W-16 を、名前と値まで決めたものです。�
 - スキーマ：contracts/schemas/tasks.schema.json。ajv（`ajv/dist/2020`、strict）で本番の tasks.json を検査する（AC-3、AC-29 の大半）。
 - スキーマの外なので、テストのコードで数えるもの：件数（v1 は 126 以上、足す版は 252 以上）、18 の組ごとの件数（7 以上 / 14 以上）、ID の重複 0（AC-4）、組ごとの external の割合 20% 以下（AC-29）、本文の平均 600 字以下と gzip 後 106,000 バイト以下（budgets.md の 2）。
 - budgets.md の 2 の予算のテストは、名前を `BUDGET2_` で始めます（例 `BUDGET2_本文の平均は600字以下`）。`AC<番号>_` の名前を付けず、G3 の AC の表に混ぜません。検証レポートでは AC の表とは別の「予算」の行に、合否と値を書きます。
+- design の「AC にない状態」（design/001-daily-learning.md の 2 の表の下と 10 の決定。例：D-30 の知らせ `task.dayChanged`、U-15）だけを確かめるテストは、名前を `DESIGN_<design の番号>_` で始めます（例 `DESIGN_D30_…`、`DESIGN_U15_…`）。`AC<番号>_` の名前を付けず、AC のループ（例：AC-27 の「6 つの画面」）にも足さず、G3 の AC の表に混ぜません。検証レポートでは AC の表とは別の「design の状態」の行に合否を書きます（`BUDGET2_` と同じ扱い。G2 tech-lead r3 の提案 4）。
 
 ## W-7 データの投入（seed）
 - 形：contracts/schemas/data.schema.json（保存の形と同じ）。見本：contracts/fixtures/seeds/ と contracts/fixtures/data/v1/。verifier は自分のフォルダに seed を置き、テストの中で ajv に通してから使う。
@@ -71,6 +72,8 @@ verifier G0 r3 の W-1〜W-16 を、名前と値まで決めたものです。�
   - S8 の注意 `settings.storage.notPersisted` は、S8 を描くたびに `persisted()` を読んで決まる。`persist()` だけを注入すると、エンジンの既定の `persisted()` の値で結果が変わる。
   - アプリは `persist()` を、保存データで初めて今日の課題を出した後の S3 で 1 回だけ呼ぶ（`device.persistRequested` が true なら呼ばない。求め直さない。data.md の 11）。初回の診断を終えた読み込みではちょうど 1 回。その後は 0 回（同じ日の再読み込みの `task.done`、日付を進めて翌日の課題が出た S3 も 0 回）。
   - 初回の診断を終える保存（3 問目の確定。setItem 1 回）に `device.persistRequested: true` が入る。`device.persistGranted` は書かれない。確かめるのは、上の回数、保存データの印、S8 の表示。
+  - 「保存データの印」の読み方：`page.evaluate(() => localStorage.getItem('kyounoitte:data'))` で文字列を読み、テスト側で `JSON.parse` して `device.persistRequested` と `device.persistGranted` を見るだけです。読むのは `getItem` 1 回で、`setItem` も `removeItem` もしません（AC-11 の注入の回数と、アプリの保存の回数を変えないため）。読んだ値は contracts/schemas/data.schema.json に ajv で通してよい（形の崩れも見つけられる）。書き出し（下）には `device` が入らないので、印はこの方法でだけ読みます。保存の形は公開の契約（data.schema.json）なので、アプリの中を覗くことには当たりません。
+  - S8 の待つ上限（data.md の 11。1,000 ms）を確かめるときは、addInitScript で `StorageManager.prototype.persisted` を、返らない約束（`() => new Promise(() => {})`）か、`setTimeout` で遅らせて `false` を返す約束にしてよい。W-3 の `setFixedTime` の下でもタイマーは動きます。確かめるのは、上限の後に S8 が注意なしで描かれること、待つ間の操作が優先されて遅れて S8 が描かれないこと、`pageerror` が 0 件であること。
   - 印のない「あり」の seed で開くと、その起動で今日の課題を出したとき（data.md の 4 の 6-4）に 1 回呼ぶ。回数を数えるテストは初回の診断から始めるか、seed に `device: { "persistRequested": true }` を入れる。
 - 書き出し：`page.waitForEvent('download')` で 1 件。中身は data.schema.json に通り、`device` を含まない。版の項目は `formatVersion`、今の値は 1。AC-25 のファイルは `formatVersion: 2` にする（fixtures/data/invalid-newer-version.json が見本）。
 - 読み込み：隠した input（`settings.import.file`、`home.standalone.importFile`）に `setInputFiles`。
