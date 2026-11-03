@@ -250,7 +250,7 @@ firstOpenDate 2026-02-30（P1） → true
   - D10 AC-8 の 8 通り目と 9 通り目：data.md の 5（seed の表、各行の `level` はその課題が出たときの段階）、fixtures/seeds/ に 2 件、test-hooks.md の W-7、ADR 0001 の単体テストの数。
 - 未確認の項目、確かめる方法、確かめる役：
   - backend/package.json、build.mjs、check-budget.mjs、単体テスト、受け入れテストのコマンドは、まだ動かしていない（backend/ がない）。G2 で backend-engineer と verifier が動かし、出力を出す。
-  - localStorage の 1 origin あたりの上限（約 5 MB と言われる）：公式の数字を見つけていない。見直す条件で監視する（ADR 0002）。
+  - localStorage の 1 origin あたりの上限：2026-11-03 に Playwright で測った（Chromium 5,242,865 字、WebKit で日本語を含むと 2,621,432 字。data.md の 10）。公式の数字、本物の Safari 17 の値、origin を共有する他のページが使う分は未確認。見直す条件で監視する（ADR 0002）。
   - どのブラウザ設定で localStorage が例外になるか（S0 error の変種 (2)）：G4 で Takuma が実機で 1 つ試す（Safari の「すべての Cookie をブロック」）。
   - LINE などのアプリ内ブラウザの UA と保存の行き先、iOS 実機のホーム画面の Web アプリでの書き出しと読み込み、persist() の 7 日の免除：G0 の承認で G4 に回した（未検証に数えない）。
   - meta の CSP で frame-ancestors が効かないことの各ブラウザの挙動：確かめていない。枠の中で始めない作りなので結果に影響しない。
@@ -312,3 +312,4 @@ PRD r7 と Takuma の Q11 の決定（A：AC-14 に 2 通り目を足す。2026-
 実装の後の地図と依存の整理（2026-11-03、tech-lead）。1 行に 1 つの変更。
 - contracts/dependencies.md に「推移的な依存」の節（扱いの決まり、確かめ方 3 つ、lockfile の 7 件の表）を足し、CLAUDE.md の段階を G2（実装）に、コマンドの「未確認」を backend/ で動かした結果に直した（受け入れテストは 133 本）。
 - contracts/data.md の 10：「365 行 × 2,000 字で 1,000,000 字以下」は答えが日本語か英数字のときだけ成り立つので、字の種類ごとの長さの表、Chromium と WebKit で測った localStorage の上限、上限を超えたときの動きに書き直した（backend-engineer の G2 の報告）。6 の「保存の大きさ」と 7 の D の行の 1,000,000 字も同じ前提で読む。ADR 0001 の「確かめたこと」に backend/ で確認した追記を足した（G2 reviewer r1 の提案）。
+- ADR 0002：U-6、検討した案の (a) と (b)、反論への答え、確かめたことの上限の数字を data.md の 10 に合わせ（答えが日本語か英数字のときの前提、測った上限）、見直す条件に「上限に届いたあとの扱いは v1 で手当てせず 002 以降」（指揮役の決定、docs/approvals/delegation.md）を足した。10 の未確認の localStorage の上限の行も測った値に直した。
