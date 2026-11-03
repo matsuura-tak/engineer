@@ -32,3 +32,4 @@
 - 2026-11-01 001-daily-learning G0 再承認 Takuma が PRD r7 を承認、Q11 は A。push と下書き PR は指揮役が実行（docs/approvals/001-daily-learning-G0.md）
 - 2026-11-01 001-daily-learning 実装前の準備が完了 PR #4（下書き）。契約 Q11、テスト 133 本（red）、design r5 をコミット。Takuma の D8（app.json の backend_test）待ちで、入り次第 backend-engineer の実装（G2）へ
 - 2026-11-01 001-daily-learning 課題集 v1 の下書き 126 件（docs/prd/001-daily-learning/tasks.v1.json。スキーマ通過、external 7 件、gzip 約 30KB）。Takuma の全件確認待ち（tasks-review.md）。D8 も待ち
+- 2026-11-03 001-daily-learning Takuma が承認をこのプロジェクトで指揮役に委任。課題集 v1 を採用、T1〜T3 は推奨どおり。D8 は未だが実装（G2）を始める（docs/approvals/delegation.md）
