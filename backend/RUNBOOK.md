@@ -46,10 +46,12 @@
 
 ## 7. アラートと外部サービス
 - アラート：なし（サーバーも計測もない。v1 はイベントを記録しない：PRD 15、D6）。
-- 外部サービス：GitHub Pages だけ。月額 0 円。GitHub Pages の上限（公開するサイトは 1 GB まで、帯域は月 100 GB の soft limit。https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits 、2026-11-03 に確認）に対し、配布物は gzip 後で約 63 KB（2026-11-03 の check-budget）。初回の読み込みだけなら月 100 GB は約 160 万回分。請求の設定はない（無料）。
+- 外部サービス：GitHub Pages だけ。月額 0 円。GitHub Pages の上限（公開するサイトは 1 GB まで、帯域は月 100 GB の soft limit。https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits 、2026-11-03 に確認）に対し、配布物は gzip 後で約 65 KB（2026-11-04 の check-budget で 64,770 バイト）。初回の読み込みだけなら月 100 GB は約 160 万回分。請求の設定はない（無料）。
 - 利用者からの報告で気づく症状と対処：
   | 症状 | まず見る所 | 対処 |
   |---|---|---|
   | 新しい版が届かない | 配った index.html の data-build-version、sw.js の VERSION | 版を上げて配り直す（4） |
   | 開くと error の画面 | 利用者が保存した壊れたデータのファイル | 5 の壊れたデータ |
   | 課題が出ない（task.exhausted） | その領域と段階の課題の数 | 課題集を足した版を配る（AC-28） |
+  | 「日付が変わったため、直前の操作は無効になりました」が出て、完了や評価が記録されていない | 仕様どおりか（画面を開いたまま日付が変わった後の最初の操作は実行しない。contracts/data.md の 4、design の D-30） | 不具合ではない。前の課題は履歴の「申告なし」の行にあり、書きかけの答えもそこに残る。サポートのページで説明する（pdm） |
+  | 設定に「このブラウザは保存の永続化を許可しませんでした」が出る | 設定を開くたびに `navigator.storage.persisted()` の今の値で決まる（保存した値は使わない。data.md の 11）。`persist()` は保存データごとに 1 回だけ求め、求め直さない | 利用者に「ファイルに書き出す」を勧める。Safari はホーム画面に追加すると通りやすい。データが消えた報告が続くなら、求め直す案を tech-lead と pdm に上げる（data.md の 11 の「見直す条件」） |

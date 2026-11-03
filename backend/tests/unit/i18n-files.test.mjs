@@ -15,7 +15,9 @@ test('配る文言 ja.json と en.json が strings.schema.json に通り、キ�
   assert.equal(strings(ja), true, JSON.stringify(strings.errors?.slice(0, 3)));
   assert.equal(strings(en), true, JSON.stringify(strings.errors?.slice(0, 3)));
   assert.deepEqual(Object.keys(ja).sort(), Object.keys(en).sort());
-  assert.equal(Object.keys(ja).length, 145);
+  assert.equal(Object.keys(ja).length, 146);
+  assert.equal(typeof ja['task.dayChanged'], 'string');
+  assert.equal(typeof en['task.dayChanged'], 'string');
 });
 
 test('pickLang：ja で始まれば ja、それ以外と空は en', () => {

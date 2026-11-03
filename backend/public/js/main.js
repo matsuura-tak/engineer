@@ -6,8 +6,9 @@ import { openStore, save, removeAll } from './store.js';
 import * as R from './rules.js';
 import { download, readImport } from './files.js';
 import { errorScreen, startScreen, questionScreen, importer } from './view-start.js';
-import { todayScreen, rateScreen, doneScreen, skippedScreen, exhaustedScreen } from './view-task.js';
+import { todayScreen, rateScreen, doneScreen, skippedScreen, exhaustedScreen, dayChangedNotice } from './view-task.js';
 import { settingsScreen, statsScreen, historyScreen, confirmDialog } from './view-settings.js';
+import { canRequestPersist, requestPersist, readNotPersisted } from './persist.js';
 
 const root = document.documentElement;
 const TASK_STATES = new Set(['task.today', 'task.done', 'task.skipped', 'task.exhausted']);
@@ -31,9 +32,12 @@ const app = {
   storage: null,
   data: null,
   day: '', // 画面を描いた日（端末の日付）
+  checkDay: false,
+  notice: null, // task.dayChanged
+  seq: 0, // render の回数
   draft: null, // やり直しの診断の下書き（メモリだけ。U-7）
   dialog: null,
-  answer: null, // S3 の答えの欄 { view, timer }
+  answer: null, // S3 の答えの欄 { view, timer, shown }
   loadMsWritten: false,
   swScheduled: false,
   persistAsked: false,
@@ -57,16 +61,36 @@ function isIosSafari() {
   return ios && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua);
 }
 
+// 操作の入口（data.md の 4、design の D-30）
 function act(fn) {
   return (ev) => {
     if (ev && typeof ev.preventDefault === 'function' && ev.type !== 'change') ev.preventDefault();
-    if (today() !== app.day) {
-      flushAnswer();
-      decide({ focus: true });
+    clearNotice();
+    if (app.checkDay && today() !== app.day) {
+      dayChanged();
       return;
     }
     fn(ev);
   };
+}
+
+function clearNotice() {
+  if (app.notice) app.notice.remove();
+  app.notice = null;
+}
+
+// data.md の 4「画面を開いたまま日付が変わったとき」
+function dayChanged() {
+  const a = app.answer;
+  let held = null;
+  if (a) {
+    clearTimeout(a.timer);
+    held = { value: a.view.value(), shown: a.shown };
+    app.answer = null;
+  }
+  app.draft = null;
+  closeDialog();
+  decide({ focus: true, held, dayChanged: true });
 }
 
 function commit(next, onOk, onFail) {
@@ -104,20 +128,27 @@ function closeDialog({ restoreFocus = false } = {}) {
   if (restoreFocus && d.returnFocus?.isConnected) d.returnFocus.focus();
 }
 
-function render(state, node, { navAs = navKind(), focus = null } = {}) {
+function render(state, node, { navAs = navKind(), focus = null, lead = null } = {}) {
+  app.seq += 1;
   closeDialog();
   if (state !== 'diagnosis.question') app.draft = null;
   flushAnswer();
   app.answer = null;
+  app.notice = lead;
   renderNav(navAs, state);
-  main.replaceChildren(node);
+  if (lead) main.replaceChildren(lead, node);
+  else main.replaceChildren(node);
   root.setAttribute('data-state', state);
   app.day = today();
+  app.checkDay = R.checksDay(state, app.data);
   if (!app.loadMsWritten && TASK_STATES.has(state)) {
     root.setAttribute('data-debug-load-ms', String(Math.round(performance.now())));
     app.loadMsWritten = true;
   }
-  if (focus) focus.focus();
+  if (lead) {
+    lead.focus({ preventScroll: true });
+    window.scrollTo(0, 0);
+  } else if (focus) focus.focus();
   scheduleServiceWorker();
 }
 
@@ -142,14 +173,26 @@ function route(opts = {}) {
   const kind = R.classify(app.data);
   if (kind === 'inProgress') return showQuestion(R.firstUnanswered(app.data.diagnosis), false, opts);
   if (kind === 'none') return showStart(opts);
-  const r = R.startOfDay(app.data, today(), app.tasks);
+  const r = R.planDay(app.data, today(), app.tasks, {
+    canPersist: canRequestPersist(navigator.storage),
+    shown: opts.held?.shown ?? null,
+    held: opts.held?.value ?? null,
+  });
   let saveFailed = false;
   if (r.changed) {
     app.data = r.data;
     saveFailed = !save(app.storage, r.data);
   }
   if (r.issued) track('Task Issued');
-  showDay(r.state, { ...opts, saveFailed });
+  showDay(r.state, { focus: opts.focus, saveFailed, dayChanged: opts.dayChanged === true });
+  if (r.askPersist) askPersist();
+}
+
+// data.md の 11
+function askPersist() {
+  if (app.persistAsked) return;
+  app.persistAsked = true;
+  requestPersist(navigator.storage, () => track('Storage Persist Answered'));
 }
 
 function retryStartupSave(view) {
@@ -232,13 +275,14 @@ function onAnswer(view, index, redo) {
       showQuestion(index + 1, true, { focus: true });
       return;
     }
-    const r = R.finishRedo(app.data, app.draft, day, app.tasks);
+    const r = R.markPersist(R.finishRedo(app.data, app.draft, day, app.tasks), canRequestPersist(navigator.storage));
     commit(
       r.data,
       () => {
         track('Diagnosis Completed');
         if (r.issued) track('Task Issued');
         showDay(r.state, { focus: true });
+        if (r.askPersist) askPersist();
       },
       (retry) => view.showStorageError(retry),
     );
@@ -255,13 +299,14 @@ function onAnswer(view, index, redo) {
     );
     return;
   }
-  const r = R.finishInitial(app.data, value, day, app.tasks);
+  const r = R.markPersist(R.finishInitial(app.data, value, day, app.tasks), canRequestPersist(navigator.storage));
   commit(
     r.data,
     () => {
       track('Diagnosis Completed');
       if (r.issued) track('Task Issued');
       showDay(r.state, { focus: true });
+      if (r.askPersist) askPersist();
     },
     (retry) => view.showStorageError(retry),
   );
@@ -295,10 +340,9 @@ function showToday(opts = {}) {
     },
     onReport: (report) => act(() => onReport(view, report)),
   });
-  render('task.today', view.node, { focus: opts.focus ? view.focus : null });
-  app.answer = { view, timer: 0 };
+  render('task.today', view.node, { focus: opts.focus ? view.focus : null, lead: opts.dayChanged ? dayChangedNotice(t) : null });
+  app.answer = { view, timer: 0, shown: { date: current.date, taskId: current.taskId } };
   if (opts.saveFailed) view.showError('startup', retryStartupSave(view));
-  maybePersist();
 }
 
 function saveAnswer() {
@@ -338,25 +382,6 @@ function onReport(view, report) {
   );
 }
 
-function maybePersist() {
-  if (app.persistAsked || app.data?.device?.persistRequested) return;
-  const sm = navigator.storage;
-  if (!sm || typeof sm.persist !== 'function') return;
-  app.persistAsked = true;
-  Promise.resolve()
-    .then(() => sm.persist())
-    .then(
-      (granted) => granted === true,
-      () => false,
-    )
-    .then((granted) => {
-      track('Storage Persist Answered');
-      if (R.classify(app.data) !== 'exists') return;
-      const next = R.withDevice(app.data, { persistRequested: true, persistGranted: granted });
-      if (save(app.storage, next)) app.data = next;
-    });
-}
-
 function showRate() {
   const view = rateScreen(t, {
     onRate: (helpful) =>
@@ -390,7 +415,7 @@ function showSkipped(opts = {}) {
 
 function showExhausted(opts = {}) {
   const view = exhaustedScreen(t, { onRedo: act(() => startRedo('exhausted')) });
-  render('task.exhausted', view.node, { focus: opts.focus ? view.focus : null });
+  render('task.exhausted', view.node, { focus: opts.focus ? view.focus : null, lead: opts.dayChanged ? dayChangedNotice(t) : null });
   if (opts.saveFailed) view.showError('startup', retryStartupSave(view));
 }
 
@@ -456,6 +481,7 @@ function openDeleteConfirm(returnFocus) {
     }
     track('Data Deleted');
     app.data = null;
+    app.persistAsked = false;
     showStart({ focus: true });
   });
   const d = confirmDialog(t, {
@@ -467,13 +493,26 @@ function openDeleteConfirm(returnFocus) {
   openDialog(d, returnFocus);
 }
 
+// data.md の 11、design の D-31
 function showSettings(opts = {}) {
+  if (R.classify(app.data) !== 'exists') {
+    drawSettings(false, opts);
+    return;
+  }
+  const seq = app.seq;
+  readNotPersisted(navigator.storage).then((notPersisted) => {
+    if (seq !== app.seq) return;
+    drawSettings(notPersisted, opts);
+  });
+}
+
+function drawSettings(notPersisted, opts) {
   const imp = makeImporter('settings.import', 'settings.import.file', R.classify(app.data) !== 'exists');
   const view = settingsScreen(t, {
     kind: R.classify(app.data),
     data: app.data,
     version: root.getAttribute('data-build-version') ?? '',
-    notPersisted: app.data?.device?.persistGranted === false,
+    notPersisted,
     homeScreen: isIosSafari() && !isStandalone(),
     importerParts: imp.nodes,
     onExport: act(() => {

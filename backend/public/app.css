@@ -141,6 +141,7 @@ main {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
+  margin-left: calc(-1 * var(--space-2));
   margin-right: calc(-1 * var(--space-2));
 }
 
@@ -271,6 +272,11 @@ code {
   text-underline-offset: 0.15em;
 }
 
+/* tokens 4「リンク」「開閉」：行の先頭は内側 space.2 を戻す */
+.screen p > .link:only-child {
+  margin-left: calc(-1 * var(--space-2));
+}
+
 .link:active {
   text-decoration-thickness: 2px;
 }
@@ -296,7 +302,11 @@ code {
   align-items: stretch;
 }
 
+/* tokens 4「ボタン」 */
 @media (max-width: 479.98px) {
+  .btn {
+    width: 100%;
+  }
   .actions > .btn,
   .actions .btn {
     flex: 1 1 100%;
@@ -412,6 +422,10 @@ code {
   margin-bottom: var(--space-2);
 }
 
+.day-changed {
+  margin: var(--space-5) 0 var(--space-4);
+}
+
 textarea {
   display: block;
   width: 100%;
@@ -425,6 +439,12 @@ textarea {
   font-size: 1rem;
   line-height: 1.6;
   resize: vertical;
+}
+
+/* tokens 4「入力欄」 */
+textarea.is-error {
+  border: var(--size-border-strong) solid var(--color-error);
+  padding: calc(var(--space-3) - (var(--size-border-strong) - var(--size-border)));
 }
 
 .status {
@@ -499,6 +519,7 @@ summary {
   display: inline-block;
   min-height: var(--size-target-min);
   padding: var(--space-3) var(--space-2);
+  margin-left: calc(-1 * var(--space-2));
   color: var(--color-action-primary);
   text-decoration: underline;
   cursor: pointer;
@@ -560,5 +581,8 @@ summary {
   .badge,
   textarea {
     border: var(--size-border) solid CanvasText;
+  }
+  textarea.is-error {
+    border-width: var(--size-border-strong);
   }
 }

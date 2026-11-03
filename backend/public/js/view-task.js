@@ -9,6 +9,14 @@ const REPORT_BUTTONS = [
   ['no_time', 'task.report.noTime'],
 ];
 
+// identifiers.md の 3
+export function dayChangedNotice(t) {
+  return h('p', { testid: 'task.dayChanged', cls: 'day-changed warning', attrs: { role: 'status', tabindex: '-1' }, text: t('task.dayChanged') });
+}
+
+const ANSWER_HELP_ID = 'task-answer-help';
+const ANSWER_ERROR_ID = 'task-answer-error';
+
 export function todayScreen(t, { task, current, onInput, onReport }) {
   const title = h('h1', { testid: 'task.today.title', attrs: { tabindex: '-1' } }, inline(task.title));
   const parts = [
@@ -38,8 +46,20 @@ export function todayScreen(t, { task, current, onInput, onReport }) {
   const errors = errorSlots(t, ['answer', 'report', 'startup']);
   const area = h('textarea', {
     testid: 'task.answer',
-    attrs: { id: 'task-answer', rows: 6, maxlength: ANSWER_MAX, 'aria-describedby': 'task-answer-help' },
+    attrs: { id: 'task-answer', rows: 6, maxlength: ANSWER_MAX, 'aria-describedby': ANSWER_HELP_ID },
   });
+  // tokens 4「入力欄」（aria-invalid は付けない）
+  const syncAnswerError = () => {
+    const msg = errors.el('answer').querySelector('[data-testid="error.storage.message"]');
+    if (msg) {
+      msg.id = ANSWER_ERROR_ID;
+      area.classList.add('is-error');
+      area.setAttribute('aria-describedby', `${ANSWER_HELP_ID} ${ANSWER_ERROR_ID}`);
+    } else {
+      area.classList.remove('is-error');
+      area.setAttribute('aria-describedby', ANSWER_HELP_ID);
+    }
+  };
   area.value = current.answer;
   const status = h('p', { cls: 'status small', attrs: { role: 'status' } });
   const limit = slot();
@@ -57,7 +77,7 @@ export function todayScreen(t, { task, current, onInput, onReport }) {
       'div',
       { cls: 'answer' },
       h('label', { testid: 'task.answer.label', cls: 'label', attrs: { for: 'task-answer' }, text: t('task.answer.label') }),
-      h('p', { testid: 'task.answer.help', cls: 'small secondary', attrs: { id: 'task-answer-help' }, text: t('task.answer.help') }),
+      h('p', { testid: 'task.answer.help', cls: 'small secondary', attrs: { id: ANSWER_HELP_ID }, text: t('task.answer.help') }),
       area,
       status,
       limit.el,
@@ -96,9 +116,11 @@ export function todayScreen(t, { task, current, onInput, onReport }) {
     },
     showError(where, onRetry) {
       errors.show(where, onRetry);
+      syncAnswerError();
     },
     clearErrors() {
       errors.clear();
+      syncAnswerError();
     },
   };
 }

@@ -16,6 +16,11 @@ export function classify(data) {
   return 'none';
 }
 
+// data.md の 4（U-15）
+export function checksDay(state, data) {
+  return state !== 'error' && classify(data) === 'exists';
+}
+
 export function firstUnanswered(diagnosis) {
   if (!diagnosis?.area) return 1;
   if (!diagnosis.level) return 2;
@@ -88,6 +93,29 @@ export function startOfDay(data, today, tasks) {
   if (next === data) next = clone(next);
   next.current = { date: today, taskId: task.id, area: task.area, level: task.level, mode: task.mode, answer: '' };
   return { state: 'task.today', data: next, changed: true, issued: true, row: null };
+}
+
+// data.md の 4 の 2
+export function carryAnswer(data, shown, held) {
+  if (!data?.current || !shown || typeof held !== 'string') return data;
+  const c = data.current;
+  if (c.date !== shown.date || c.taskId !== shown.taskId || c.answer === held) return data;
+  return setAnswer(data, held);
+}
+
+// data.md の 2、11
+export function markPersist(r, canPersist) {
+  if (!r.issued || !canPersist || r.data.device?.persistRequested === true) return { ...r, askPersist: false };
+  const device = { ...(r.data.device ?? {}), persistRequested: true };
+  return { ...r, data: { ...r.data, device }, changed: true, askPersist: true };
+}
+
+// data.md の 4 の 6
+export function planDay(data, today, tasks, { canPersist = false, shown = null, held = null } = {}) {
+  const base = carryAnswer(data, shown, held);
+  let r = startOfDay(base, today, tasks);
+  if (base !== data && !r.changed) r = { ...r, changed: true };
+  return markPersist(r, canPersist);
 }
 
 export function answerInitial(data, question, value, today) {
