@@ -39,7 +39,7 @@ package.json の scripts（この名前で作る。CLAUDE.md のコマンドが�
 - `check:contracts`：check-schemas.mjs は ajv を、スクリプトの場所でなく実行したフォルダ（`process.cwd()`）から探す。npm の scripts は backend/ で動くので、backend/package.json に ajv が入っていれば動く。入っていないと `Cannot find module 'ajv/dist/2020'` で落ちる（G2 reviewer r1 の提案 6 の答え。2026-10-31 にスクラッチパッドの backend/ の写しで、ajv だけを入れて `npm run check:contracts` → 見本 41 件、期待と違う結果 0 件、終了コード 0。外すと同じエラー）。
 - `test:acceptance` は受け入れテストのフォルダで依存とブラウザを入れてから動かす（ADR 0004）。`npm test` だけで、新しい手元でも 3 つが順に動く。
 - 層とモジュールの数の上限：JS のファイルは 15 個まで（modulepreload の数と、読む人の量を抑えるため）。class の継承、DI の仕組み、状態管理のライブラリは作らない。
-- 単体テストで確かめること（最低限）：手書きのデータの検査が contracts/fixtures/ のすべてで ajv と同じ合否、段階の規則の 9 通り（data.md の 5。AC-8）、日付の作り方（Asia/Tokyo 以外の TZ でも端末の日付）、差し込みの 10 キー、CSP の文字列が budgets.md と一致、`FILES` と出力のフォルダのファイルが一致、365 行の保存データが 1,000,000 字以下。
+- 単体テストで確かめること（最低限）：手書きのデータの検査が contracts/fixtures/ のすべてで ajv と同じ合否、段階の規則の 9 通り（data.md の 5。AC-8）、日付の作り方（Asia/Tokyo 以外の TZ でも端末の日付）、差し込みの 10 キー、CSP の文字列が budgets.md と一致、`FILES` と出力のフォルダのファイルが一致、365 行の保存データが 1,000,000 字以下（答えが日本語か英数字のとき。改行や制御文字では JSON の長さが増える。data.md の 10）。
 
 ## 検討した案
 | 案 | 良い点 | 悪い点 | 選ばなかった理由 |
@@ -69,6 +69,7 @@ package.json の scripts（この名前で作る。CLAUDE.md のコマンドが�
 - MDN の互換データ（@mdn/browser-compat-data 8.1.7、2026-10-30）：`html.elements.link.rel.modulepreload` は Safari 17、`html.elements.script.type.module` は Safari 10.1。
 - `node --test 'tests/unit/**/*.test.mjs'` は Node 24.22.1 で動いた（`ℹ tests 1`、`ℹ pass 1`）。`node --test tests/unit/` はフォルダを指すと `Cannot find module` で失敗したので、scripts は glob の形にした。
 - 未確認：backend/ はまだないので、本物の build.mjs と check-budget.mjs と package.json の scripts は動かしていない（G2 で backend-engineer が確かめる）。scripts の形（`check:contracts`、`test:unit`、`test:acceptance`、`test`）は、2026-10-31 にスクラッチパッドの backend/ の写しで `npm ci && npm test` を動かし、契約の検査と単体テスト（仮の 1 件）が通り、受け入れテストが 131 件とも「build.mjs が見つからない」で落ちる（実装前の赤）ところまで確かめた。
+- 2026-11-03 の追記：上の未確認は backend/ で確認した（`npm test` が終了コード 0。コマンドごとの結果は CLAUDE.md）。上の行は書いた時点の記録として残す。
 
 ## 確かめ（B）
 - [x] 案が2つ以上あり、どの案にも悪い点が書いてある
