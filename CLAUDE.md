@@ -7,24 +7,24 @@
 ## 概要
 - 何のアプリか：「今日の一手」。3 問の自己診断に答えると、毎日 15 分で終わる学習の課題が 1 つ出る、ブラウザだけで動く Web アプリ（サーバーなし、登録なし）。データはブラウザの中だけ。
 - 使う人：すでにコードを書いている実務 1〜5 年目のエンジニア（docs/prd/product.md）。
-- いまの段階：001-daily-learning は Takuma の FB 1 回目を受けた作り直し。G0 PASS（PRD r10、AC-1〜AC-40）、G1 の途中（design r8 に合わせて契約、ADR 0002 の改訂、設計メモを更新した。2026-11-05）。実装と受け入れテストはこれから r8 に追従する（下のコマンドの結果は 2026-11-03 の前の版のもの）。公開先は https://matsuura-tak.github.io/engineer/（GitHub Pages。2026-11-05 は未公開で 404。公開は 2026-11-30 の仮置き）。
+- いまの段階：001-daily-learning は Takuma の FB 1 回目を受けた作り直しで G2 PASS（PRD r10 の AC-1〜AC-40、design r8。G2 の判定はコードが reviewer r5、受け入れテストが tech-lead r5）。次は G3 の検証。下のコマンドの結果は 2026-11-05 に HEAD a7383da で tech-lead が動かしたもの。公開先は https://matsuura-tak.github.io/engineer/（GitHub Pages。2026-11-05 は未公開で 404。公開は 2026-11-30 の仮置き）。
 
 ## ビルド/テストのコマンド
 .claude/org/app.json の commands と同じものを書きます。CI は app.json の方を使います。
 コマンドを変えたら、app.json の更新を Takuma に頼みます（.claude/ は Takuma だけが直せます）。
 受け入れテストは、受け入れテストのフォルダの中の設定（backend/tests/acceptance/playwright.config.mjs）だけで動きます。
 - iOS のビルド、iOS のテスト：なし（iOS のアプリは作らない。stacks は backend だけ）
-- バックエンドのテスト（app.json の backend_test の案。Takuma の決定 D8 で Takuma が main で入れる。2026-11-03 の時点で app.json の backend_test はまだ空。2026-11-03 に backend/ で終了コード 0。実行の記録は docs/verification/001-daily-learning/evidence/npm-test-after-ac20-fix.log。下の個別のコマンドは tech-lead も同じ日に動かした）：
+- バックエンドのテスト（app.json の backend_test の案。Takuma の決定 D8 で Takuma が main で入れる。2026-11-05 の時点で app.json の backend_test はまだ空。2026-11-05 に backend/ で終了コード 0。ただし 1 回目は WebKit の 5 件が `context.close` の trace の ENOENT（test-results の中のファイルがない）で落ち、同じコードの 2 回目と 3 回目は全件合格。原因は未確認）：
   `cd backend && npm ci && npm test`
-  - `npm test` の中身（ADR 0001 の scripts）：契約の検査 → 単体テスト → 受け入れテスト（`test:acceptance` が受け入れテストのフォルダで npm ci とブラウザの入れ方までする）。結果（2026-11-03）：見本 41 件 OK（2026-11-05 の今は 52 件。下の契約の検査）、単体 85/85、受け入れ 133 passed
+  - `npm test` の中身（ADR 0001 の scripts）：契約の検査 → 単体テスト → 受け入れテスト（`test:acceptance` が受け入れテストのフォルダで npm ci とブラウザの入れ方までする）。結果（2026-11-05）：見本 52 件 OK、単体 158/158、受け入れ 219 passed
   - Linux の CI で WebKit の OS のライブラリ（`npx playwright install-deps`）が要るかは未確認（ADR 0004）
 - 受け入れテスト（依存は受け入れテストのフォルダの package.json だけ。ADR 0004）：
-  `cd backend/tests/acceptance && npm ci && npx playwright install chromium webkit && npx playwright test`（2026-11-03 に `--list` で `Total: 133 tests in 16 files`。全件合格は上のログ）
+  `cd backend/tests/acceptance && npm ci && npx playwright install chromium webkit && npx playwright test`（2026-11-05 に `--list` で `Total: 219 tests in 23 files`。AC-15 の Chromium の 5 回は 1136, 1087, 1087, 1081, 1080 ms）
 - 個別のコマンド（どれも backend/ で実行）：
   - 契約の検査：`npm run check:contracts`（= `node ../contracts/tools/check-schemas.mjs`。ajv は実行したフォルダから探すので backend/package.json に ajv が要る。2026-11-05 に backend/ で確認：見本 52 件、期待と違う結果 0 件、終了コード 0）
-  - 単体テスト：`node --test 'tests/unit/**/*.test.mjs'`（2026-11-03 に backend/ で確認：85 件中 85 件合格、終了コード 0。フォルダを渡す形 `tests/unit/` は終了コード 1）
-  - ビルド：`npm run build -- --version <YYYY-MM-DD.N>`（= `node scripts/build.mjs --out dist --version …`。2026-11-03 に `--out` を一時フォルダにして確認：19 ファイル、終了コード 0。`--version dev` は終了コード 1）
-  - 転送量の予算：`node scripts/check-budget.mjs dist`（2026-11-03 に確認：gzip 後の合計 62,960 / 150,000 バイト、終了コード 0）
+  - 単体テスト：`node --test 'tests/unit/**/*.test.mjs'`（2026-11-05 に backend/ で確認：158 件中 158 件合格、終了コード 0。フォルダを渡す形 `tests/unit/` は終了コード 1）
+  - ビルド：`npm run build -- --version <YYYY-MM-DD.N>`（= `node scripts/build.mjs --out dist --version …`。2026-11-05 に `--out` を一時フォルダにして確認：20 ファイル、終了コード 0。`--version dev` は終了コード 1）
+  - 転送量の予算：`node scripts/check-budget.mjs dist`（2026-11-05 に確認：gzip 後の合計 109,554 / 150,000 バイト、殻 30,023 / 32,000（JS 25,829。見直しの線 27,000 は ADR 0001）、終了コード 0）
 - 依存：backend/package.json の devDependencies は ajv 8.20.0 だけ。lockfile には ajv が持ち込む 4 件もある。推移的な依存の決まりと確かめ方は contracts/dependencies.md。入れるのは `npm ci` だけ。
 - Node は 24（.tool-versions）。
 

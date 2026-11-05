@@ -68,6 +68,7 @@ verifier G0 r3 の W-1〜W-16 を、名前と値まで決めたものです。�
   - 10、29、99 件：固定の見本は置かず、verifier が同じ形で作る。決まり：
     - 完了の行（`report: "done"`）を n 行。1 つの ID は 1 回だけ（data.md の 8）。
     - 目標の組（`backend`、`intermediate`）には未出を 1 件以上残す（開いたときに今日の課題を出すため）。目標の組からは 13 件まで使い、残りは他の組の ID を使う（99 件は 1 領域の 35 件を超えるので、3 領域以上にまたがる）。他の組の行を古い方に、目標の組の行を新しい方に置く。他の領域の行を入れるときは、その領域の `levels` に最後の行の段階を入れる（data.md の 8 は `levels[diagnosis.area]` だけを求めるが、アプリが書く形に寄せる）。
+    - 目標の領域の `levels` は目標の段階のまま（同じ領域の別の段階の行では書き換えない）。作った seed に data.md の 5 を当てて、次に出る ID が目標の組の最小の未出であることを確かめる（2026-11-05 に足した。G2 tech-lead r5 の提案）。
     - 日付は古い順で、同じ日に何行並べてもよい（data.md の 8）。どの行も `firstOpenDate` 以上。時刻は最後の行の翌日に固定する（最後の行の日に開くと 4 の 6-3 で `task.done` になる）。
     - ajv に通し、統計の `data-stat-completed` が n であることを完了の前に確かめる。
 - AC-36 の seed：fixtures/seeds/seed-ac36-three-issued.json（目標の組 `backend` / `intermediate` の 001〜003 の 3 行：完了、難しすぎ、`none`。最後の行は 2026-11-03）。時刻を 2026-11-04 に固定して開くと S3 で、`data-task-id` は `backend-intermediate-004`、`data-progress-index` は 4、`data-progress-total` は課題集のその組の件数（v1 は 14。data.md の 9）。

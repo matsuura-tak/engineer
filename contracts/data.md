@@ -24,7 +24,7 @@
 | 起動時に日付が変わった課題を移す、今日の課題を出す | `history` に足す、`current`。`current` を作るとき印がなければ `device.persistRequested: true`（11） | はい（まとめて 1 回） |
 | 「次の一手に進む」`task.next`（S5、S6） | 4 の「操作で出す」で選んだ課題を `current` に。印がなければ `device.persistRequested: true` も（11）。選べなければ保存しない（S7 を描くだけ。変える値がない） | はい |
 | 「次の段階に進む」`task.exhausted.advance`（S7 の levelDone） | `levels[a]` を 1 段上げ（`beginner` → `intermediate` → `advanced`）、4 の「操作で出す」で新しい組から選んだ課題を `current` に（印がなければ `device.persistRequested: true` も。11）。選べなければ上げた `levels[a]` だけを保存し、新しい段階の S7 を描く（中級なら levelDone、上級なら allDone。再読み込みの結果がぶれない：design の D-40） | はい（まとめて 1 回） |
-| 答えを書く欄の入力 | `current.answer`。最後の入力から 300 ms 後。`pagehide` と `visibilitychange`（hidden）のときはすぐ。前に保存した値と同じなら保存しない | はい |
+| 答えを書く欄の入力 | `current.answer`。最後の入力から 300 ms 後。`pagehide` と `visibilitychange`（hidden）のとき、S3 から画面を離れる操作（nav の `nav.history` と `nav.settings`、アプリ名 `app.name`）のときはすぐ。前に保存した値と同じなら保存しない。申告では別に保存せず、申告の 1 回に含める。画面を開いたまま日付が変わった後の操作では、上の 4 の判定のやり直しの 1 回に含める（2026-11-05 に画面を離れる操作を足した。実装は 2026-11-03 からこう動く：G2 reviewer r5 の提案） | はい |
 | 申告（4 種） | `current` を外し、`history` に行を足す。段階の規則で `levels` が変わればそれも | はい |
 | 「役に立ったか」に答える | その行の `helpful` | はい |
 | 読み込みで置き換える | ファイルの中身（`device` はこのブラウザの値を残す） | はい |
