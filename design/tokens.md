@@ -1,6 +1,6 @@
 # デザイントークン（今日の一手。ブラウザだけで動く Web アプリ）
 
-- 書いた役：designer　日付：2026-10-30　初版（001-daily-learning で導入）。r2：G1 r1 の design-reviewer の指摘 3、5、10、11 を反映（color.overlay、リンクの最小幅、ホバーと押した瞬間、定義リストの使い所、ファイルの読み込みの部品）。r3：G1 r2 の design-reviewer の提案 1 を反映（4「リンク」の列挙にヘッダーのアプリ名 `app.name` を足した）。r4：Takuma の決定 D1（主操作の色は青。値は変えない）と D5（ホーム画面のアイコンの色）を受けて、1 にアイコンの 1 行。r5（2026-11-03）：G3 r1 の design-reviewer の指摘 4〜6 と提案 9、11 を受けて、1 に案内の枠の例外と color.warning の使い所、4 にボタンの幅の規則が及ぶ範囲、リンクと summary の左端、入力欄のエラーの枠、「案内」と「開閉」の行。値は変えていない。r6（2026-11-05）：仕様 r7（FB-2、FB-3）に合わせ、2 の text.title の「使う所」に累計の値を足した。新しいトークンは足さず、値も変えていない
+- 書いた役：designer　日付：2026-10-30　初版（001-daily-learning で導入）。r2：G1 r1 の design-reviewer の指摘 3、5、10、11 を反映（color.overlay、リンクの最小幅、ホバーと押した瞬間、定義リストの使い所、ファイルの読み込みの部品）。r3：G1 r2 の design-reviewer の提案 1 を反映（4「リンク」の列挙にヘッダーのアプリ名 `app.name` を足した）。r4：Takuma の決定 D1（主操作の色は青。値は変えない）と D5（ホーム画面のアイコンの色）を受けて、1 にアイコンの 1 行。r5（2026-11-03）：G3 r1 の design-reviewer の指摘 4〜6 と提案 9、11 を受けて、1 に案内の枠の例外と color.warning の使い所、4 にボタンの幅の規則が及ぶ範囲、リンクと summary の左端、入力欄のエラーの枠、「案内」と「開閉」の行。値は変えていない。r6（2026-11-05）：仕様 r7（FB-2、FB-3）に合わせ、2 の text.title の「使う所」に累計の値を足した。新しいトークンは足さず、値も変えていない。r7（2026-11-05）：仕様 r8（Takuma の答え「控えめな演出を足す」。D-43）に合わせ、5 に動きのトークン 4 つ（motion.fade、motion.tick、motion.draw、motion.delay.tick）を足し、1 の color.success の使う所に完了の印と節目の文を足した。色と文字と余白の値は変えていない
 - 使い方：画面の仕様（design/<機能名>.md）と実装（CSS カスタムプロパティ）は、ここにある名前だけを使う。色の値を直接書かない。
 - 単位：CSS px。文字と余白は実装では rem（16 px = 1 rem）にして、ブラウザの文字サイズ設定と拡大に追従させる（調査 R-16、R-26）。
 - 根拠：design/001-daily-learning-research.md の R 番号と、原則 B-1〜B-6（.claude/skills/craft-designer/SKILL.md）。コントラスト比は WCAG 2.2 の式で計算した（計算スクリプトの出力は design/001-daily-learning.md の 9 に転記）。
@@ -19,7 +19,7 @@
 | color.action.onPrimary | 主操作のボタンの文字 | #FFFFFF | #0B1A33 | #FFFFFF | #000000 | `--color-action-on-primary` |
 | color.border | 副操作のボタン、入力欄、印、区切りの枠 | #6B6B6B | #8C8C8C | #000000 | #FFFFFF | `--color-border` |
 | color.focus | キーボードのフォーカスの枠 | #1D4ED8 | #8AB4F8 | #0B3B9E | #A8C7FA | `--color-focus` |
-| color.success | 成功の知らせの文字（「保存しました」） | #1B6E3A | #7FD39A | #0E4D28 | #A6E3B5 | `--color-success` |
+| color.success | 成功の知らせの文字（「保存しました」）。r7：S4 の完了の印の線と、節目（7 / 30 / 100）の祝いの文の文字（design/001-daily-learning.md の D-43、D-36） | #1B6E3A | #7FD39A | #0E4D28 | #A6E3B5 | `--color-success` |
 | color.warning | 注意の文字（永続化を断られた、ホーム画面の案内の見出し、答えの上限、日付が変わった知らせ） | #7A4A00 | #F2C35B | #5A3600 | #F7D98B | `--color-warning` |
 | color.error | エラーの文字と枠、取り消せない操作のボタンの文字 | #B42318 | #F28B82 | #8A1A12 | #F7B1AB | `--color-error` |
 | color.overlay | ダイアログの `::backdrop`（後ろの画面を暗くする。半透明はここだけ） | rgba(0,0,0,0.5) | rgba(0,0,0,0.5) | rgba(0,0,0,0.5) | rgba(0,0,0,0.5) | `--color-overlay` |
@@ -99,6 +99,18 @@
 | 無効（`disabled`） | 使わない。進めないときは無効にせず、エラーの文を出す（仕様の D-8） | — |
 | `forced-colors: active` | システム色に任せ、下線と枠だけ残す | 同左 |
 
-## 5. 動き
+## 5. 動き（motion.*）
 - 画面の切り替えに動きを付けない（状態の差し替えだけ）。
-- 唯一の動きは「保存しました」の知らせの不透明度（0→1、150 ms）と、`app.loading` の文の遅延表示（1 秒後に不透明度 0→1）。`prefers-reduced-motion: reduce` では時間を 0 にする（R-23）。
+- 動きは 3 つだけ：「保存しました」の知らせの不透明度（0→1、motion.fade）、`app.loading` の文の遅延表示（1 秒後に不透明度 0→1、motion.fade）、S4 を「完了」の直後に描いたときの完了の演出（design/001-daily-learning.md の D-43。1 秒未満で 1 回。印の線が描かれ、累計の数字が前の値から増える。節目では円が先に描かれる）。
+- `prefers-reduced-motion: reduce` では 4 つとも 0 ms にする（R-23、R-33、R-38）。完了の演出は動きなしで最終の状態だけ（印は完成した形、数字は最終の値、前の値の要素は作らない）。色は reduce でも同じ。
+- イージングは `ease-out` だけ（CSS のキーワード。独自の cubic-bezier は足さない：B-2）。拡大、回転、ぼかし、横方向の移動は使わない（R-40 の引き金）。
+- 実装は app.css のクラスと `@keyframes` だけで行う（CSP：`style` 属性とインラインのスタイルを使わない。contracts/budgets.md の 3）。
+
+| トークン | 値 | 使う所 | CSS |
+|---|---|---|---|
+| motion.fade | 150 ms | 「保存しました」と `app.loading` の不透明度（r6 までの `--motion`。名前を変えた） | `--motion-fade` |
+| motion.tick | 250 ms | S4 の累計の数字：`task.total.prev`（前の値）が上へ 0.3em 動いて消え、`task.total.value`（新しい値）が下から 0.3em 上がって現れる（D-43） | `--motion-tick` |
+| motion.draw | 400 ms | S4 の完了の印：`stroke-dashoffset` 1→0 で線が描かれる。節目では円（400 ms）の後にチェック（400 ms） | `--motion-draw` |
+| motion.delay.tick | 300 ms | S4 を描いてから数字が動き始めるまで。節目では motion.draw（円の分）を足して 700 ms | `--motion-delay-tick` |
+
+- 時間の表（0 は S4 を描いた時点）：通常＝チェック 0〜400 ms、数字 300〜550 ms。節目＝円 0〜400 ms、チェック 400〜800 ms、数字 700〜950 ms。どちらも 1 秒未満で、途中でもボタンは押せる（R-32）。
