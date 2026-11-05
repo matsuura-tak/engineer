@@ -147,7 +147,7 @@ export function startScreen(t, { standalone, guide, importerParts, onBegin, onGu
 }
 
 const QUESTIONS = {
-  1: { name: 'area', options: AREAS.map((v) => ({ value: v, key: `area.${v}` })) },
+  1: { name: 'area', options: AREAS.map((v) => ({ value: v, key: `area.${v}`, desc: `area.${v}.desc` })) },
   2: { name: 'level', options: LEVELS.map((v) => ({ value: v, key: `level.${v}`, desc: `level.${v}.desc` })) },
   3: { name: 'years', options: YEARS.map((v) => ({ value: v, key: `years.${v}` })) },
 };

@@ -313,6 +313,19 @@ export function milestoneOf(count) {
   return count === 7 || count === 30 || count === 100 ? String(count) : 'none';
 }
 
+// S4 / S5 の数。完了の行は今日の最後の行
+export function doneInfo(data, tasks, now) {
+  const count = completedCount(data);
+  const i = lastIndexOn(data.history, ymd(now));
+  return {
+    count,
+    milestone: milestoneOf(count),
+    progress: i < 0 ? null : progressOfRow(data.history, i, tasks),
+    week: daysCompletedWeek(data, now),
+    taskId: i < 0 ? null : data.history[i].taskId,
+  };
+}
+
 export function nextNote(data, tasks) {
   const { area, level } = targetOf(data);
   return { last: pickTask(data, tasks) === null, area, level };

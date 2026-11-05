@@ -31,7 +31,10 @@
 
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans JP", sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  --motion: 150ms;
+  --motion-fade: 150ms;
+  --motion-tick: 250ms;
+  --motion-draw: 400ms;
+  --motion-delay-tick: 300ms;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -81,7 +84,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   :root {
-    --motion: 0ms;
+    --motion-fade: 0ms;
+    --motion-tick: 0ms;
+    --motion-draw: 0ms;
+    --motion-delay-tick: 0ms;
   }
 }
 
@@ -454,7 +460,7 @@ textarea.is-error {
 
 .saved {
   color: var(--color-success);
-  animation: appear var(--motion) ease-out both;
+  animation: appear var(--motion-fade) ease-out both;
 }
 
 @keyframes appear {
@@ -463,6 +469,103 @@ textarea.is-error {
   }
   to {
     opacity: 1;
+  }
+}
+
+/* D-43、D-35、D-36：S4 の完了の印と累計。動きは no-preference のときだけ、クラスと @keyframes で付ける（CSP。tokens 5） */
+.mark {
+  width: 1em;
+  height: 1em;
+  margin-inline-end: var(--space-2);
+  vertical-align: -0.125em;
+  color: var(--color-success);
+  overflow: visible;
+}
+
+.mark path,
+.mark circle {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+
+.total-value,
+.total-prev {
+  display: inline-block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.total-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.total-prev {
+  position: absolute;
+  top: 0;
+  left: 0;
+  white-space: nowrap;
+  opacity: 0;
+}
+
+.cheer.is-milestone {
+  color: var(--color-success);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .mark.is-animated .mark-ring,
+  .mark.is-animated .mark-check {
+    animation: draw var(--motion-draw) ease-out both;
+  }
+  .mark.is-animated.is-milestone .mark-check {
+    animation-delay: var(--motion-draw);
+  }
+  .is-ticking .total-value {
+    animation: tick-in var(--motion-tick) ease-out var(--motion-delay-tick) both;
+  }
+  .is-ticking .total-prev {
+    animation: tick-out var(--motion-tick) ease-out var(--motion-delay-tick) both;
+  }
+  .is-ticking.is-milestone .total-value,
+  .is-ticking.is-milestone .total-prev {
+    animation-delay: calc(var(--motion-delay-tick) + var(--motion-draw));
+  }
+}
+
+@keyframes draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes tick-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.3em);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes tick-out {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-0.3em);
   }
 }
 
@@ -572,7 +675,7 @@ summary {
 .loading {
   margin-top: var(--space-6);
   opacity: 0;
-  animation: appear var(--motion) ease-out 1s both;
+  animation: appear var(--motion-fade) ease-out 1s both;
 }
 
 @media (forced-colors: active) {

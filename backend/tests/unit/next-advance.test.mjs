@@ -349,3 +349,22 @@ test('U-17：日付が変わった後に取り消した操作が task.next な�
   assert.equal(r.state, 'task.today');
   assert.equal(R.nthToday(r.data), 1);
 });
+
+test('S4 / S5 の数（doneInfo）：累計、節目、完了の行の n / N（none の行も数える）、今週（月曜から）の完了日数、完了した課題の ID', () => {
+  const [a, b, c, d] = idsOf('backend', 'intermediate');
+  // 2026-11-06 は金曜。月曜は 11-02。11-01（日）は前の週
+  const data = base('backend', 'intermediate', [
+    rowOf('2026-11-01', a, 'done'),
+    rowOf('2026-11-03', b, 'none'),
+    rowOf('2026-11-04', c, 'done'),
+    rowOf('2026-11-06', d, 'done'),
+  ]);
+  const info = R.doneInfo(data, TASKS, new Date(2026, 10, 6, 9, 0));
+  assert.deepEqual(info, { count: 3, milestone: 'none', progress: { index: 4, total: 14 }, week: 2, taskId: d });
+  const seven = base('backend', 'intermediate', Array.from({ length: 7 }, (_, i) => rowOf(`2026-10-${String(10 + i).padStart(2, '0')}`, idsOf('backend', 'intermediate')[i], 'done')));
+  const s = R.doneInfo(seven, TASKS, new Date(2026, 9, 16, 21, 0));
+  assert.equal(s.count, 7);
+  assert.equal(s.milestone, '7');
+  assert.deepEqual(s.progress, { index: 7, total: 14 });
+  assert.equal(R.doneInfo(seven, TASKS, new Date(2026, 9, 17)).progress, null, '今日の行がなければ n / N はない');
+});

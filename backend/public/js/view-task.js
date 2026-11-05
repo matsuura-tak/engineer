@@ -138,13 +138,76 @@ export function todayScreen(t, { task, current, nth = 1, progress, onInput, onRe
   };
 }
 
-export function rateScreen(t, { onRate, onClose }) {
-  const title = h('h1', { testid: 'task.rate.title', attrs: { tabindex: '-1' }, text: t('task.rate.title') });
+// D-43 の印（createElementNS。ADR 0005）
+const SVG_NS = 'http://www.w3.org/2000/svg';
+function svg(tag, attrs) {
+  const el = document.createElementNS(SVG_NS, tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, String(v));
+  return el;
+}
+
+export function rateMark(milestone, animate) {
+  const ring = milestone !== 'none';
+  const cls = ['mark', ring ? 'is-milestone' : null, animate ? 'is-animated' : null].filter(Boolean).join(' ');
+  const el = svg('svg', { 'data-testid': 'task.rate.mark', class: cls, viewBox: '0 0 24 24', 'aria-hidden': 'true', focusable: 'false' });
+  if (ring) el.append(svg('circle', { class: 'mark-ring', cx: 12, cy: 12, r: 10.5, pathLength: 1 }));
+  el.append(svg('path', { class: 'mark-check', d: 'M6 12.5l4 4L18 8', pathLength: 1 }));
+  return el;
+}
+
+// D-35、D-43。value は最初から最終の値。prev は value の兄弟
+export function totalLine(t, count, { animate = false, milestone = 'none' } = {}) {
+  const value = h('span', { testid: 'task.total.value', cls: 'total-value', attrs: { 'data-stat-completed': String(count) }, text: t('task.total.value', { count }) });
+  const wrap = h('span', { cls: 'total-wrap' }, value);
+  if (animate) {
+    wrap.className = milestone !== 'none' ? 'total-wrap is-ticking is-milestone' : 'total-wrap is-ticking';
+    const prev = h('span', { testid: 'task.total.prev', cls: 'total-prev', attrs: { 'aria-hidden': 'true' }, text: t('task.total.value', { count: count - 1 }) });
+    const drop = () => prev.remove();
+    prev.addEventListener('animationend', drop);
+    prev.addEventListener('animationcancel', drop);
+    wrap.append(prev);
+  }
+  return h('p', { testid: 'task.total', cls: 'total' }, h('span', { testid: 'task.total.label', cls: 'small secondary', text: t('task.total.label') }), ' ', wrap);
+}
+
+// D-44、D-36
+function doneFacts(t, { progress, milestone, count }) {
+  return [
+    progress
+      ? h('p', {
+          testid: 'task.progress.done',
+          cls: 'small secondary',
+          attrs: { 'data-progress-index': String(progress.index), 'data-progress-total': String(progress.total) },
+          text: t('task.progress.done', progress),
+        })
+      : null,
+    h('p', {
+      testid: 'task.cheer',
+      cls: milestone !== 'none' ? 'cheer is-milestone' : 'cheer',
+      attrs: { 'data-milestone': milestone },
+      text: milestone !== 'none' ? t(`task.cheer.at${milestone}`) : t('task.cheer.default', { count }),
+    }),
+  ];
+}
+
+function insightParts(t, insight) {
+  if (typeof insight !== 'string') return [];
+  return [h('h2', { testid: 'task.insight', text: t('task.insight') }), h('p', { testid: 'task.insight.text', text: insight })];
+}
+
+const reducedMotion = () => globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true;
+
+export function rateScreen(t, { count, milestone, progress, insight, onRate, onClose, reduce = reducedMotion() }) {
+  const animate = !reduce;
+  const title = h('h1', { testid: 'task.rate.title', attrs: { tabindex: '-1' } }, rateMark(milestone, animate), t('task.rate.title'));
   const errors = errorSlots(t, ['rate']);
   const node = h(
     'div',
     { cls: 'screen' },
     title,
+    totalLine(t, count, { animate, milestone }),
+    doneFacts(t, { progress, milestone, count }),
+    insightParts(t, insight),
     h('p', { testid: 'task.rate.question', text: t('task.rate.question') }),
     errors.el('rate'),
     h(
@@ -169,7 +232,8 @@ function nextParts(t, note, onNext, errors) {
   return [h('p', { testid: 'task.next.note', cls: 'small', text }), errors.el('next'), h('div', { cls: 'actions' }, button('task.next', t('task.next'), onNext))];
 }
 
-export function doneScreen(t, { title, note, onNext, onHistory }) {
+// D-45 の並び
+export function doneScreen(t, { title, count, milestone, progress, week, insight, note, onNext, onHistory }) {
   const h1 = h('h1', { testid: 'task.done.title', attrs: { tabindex: '-1' }, text: t('task.done.title') });
   const errors = errorSlots(t, ['next']);
   const node = h(
@@ -177,7 +241,11 @@ export function doneScreen(t, { title, note, onNext, onHistory }) {
     { cls: 'screen' },
     h1,
     title ? h('p', { testid: 'task.done.task', cls: 'small secondary', text: t('task.done.task', { title }) }) : null,
+    totalLine(t, count),
+    doneFacts(t, { progress, milestone, count }),
+    h('p', { testid: 'task.week', attrs: { 'data-stat-days-completed-week': String(week) }, text: t('task.week', { days: week }) }),
     nextParts(t, note, onNext, errors),
+    insightParts(t, insight),
     h('p', {}, link('task.done.history', t('task.done.history'), onHistory)),
   );
   return { node, focus: h1, showError: (where, onRetry) => errors.show(where, onRetry) };
@@ -200,7 +268,7 @@ export function skippedScreen(t, { notice, note, onNext, onHistory }) {
   return { node, focus: h1, showError: (where, onRetry) => errors.show(where, onRetry) };
 }
 
-export function exhaustedScreen(t, { info, onAdvance, onRedo }) {
+export function exhaustedScreen(t, { info, count, onAdvance, onRedo }) {
   const area = t(`area.${info.area}`);
   const level = t(`level.${info.level}`);
   const errors = errorSlots(t, ['startup', 'advance']);
@@ -208,13 +276,14 @@ export function exhaustedScreen(t, { info, onAdvance, onRedo }) {
   let h1;
   if (info.variant === 'allDone') {
     h1 = h('h1', { testid: 'task.exhausted.allDone', attrs: { tabindex: '-1' }, text: t('task.exhausted.allDone', { area }) });
-    parts.push(h1, h('p', { testid: 'task.exhausted.allDone.detail', text: t('task.exhausted.allDone.detail', { total: info.total }) }), errors.el('startup'));
+    parts.push(h1, totalLine(t, count), h('p', { testid: 'task.exhausted.allDone.detail', text: t('task.exhausted.allDone.detail', { total: info.total }) }), errors.el('startup'));
     parts.push(h('div', { cls: 'actions' }, button('task.exhausted.redo', t('task.exhausted.redo'), onRedo, 'primary')));
   } else {
     const nextLevel = t(`level.${info.nextLevel}`);
     h1 = h('h1', { testid: 'task.exhausted.levelDone', attrs: { tabindex: '-1' }, text: t('task.exhausted.levelDone', { area, level }) });
     parts.push(
       h1,
+      totalLine(t, count),
       h('p', { testid: 'task.exhausted.levelDone.detail', text: t('task.exhausted.levelDone.detail', { total: info.total }) }),
       h('p', { testid: 'task.exhausted.next', text: t('task.exhausted.next', { nextLevel, desc: t(`level.${info.nextLevel}.desc`) }) }),
       info.note ? h('p', { testid: `task.exhausted.${info.note}`, cls: 'small', text: t(`task.exhausted.${info.note}`, { nextLevel }) }) : null,

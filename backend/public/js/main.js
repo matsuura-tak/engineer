@@ -384,8 +384,16 @@ function onReport(view, report) {
   );
 }
 
+// S4 / S5（data.md の 5：ID がない行は解説なし）
+function doneView() {
+  const info = R.doneInfo(app.data, app.tasks, new Date());
+  const task = info.taskId ? app.byId.get(info.taskId) : null;
+  return { ...info, insight: task?.insight ?? null, title: info.taskId ? task?.title ?? info.taskId : '' };
+}
+
 function showRate() {
   const view = rateScreen(t, {
+    ...doneView(),
     onRate: (helpful) =>
       act(() =>
         commit(
@@ -403,10 +411,8 @@ function showRate() {
 }
 
 function showDone(opts = {}) {
-  const row = R.rowOn(app.data.history, today());
-  const title = row ? app.byId.get(row.taskId)?.title ?? row.taskId : '';
   const view = doneScreen(t, {
-    title,
+    ...doneView(),
     note: R.nextNote(app.data, app.tasks),
     onNext: act(() => onNext(view), 'task.next'),
     onHistory: act(() => showHistory({ focus: true })),
@@ -427,6 +433,7 @@ function showSkipped(opts = {}) {
 function showExhausted(opts = {}) {
   const view = exhaustedScreen(t, {
     info: R.exhaustedInfo(app.data, app.tasks),
+    count: R.completedCount(app.data),
     onAdvance: act(() => onAdvance(view), 'task.exhausted.advance'),
     onRedo: act(() => startRedo('exhausted')),
   });

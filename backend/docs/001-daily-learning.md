@@ -27,8 +27,9 @@ contracts/openapi.yaml はない（API がない）。代わりに、AC ごと�
 | AC-31、AC-32 | 操作 0 回で今日の課題、書きかけの答え | js/main.js（route、showToday、saveAnswer、flushAnswer）、js/rules.js（setAnswer、startOfDay） | ac31-ac32-zero-ops-answer | rules（日付が変わると…答えも残る） |
 | AC-33 | 同じ日の 2 件目以降（`task.next`）、起動の 6-2 を 6-3 より先、その日の何件目 | js/rules.js（nextTask、startOfDay、nthToday、markPersist）、js/main.js（onNext、issueByAction、showToday）、js/view-task.js（todayScreen の `data-task-nth-today` と `task.today.label.nth`、doneScreen / skippedScreen の task.next） | ac33-next | next-advance（起動 2 本、task.next 3 本、issued） |
 | AC-14（r8） | やり直しの行き先：今日の current があればそのまま、なければ新しい組からその日のうちに | js/rules.js（finishRedo）、js/main.js（onAnswer の redo） | ac14-ac16-redo-delete | next-advance（やり直し 2 本） |
-| AC-35〜AC-37、design D-44 | 累計、節目、進み具合 n / N、今週、組の最後 | js/rules.js（completedCount、milestoneOf、progressOfCurrent、progressOfRow、daysCompletedWeek、nextNote）、js/view-task.js（todayScreen の `data-progress-*` と `task.progress`、nextParts の `task.next.note` / `.last`）。S4 / S5 の累計・祝い・今週・`task.progress.done`・`task.insight` の DOM は後半 | ac35-ac37-done-screen、design-d40-d44-next-note | next-advance（AC-35、AC-36、AC-37、組の最後） |
-| AC-39、AC-40 | 診断 r8（経験年数 `never`） | js/validate.js（YEARS の先頭に never）、js/view-start.js（questionScreen の 3 問目の選択肢は YEARS から作る） | ac39-ac40-diagnosis-r8 | rules（診断：…AC-40）、validate |
+| AC-35〜AC-38（画面）、design D-34〜D-36、D-38、D-44、D-45 | 累計、節目の祝い、進み具合 n / N（S3 と終えた後）、今週、ひとこと解説、組の最後、S4 / S5 の並び、S7 の累計 | js/rules.js（completedCount、milestoneOf、progressOfCurrent、progressOfRow、daysCompletedWeek、nextNote、doneInfo）、js/view-task.js（todayScreen の `data-progress-*` と `task.progress`、totalLine、doneFacts、insightParts、rateScreen、doneScreen、exhaustedScreen の累計、nextParts の `task.next.note` / `.last`）、js/main.js（doneView、showRate、showDone、showExhausted） | ac35-ac37-done-screen、design-d40-d44-next-note | next-advance（AC-35、AC-36、AC-37、組の最後、doneInfo）、view-task（S4 / S5 / S7 の並び、節目の文） |
+| design D-43（AC の外） | 完了の控えめな演出：印（inline SVG）と累計の数字。reduce では動きなし・prev なし | js/view-task.js（rateMark、totalLine の prev と animationend、rateScreen の matchMedia）、app.css（`.mark`、`.total-wrap`、`.is-ticking`、`@keyframes draw / tick-in / tick-out`、motion の 4 トークン） | ac35-ac37-done-screen（DESIGN_D43_ 2 本 × 2） | view-task（印の形、prev の兄弟と animationend、reduce） |
+| AC-39、AC-40、design D-41 | 診断 r8（1 問目のヒント文 `area.*.desc`、2 問目の `level.*.desc` と legend の {area}、経験年数 `never`）、S1 の lead | js/validate.js（YEARS の先頭に never）、js/view-start.js（questionScreen の QUESTIONS：1 問目と 2 問目の desc を label の中に。3 問目の選択肢は YEARS から作る）、文言 `diagnosis.start.lead.1` | ac39-ac40-diagnosis-r8 | rules（診断：…AC-40）、validate、view-task（D-41） |
 | design D-30、U-15、U-17（AC の外） | 画面を開いたまま日付が変わった後の最初の操作：操作をせず読み直して判定、`task.dayChanged`。取り消した操作が `task.next` なら知らせを出さない（U-17）。「なし」「途中」の画面と S0 error は日付を確かめない | js/main.js（act の op、clearNotice、dayChanged、route の showsDayChanged、render の lead と checkDay）、js/rules.js（checksDay、carryAnswer、planDay、showsDayChanged）、js/view-task.js（dayChangedNotice） | design-d30-day-changed、ac17-ac18-ac27-a11y（AC27_task.today.dayChanged） | day-persist（日付の変わり目…、U-15…、carryAnswer…） |
 | design-reviewer G3 r1 の 4〜6 | 行の先頭のリンクと summary の左端、480 px 未満のボタンの幅、答えの保存のエラーの枠 | public/app.css（`.site-header nav`、`.screen p > .link:only-child`、`summary`、`.btn` の幅、`textarea.is-error`）、js/view-task.js（todayScreen の syncAnswerError） | ac17-ac18-ac27-a11y（押せること、切れないこと） | —（8 の Playwright の実測） |
 
@@ -231,6 +232,47 @@ docs/reviews/001-daily-learning-G2-code-reviewer-r1.md の要修正（契約と 
   - 後半（画面）の分で落ちたもの：AC35 × 8、DESIGN_D43 × 4、AC37 × 2、AC38_task.todayでは… × 2（S4 / S5 の累計、祝い、今週、insight、演出）、AC39 × 4（S2 の `area.*.desc`）、DESIGN_D44 × 2（`task.next.note.last` までは通り、S5 の `task.progress.done` がない）。
   - AC18 × 2：`Tab を 40 回押しても data-testid="years.lt1" にフォーカスが来ない`。3 問目の先頭が `years.never` になった（design の 7 の 383 行目「3 問目の先頭」）ので、radio の組に Tab で入ると先頭の `years.never` に止まり、`years.lt1` へは矢印キーで移る。実装は design どおりで、テストの前提（`years.lt1` が先頭）が古い。受け入れテストは verifier の範囲なので直していない（9 の 9）。
 
+### 実装・後半（画面と演出。2026-11-05、macOS、node v24.22.1、Playwright 1.64.1）
+入力：design/001-daily-learning.md（r9）の D-34〜D-36、D-38、D-41、D-43〜D-45、5、5.1、6、6.1、design/tokens.md の 5、contracts/identifiers.md の 3 と 4、test-hooks.md「完了の演出の確かめ方」、budgets.md の 1、3、5、data.md の 5 と 9。
+
+指示書の 1〜9 と状態：
+| 項目 | 状態 | 実装 |
+|---|---|---|
+| 1. S4 / S5 | 済み | view-task.js：`rateMark`（inline SVG。createElementNS、`aria-hidden`、`focusable=false`、`viewBox 0 0 24 24`、`pathLength=1` のチェック、節目は円が先）、`totalLine`（`task.total` の `<p>` に `task.total.label` と包みの `<span class="total-wrap">`。中に `task.total.value`（`data-stat-completed`、最初から最終の値、aria-live なし）と兄弟の `task.total.prev`（aria-hidden、count − 1））、`doneFacts`（`task.progress.done` の data-progress-*、`task.cheer` の data-milestone と at7 / at30 / at100 / default）、`insightParts`（h2 + `<p>` に textContent。課題集に ID がなければ置かない：data.md の 5）。並び：S4 は D-34、S5 は D-45（解説は `task.next` の後ろ）。main.js の `doneView` が rules.js の `doneInfo`（累計、節目、今日の最後の行の n / N、今週、課題 ID）を S4 と S5 に渡す |
+| 2. 演出 | 済み | app.css：motion の 4 トークン（`--motion-fade` 150、`--motion-tick` 250、`--motion-draw` 400、`--motion-delay-tick` 300。reduce ではすべて 0ms。前の `--motion` は `--motion-fade` に名前を変えた：tokens 5）。`@media (prefers-reduced-motion: no-preference)` の中だけで `.mark.is-animated` の `@keyframes draw`（dashoffset 1 → 0）、節目はチェックに `animation-delay: var(--motion-draw)`、`.is-ticking` の `tick-in` / `tick-out`（不透明度と translateY 0.3em、ease-out、fill both、遅延 300 ms、節目は calc(300 + 400)）。JS のタイマーなし。`rateScreen` は `matchMedia('(prefers-reduced-motion: reduce)').matches` のときクラスを付けず prev を作らない。prev は `animationend`（と `animationcancel`）で外す。S5、S6、S7 は `totalLine(t, count)`（動きなし） |
+| 3. S6 | 前半で済み（今回は変えていない） | `task.skipped.levelChanged` / `levelHint`、`task.next.note`（`.last`）。DESIGN_D44_ の S6 の 1 本が通る |
+| 4. S7 | 前半で済み + 累計 | exhaustedScreen の両方の変種で h1 の直後に `task.total`（D-35、D-40）。main.js の showExhausted が `completedCount` を渡す |
+| 5. S2 / S1 | 済み | view-start.js の QUESTIONS の 1 問目に `area.*.desc`（label の中の `.choice-text`）。2 問目の `level.*.desc` と legend の {area}、3 問目の never、S1 の lead.1 は前半で済み |
+| 6. S3 | 前半で済み | `task.progress`、`task.today.label.nth`、`data-task-nth-today`。AC36、AC33 が通る |
+| 7. S9 | 前半で済み | `daysCompletedWeek`、`extraCompleted` の 2 行。AC24、AC37 が通る |
+| 8. 予算 | 済み | 下の表。JS のファイルは 12 + sw.js の 13 個のまま（分けていない。sw.js の FILES と modulepreload は変えていない） |
+| 9. 単体テスト、このノート | 済み | tests/unit/fake-dom.mjs（依存なしの小さな DOM。createElement / createElementNS / テキスト / 属性 / classList / append / remove / イベント）、tests/unit/view-task.test.mjs（9 本）、next-advance.test.mjs に doneInfo の 1 本 |
+
+演出の実測（スクラッチパッドの motion/measure.mjs。受け入れテストのフォルダの playwright を読むだけ。幅 390、seed-ac35-six-completed.json（累計 6 → 7）と、そこから完了の行を 1 つ除いたもの（5 → 6）、2026-11-07 に固定。S4 に着いた時点を 0 として requestAnimationFrame で読んだ）：
+| 場合 | Chromium | WebKit |
+|---|---|---|
+| 通常（6 件）、no-preference | getAnimations 3 件。value の不透明度 0 → 352 ms で 0.10 → 512 ms で 0.89 → 655 ms で 1、prev は 655 ms で DOM になし。チェックの dashoffset 1px → 512 ms で 0px。最後の endTime 550 | 同じ形（356 ms で 0.29、500 ms で 0.91、661 ms で prev なし）。endTime 550 |
+| 節目（7 件）、no-preference | 4 件。円は 361 ms で 0.012px、チェックは 507 ms で 0.62px、value は 666 ms まで 0、761 ms で 0.40、1001 ms で 1 と prev なし。endTime 950 | 同じ形（758 ms で 0.36、1014 ms で prev なし）。endTime 950 |
+| reduce（両方の場合） | getAnimations 0、prev なし、value 1、チェックと円の dashoffset 0px | 同じ |
+| 共通 | フォーカスは `task.rate.title`、印の箱 24 × 24、色 rgb(27, 110, 58)（color.success）、`pathLength.baseVal` 1、pageerror 0 | 同じ |
+- 見た目：スクラッチパッドの shots/webkit-milestone(7).png（1 秒後）。h1 の先頭に緑の円とチェック、「これまでに完了した課題 7 件」、「この段階の 7 / 14 件目でした」、緑の節目の文、ひとこと解説、問い、ボタンの順。
+
+実行したコマンドと出力：
+- `cd backend && npm run check:contracts` → `見本 52 件、期待と違う結果 0 件`、終了コード 0。
+- `cd backend && node --test 'tests/unit/**/*.test.mjs'` → `tests 155 / pass 155 / fail 0`、終了コード 0（前半の 145 + view-task 9 + doneInfo 1）。
+- `node scripts/build.mjs --out <スクラッチパッド>/dist --version 2026-11-05.4` → `20 ファイル`。`node scripts/check-budget.mjs <スクラッチパッド>/dist` → `OK`、終了コード 0：
+
+| 部分 | gzip 後 / 枠 |
+|---|---|
+| 殻（HTML、CSS、JS、sw.js） | 30,001 / 32,000（JS は sw.js を含めて 25,806。ADR 0001 の 26,000 の線まで 194。CSS 3,329、HTML 866） |
+| 文言 | 8,045 / 9,000 |
+| アイコンと manifest | 2,173 / 4,000 |
+| 課題集 | 69,313 / 105,000 |
+| 合計 | 109,532 / 150,000 |
+- 一度は JS が 26,036 になった（線を 36 超えた）ので、今回足したコメントを短くして 25,806 にした。処理は削っていない。
+- `cd backend/tests/acceptance && npx playwright test --reporter=line` → `Running 219 tests`、`217 passed / 2 failed (1.2m)`、終了コード 1。落ちたのは AC18 × 2（chromium、webkit）だけで、理由は前半と同じ（`Tab を 40 回押しても data-testid="years.lt1" にフォーカスが来ない`。3 問目の先頭が `years.never` になったため。テストの前提が古い：9 の 9）。前半の時間切れ 9 件は今回は出なかった。後半の 22 件（AC35 × 8、DESIGN_D43 × 4、AC37 × 2、AC38_task.today… × 2、AC39 × 4、DESIGN_D44 × 2）はすべて通った。
+- grep（backend/public の js、sw.js、index.html）：`innerHTML|outerHTML|insertAdjacentHTML|document\.write|eval\(|new Function|setHTMLUnsafe|toISOString|import\(` 0 件。`style=|<style|\son[a-z]+=`（index.html、js、sw.js、app.css）0 件。view-task.js の `.style.|cssText|setAttribute('style'|setAttribute('on|setTimeout|setInterval|requestAnimationFrame` 0 件。`location.(search|hash)|URLSearchParams|__test|__acceptance|window.__|globalThis.__|testHook|webdriver|playwright|[?&](reset|now|seed)=` 0 件。`localStorage` は main.js:157 と store.js:1 のコメントだけ。CSP の meta 1 つ。budgets.md 5 の「使わない」機能 0 件（CSS の入れ子なし）。新しく使った API は `document.createElementNS`、SVG の `pathLength`、CSS の `@keyframes` / `animation` / `stroke-dashoffset` / `transform: translateY`、`animationend` / `animationcancel`、`matchMedia`（budgets.md 5 の表のとおり）。
+
 ## 9. 未確認のこと
 1. （解決済み。verifier が a7fc7e9 で、閉じる前にファイルを複製する形に直し、受け入れは 133 passed）AC20 の受け入れテストの不具合：tests/ac19-ac20-ac25-export-import.spec.mjs の 57 行目で `context.close()` を呼んでから、67 行目で書き出したファイル `exported.file`（`download.path()` の一時ファイル）を読み込ませている。Playwright はダウンロードを作ったコンテキストを閉じるとそのファイルを消すので、ENOENT で落ちる。Playwright 1.64.1 で確認した（閉じる前は存在、閉じた後は存在しない）。テストの写しを作業用フォルダに作り、閉じる前にファイルを別の場所へ複製する 1 行だけを足して流すと、Chromium と WebKit の 2 本とも通った（実装は AC20 を満たす）。受け入れテストは verifier の範囲なので直していない。
 2. Linux の CI で WebKit の OS のライブラリが要るか（ADR 0004）：macOS でだけ動かした。
@@ -243,6 +285,10 @@ docs/reviews/001-daily-learning-G2-code-reviewer-r1.md の要修正（契約と 
 9. （2026-11-05）AC18 の受け入れテスト（ac17-ac18-ac27-a11y.spec.mjs の 156 行目 `activate('years.lt1', 'Space', …)`）は Tab だけで `years.lt1` に届く前提。3 問目の先頭が `years.never` になったので届かない。直すのは verifier（`years.never` を選ぶか、矢印キーで移る）。
 10. （2026-11-05）ADR 0002 の「公開の時点で課題 ID の一覧を固定する単体テスト」は公開の時点で置く（今は置いていない）。
 11. （2026-11-05）U-17（取り消した操作が `task.next` なら `task.dayChanged` を出さない。advance では出す）は、単体テスト（next-advance の U-17：showsDayChanged）だけで確かめている。受け入れテストのフォルダと test-plan に U-17 を名指しするテストはない（`grep -rnE "U-?17"` で 0 件）。design-d30 の 12 本は通った。画面で確かめるテストを足すかは verifier の判断。
+
+12. （2026-11-05、後半）完了の演出は Playwright の Chromium 156 と WebKit 27.2 でだけ確かめた。Safari 17 の実機での `pathLength` と dashoffset の見た目は G4 で Takuma が見る（budgets.md の 5。効かなければ実長の代わりを tech-lead に上げる。RUNBOOK の 7）。
+13. （2026-11-05、後半）JS の gzip 後の合計は 25,806 で、ADR 0001 の見直しの線 26,000 まで 194 バイト。次に処理を足すと線を超える見込みが高い。超えたときにビルドの道具（まとめる、コメントを落とす）を足すかは tech-lead の判断（budgets.md の 1「守ること」）。
+14. （2026-11-05、後半）S4 の `task.cheer` と S5 の `task.week` の文字の大きさは text.body（design に別の指定がないため）。S5 の幅 390 の初期表示にボタンが入るか（D-45 の約 446 px の見積もり）は G3 のスクリーンショットで確かめる（今回は測っていない）。
 
 ## チェックリスト（craft-backend-engineer の 6）
 - [x] 対応表の行の数が、技術設計メモの 4 の表の operation の数と同じ。→ API の operation は 0。代わりに AC-1〜AC-40 を 1 の表に並べた（2026-11-05 に AC-33〜AC-40 を足した）。
@@ -257,3 +303,4 @@ docs/reviews/001-daily-learning-G2-code-reviewer-r1.md の要修正（契約と 
 - 2026-11-04 の直しでも上の印は変わらない（API、DB、外部サービス、環境変数は増えていない）。
 - 2026-11-04（2 回目、G2 r3 の要修正と契約 f40c61a）の直しでも上の印は変わらない。
 - 2026-11-05（実装・前半）の直しでも上の印は変わらない（API、DB、外部サービス、環境変数は増えていない）。対応表は AC-1〜AC-40 と design の D-30、D-31、D-40、D-44、U-15、U-17 を並べた。
+- 2026-11-05（実装・後半）の直しでも上の印は変わらない（API、DB、外部サービス、環境変数は増えていない）。対応表に design の D-34〜D-36、D-38、D-41、D-43、D-45 を足した。
