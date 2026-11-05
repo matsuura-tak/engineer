@@ -102,7 +102,7 @@
 ## 5. 動き（motion.*）
 - 画面の切り替えに動きを付けない（状態の差し替えだけ）。
 - 動きは 3 つだけ：「保存しました」の知らせの不透明度（0→1、motion.fade）、`app.loading` の文の遅延表示（1 秒後に不透明度 0→1、motion.fade）、S4 を「完了」の直後に描いたときの完了の演出（design/001-daily-learning.md の D-43。1 秒未満で 1 回。印の線が描かれ、累計の数字が前の値から増える。節目では円が先に描かれる）。
-- `prefers-reduced-motion: reduce` では 4 つとも 0 ms にする（R-23、R-33、R-38）。完了の演出は動きなしで最終の状態だけ（印は完成した形、数字は最終の値、前の値の要素は作らない）。色は reduce でも同じ。
+- `prefers-reduced-motion: reduce` では motion.* のトークン 4 つ（motion.fade、motion.draw、motion.tick、motion.delay.tick。上の「動きは 3 つ」は動く場面の数で、完了の演出が draw、tick、delay.tick の 3 つを使う）をすべて 0 ms にする（R-23、R-33、R-38。design-reviewer G1 r4 の提案 4、2026-11-05）。完了の演出は動きなしで最終の状態だけ（印は完成した形、数字は最終の値、前の値の要素は作らない）。色は reduce でも同じ。
 - イージングは `ease-out` だけ（CSS のキーワード。独自の cubic-bezier は足さない：B-2）。拡大、回転、ぼかし、横方向の移動は使わない（R-40 の引き金）。
 - 実装は app.css のクラスと `@keyframes` だけで行う（CSP：`style` 属性とインラインのスタイルを使わない。contracts/budgets.md の 3）。
 

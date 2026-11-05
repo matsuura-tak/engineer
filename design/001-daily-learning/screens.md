@@ -1,7 +1,7 @@
 # 画面の図（文字）001-daily-learning
 
 design/001-daily-learning.md の補助。幅 320 CSS px（AC-17 の条件）での並びを文字で描く。
-`[ ]` は副操作のボタン（枠）、`[[ ]]` は主操作のボタン（塗り）、`<u>…</u>` はリンク（下線）。縦の線 `|` は本文の列の左右の線（space.4 の余白の内側）。`┌ ┐ └ ┘` は 1 px の枠（案内とダイアログ、入力欄）。色は付けない。r6（2026-11-03）：S1 の案内を枠で描き、S3 に「日付が変わった後」の図を足し、S8 と S10 の注記を直した（design-reviewer G3 r1 の 3、4、8、11）。r7（2026-11-05。仕様 r7、FB-1〜FB-3）：S2 に 1 問目（ヒント文）の図を足し、S3 に進み具合の行、S4 と S5 を累計・祝い・解説・今週・次の一手の並びに描き直し、S6 と S7（2 変種）の図を足し、S9 を 11 行にした。r8（2026-11-05。仕様 r8）：S1 の lead.1 と S8 の `settings.redo.note` を仕様 7 の r7 の文に直した（design-reviewer G1 r3 の要修正 3）。S2 の 2 問目の legend に「この領域で」。S4 に完了の印と `task.progress.done`、祝いの既定の文を `{count}` の形に。S5 を「解説をボタンの後ろ」の並びに描き直し（D-45）、`task.next.note.last` の注記。S6 に段階が変わった変種、S7 に `task.exhausted.nextDone` と再読み込みの注記。
+`[ ]` は副操作のボタン（枠）、`[[ ]]` は主操作のボタン（塗り）、`<u>…</u>` はリンク（下線）。縦の線 `|` は本文の列の左右の線（space.4 の余白の内側）。`┌ ┐ └ ┘` は 1 px の枠（案内とダイアログ、入力欄）。色は付けない。r6（2026-11-03）：S1 の案内を枠で描き、S3 に「日付が変わった後」の図を足し、S8 と S10 の注記を直した（design-reviewer G3 r1 の 3、4、8、11）。r7（2026-11-05。仕様 r7、FB-1〜FB-3）：S2 に 1 問目（ヒント文）の図を足し、S3 に進み具合の行、S4 と S5 を累計・祝い・解説・今週・次の一手の並びに描き直し、S6 と S7（2 変種）の図を足し、S9 を 11 行にした。r8（2026-11-05。仕様 r8）：S1 の lead.1 と S8 の `settings.redo.note` を仕様 7 の r7 の文に直した（design-reviewer G1 r3 の要修正 3）。S2 の 2 問目の legend に「この領域で」。S4 に完了の印と `task.progress.done`、祝いの既定の文を `{count}` の形に。S5 を「解説をボタンの後ろ」の並びに描き直し（D-45）、`task.next.note.last` の注記。S6 に段階が変わった変種、S7 に `task.exhausted.nextDone` と再読み込みの注記。r9（2026-11-05。仕様 r9）：S4 の印と文字の間（space.2）、累計の value と prev の包み（D-43、提案 2）。S5 と S6 の `task.next.note.last` を次に出す組について言う文に（D-44 (2)、design-reviewer G1 r4 の要修正 1）。S6 に levelChanged と note.last が重なる注記。
 
 ## S1 diagnosis.start（iOS の Safari、非スタンドアロン、閉じた印なし）
 ```
@@ -146,8 +146,8 @@ design/001-daily-learning.md の補助。幅 320 CSS px（AC-17 の条件）で�
 ```
 | 今日の一手                 履歴  設定 |
 |                                        |
-| ✓ 完了しました                         |   h1（フォーカスを移す）。先頭の ✓ は inline SVG task.rate.mark（1em、線は color.success、aria-hidden）。描いた直後に線が 400 ms で描かれる。節目（7 / 30 / 100）では ✓ を囲む円が先に 400 ms で描かれる（D-43）
-| これまでに完了した課題  7 件           |   p task.total：span task.total.label（text.small、secondary）+ span task.total.value（text.title、color.text。data-stat-completed=7。最初から最終の値）。描いた直後は同じ位置に aria-hidden の span task.total.prev「6 件」が重なり、300 ms の時点で prev が上へ消え、value が下から上がる（250 ms）。入らなければ値が 2 行目に落ちる
+| ✓ 完了しました                         |   h1（フォーカスを移す）。先頭の ✓ は inline SVG task.rate.mark（1em、線は color.success、aria-hidden。✓ と文字の間は space.2）。描いた直後に線が 400 ms で描かれる。節目（7 / 30 / 100）では ✓ を囲む円が先に 400 ms で描かれる（D-43）
+| これまでに完了した課題  7 件           |   p task.total：span task.total.label（text.small、secondary）+ span task.total.value（text.title、color.text。data-stat-completed=7。最初から最終の値）。描いた直後は同じ位置に aria-hidden の span task.total.prev「6 件」が重なり（value と prev は position: relative の inline-block の包みの中。prev は value の子にしない）、300 ms の時点で prev が上へ消え、value が下から上がる（250 ms）。入らなければ値が 2 行目に落ちる（prev は包みの中で value を追う）
 | この段階の 4 / 14 件目でした           |   p task.progress.done（text.small、secondary。data-progress-index=4、-total=14。r8。D-44）
 | 7 件目を終えました。最初の節目です。    |   p task.cheer（text.body。data-milestone=7。文言は task.cheer.at7。節目のときだけ color.success。節目以外は task.cheer.default「11 件目を終えました。」で color.text。cheer 自体は動かない）
 |                                        |
@@ -173,7 +173,7 @@ design/001-daily-learning.md の補助。幅 320 CSS px（AC-17 の条件）で�
 |                                        |
 | 今週（月曜から）の完了日数：3 日        |   task.week（text.body。data-stat-days-completed-week=3。曜日の並びもドットも出さない）
 |                                        |
-| 明日も課題が 1 件出ます。続けるなら、次 |   task.next.note（text.body。組の最後の 1 件の後は task.next.note.last「この段階の課題はこれで最後です。次に進むと、修了の案内が出ます。」：D-44）
+| 明日も課題が 1 件出ます。続けるなら、次 |   task.next.note（text.body。次に出す組を出し終えているとき（押すと S7）は task.next.note.last「バックエンド設計の初級の課題は、すべて出し終えています。次に進むと、修了の案内が出ます。」（{area} は今の領域、{level} は次に出す組の段階）：D-44 (2)。r9）
 | の一手に進めます。                      |
 | [ 次の一手に進む ]                     |   task.next（副操作の形：枠。塗りにしない。列いっぱい、44 px 以上。押すと同期で S3（組の最後なら S7）、フォーカスは次の画面の h1）
 |                                        |
@@ -181,7 +181,7 @@ design/001-daily-learning.md の補助。幅 320 CSS px（AC-17 の条件）で�
 | …課題集の insight…                     |   task.insight.text
 | <u>履歴を見る</u>                      |   task.done.history（上下に space.3）
 ```
-再読み込みしても同じ画面（今日の最後の行が done）。何件目でも同じ並び。確認も催促もない。幅 390 ではボタンの上端が約 430 px で初期表示に入る見込み（幅 320 では約 455 px で入らないことがある。仕様 8）。
+再読み込みしても同じ画面（今日の最後の行が done）。何件目でも同じ並び。確認も催促もない。幅 390 ではボタンの上端が約 446 px で初期表示に入る見込み（幅 320 では約 472 px で、表示域の目安 460 px を超えて入らない。仕様 8。r9 で 430 / 455 から直した）。
 
 ## S6 task.skipped（r7：次の一手を足した。解説、累計、祝いは出さない）
 ```
@@ -191,12 +191,12 @@ design/001-daily-learning.md の補助。幅 320 CSS px（AC-17 の条件）で�
 | 同じ申告が 2 回続くと、次に出す課題から |   task.skipped.levelHint（too_hard / too_easy で、段階がまだ変わらないとき。no_time では出ない）
 | 段階が変わります。                      |
 |                                        |
-| 明日も課題が 1 件出ます。続けるなら、次 |   task.next.note（組の最後の 1 件の後は task.next.note.last：D-44）
+| 明日も課題が 1 件出ます。続けるなら、次 |   task.next.note（次に出す組を出し終えているとき（押すと S7）は task.next.note.last「{area}の{level}の課題は、すべて出し終えています。…」。{level} は次に出す組の段階：D-44 (2)。r9）
 | の一手に進めます。                      |
 | [ 次の一手に進む ]                     |   task.next
 | <u>履歴を見る</u>                      |   task.skipped.history
 ```
-段階が変わったとき（同じ申告の 2 回目。AC-8。r8。D-44）：`task.skipped.levelHint` の代わりに `task.skipped.levelChanged`「同じ申告が 2 回続いたので、次に出す課題から段階が初級になります。」（{level} は変わった先の段階名）。他は同じ。
+段階が変わったとき（同じ申告の 2 回目。AC-8。r8。D-44）：`task.skipped.levelHint` の代わりに `task.skipped.levelChanged`「同じ申告が 2 回続いたので、次に出す課題から段階が初級になります。」（{level} は変わった先の段階名）。他は同じ。変わった先の組をすでに出し終えているとき（初級を修了して中級に進み、「難しすぎ」2 回で初級に戻った。仕様 5.1 の #54）は、この文の次の行に task.next.note.last「バックエンド設計の初級の課題は、すべて出し終えています。次に進むと、修了の案内が出ます。」が並ぶ。note.last は次に出す組について言うので、levelChanged の後でも事実と合う（r9。design-reviewer G1 r4 の要修正 1）。
 
 ## S7 task.exhausted（levelDone：初級を出し終えた。r7。D-40）
 ```
