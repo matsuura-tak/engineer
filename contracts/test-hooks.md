@@ -111,6 +111,7 @@ verifier G0 r3 の W-1〜W-16 を、名前と値まで決めたものです。�
   - `Network.enable` の後 `Network.emulateNetworkConditions`：`{ offline: false, latency: 150, downloadThroughput: 200000, uploadThroughput: 93750 }`（下り 1.6 Mbps＝200,000 バイト/秒、上り 750 kbps）。
   - `Emulation.setCPUThrottlingRate`：`{ rate: 4 }`。
 - 1 回ごとに新しいコンテキスト（キャッシュなし）に seed を入れ、制限をかけてから `goto`。`data-state="task.today"` を待って `data-debug-load-ms` を読む。5 回とも 2,000 以下。
+- AC-15 は他のテストと並列にしない（AC-15 だけを workers 1 で別に流す）。他の worker の負荷が混ざると、測りたいアプリの速さが測れないため（2026-11-05 の指揮役の決定、docs/approvals/delegation.md）。期待値 2,000 ms、5 回、1 回ごとに新しいコンテキスト、は上のとおりで変えない。
 - serviceWorkers は既定（allow）のまま。初めての訪問では SW はまだ動いておらず、登録は画面を描いた後（service-worker.md の 1）。
 - 監査の道具 @axe-core/playwright（AC-27）は contracts/dependencies.md にある。
 
@@ -208,7 +209,7 @@ G2 tech-lead r2 の要修正への決定です。今の `expect(...).toHaveAttri
 - reduce のとき：「完了」を押して `data-state` が `task.rate`（S4）になった直後に、`page.evaluate(() => document.getAnimations().length)` が 0、`[data-testid="task.total.prev"]` の件数が 0。`task.rate.mark` はある（形は完成したもの）。
 - reduce でないとき：S4 に着いた直後は `document.getAnimations().length` が 1 以上（印の線。CSS の animation-fill-mode が forwards か both なら、終わった後も getAnimations に残る：下の spike）。件数の上限は決めない（作りで変わるため）。
 - `task.total.value` のテキストは、reduce の有無によらず、S4 に着いた直後に読んだ値が最終の値（新しい累計の文言。`data-stat-completed` も同じ値）。途中の値は `task.total.prev`（`aria-hidden`）にだけある。
-- スクリーンショット（5.1 の S4 の行）：reduce でない設定で、`data-state` が `task.rate` になってから 1 秒（`page.waitForTimeout(1000)`）待って撮る。演出は通常 550 ms、節目 950 ms で止まる（design/tokens.md の 5）。撮る直前に `task.total.prev` の件数が 0（`animationend` で外れた）ことを確かめる。`page.screenshot` は既定（`animations: 'allow'`）のまま撮る。`expect(page).toHaveScreenshot` は既定が `'disabled'`（終わりまで早送りする）なので、使うなら `animations: 'allow'` を渡す（backend/tests/acceptance/node_modules の playwright の型定義で確認。https://playwright.dev/docs/api/class-page#page-screenshot ）。
+- スクリーンショット（5.1 の S4 の行）：reduce でない設定で、`data-state` が `task.rate` になってから 1 秒（`page.waitForTimeout(1000)`）待ち、さらに `[data-testid="task.total.prev"]` が DOM から消える（件数が 0 になる。`animationend` で外れる）まで待って撮る。演出は通常 550 ms、節目 950 ms で止まる（design/tokens.md の 5）。1 秒は節目の 950 ms に対して余裕が 50 ms しかないので、消えるまで待つことで撮影の時点を演出の終わりの後にそろえる（2026-11-05 の指揮役の決定）。`page.screenshot` は既定（`animations: 'allow'`）のまま撮る。`expect(page).toHaveScreenshot` は既定が `'disabled'`（終わりまで早送りする）なので、使うなら `animations: 'allow'` を渡す（backend/tests/acceptance/node_modules の playwright の型定義で確認。https://playwright.dev/docs/api/class-page#page-screenshot ）。
 - W-3 の setFixedTime の下でも、CSS のアニメーションは実際の時間で進む（固定されるのは `Date`。ページの `performance.now()` は W-3 の置き換えでも差は進む）。
 - spike（tech-lead、2026-11-05。リポジトリの外。Playwright の Chromium 156.0.8078.4 と WebKit 27.2。D-43 と同じ SVG（`pathLength="1"` のチェックと円、`stroke-dasharray: 1`、`@keyframes` で `stroke-dashoffset` 1 → 0、400 ms、fill both、`@media (prefers-reduced-motion: no-preference)` の中だけでアニメーションを付ける））：
   - 両方で `path.pathLength.baseVal` が 1、始めの `stroke-dashoffset` が 1px、600 ms 後に 0px、アニメーションは 2 件で `finished`（currentTime 400）のまま残る。
