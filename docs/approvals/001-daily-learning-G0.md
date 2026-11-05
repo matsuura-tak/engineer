@@ -76,3 +76,10 @@ D6、D9、D10 は PRD を変えるので、pdm が反映した後に PRD の再�
   - Q11（AC-14 に 2 通り目を足すか）：「A 足す (Recommended)」
   - push と下書き PR：「私が push して下書き PR を作る (Recommended)」（指揮役が実行する）
 - 読み取り：PRD r7 を G0 の承認済みとする。Q11 は A（AC-14 の 2 通り目はそのまま残す。契約 W-7 とテストに 1 本足す）。
+
+## r10 の再承認（2026-11-05、委任による指揮役の承認）
+- 対象：docs/prd/001-daily-learning.md r10、docs/prd/product.md r5（コミット 70089a7 時点）。Takuma の FB 1 回目（docs/approvals/001-daily-learning-FB1.md）を反映した改訂
+- 判定：docs/reviews/001-daily-learning-G0-verifier-r4.md（PASS、要修正 4 件は r9 で直した）、docs/reviews/001-daily-learning-G0-tech-lead-r3.md（FAIL）→ docs/reviews/001-daily-learning-G0-tech-lead-r4.md（PASS、要修正 2 件は r10 で直した）
+- 承認者：指揮役（Takuma の委任：「僕の承認はあなたに権限を本PJでは移譲します」。docs/approvals/delegation.md）
+- 決定：Q12 A、Q13 A、Q15〜Q19 A（delegation.md の 2026-11-05 の行）。Q14 は Takuma の返事待ちで、返事がないまま判定日になれば B
+- 要点：AC は 32 → 40。初級は未経験の人向け（84 件を新しく書く）、同じ日に「次の一手に進む」で続けられる（上限なし）、ひとこと解説・減らない累計と節目・修了と進級・今週の完了日。連続記録は入れない。14 の撤退基準は変えていない
