@@ -1,7 +1,7 @@
 # 画面の図（文字）001-daily-learning
 
 design/001-daily-learning.md の補助。幅 320 CSS px（AC-17 の条件）での並びを文字で描く。
-`[ ]` は副操作のボタン（枠）、`[[ ]]` は主操作のボタン（塗り）、`<u>…</u>` はリンク（下線）。縦の線 `|` は本文の列の左右の線（space.4 の余白の内側）。`┌ ┐ └ ┘` は 1 px の枠（案内とダイアログ、入力欄）。色は付けない。r6（2026-11-03）：S1 の案内を枠で描き、S3 に「日付が変わった後」の図を足し、S8 と S10 の注記を直した（design-reviewer G3 r1 の 3、4、8、11）。r7（2026-11-05。仕様 r7、FB-1〜FB-3）：S2 に 1 問目（ヒント文）の図を足し、S3 に進み具合の行、S4 と S5 を累計・祝い・解説・今週・次の一手の並びに描き直し、S6 と S7（2 変種）の図を足し、S9 を 11 行にした。r8（2026-11-05。仕様 r8）：S1 の lead.1 と S8 の `settings.redo.note` を仕様 7 の r7 の文に直した（design-reviewer G1 r3 の要修正 3）。S2 の 2 問目の legend に「この領域で」。S4 に完了の印と `task.progress.done`、祝いの既定の文を `{count}` の形に。S5 を「解説をボタンの後ろ」の並びに描き直し（D-45）、`task.next.note.last` の注記。S6 に段階が変わった変種、S7 に `task.exhausted.nextDone` と再読み込みの注記。r9（2026-11-05。仕様 r9）：S4 の印と文字の間（space.2）、累計の value と prev の包み（D-43、提案 2）。S5 と S6 の `task.next.note.last` を次に出す組について言う文に（D-44 (2)、design-reviewer G1 r4 の要修正 1）。S6 に levelChanged と note.last が重なる注記。
+`[ ]` は副操作のボタン（枠）、`[[ ]]` は主操作のボタン（塗り）、`<u>…</u>` はリンク（下線）。縦の線 `|` は本文の列の左右の線（space.4 の余白の内側）。`┌ ┐ └ ┘` は 1 px の枠（案内とダイアログ、入力欄）。色は付けない。r6（2026-11-03）：S1 の案内を枠で描き、S3 に「日付が変わった後」の図を足し、S8 と S10 の注記を直した（design-reviewer G3 r1 の 3、4、8、11）。r7（2026-11-05。仕様 r7、FB-1〜FB-3）：S2 に 1 問目（ヒント文）の図を足し、S3 に進み具合の行、S4 と S5 を累計・祝い・解説・今週・次の一手の並びに描き直し、S6 と S7（2 変種）の図を足し、S9 を 11 行にした。r8（2026-11-05。仕様 r8）：S1 の lead.1 と S8 の `settings.redo.note` を仕様 7 の r7 の文に直した（design-reviewer G1 r3 の要修正 3）。S2 の 2 問目の legend に「この領域で」。S4 に完了の印と `task.progress.done`、祝いの既定の文を `{count}` の形に。S5 を「解説をボタンの後ろ」の並びに描き直し（D-45）、`task.next.note.last` の注記。S6 に段階が変わった変種、S7 に `task.exhausted.nextDone` と再読み込みの注記。r9（2026-11-05。仕様 r9）：S4 の印と文字の間（space.2）、累計の value と prev の包み（D-43、提案 2）。S5 と S6 の `task.next.note.last` を次に出す組について言う文に（D-44 (2)、design-reviewer G1 r4 の要修正 1）。S6 に levelChanged と note.last が重なる注記。 **r11（2026-11-06。仕様 r11、PRD r13 の FB2）**：S1 にミル（案内役）と lead.1 / lead.3 の新しい文、S3 を「問 0 / 3」と「返し」の 2 図に描き直し、図の 6 型の図、S4 をまとめ（正答数、ミル、累計…）、S5 に正答数、S6 を申告 1 種類、S7 にミル、S8 に節「案内役」、S9 を 13 行、S10 に正答数と「選んだ答えを見る」。答えの欄、難しすぎ／簡単すぎ、「完了」ボタン、外で行う課題の印は消した。`┃` は図の強調の箱（3 px の color.figure.accent）。
 
 ## S1 diagnosis.start（iOS の Safari、非スタンドアロン、閉じた印なし）
 ```
@@ -9,12 +9,18 @@ design/001-daily-learning.md の補助。幅 320 CSS px（AC-17 の条件）で�
 |                                        |
 | 3 問に答えると、今日の学習が 1 つ出ます |   h1 text.title
 |                                        |
-| コードを書いたことがない人から現役のエン |   lead.1〜.3（text.body。lead.1 は r7 で差し替えた文：仕様 7）
+| コードを書いたことがない人から現役のエン |   lead.1〜.3（text.body。lead.1 と lead.3 は r11 で差し替えた文：仕様 7）
 | ジニアまで使えます。15 分（初級は 10 分） |
-| で終わる課題が毎日 1 つ出て、やりたい日  |
-| は続けて進めます。                      |
+| で終わる課題が出ます。読んで、3 問の選択  |
+| 肢を選ぶだけで、その場で正誤と理由が分か |
+| ります。                                |
 | 登録はありません。入力したデータは…    |
-| 難しすぎ・簡単すぎの申告が 2 回続くと…  |
+| 正答数に合わせて、次の課題から段階が自動 |
+| で変わります。                          |
+|                                        |
+| ┌────┐  ミル                           |   aside guide.character（data-mood=idle、aria-label=ミル。r11。D-53）：img guide.sprite 96×96（aria-hidden、pixelated）
+| │ ・ ・│  │3 問に答えてください。今日の  |   p guide.name（text.small、color.guide）、p guide.say（text.body。左に 2 px の縦線 color.guide。文言 guide.intro）
+| └────┘  │一手を決めます。              |   幅 480 未満では絵の下に縦に積む。showCharacter が false なら 0 件
 |                                        |
 | ┌────────────────────────────────────┐ |   section home.addToHomeScreen（案内。四方 1 px の枠 color.border。tokens 4「案内」）
 | │ ホーム画面に追加してから始めること │ |   h2 .title（color.warning）
@@ -92,263 +98,216 @@ design/001-daily-learning.md の補助。幅 320 CSS px（AC-17 の条件）で�
 ```
 3 問目（r7）：legend「コードを書いてきた年数に近いものを選んでください」、radio 5 つ：`( ) まだコードを書いたことがない`（`years.never`。先頭）、`( ) 1 年未満`、`( ) 1〜3 年`、`( ) 3〜5 年`、`( ) 5 年以上`。ヒント文はない。
 
-## S3 task.today（external の例）
+## S3 task.today（r11：問 0 / 3。開いた直後。導入の図は flow の例）
 ```
-| 今日の一手                 履歴  設定 |   header（nav は flex-wrap で 2 行目に落ちてよい）
+| 今日の一手                 履歴  設定 |   header（position: static）
 |                                        |
-| 今日の課題 2026-10-30                  |   task.today.label（text.small、secondary。同じ日の 2 件目以降は task.today.label.nth「今日 2 件目の課題 2026-10-30」）
-| この段階の 4 / 14 件目                 |   task.progress（text.small、secondary。r7。AC-36。data-progress-index=4、-total=14 は article task.today の属性）
-| 自分のリポジトリの直近 10 コミットを    |   h1 task.today.title（text.title。折り返す）
-| 読み、1 つを分割し直す                 |
-| Git とチーム開発 / 中級 / 所要時間 15 分 |   task.meta（text.small。1 行の文として折り返す）
-| [外で行う]                             |   task.external.badge（枠だけの印。external のときだけ）
-| 要る道具                               |   dl > dt（text.heading）
-| ・ターミナル                           |   dd > ul（課題集の tools）
-| ・Git                                  |
+| 今日の課題 2026-11-06                  |   task.today.label（text.small、secondary。2 件目以降は task.today.label.nth）
+| この段階の 4 / 14 件目                 |   task.progress（text.small、secondary。data-progress-index=4、-total=14 は article task.today の属性）
+| 直近の課題の正答数に合わせて、段階を    |   task.level.adjusted.down（段階が変わった直後の課題だけ。text.body、color.text。D-60）
+| 初級にしました。                       |
+| リクエストが届いてから返事を返すまで    |   h1 task.today.title（text.title。折り返す）
+| バックエンド設計 / 初級 / 所要時間 10 分 |   task.meta（text.small。1 行の文として折り返す）
 |                                        |
-| なぜ今これか                           |   h2 task.why（text.heading）
-| …本文…                                 |
-| やり方                                 |   h2 task.how
-| …本文（行内の code は等幅）…           |
-| 完了の目安                             |   h2 task.goal
-| …本文…                                 |
+| …導入の本文（intro。300 字以内。       |   p task.intro.text（text.body。行内の code は等幅）
+| なぜ今これかを含む）…                  |
+| ┌──────────┐    ┌──────────┐    ┌──────────┐ |   figure task.figure（role=img、aria-label=alt、data-figure-type=flow、data-figure-of=intro、data-figure-highlight=1）
+| │ 受け取る │ →  ┃ 確かめる ┃ →  │ 返す     │ |   箱 [data-figure-part=box]（枠 2 px color.text、角 8 px）、矢印は inline SVG [data-figure-part=line]（stroke 2 px color.text）
+| └──────────┘    └──────────┘    └──────────┘ |   強調の箱（┃）は枠 3 px の color.figure.accent、ラベル 700 の color.figure.accent。幅 480 未満では縦に積み矢印は ↓
 |                                        |
-| 答え（任意）                           |   label task.answer.label（text.heading）
-| 採点はしません。入力は自動で保存され、  |   task.answer.help（text.small）
-| 今日中なら開き直しても残ります。        |
-| ┌────────────────────────────────┐     |   textarea task.answer（rows=6、16 px、枠 color.border）
-| │                                │     |
-| │                                │     |
-| └────────────────────────────────┘     |
-| 保存しました                           |   task.answer.saved（role=status、color.success、text.small）
+| 問 1 / 3                               |   h2 task.question.heading（text.heading、tabindex=-1）。section task.question（data-question-number=1。答える前は data-answer-result なし）
+| …問題文（100 字以内。場面から始まる）… |   p task.question.text（text.body）
+| [ 届いた値をそのまま保存する         ] |   button task.choice（data-choice-index=0。副操作の形：枠 1 px color.border、左寄せ、44 px 以上、列いっぱい）
+| [ 値を確かめてから保存する           ] |   button task.choice（data-choice-index=1）
+| [ 保存してから値を確かめる           ] |   button task.choice（data-choice-index=2）。3 つは role=group task.question.choices の中（aria-labelledby は h2）
 |                                        |
-| 申告すると、この課題は履歴に移ります。  |   task.report.note（text.small。r7 で差し替え）
-| 続けるかどうかは、その後に選べます。    |
-| [[ 完了 ]]                             |   主操作（列いっぱい）
-| [ 難しすぎ ]  [ 簡単すぎ ]             |   副操作 3 つ（flex-wrap。320 px では 1 列に 1 つずつ）
-| [ 今日はできない ]                     |
+| 今日はやめておくと、この課題は答えた分  |   task.skip.note（text.small、secondary。D-26）
+| だけ履歴に残ります。続けたくなったら、  |
+| 次の一手に進めます。                    |
+| [ 今日はやめておく ]                   |   button task.skip（副操作の形。列いっぱい。D-3）
 ```
-初期表示（幅 320、文字 100%）に、ヘッダー、ラベル、進み具合、題名、meta、「なぜ今これか」の 2 行目までが入る（差をつける点 1。r7 で進み具合の 1 行が増えた）。
+初期表示（幅 390、文字 100%）に、ヘッダー、ラベル、進み具合、題名、meta、導入の 3〜4 行と図の先頭が入る（仕様 8）。`guide.character` は 0 件（AC-31）。`task.insight.text` は DOM にない（AC-38）。
 
-### S3 task.today（画面を開いたまま日付が変わった後の最初の操作の直後。D-30）
+## S3 task.today（r11：問 1 に不正解で答えた返し。問 2 はまだ出ていない）
+```
+| 問 1 / 3                               |
+| …問題文…                               |
+| [ 届いた値をそのまま保存する   選んだ答え ] |   task.choice（data-choice-state=selected-incorrect、aria-disabled=true。枠 2 px color.border。末尾に span task.choice.tag.selected（text.small））
+| [ ✓ 値を確かめてから保存する   正解      ] |   task.choice（data-choice-state=correct、aria-disabled=true。先頭に svg task.answer.mark（color.success、aria-hidden）、末尾に span task.choice.tag.correct（text.small、color.success））
+| [ 保存してから値を確かめる             ] |   task.choice（data-choice-state=none、aria-disabled=true。見た目は変えない）
+|                                        |
+| 惜しい                                 |   div task.question.feedback（不透明度 0→1、150 ms。reduce では即時）> p role=status task.answer.result.incorrect（text.heading、color.text。正解のときは「✓ 正解」で color.success）
+| ┌────┐  ミル                           |   aside guide.character（data-mood=incorrect、aria-label=ミル）：img guide.sprite 96×96（aria-hidden、pixelated）を左、右に p guide.name（text.small、color.guide）
+| │ ಠ_ಠ│  │もう一度、図と問題文を見て    |   p guide.say（text.body。左に 2 px の縦線 color.guide。文言 guide.incorrect）。幅 480 未満では絵の下に縦に積む
+| └────┘  │みましょう。                  |
+|                                        |
+| 選んだ答えについて                     |   p task.question.explain.label.selected（text.small、secondary）
+| …選んだ選択肢の explain（120 字以内）… |   p task.question.explain（data-explain-for=selected。中身は explain と等しい）
+| 正解について                           |   p task.question.explain.label.correct（不正解のときだけ）
+| …正解の選択肢の explain…               |   p task.question.explain（data-explain-for=correct）
+| [[ 次の問題へ ]]                       |   button task.question.next（主操作。問 3 の後は task.summary.open「まとめへ」）
+|                                        |
+| 今日はやめておくと、…                   |   task.skip.note と task.skip は最後の問の下に残る
+| [ 今日はやめておく ]                   |
+```
+選択肢を押してから `data-answer-result` が付くまで 300 ms 以内（AC-41）。「次の問題へ」で問 2 が下に足され（問 1 の返しは残り、ミルは消える）、問 2 の h2 にフォーカスが移る（D-64）。再読み込みで復元した返しにはミルが出ない（D-53）。`showCharacter` が false なら `guide.character` は 0 件で、他は同じ。
+
+## 図の 6 型（r11。D-50、D-51。上：幅 480 以上、下：幅 480 未満。┃ は強調の箱）
+```
+flow（箱と矢印 2〜5）           layers（積み重ね 2〜5）        compare（見出し 2 + 行 1〜3）
+┌────┐ → ┃────┃ → ┌────┐        ┌──────────────┐                ┌──────────┬──────────┐
+└────┘   ┃────┃   └────┘        │ 画面         │                │ 同期     │ 非同期   │  見出し（700、下枠 2 px）
+                                 ├──────────────┤                ├──────────┼──────────┤
+幅 480 未満：                    ┃ API          ┃  強調          │ 待つ     ┃ 待たない ┃  行（対。強調は 1 セル）
+┌────┐                           ├──────────────┤                └──────────┴──────────┘
+└────┘                           │ データベース │                常に 2 列。ラベルは列の中で折り返す
+  ↓                              └──────────────┘
+┃────┃  強調                     常に縦（labels[0] が上）
+  ↓
+┌────┐
+└────┘
+
+sequence（番号つき 2〜5）        tree（親 1 + 子 2〜4）          split（1 → 2〜3）
+(1) 書く                         ┌──────┐                        ┌──────┐
+(2) 確かめる   ← 強調：丸と      │ 親   │                        │ 入力 │
+(3) 送る         ラベルが橙      └──┬───┘                        └──┬───┘
+番号は CSS counter の ::before     ┌──┴─┬────┐   線 2 px（border）   → 子 1 ┃ → 子 2 ┃ ← 矢印は SVG
+常に縦                          ┌┴─┐┌┴─┐┌┴──┐                     幅 480 未満：縦に並べ、左の縦線から
+                                │子││子││子 │                     各子へ矢印（→）
+                                └──┘└──┘└───┘
+                                幅 480 未満：子を縦 1 列、左に縦の線と各子への短い横線
+```
+どの型も `task.figure` に `background-color: var(--color-bg)` を明示し、線（`[data-figure-part="line"]`）の `border-color` / `stroke` と地の比を 3:1 以上にする（AC-44 の (a)。D-52）。文字は axe-core。図の中に `<img>` はない。
+
+## S4 task.rate（r11：まとめ。正答数、ミル celebrate、累計、進み具合、祝い、解説、役に立ったか。D-34、D-43、D-59）
 ```
 | 今日の一手                 履歴  設定 |
 |                                        |
-| 日付が変わったため、直前の操作は無効に |   task.dayChanged（p role=status tabindex=-1。text.body、color.warning。フォーカスはここに移り、画面の先頭が見える）
-| なりました。前の課題は履歴にあります。 |
+| ✓ 完了しました                         |   article task.rate（data-score=2）> h1 task.rate.title（フォーカス）。先頭の ✓ は task.rate.mark（400 ms で描かれる。節目は円が先）
+| 3 問中 2 問に正解しました              |   p task.rate.score（text.body。「点」の語なし）
+| ┌────┐  ミル                           |   aside guide.character（data-mood=celebrate）。絵は静止
+| │ ^ω^│  │2 問は見えていました。あと 1  |   p guide.say（文言 guide.rate.score2。節目なら guide.rate.milestone）
+| └────┘  │問は次に生きます。            |
+| これまでに完了した課題  11 件          |   p task.total：label（text.small）+ value（text.title。data-stat-completed=11。300 ms から前の値 10 が上へ消え 11 が下から：D-43）
+| この段階の 4 / 14 件目でした           |   p task.progress.done（text.small、secondary）
+| 11 件目を終えました。                  |   p task.cheer（data-milestone=none。節目は at7 / at30 / at100 で color.success）
 |                                        |
-| 今日の課題 2026-10-31                  |   task.today.label（以下は通常の S3 と同じ。答えの欄は空）
-| …翌日の課題の題名…                     |   h1
-```
-出るのは「操作」で翌日の S3（か S7）に着いたときだけ（読み込みでは出ない）。次の操作（ボタン、リンク）か再読み込みで消える。textarea への入力では消えない。S7 では h1 `task.exhausted.levelDone`（か `.allDone`）の上に同じ知らせ。
-
-## S4 task.rate（r7：累計、祝い、解説を足した。r8：完了の印と演出、進み具合。D-34〜D-36、D-38、D-43、D-44）
-```
-| 今日の一手                 履歴  設定 |
-|                                        |
-| ✓ 完了しました                         |   h1（フォーカスを移す）。先頭の ✓ は inline SVG task.rate.mark（1em、線は color.success、aria-hidden。✓ と文字の間は space.2）。描いた直後に線が 400 ms で描かれる。節目（7 / 30 / 100）では ✓ を囲む円が先に 400 ms で描かれる（D-43）
-| これまでに完了した課題  7 件           |   p task.total：span task.total.label（text.small、secondary）+ span task.total.value（text.title、color.text。data-stat-completed=7。最初から最終の値）。描いた直後は同じ位置に aria-hidden の span task.total.prev「6 件」が重なり（value と prev は position: relative の inline-block の包みの中。prev は value の子にしない）、300 ms の時点で prev が上へ消え、value が下から上がる（250 ms）。入らなければ値が 2 行目に落ちる（prev は包みの中で value を追う）
-| この段階の 4 / 14 件目でした           |   p task.progress.done（text.small、secondary。data-progress-index=4、-total=14。r8。D-44）
-| 7 件目を終えました。最初の節目です。    |   p task.cheer（text.body。data-milestone=7。文言は task.cheer.at7。節目のときだけ color.success。節目以外は task.cheer.default「11 件目を終えました。」で color.text。cheer 自体は動かない）
-|                                        |
-| ひとこと解説                           |   h2 task.insight（text.heading）
-| …課題集の insight（1〜120 字）…        |   p task.insight.text（text.body）
+| ひとこと解説                           |   h2 task.insight
+| …課題集の insight（1〜120 字）…        |   p task.insight.text
 |                                        |
 | この課題は役に立ちましたか             |   task.rate.question
-| [ 役に立った ]                         |   同格の副操作 2 つ（縦に積む）
+| [ 役に立った ]                         |   同格の副操作 2 つ（縦）
 | [ 立たなかった ]                       |
-| 今回は答えない                         |   task.rate.close（文字のボタン、44 px の高さ）
+| 今回は答えない                         |   task.rate.close（文字のボタン、44 px）
 ```
-「次の一手に進む」はこの画面には置かない（S5 で出す。D-34）。演出は 1 秒未満で 1 回だけ（通常 550 ms、節目 950 ms で静止）。3 つのボタンは最初から押せる。`prefers-reduced-motion: reduce` では、印は完成した形、数字は最終の値で、prev は作らない（1 秒後の見た目は同じ）。S5 ではこの演出は起きない。
+演出は印と数字だけで 1 秒未満（通常 550 ms、節目 950 ms）。ミルは動かない。`prefers-reduced-motion: reduce` では最終の状態だけ。「次の一手に進む」は S5。
 
-## S5 task.done（r7：確認ページの型。r8：解説をボタンの後ろに。D-4、D-39、D-44、D-45）
+## S5 task.done（r11：正答数の行を足した。D-4、D-45）
 ```
-| 今日の一手                 履歴  設定 |
-|                                        |
-| 完了を記録しました                     |   h1 task.done.title（S4 から来たらフォーカスを移す。印はない）
+| 完了を記録しました                     |   article task.done（data-score=2）> h1 task.done.title（フォーカス）
 | 完了した課題：…題名…                   |   task.done.task（text.small、secondary）
-| これまでに完了した課題  7 件           |   task.total（S4 と同じ値。静止。prev はない）
-| この段階の 4 / 14 件目でした           |   task.progress.done（S4 と同じ。r8）
-| 7 件目を終えました。最初の節目です。    |   task.cheer（S4 と同じ。節目のときだけ color.success）
-|                                        |
-| 今週（月曜から）の完了日数：3 日        |   task.week（text.body。data-stat-days-completed-week=3。曜日の並びもドットも出さない）
-|                                        |
-| 明日も課題が 1 件出ます。続けるなら、次 |   task.next.note（text.body。次に出す組を出し終えているとき（押すと S7）は task.next.note.last「バックエンド設計の初級の課題は、すべて出し終えています。次に進むと、修了の案内が出ます。」（{area} は今の領域、{level} は次に出す組の段階）：D-44 (2)。r9）
+| 3 問中 2 問に正解しました              |   task.rate.score（同じ文言キー）
+| これまでに完了した課題  11 件          |   task.total（静止）
+| この段階の 4 / 14 件目でした           |   task.progress.done
+| 11 件目を終えました。                  |   task.cheer
+| 今週（月曜から）の完了日数：3 日        |   task.week
+| 明日も課題が 1 件出ます。続けるなら、次 |   task.next.note（組の最後なら task.next.note.last）
 | の一手に進めます。                      |
-| [ 次の一手に進む ]                     |   task.next（副操作の形：枠。塗りにしない。列いっぱい、44 px 以上。押すと同期で S3（組の最後なら S7）、フォーカスは次の画面の h1）
-|                                        |
-| ひとこと解説                           |   h2 task.insight（r8 でボタンの後ろに。S4 で読んだ文を読み返せる位置：D-45）
-| …課題集の insight…                     |   task.insight.text
-| <u>履歴を見る</u>                      |   task.done.history（上下に space.3）
+| 次の課題のファイルをまだ取り込めていま  |   （オフラインで次の組が無いときだけ）p role=alert error.tasks.offline（color.error）+ button task.next.retry「もう一度進む」。D-61
+| せん。ネットにつないでから…            |
+| [ 次の一手に進む ]                     |   task.next（副操作の形。列いっぱい）
+| ひとこと解説                           |   h2 task.insight + task.insight.text（ボタンの後ろ：D-45）
+| …insight…                              |
+| <u>履歴を見る</u>                      |   task.done.history
 ```
-再読み込みしても同じ画面（今日の最後の行が done）。何件目でも同じ並び。確認も催促もない。幅 390 ではボタンの上端が約 446 px で初期表示に入る見込み（幅 320 では約 472 px で、表示域の目安 460 px を超えて入らない。仕様 8。r9 で 430 / 455 から直した）。
+ミルは出ない（D-53）。再読み込みしても同じ。
 
-## S6 task.skipped（r7：次の一手を足した。解説、累計、祝いは出さない）
+## S6 task.skipped（r11：申告は「今日はやめておく」の 1 種類。段階の文は消えた）
 ```
-| 今日の一手                 履歴  設定 |
-|                                        |
-| 申告を記録しました                     |   h1 task.skipped.title（フォーカスを移す）
-| 同じ申告が 2 回続くと、次に出す課題から |   task.skipped.levelHint（too_hard / too_easy で、段階がまだ変わらないとき。no_time では出ない）
-| 段階が変わります。                      |
-|                                        |
-| 明日も課題が 1 件出ます。続けるなら、次 |   task.next.note（次に出す組を出し終えているとき（押すと S7）は task.next.note.last「{area}の{level}の課題は、すべて出し終えています。…」。{level} は次に出す組の段階：D-44 (2)。r9）
+| 今日はやめておきました                 |   h1 task.skipped.title（フォーカス）
+| 明日も課題が 1 件出ます。続けるなら、次 |   task.next.note（か .last）
 | の一手に進めます。                      |
-| [ 次の一手に進む ]                     |   task.next
+| [ 次の一手に進む ]                     |   task.next（オフラインで次の組が無ければ直上に error.tasks.offline + task.next.retry）
 | <u>履歴を見る</u>                      |   task.skipped.history
 ```
-段階が変わったとき（同じ申告の 2 回目。AC-8。r8。D-44）：`task.skipped.levelHint` の代わりに `task.skipped.levelChanged`「同じ申告が 2 回続いたので、次に出す課題から段階が初級になります。」（{level} は変わった先の段階名）。他は同じ。変わった先の組をすでに出し終えているとき（初級を修了して中級に進み、「難しすぎ」2 回で初級に戻った。仕様 5.1 の #54）は、この文の次の行に task.next.note.last「バックエンド設計の初級の課題は、すべて出し終えています。次に進むと、修了の案内が出ます。」が並ぶ。note.last は次に出す組について言うので、levelChanged の後でも事実と合う（r9。design-reviewer G1 r4 の要修正 1）。
+解説、累計、祝い、正答数、ミルは出さない。答えた分（answers、score）は履歴の行にだけ残る（S10）。
 
-## S7 task.exhausted（levelDone：初級を出し終えた。r7。D-40）
+## S7 task.exhausted（r11：ミル celebrate を h1 の直後に。levelDone の例）
 ```
-| 今日の一手                 履歴  設定 |
-|                                        |
-| バックエンド設計の初級を修了しました   |   h1 task.exhausted.levelDone（フォーカスを移す。操作で日付をまたいで着いたときは上に task.dayChanged）
+| バックエンド設計の初級を修了しました   |   h1 task.exhausted.levelDone（フォーカス）
+| ┌────┐  ミル                           |   aside guide.character（data-mood=celebrate）
+| │ ^ω^│  │この段階の課題は、全部見まし  |   guide.say（文言 guide.exhausted.levelDone。allDone は guide.exhausted.allDone）
+| └────┘  │た。次に進めます。            |
 | これまでに完了した課題  14 件          |   task.total
-| この段階の 14 件をすべて出し終えました。 |   task.exhausted.levelDone.detail
+| この段階の 14 件をすべて出し終えました。|   task.exhausted.levelDone.detail
 | 次の段階に進むと、その課題は今日から出  |
 | ます。                                  |
-| 次の段階は中級です。仕事や学習でコード  |   task.exhausted.next（{nextLevel} と level.intermediate.desc。r8 で文末に句点）
+| 次の段階は中級です。仕事や学習でコード  |   task.exhausted.next（{nextLevel}、{desc}）
 | を書いている（人に聞きながらでもよい）。|
-| 中級の課題は、前に出したものを除いて続  |   task.exhausted.seenNext（履歴に同じ領域の中級の行があり、中級に未出の課題が残るときだけ。「難しすぎ」2 回で下がった後に初級を出し終えた場合）。中級もすべて出し終えていれば代わりに task.exhausted.nextDone「中級の課題も、すでにすべて出し終えています。進むと、その次の案内が出ます。」（r8。D-40）
-| きます。難しいときは、別の領域を選ぶこ  |
-| ともできます。                          |
-| [[ 中級に進む ]]                       |   task.exhausted.advance（主操作。塗り。段階を上げて保存し、同じ日に中級の課題を出して S3。中級も出し終えていれば中級の S7 を描く）
-| [ 別の領域を選ぶ ]                     |   task.exhausted.redo（副操作。→ S2。「やめる」で S7 に戻る）
+| （中級の課題は、前に出したものを除いて  |   task.exhausted.seenNext か .nextDone（条件つき。D-40）
+| 続きます。…）                          |
+| 次の課題のファイルをまだ取り込めていま  |   （オフラインで次の段階の組が無いときだけ）error.tasks.offline + task.next.retry。D-61
+| せん。…                                 |
+| [[ 中級に進む ]]                       |   task.exhausted.advance（主操作）
+| [ 別の領域を選ぶ ]                     |   task.exhausted.redo（副操作）
 ```
-再読み込み（r8。tech-lead G1 r2 の要修正 1）：今日の行がある日に `task.next` ややり直しで着いた S7 は、再読み込みすると S5 / S6 に戻る（S7 は保存しない）。もう一度「次の一手に進む」を押すと S7。読み込みで着いた S7（今日の行がない日）は再読み込みしても S7。
+allDone：h1 `task.exhausted.allDone` → ミル → 累計 → `task.exhausted.allDone.detail` → `task.exhausted.redo`（主操作）。r10 と同じ。
 
-### S7 task.exhausted（allDone：上級を出し終えた）
+## S8 settings（r11：節「案内役」を「診断」の直後に。診断済み、iOS の Safari の例）
 ```
-| 今日の一手                 履歴  設定 |
-|                                        |
-| バックエンド設計の上級を修了しました   |   h1 task.exhausted.allDone
-| これまでに完了した課題  35 件          |   task.total
-| 上級の課題 7 件をすべて出し終えました。 |   task.exhausted.allDone.detail
-| 上級の新しい課題は次の版で足します。そ  |
-| れまでは、別の領域を選べます（診断のや  |
-| り直しで、同じ領域の別の段階も選べま    |
-| す）。                                  |
-| [[ 別の領域を選ぶ ]]                   |   task.exhausted.redo（この変種では主操作。task.exhausted.advance は 0 件）
-```
-
-## S8 settings（診断済み、persist() を断られた、iOS の Safari）
-```
-| 今日の一手                 履歴  設定 |
-|                                        |
 | 設定                                   |   h1
-|                                        |
-| データ                                 |   h2
-| 入力したデータはこのブラウザの中だけに  |   settings.data.note
-| 保存され、外には送りません。…          |
-| このブラウザは保存の永続化を許可しませ  |   settings.storage.notPersisted（color.warning。S8 を出すたびに persisted() を読み、false のときだけ：D-31）
-| んでした。…ファイルに書き出しておいて  |
-| ください。                              |
-| [[ ファイルに書き出す ]]               |   主操作
-| 書き出しました                         |   settings.export.done（role=status。押した後だけ）
-| 書き出したファイル（.json）を選びます。 |   settings.import.note
-| …置き換わります。                      |
-| [ ファイルを読み込む ]                 |   button settings.import（隠した input type=file settings.import.file の click() を呼ぶ）
-| このファイルは読み込めませんでした。…  |   error.import.message（失敗のときだけ。role=alert）
-| ファイルの形式がこの版より新しいです。… |   error.import.reason.version
-|                                        |
-| 診断                                   |   h2
-| いまの領域：バックエンド設計、段階：中級 |
+| データ                                 |   h2 settings.data.title（r10 と同じ：注記、注意、書き出す、読み込む）
+| …                                      |
+| 診断                                   |   h2 settings.diagnosis.title（r10 と同じ）
+| いまの領域：バックエンド設計、段階：初級 |
 | [ 診断をやり直す ]                     |
-| まだ申告していない今日の課題はそのまま  |   settings.redo.note（text.small。r7 の文：仕様 7。「新しい診断は次に出す課題から効きます。申告した後にやり直すと、新しい診断の課題が今日のうちに出ます。履歴は残ります。」と続く）
-| 残り、新しい診断は次に出す課題から効き  |
-| ます。…                                |
-|                                        |
-| ホーム画面                             |   h2（iOS の Safari、非スタンドアロンだけ）
-| [ ホーム画面に追加する手順を見る ]     |   押すと直下に home.addToHomeScreen を開く
-|                                        |
-| 記録                                   |   h2
-| <u>統計を見る</u>                      |
-| <u>履歴を見る</u>                      |
-|                                        |
-| 削除                                   |   h2
-| [ すべてのデータを削除 ]               |   取り消せない操作（枠と文字が color.error）
-|                                        |
-| 版 1.0.0                               |   settings.version（text.small）
-| <u>プライバシーについて</u>            |   settings.privacy
+| …注記…                                 |
+| 案内役                                 |   h2 settings.character.title（r11。D-56）
+| [x] 案内役のミルを表示する             |   input type=checkbox settings.character.show（checked=showCharacter）+ label settings.character.show.label（44 px）
+| 非表示にしても、解説、累計、祝いの文は  |   p settings.character.note（text.small、secondary）
+| 出ます。                               |
+| ホーム画面                             |   h2（iOS の Safari だけ。r10 と同じ）
+| 記録 / 削除 / 版 / プライバシー        |   r10 と同じ
 ```
+保存データなしの S8（S1 から来たとき）：「データ」（読み込みだけ）→ 「案内役」→（ホーム画面）→ 版、プライバシー（U-25）。
 
-### S8 settings（保存データなし。S1 か初回の S2 の「設定」から来たとき。契約 data.md 3 の「なし」と「診断の途中」の両方でこの表示。design-reviewer r1 の 1、r2 の 2）
+## S9 settings.stats（r11：13 行。tooHard を消し、答えた問題数、正解した問題数、正答 1 問以下の課題数を足した）
 ```
-| 今日の一手                        設定 |   header（nav は「設定」だけ。aria-current）
-|                                        |
-| 設定                                   |   h1
-|                                        |
-| データ                                 |   h2
-| 入力したデータはこのブラウザの中だけに  |   settings.data.note
-| 保存され、外には送りません。…          |
-| 書き出したファイル（.json）を選びます。 |   settings.import.note
-| …置き換わります。                      |
-| [[ ファイルを読み込む ]]               |   settings.import（この表示では主操作の形。隠した settings.import.file の click()）
-| このファイルは読み込めませんでした。…  |   error.import.message（失敗のときだけ）
-|                                        |
-| ホーム画面                             |   h2（iOS の Safari、非スタンドアロンだけ）
-| [ ホーム画面に追加する手順を見る ]     |   settings.homeScreen.open
-|                                        |
-| 版 1.0.0                               |   settings.version
-| <u>プライバシーについて</u>            |   settings.privacy（単独のリンク。44 × 44）
-```
-書き出し、診断、記録、削除の節は出さない（「診断の途中」でも同じ）。読み込みに成功すると今日の状態（S3 / S5 / S6 / S7）へ移り、確認ダイアログは出ない（AC-20。「診断の途中」でも確認なし：契約 data.md 7）。
-
-## ダイアログ settings.delete.confirm
-```
-┌──────────────────────────────────┐
-│ すべてのデータを削除しますか      │   h2（aria-labelledby）
-│ 診断の回答、履歴、答えがこのブラウ │   .body
-│ ザから消え、最初の画面に戻ります。 │
-│ この操作は元に戻せません。…       │
-│ [ 削除する ]                      │   .ok（color.error の枠と文字）
-│ [ やめる ]                        │   .cancel（初期フォーカス）
-└──────────────────────────────────┘
-```
-後ろの画面は color.overlay で暗くなる。ダイアログは開くときに DOM に足し、閉じたら外す。
-`settings.import.confirm` は h2、`.summary`（履歴 n 件、初めて開いた日）、`.body`、`[ 置き換える ]`、`[ やめる ]`。
-
-## S9 settings.stats
-```
-| 今日の一手                 履歴  設定 |
-|                                        |
 | 統計                                   |   h1
-| 今日 2026-11-06                        |   settings.stats.today（text.small）
-|                                        |
-| 初めて開いた日                         |   dt（text.heading）
-| 2026-11-01                             |   dd（data-stat-first-open-date）
-| 出した課題の件数                       |
-| 6                                      |   dd（data-stat-issued。AC-24 の seed の値：r7）
-| 完了した件数                           |
-| 4                                      |
-| 初めて開いた日に完了したか             |
-| 完了した                               |   settings.stats.firstDayCompleted.yes
-| 直近 7 日に完了した日数                |
-| 3                                      |
-| 今週（月曜から）の完了日数             |   r7（data-stat-days-completed-week）
-| 2                                      |
-| 同じ日の 2 件目以降の完了件数          |   r7（data-stat-extra-completed）
-| 1                                      |
-| 「役に立った」の件数                   |
-| 2                                      |
-| 「役に立ったか」に答えた件数           |
-| 2                                      |
-| 「難しすぎ」の件数                     |
-| 1                                      |
-| 「今日はできない」の件数               |
-| 1                                      |
-|                                        |
-| この値は、このブラウザの記録から計算し  |   settings.stats.note（text.small）
-| ています。…                            |
-| <u>設定に戻る</u>                      |
+| 今日 2026-11-06                        |   settings.stats.today
+| 初めて開いた日        2026-11-01       |   dl：dt は text.heading、dd は text.body（縦に積む）。dd は data-stat-*
+| 出した課題の件数      6                |
+| 完了した件数          4                |
+| 初めて開いた日に完了したか  完了した    |   dd の中に span .yes / .no
+| 直近 7 日に完了した日数    3           |
+| 今週（月曜から）の完了日数  2          |
+| 同じ日の 2 件目以降の完了件数  1       |
+| 「役に立った」の件数   2               |
+| 「役に立ったか」に答えた件数  2        |
+| 答えた問題数          13               |   settings.stats.questionsAnswered（data-stat-questions-answered。r11）
+| 正解した問題数        10               |   settings.stats.questionsCorrect（data-stat-questions-correct。r11）
+| 正答 1 問以下で完了した課題数  1       |   settings.stats.lowScoreTasks（data-stat-low-score-tasks。r11）
+| 「今日はやめておく」の件数  1          |   settings.stats.noTime（data-stat-no-time）
+| …注記…                                 |   settings.stats.note
+| <u>設定に戻る</u>                      |   settings.stats.back
 ```
 
-## S10 history（1 行の例と空）
+## S10 history（r11：1 行の例。正答数と「選んだ答えを見る」を足し、答えの本文の開閉を消した）
 ```
-| 2026-10-30                             |   li（data-date、data-task-id、data-report=done、data-helpful=helpful）
-| …課題の題名…                           |
-| 完了 ・ 役に立った                     |   report.done、helpful.yes（文字。色なし）
-| ▸ 答えを見る                           |   details > summary（答えがあるときだけ。印 ▸ の左端を列の左の線にそろえる：tokens 4「開閉」）
-| ────────────────────────────────────── |   区切り（1 px、color.border）
+| 履歴                                   |   h1
+| 2026-11-06                             |   li history.row（data-task-id、data-date、data-report=done、data-helpful=helpful、data-score=2）> history.row.date（text.small）
+| リクエストが届いてから返事を返すまで    |   history.row.taskTitle
+| 完了 ・ 3 問中 2 問 ・ 役に立った       |   report.done、history.row.score、helpful.yes（縦に積んでもよい）
+| ▸ 選んだ答えを見る                     |   details > summary history.row.answers（44 px）
+|   1. 届いた値をそのまま保存する  惜しい |   ol > li history.row.answer.item（data-question-number=1、data-correct=false。文字は選択肢の text + task.answer.result.incorrect の文言）
+|   2. 値を確かめてから保存する    正解   |   data-correct=true
+|   3. …                           正解   |
+| 2026-11-05                             |   no_time の行：report.noTime「今日はやめておく」。答えた問があれば history.row.score と details、なければどちらも出さない
+| …題名…                                 |
+| 今日はやめておく ・ 3 問中 1 問          |
+| 2026-11-04                             |   none の行：report.none「申告なし」（日付が変わった課題）
 ```
-空：`まだ履歴はありません。課題を申告すると、ここに残ります。` と `[[ 今日の課題へ ]]`。
+空：`history.empty` + 主操作 `history.empty.action`（r10 と同じ）。
+
+## ダイアログ settings.delete.confirm、settings.import.confirm
+r10 と同じ（文言の「答え」を「選んだ答え」に変えただけ）。
