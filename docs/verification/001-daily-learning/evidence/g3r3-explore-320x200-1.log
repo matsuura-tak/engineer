@@ -1,0 +1,269 @@
+# date: 2026-11-05 21:58:38 +0900
+# commit: a3affdc9351ffa811d066ba0d990381b60d12e3b
+# command: npx playwright test tests/explore-g3r3-320x200.spec.mjs --retries=0 --reporter=list,json
+npm notice run npx
+npm notice run 'playwright' test tests/explore-g3r3-320x200.spec.mjs --retries=0 --reporter=list,json
+
+Running 22 tests using 5 workers
+
+  ✓   1 [chromium] › tests/explore-g3r3-320x200.spec.mjs:150:1 › EXPLORE_320x200_S7_allDone (963ms)
+  ✓   5 [chromium] › tests/explore-g3r3-320x200.spec.mjs:141:1 › EXPLORE_320x200_S7_levelDone (1.0s)
+  ✓   2 [chromium] › tests/explore-g3r3-320x200.spec.mjs:160:1 › EXPLORE_320x200_S7_seenNext (1.1s)
+  ✓   4 [chromium] › tests/explore-g3r3-320x200.spec.mjs:120:1 › EXPLORE_320x200_S6_too_hard（levelHint） (1.1s)
+  ✓   3 [chromium] › tests/explore-g3r3-320x200.spec.mjs:128:1 › EXPLORE_320x200_S6_levelChanged_note.last (1.3s)
+  ✓   6 [chromium] › tests/explore-g3r3-320x200.spec.mjs:169:1 › EXPLORE_320x200_S7_nextDone (676ms)
+  ✓   8 [chromium] › tests/explore-g3r3-320x200.spec.mjs:187:1 › EXPLORE_320x200_S9_stats (801ms)
+  ✓   9 [chromium] › tests/explore-g3r3-320x200.spec.mjs:197:1 › EXPLORE_320x200_S10_history (1.0s)
+  ✘  10 [chromium] › tests/explore-g3r3-320x200.spec.mjs:210:1 › EXPLORE_320x200_dialog_delete (805ms)
+  ✘   7 [chromium] › tests/explore-g3r3-320x200.spec.mjs:180:1 › EXPLORE_320x200_S8_settings (1.3s)
+  ✘  11 [chromium] › tests/explore-g3r3-320x200.spec.mjs:220:1 › EXPLORE_320x200_dialog_import (909ms)
+  ✓  15 [webkit] › tests/explore-g3r3-320x200.spec.mjs:150:1 › EXPLORE_320x200_S7_allDone (2.5s)
+  ✓  12 [webkit] › tests/explore-g3r3-320x200.spec.mjs:120:1 › EXPLORE_320x200_S6_too_hard（levelHint） (2.7s)
+  ✓  16 [webkit] › tests/explore-g3r3-320x200.spec.mjs:160:1 › EXPLORE_320x200_S7_seenNext (2.7s)
+  ✓  14 [webkit] › tests/explore-g3r3-320x200.spec.mjs:141:1 › EXPLORE_320x200_S7_levelDone (2.9s)
+  ✓  13 [webkit] › tests/explore-g3r3-320x200.spec.mjs:128:1 › EXPLORE_320x200_S6_levelChanged_note.last (3.3s)
+  ✓  17 [webkit] › tests/explore-g3r3-320x200.spec.mjs:169:1 › EXPLORE_320x200_S7_nextDone (1.4s)
+  ✓  19 [webkit] › tests/explore-g3r3-320x200.spec.mjs:187:1 › EXPLORE_320x200_S9_stats (1.2s)
+  ✓  20 [webkit] › tests/explore-g3r3-320x200.spec.mjs:197:1 › EXPLORE_320x200_S10_history (1.4s)
+  ✘  21 [webkit] › tests/explore-g3r3-320x200.spec.mjs:210:1 › EXPLORE_320x200_dialog_delete (1.2s)
+  ✘  18 [webkit] › tests/explore-g3r3-320x200.spec.mjs:180:1 › EXPLORE_320x200_S8_settings (1.8s)
+  ✘  22 [webkit] › tests/explore-g3r3-320x200.spec.mjs:220:1 › EXPLORE_320x200_dialog_import (869ms)
+
+
+  1) [chromium] › tests/explore-g3r3-320x200.spec.mjs:180:1 › EXPLORE_320x200_S8_settings ──────────
+
+    Error: S8_settings の text-overflow: ellipsis
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 3
+
+    - Array []
+    + Array [
+    +   "input[data-testid=settings.import.file]",
+    + ]
+
+       95 |   expect(result.scrollWidth, `${scene} の横スクロール（はみ出す要素 ${JSON.stringify(o.wide)}）`).toBe(result.clientWidth);
+       96 |   expect(o.wide, `${scene} の表示域からはみ出す要素`).toEqual([]);
+    >  97 |   expect(o.ellipsis, `${scene} の text-overflow: ellipsis`).toEqual([]);
+          |                                                            ^
+       98 |   expect(o.clipped, `${scene} の overflow で切れた文字`).toEqual([]);
+       99 |   for (const op of operations.filter((x) => x.required)) {
+      100 |     expect(op.count, `${scene} の主な操作 ${op.id} の件数`).toBe(1);
+        at record (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:97:60)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:184:3
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/explore-g3r3-320x200-EXPLORE-320x200-S8-settings-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/explore-g3r3-320x200-EXPLORE-320x200-S8-settings-chromium/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/explore-g3r3-320x200-EXPLORE-320x200-S8-settings-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/explore-g3r3-320x200-EXPLORE-320x200-S8-settings-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › tests/explore-g3r3-320x200.spec.mjs:210:1 › EXPLORE_320x200_dialog_delete ────────
+
+    Error: dialog_delete の text-overflow: ellipsis
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 3
+
+    - Array []
+    + Array [
+    +   "input[data-testid=settings.import.file]",
+    + ]
+
+       95 |   expect(result.scrollWidth, `${scene} の横スクロール（はみ出す要素 ${JSON.stringify(o.wide)}）`).toBe(result.clientWidth);
+       96 |   expect(o.wide, `${scene} の表示域からはみ出す要素`).toEqual([]);
+    >  97 |   expect(o.ellipsis, `${scene} の text-overflow: ellipsis`).toEqual([]);
+          |                                                            ^
+       98 |   expect(o.clipped, `${scene} の overflow で切れた文字`).toEqual([]);
+       99 |   for (const op of operations.filter((x) => x.required)) {
+      100 |     expect(op.count, `${scene} の主な操作 ${op.id} の件数`).toBe(1);
+        at record (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:97:60)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:216:3
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/explore-g3r3-320x200-EXPLORE-320x200-dialog-delete-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/explore-g3r3-320x200-EXPLORE-320x200-dialog-delete-chromium/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/explore-g3r3-320x200-EXPLORE-320x200-dialog-delete-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/explore-g3r3-320x200-EXPLORE-320x200-dialog-delete-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium] › tests/explore-g3r3-320x200.spec.mjs:220:1 › EXPLORE_320x200_dialog_import ────────
+
+    Error: dialog_import の text-overflow: ellipsis
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 3
+
+    - Array []
+    + Array [
+    +   "input[data-testid=settings.import.file]",
+    + ]
+
+       95 |   expect(result.scrollWidth, `${scene} の横スクロール（はみ出す要素 ${JSON.stringify(o.wide)}）`).toBe(result.clientWidth);
+       96 |   expect(o.wide, `${scene} の表示域からはみ出す要素`).toEqual([]);
+    >  97 |   expect(o.ellipsis, `${scene} の text-overflow: ellipsis`).toEqual([]);
+          |                                                            ^
+       98 |   expect(o.clipped, `${scene} の overflow で切れた文字`).toEqual([]);
+       99 |   for (const op of operations.filter((x) => x.required)) {
+      100 |     expect(op.count, `${scene} の主な操作 ${op.id} の件数`).toBe(1);
+        at record (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:97:60)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:226:3
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/explore-g3r3-320x200-EXPLORE-320x200-dialog-import-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/explore-g3r3-320x200-EXPLORE-320x200-dialog-import-chromium/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/explore-g3r3-320x200-EXPLORE-320x200-dialog-import-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/explore-g3r3-320x200-EXPLORE-320x200-dialog-import-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [webkit] › tests/explore-g3r3-320x200.spec.mjs:180:1 › EXPLORE_320x200_S8_settings ────────────
+
+    Error: S8_settings の overflow で切れた文字
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 3
+
+    - Array []
+    + Array [
+    +   "input[data-testid=settings.import.file] scrollWidth=77 clientWidth=1",
+    + ]
+
+       96 |   expect(o.wide, `${scene} の表示域からはみ出す要素`).toEqual([]);
+       97 |   expect(o.ellipsis, `${scene} の text-overflow: ellipsis`).toEqual([]);
+    >  98 |   expect(o.clipped, `${scene} の overflow で切れた文字`).toEqual([]);
+          |                                                   ^
+       99 |   for (const op of operations.filter((x) => x.required)) {
+      100 |     expect(op.count, `${scene} の主な操作 ${op.id} の件数`).toBe(1);
+      101 |     expect(op.visible, `${scene} の主な操作 ${op.id} が見える`).toBe(true);
+        at record (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:98:51)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:184:3
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/explore-g3r3-320x200-EXPLORE-320x200-S8-settings-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/explore-g3r3-320x200-EXPLORE-320x200-S8-settings-webkit/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/explore-g3r3-320x200-EXPLORE-320x200-S8-settings-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/explore-g3r3-320x200-EXPLORE-320x200-S8-settings-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [webkit] › tests/explore-g3r3-320x200.spec.mjs:210:1 › EXPLORE_320x200_dialog_delete ──────────
+
+    Error: dialog_delete の overflow で切れた文字
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 3
+
+    - Array []
+    + Array [
+    +   "input[data-testid=settings.import.file] scrollWidth=77 clientWidth=1",
+    + ]
+
+       96 |   expect(o.wide, `${scene} の表示域からはみ出す要素`).toEqual([]);
+       97 |   expect(o.ellipsis, `${scene} の text-overflow: ellipsis`).toEqual([]);
+    >  98 |   expect(o.clipped, `${scene} の overflow で切れた文字`).toEqual([]);
+          |                                                   ^
+       99 |   for (const op of operations.filter((x) => x.required)) {
+      100 |     expect(op.count, `${scene} の主な操作 ${op.id} の件数`).toBe(1);
+      101 |     expect(op.visible, `${scene} の主な操作 ${op.id} が見える`).toBe(true);
+        at record (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:98:51)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:216:3
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/explore-g3r3-320x200-EXPLORE-320x200-dialog-delete-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/explore-g3r3-320x200-EXPLORE-320x200-dialog-delete-webkit/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/explore-g3r3-320x200-EXPLORE-320x200-dialog-delete-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/explore-g3r3-320x200-EXPLORE-320x200-dialog-delete-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [webkit] › tests/explore-g3r3-320x200.spec.mjs:220:1 › EXPLORE_320x200_dialog_import ──────────
+
+    Error: dialog_import の overflow で切れた文字
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 3
+
+    - Array []
+    + Array [
+    +   "input[data-testid=settings.import.file] scrollWidth=77 clientWidth=1",
+    + ]
+
+       96 |   expect(o.wide, `${scene} の表示域からはみ出す要素`).toEqual([]);
+       97 |   expect(o.ellipsis, `${scene} の text-overflow: ellipsis`).toEqual([]);
+    >  98 |   expect(o.clipped, `${scene} の overflow で切れた文字`).toEqual([]);
+          |                                                   ^
+       99 |   for (const op of operations.filter((x) => x.required)) {
+      100 |     expect(op.count, `${scene} の主な操作 ${op.id} の件数`).toBe(1);
+      101 |     expect(op.visible, `${scene} の主な操作 ${op.id} が見える`).toBe(true);
+        at record (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:98:51)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:226:3
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/explore-g3r3-320x200-EXPLORE-320x200-dialog-import-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/explore-g3r3-320x200-EXPLORE-320x200-dialog-import-webkit/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/explore-g3r3-320x200-EXPLORE-320x200-dialog-import-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/explore-g3r3-320x200-EXPLORE-320x200-dialog-import-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6 failed
+    [chromium] › tests/explore-g3r3-320x200.spec.mjs:180:1 › EXPLORE_320x200_S8_settings ───────────
+    [chromium] › tests/explore-g3r3-320x200.spec.mjs:210:1 › EXPLORE_320x200_dialog_delete ─────────
+    [chromium] › tests/explore-g3r3-320x200.spec.mjs:220:1 › EXPLORE_320x200_dialog_import ─────────
+    [webkit] › tests/explore-g3r3-320x200.spec.mjs:180:1 › EXPLORE_320x200_S8_settings ─────────────
+    [webkit] › tests/explore-g3r3-320x200.spec.mjs:210:1 › EXPLORE_320x200_dialog_delete ───────────
+    [webkit] › tests/explore-g3r3-320x200.spec.mjs:220:1 › EXPLORE_320x200_dialog_import ───────────
+  16 passed (10.4s)
+# exit: 1

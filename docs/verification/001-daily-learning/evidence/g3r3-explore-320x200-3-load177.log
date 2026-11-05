@@ -1,0 +1,338 @@
+# date: 2026-11-05 21:59:54 +0900
+# commit: a3affdc9351ffa811d066ba0d990381b60d12e3b
+# command: npx playwright test tests/explore-g3r3-320x200.spec.mjs --retries=0 --reporter=list,json
+npm notice run npx
+npm notice run 'playwright' test tests/explore-g3r3-320x200.spec.mjs --retries=0 --reporter=list,json
+
+Running 22 tests using 5 workers
+
+  ✓   3 [chromium] › tests/explore-g3r3-320x200.spec.mjs:152:1 › EXPLORE_320x200_S7_allDone (12.4s)
+  ✓   2 [chromium] › tests/explore-g3r3-320x200.spec.mjs:122:1 › EXPLORE_320x200_S6_too_hard（levelHint） (12.8s)
+  ✓   1 [chromium] › tests/explore-g3r3-320x200.spec.mjs:143:1 › EXPLORE_320x200_S7_levelDone (13.1s)
+  ✓   5 [chromium] › tests/explore-g3r3-320x200.spec.mjs:162:1 › EXPLORE_320x200_S7_seenNext (13.6s)
+  ✓   4 [chromium] › tests/explore-g3r3-320x200.spec.mjs:130:1 › EXPLORE_320x200_S6_levelChanged_note.last (13.8s)
+  ✓  10 [chromium] › tests/explore-g3r3-320x200.spec.mjs:214:1 › EXPLORE_320x200_dialog_delete (6.7s)
+  ✓   8 [chromium] › tests/explore-g3r3-320x200.spec.mjs:191:1 › EXPLORE_320x200_S9_stats (7.4s)
+  ✓   6 [chromium] › tests/explore-g3r3-320x200.spec.mjs:171:1 › EXPLORE_320x200_S7_nextDone (8.5s)
+  ✓   9 [chromium] › tests/explore-g3r3-320x200.spec.mjs:201:1 › EXPLORE_320x200_S10_history (10.0s)
+  ✓   7 [chromium] › tests/explore-g3r3-320x200.spec.mjs:182:1 › EXPLORE_320x200_S8_settings (12.6s)
+  ✓  11 [chromium] › tests/explore-g3r3-320x200.spec.mjs:224:1 › EXPLORE_320x200_dialog_import (9.3s)
+  ✘  12 [webkit] › tests/explore-g3r3-320x200.spec.mjs:122:1 › EXPLORE_320x200_S6_too_hard（levelHint） (1.2m)
+  ✘  14 [webkit] › tests/explore-g3r3-320x200.spec.mjs:130:1 › EXPLORE_320x200_S6_levelChanged_note.last (1.2m)
+  ✘  15 [webkit] › tests/explore-g3r3-320x200.spec.mjs:152:1 › EXPLORE_320x200_S7_allDone (1.2m)
+  ✘  13 [webkit] › tests/explore-g3r3-320x200.spec.mjs:143:1 › EXPLORE_320x200_S7_levelDone (1.2m)
+  ✘  16 [webkit] › tests/explore-g3r3-320x200.spec.mjs:162:1 › EXPLORE_320x200_S7_seenNext (1.2m)
+  ✘  20 [webkit] › tests/explore-g3r3-320x200.spec.mjs:201:1 › EXPLORE_320x200_S10_history (1.2m)
+  ✘  18 [webkit] › tests/explore-g3r3-320x200.spec.mjs:191:1 › EXPLORE_320x200_S9_stats (1.2m)
+  ✘  17 [webkit] › tests/explore-g3r3-320x200.spec.mjs:182:1 › EXPLORE_320x200_S8_settings (1.2m)
+  ✘  19 [webkit] › tests/explore-g3r3-320x200.spec.mjs:171:1 › EXPLORE_320x200_S7_nextDone (1.2m)
+  ✘  21 [webkit] › tests/explore-g3r3-320x200.spec.mjs:214:1 › EXPLORE_320x200_dialog_delete (1.2m)
+  ✓  22 [webkit] › tests/explore-g3r3-320x200.spec.mjs:224:1 › EXPLORE_320x200_dialog_import (6.3s)
+
+
+  1) [webkit] › tests/explore-g3r3-320x200.spec.mjs:122:1 › EXPLORE_320x200_S6_too_hard（levelHint） ─
+
+    Test timeout of 60000ms exceeded.
+
+    Error: page.goto: Test timeout of 60000ms exceeded.
+    Call log:
+      - navigating to "http://127.0.0.1:63319/engineer/", waiting until "load"
+
+
+       at ../helpers/app.mjs:27
+
+      25 |
+      26 | export async function open(page, baseURL) {
+    > 27 |   await page.goto(baseURL);
+         |              ^
+      28 | }
+      29 |
+      30 | export const tid = (page, id) => page.getByTestId(id);
+        at Module.open (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/app.mjs:27:14)
+        at openAt (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:117:13)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:123:38
+
+    Error Context: test-results/explore-g3r3-320x200-EXPLORE-320x200-S6-too-hard（levelHint）-webkit/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/explore-g3r3-320x200-EXPLORE-320x200-S6-too-hard（levelHint）-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/explore-g3r3-320x200-EXPLORE-320x200-S6-too-hard（levelHint）-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [webkit] › tests/explore-g3r3-320x200.spec.mjs:130:1 › EXPLORE_320x200_S6_levelChanged_note.last 
+
+    Test timeout of 60000ms exceeded.
+
+    Error: clock.setFixedTime: Target page, context or browser has been closed
+
+       at ../helpers/app.mjs:13
+
+      11 |
+      12 | export async function fixDate(page, ymd, time) {
+    > 13 |   await page.clock.setFixedTime(jst(ymd, time));
+         |                    ^
+      14 | }
+      15 |
+      16 | export const root = (page) => page.locator('html');
+        at Module.fixDate (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/app.mjs:13:20)
+        at openAt (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:116:13)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:133:42
+
+    Error Context: test-results/explore-g3r3-320x200-EXPLO-5463f-0-S6-levelChanged-note-last-webkit/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/explore-g3r3-320x200-EXPLO-5463f-0-S6-levelChanged-note-last-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/explore-g3r3-320x200-EXPLO-5463f-0-S6-levelChanged-note-last-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [webkit] › tests/explore-g3r3-320x200.spec.mjs:143:1 › EXPLORE_320x200_S7_levelDone ───────────
+
+    Test timeout of 60000ms exceeded.
+
+    Error: page.goto: Target page, context or browser has been closed
+
+       at ../helpers/app.mjs:27
+
+      25 |
+      26 | export async function open(page, baseURL) {
+    > 27 |   await page.goto(baseURL);
+         |              ^
+      28 | }
+      29 |
+      30 | export const tid = (page, id) => page.getByTestId(id);
+        at Module.open (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/app.mjs:27:14)
+        at openAt (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:117:13)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:146:36
+
+    Error Context: test-results/explore-g3r3-320x200-EXPLORE-320x200-S7-levelDone-webkit/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/explore-g3r3-320x200-EXPLORE-320x200-S7-levelDone-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/explore-g3r3-320x200-EXPLORE-320x200-S7-levelDone-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [webkit] › tests/explore-g3r3-320x200.spec.mjs:152:1 › EXPLORE_320x200_S7_allDone ─────────────
+
+    Test timeout of 60000ms exceeded.
+
+    Error: clock.setFixedTime: Target page, context or browser has been closed
+
+       at ../helpers/app.mjs:13
+
+      11 |
+      12 | export async function fixDate(page, ymd, time) {
+    > 13 |   await page.clock.setFixedTime(jst(ymd, time));
+         |                    ^
+      14 | }
+      15 |
+      16 | export const root = (page) => page.locator('html');
+        at Module.fixDate (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/app.mjs:13:20)
+        at openAt (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:116:13)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:155:42
+
+    Error Context: test-results/explore-g3r3-320x200-EXPLORE-320x200-S7-allDone-webkit/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/explore-g3r3-320x200-EXPLORE-320x200-S7-allDone-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/explore-g3r3-320x200-EXPLORE-320x200-S7-allDone-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [webkit] › tests/explore-g3r3-320x200.spec.mjs:162:1 › EXPLORE_320x200_S7_seenNext ────────────
+
+    Test timeout of 60000ms exceeded.
+
+    Error: clock.setFixedTime: Target page, context or browser has been closed
+
+       at ../helpers/app.mjs:13
+
+      11 |
+      12 | export async function fixDate(page, ymd, time) {
+    > 13 |   await page.clock.setFixedTime(jst(ymd, time));
+         |                    ^
+      14 | }
+      15 |
+      16 | export const root = (page) => page.locator('html');
+        at Module.fixDate (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/app.mjs:13:20)
+        at openAt (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:116:13)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:165:42
+
+    Error Context: test-results/explore-g3r3-320x200-EXPLORE-320x200-S7-seenNext-webkit/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/explore-g3r3-320x200-EXPLORE-320x200-S7-seenNext-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/explore-g3r3-320x200-EXPLORE-320x200-S7-seenNext-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [webkit] › tests/explore-g3r3-320x200.spec.mjs:171:1 › EXPLORE_320x200_S7_nextDone ────────────
+
+    Test timeout of 60000ms exceeded.
+
+    Error: clock.setFixedTime: Target page, context or browser has been closed
+
+       at ../helpers/app.mjs:13
+
+      11 |
+      12 | export async function fixDate(page, ymd, time) {
+    > 13 |   await page.clock.setFixedTime(jst(ymd, time));
+         |                    ^
+      14 | }
+      15 |
+      16 | export const root = (page) => page.locator('html');
+        at Module.fixDate (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/app.mjs:13:20)
+        at openAt (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:116:13)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:174:42
+
+    Error Context: test-results/explore-g3r3-320x200-EXPLORE-320x200-S7-nextDone-webkit/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/explore-g3r3-320x200-EXPLORE-320x200-S7-nextDone-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/explore-g3r3-320x200-EXPLORE-320x200-S7-nextDone-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  7) [webkit] › tests/explore-g3r3-320x200.spec.mjs:182:1 › EXPLORE_320x200_S8_settings ────────────
+
+    Test timeout of 60000ms exceeded.
+
+    Error: clock.setFixedTime: Target page, context or browser has been closed
+
+       at ../helpers/app.mjs:13
+
+      11 |
+      12 | export async function fixDate(page, ymd, time) {
+    > 13 |   await page.clock.setFixedTime(jst(ymd, time));
+         |                    ^
+      14 | }
+      15 |
+      16 | export const root = (page) => page.locator('html');
+        at Module.fixDate (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/app.mjs:13:20)
+        at openAt (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:116:13)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:183:44
+
+    Error Context: test-results/explore-g3r3-320x200-EXPLORE-320x200-S8-settings-webkit/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/explore-g3r3-320x200-EXPLORE-320x200-S8-settings-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/explore-g3r3-320x200-EXPLORE-320x200-S8-settings-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  8) [webkit] › tests/explore-g3r3-320x200.spec.mjs:191:1 › EXPLORE_320x200_S9_stats ───────────────
+
+    Test timeout of 60000ms exceeded.
+
+    Error: clock.setFixedTime: Target page, context or browser has been closed
+
+       at ../helpers/app.mjs:13
+
+      11 |
+      12 | export async function fixDate(page, ymd, time) {
+    > 13 |   await page.clock.setFixedTime(jst(ymd, time));
+         |                    ^
+      14 | }
+      15 |
+      16 | export const root = (page) => page.locator('html');
+        at Module.fixDate (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/app.mjs:13:20)
+        at openAt (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:116:13)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:192:44
+
+    Error Context: test-results/explore-g3r3-320x200-EXPLORE-320x200-S9-stats-webkit/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/explore-g3r3-320x200-EXPLORE-320x200-S9-stats-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/explore-g3r3-320x200-EXPLORE-320x200-S9-stats-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  9) [webkit] › tests/explore-g3r3-320x200.spec.mjs:201:1 › EXPLORE_320x200_S10_history ────────────
+
+    Test timeout of 60000ms exceeded.
+
+    Error: clock.setFixedTime: Target page, context or browser has been closed
+
+       at ../helpers/app.mjs:13
+
+      11 |
+      12 | export async function fixDate(page, ymd, time) {
+    > 13 |   await page.clock.setFixedTime(jst(ymd, time));
+         |                    ^
+      14 | }
+      15 |
+      16 | export const root = (page) => page.locator('html');
+        at Module.fixDate (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/app.mjs:13:20)
+        at openAt (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:116:13)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:202:81
+
+    Error Context: test-results/explore-g3r3-320x200-EXPLORE-320x200-S10-history-webkit/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/explore-g3r3-320x200-EXPLORE-320x200-S10-history-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/explore-g3r3-320x200-EXPLORE-320x200-S10-history-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  10) [webkit] › tests/explore-g3r3-320x200.spec.mjs:214:1 › EXPLORE_320x200_dialog_delete ─────────
+
+    Test timeout of 60000ms exceeded.
+
+    Error: clock.setFixedTime: Target page, context or browser has been closed
+
+       at ../helpers/app.mjs:13
+
+      11 |
+      12 | export async function fixDate(page, ymd, time) {
+    > 13 |   await page.clock.setFixedTime(jst(ymd, time));
+         |                    ^
+      14 | }
+      15 |
+      16 | export const root = (page) => page.locator('html');
+        at Module.fixDate (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/app.mjs:13:20)
+        at openAt (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:116:13)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:215:44
+
+    Error Context: test-results/explore-g3r3-320x200-EXPLORE-320x200-dialog-delete-webkit/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/explore-g3r3-320x200-EXPLORE-320x200-dialog-delete-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/explore-g3r3-320x200-EXPLORE-320x200-dialog-delete-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  10 failed
+    [webkit] › tests/explore-g3r3-320x200.spec.mjs:122:1 › EXPLORE_320x200_S6_too_hard（levelHint） ──
+    [webkit] › tests/explore-g3r3-320x200.spec.mjs:130:1 › EXPLORE_320x200_S6_levelChanged_note.last 
+    [webkit] › tests/explore-g3r3-320x200.spec.mjs:143:1 › EXPLORE_320x200_S7_levelDone ────────────
+    [webkit] › tests/explore-g3r3-320x200.spec.mjs:152:1 › EXPLORE_320x200_S7_allDone ──────────────
+    [webkit] › tests/explore-g3r3-320x200.spec.mjs:162:1 › EXPLORE_320x200_S7_seenNext ─────────────
+    [webkit] › tests/explore-g3r3-320x200.spec.mjs:171:1 › EXPLORE_320x200_S7_nextDone ─────────────
+    [webkit] › tests/explore-g3r3-320x200.spec.mjs:182:1 › EXPLORE_320x200_S8_settings ─────────────
+    [webkit] › tests/explore-g3r3-320x200.spec.mjs:191:1 › EXPLORE_320x200_S9_stats ────────────────
+    [webkit] › tests/explore-g3r3-320x200.spec.mjs:201:1 › EXPLORE_320x200_S10_history ─────────────
+    [webkit] › tests/explore-g3r3-320x200.spec.mjs:214:1 › EXPLORE_320x200_dialog_delete ───────────
+  12 passed (4.8m)
+# exit: 1

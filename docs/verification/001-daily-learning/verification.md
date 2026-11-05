@@ -6,7 +6,7 @@
 - 検証した役：verifier　日時：2026-11-05 20:59〜21:45（JST）
 - コミット：7a59e8415de426d9eb40f09e8f6397eb5ba090fa（feat/001-daily-learning の最新）。作業ツリーの変更は受け入れテストのフォルダの 4 ファイル（playwright.config.mjs、package.json、README.md、tools/screenshots.mjs。5 章）と docs/verification/ だけ。tests/ と helpers/ は変えていない
 - 環境：macOS 27.2、Node v24.22.1、@playwright/test 1.64.1、Chromium 156.0.8078.4（chromium-1248）、WebKit 27.2（webkit-2370）、@axe-core/playwright 4.14.0、ajv 8.20.0。iOS のアプリはないので Xcode とシミュレーターは使わない。接続先：受け入れテストのフォルダの静的サーバー `http://127.0.0.1:<port>/engineer/`（配布物は `backend/scripts/build.mjs --version 2026-11-30.1` で mkdtemp の一時フォルダにビルド。GitHub Pages と同じパスとヘッダー）。timezoneId Asia/Tokyo、locale ja-JP（AC-26 の 1 本と撮影の `en` は en-US）。workers 5（CI でない既定）。AC-15 だけは project `chromium-ac15` で全件の後に 1 本だけ動く（W-11）
-- 読み替え（test-plan の冒頭と同じ）：「シミュレーター」は Playwright の Chromium と WebKit、「再起動」は再読み込みと新しいタブ、「AX5」はルートの文字サイズ 200%（design 9）と幅 320 CSS px、「performAccessibilityAudit()」は axe-core（wcag2a、wcag2aa、wcag21a、wcag21aa）。
+- 読み替え（test-plan の冒頭と同じ）：「シミュレーター」は Playwright の Chromium と WebKit、「再起動」は再読み込みと新しいタブ、「AX5」はルートの文字サイズ 200%（design 9）で幅 390 CSS px（design r10 の 5.1 の前書き：`_ax5.png` 20 枚はすべて 390 × 844 @2、ルート 32 px で、この条件どおり。幅 320 × 200% の画像は撮らず、幅 320 で横スクロールと切れがないことは AC-17（S1、S3、S5、S7）と AC-39（S2 の 1 問目）の数値、それ以外の画面とダイアログは探索（8 章のセッション 4 と 4b）で見る。r3 の報告の時点では「幅 320 CSS px」と書いていたが、design-reviewer G3 r3 の要修正 1 を受けた designer の r10（a3affdc）で幅 390 に決まったので、2026-11-05 に読み替えだけを直した。撮り直しはしていない）、「performAccessibilityAudit()」は axe-core（wcag2a、wcag2aa、wcag21a、wcag21aa）。
 - G3 の FAIL 条件の確認：FAIL か未検証の AC 0 件、飛ばしたテスト 0 件、揺れたテスト 0 件（AC-15 の扱いは 4 章）、PRD の根拠のない受け入れテストの変更 0 件（5 章）、0 件であるべき検査はすべて 0 件（6 章）。`git diff --name-only origin/main...HEAD -- .claude .github` は空。
 
 ### r2 からの差分（要点）
@@ -83,6 +83,16 @@ Running 219 tests using 5 workers
 - `npx playwright test --list` → `Total: 219 tests in 23 files`（chromium 109、webkit 109、chromium-ac15 1）
 - 予算の受け入れテスト `BUDGET2_`：平均の字数 390.6（210 件。上限 480）、gzip 後 69,313 バイト（上限 105,000）。両ブラウザで passed（コマンド 1）
 
+### コマンド 11（r3 の後の追記、2026-11-05 21:5x〜22:1x：幅 320 × 文字 200% の探索の追加。design r10 の 5.1 を受けた指揮役の指示。使い捨てのテスト、HEAD a3affdc）
+- 実装（backend/public、backend/scripts）と受け入れテスト（tests/、helpers/）は 7a59e84 から変わっていない（`git diff --name-only 7a59e84..a3affdc -- backend` は 0 件。a3affdc は design の r10 だけ）
+- `cd backend/tests/acceptance && PLAYWRIGHT_JSON_OUTPUT_NAME=… npx playwright test tests/explore-g3r3-320x200.spec.mjs --retries=0 --reporter=list,json`（chromium 11 本 + webkit 11 本 = 22 本。1 本の中で S10 は答えを開く前と後の 2 場面を記録するので場面は 12 × 2 ブラウザ）
+  - 1 回目 → 終了コード 1（16 passed、6 failed）。落ちた S8 とダイアログ 2 つ × 2 ブラウザは探索テストの側の誤り：見た目だけ隠したファイルの input `settings.import.file`（contracts/identifiers.md の 2 で「見た目だけ隠した」例外）を「切れた文字」に数えていた。ログ：evidence/g3r3-explore-320x200-1.log
+  - 2 回目（ファイルの input を数えから除いた） → 終了コード 1（20 passed、2 failed）。落ちた S8 × 2 ブラウザも探索テストの側の誤り：`settings.homeScreen.open` を必須にしていたが、design 5 の S8 の行で「iOS の Safari で非スタンドアロンのときだけ」出す要素で、偽装なしの S8 で 0 件は仕様どおり。ログ：evidence/g3r3-explore-320x200-2.log
+  - 3 回目（`settings.homeScreen.open` を記録だけに） → 終了コード 1（12 passed、10 failed）。chromium は 11 本すべて合格。webkit の 10 本は `page.goto` か `clock.setFixedTime`（アプリに触る前）で 60 秒を超えた。原因は環境：別の作業の iOS シミュレーターが CPU を占有し、負荷平均が 138〜177（`uptime`。ログの先頭に記録。chromium も 1 本 1 秒だったのが 12 秒になった）。製品の不具合ではない。ログ：evidence/g3r3-explore-320x200-3-load177.log
+  - webkit だけ流し直し：`npx playwright test tests/explore-g3r3-320x200.spec.mjs --project=webkit --workers=1 --timeout=300000 --retries=0 --reporter=list,json`（負荷の下で goto が終わるよう上限時間だけ 300 秒に。確かめる中身は同じ。再試行ではなく 1 回の実行。負荷平均は始め 172、終わり 134） → 終了コード 0、11 passed / 0 failed / 0 skipped（56 秒）。ログ：evidence/g3r3-explore-320x200-webkit.log、JSON：exploration/g3r3-explore-320x200-webkit.json
+- 結果：24 場面（12 × 2 ブラウザ）すべてで、ルートの文字サイズ 32 px、`scrollWidth` 320 = `clientWidth` 320、表示域の幅からはみ出す要素 0、`text-overflow: ellipsis` 0、`overflow` で隠れた文字 0、主な操作（下の表）はすべて 1 件・見える・44 × 44 以上・スクロールすれば表示域に全部入る。ダイアログ 2 つは幅 256 で表示域の中、初期フォーカスが「やめる」で表示域の中、移動キー 3 回（Tab が BODY を 1 回通る：コマンド 7 と同じ）で「削除する／置き換える」に届き表示域の中。証拠：exploration/g3r3/320x200/{chromium,webkit}_EXPLORE_320x200_results.json（場面ごとの数値、主な操作の座標、ダイアログの記録）と PNG 24 枚（`<browser>_<場面>.png`。ダイアログは表示域、ほかは全体）
+- spec は tests/ から消し、写しを exploration/g3r3/explore-g3r3-320x200.spec.mjs.txt に残した（`npx playwright test --list` は 219 本のまま）
+
 ## 2. 受け入れ条件ごとの結果
 動いたテストの数は chromium + webkit の合計（コマンド 1。AC-15 は chromium-ac15 だけ：W-11）。飛ばしたテストは全 AC で 0。annotation の値は evidence/g3r4-full-run.json から写した。スクリーンショットのパスは evidence/screenshots/ からの相対（chromium。webkit は webkit/ の下に同名）。
 | AC | 結果（PASS / FAIL / 未検証） | 動いたテストの数 | 飛ばしたテストの数 | 証拠（テストの名前、ログの行、スクリーンショットのパス） |
@@ -149,7 +159,7 @@ AC 番号のないテスト（AC の表とは別。契約 W-6）：
 | 権限を断った | 自動（その場、返らない、遅い）＋範囲外（あとから） | PASS | AC-13 の 3 本（`persist()` と `persisted()` を false に注入、呼ぶ回数）、`DESIGN_D31_` 3 本。S8_settings_notPersisted_light.png。あとから撤回する操作は Web の persist にない。補足：注入なしでも headless の両ブラウザは `persisted()` に false を返すので S8_settings_light.png にも注意が出る（11 章の提案 3） |
 | バックグラウンドから復帰 | 自動（タブの切り替えで代える）＋範囲外（Web に電話などの割り込みはない） | PASS | AC-32（新しいタブ、開いたまま翌日）、AC-23（新しいタブ）、`DESIGN_D30_`、`DESIGN_U15_`。探索 R3_U17（8 章） |
 | 言語と地域（ja、en） | 自動 | PASS | AC-26（en-US、ja-JP。キー 174 = 174）。英語の全画面：`_en.png` 21 枚（index.tsv の lang=en 20 枚。S0_loading_en は JS を止めて撮るので lang は殻の ja のまま）。英語が長い置き場所（S3 external、S8 の案内、S1 の案内、S7 allDone）の `_en.png` に切れ・重なりなし |
-| 大きい文字、ダークモード | 自動（幅 320、文字 200%、ダーク）＋G4 の人（実機の OS の文字サイズ最大とダーク） | PASS | AC-17、AC-39（幅 320）。`_ax5.png` 20 枚（ルートの font-size 32px。横スクロール 0）、`_dark.png` 18 枚、`_w320.png` 3 枚。dialog-ax5-focus.tsv の 4 行すべて ok（200% でも初期フォーカスの「やめる」と、移動キー 3 回で届く「置き換える／削除する」が表示域の中）。探索 R8_320_200（S1〜S5 の 7 画面で scrollWidth 320、はみ出す要素 0） |
+| 大きい文字、ダークモード | 自動（幅 320、文字 200%、ダーク）＋G4 の人（実機の OS の文字サイズ最大とダーク） | PASS | AC-17、AC-39（幅 320）。`_ax5.png` 20 枚（ルートの font-size 32px。横スクロール 0）、`_dark.png` 18 枚、`_w320.png` 3 枚。dialog-ax5-focus.tsv の 4 行すべて ok（200% でも初期フォーカスの「やめる」と、移動キー 3 回で届く「置き換える／削除する」が表示域の中）。探索 R8_320_200（S1〜S5 の 7 画面で scrollWidth 320、はみ出す要素 0）。r3 の後の追記：探索 4b（S6 × 2、S7 × 4、S8、S9、S10 × 2、ダイアログ 2 の 12 場面 × 2 ブラウザで scrollWidth 320、はみ出す要素 0、主な操作が見える。1 章のコマンド 11） |
 | 容量不足、割り込み | 自動（容量不足の注入）＋範囲外（割り込み） | PASS | AC-11（QuotaExceededError）、`DESIGN_D30_`（知らせのある S3 で申告の保存の失敗）、探索 R3_U17（日付が変わった後の task.next の保存の失敗 → retry 1 回で復帰）。撮影：S2 / S3 ×2 / S4 / S5 / S6 / S7 / ダイアログの保存の失敗（design 5.1 #12、#19、#20、#26、#29、#50、#36、#45） |
 
 design 5.1 の 54 行とテスト・道具の対応は evidence/g3r3-state-table.md（前半）。後半で変わった行：#25（S4 節目 100：両ブラウザ ok）、#27（S5_task.done_afterRate を足した）、#34（S7_task.exhausted_allDone の 4 通りを足した）、#45（dialog_settings.import.confirm_error_storage を足した。未撮影 → ok）。54 行すべてに自動のテストか道具の証拠がある。
@@ -230,6 +240,13 @@ incomplete（axe が判定できなかったもの。違反ではない）：8 �
 - 区切り：予定 40 操作 → 実際 約 25 操作
 - 試したこと：S1、S2 の 1〜3 問目（desc 6 件、radio 5 件で先頭 `years.never`）、S3、S4 節目 7、S5 の 7 画面で scrollWidth 320 = clientWidth 320、表示域からはみ出す要素 0
 - 見つけた不具合：なし。証拠：exploration/g3r3/{chromium,webkit}_EXPLORE_320_200_results.json
+### セッション 4b（R8 の続き：幅 320 × 文字 200% で S6〜S10 とダイアログ。r3 の後の追記、2026-11-05、design r10 の 5.1 の前書き「それ以外の画面とダイアログは探索のセッションで見る」）
+- チャーター：セッション 4 で見ていない S6（too_hard の levelHint、levelChanged + `task.next.note.last`）、S7（levelDone、allDone、seenNext、nextDone）、S8（設定）、S9（統計）、S10（履歴。答えを開く前と後）、ダイアログ（削除の確認、読み込みの確認）を幅 320 CSS px × ルートの文字サイズ 200% で開き、横スクロール、はみ出し、文字の切れ、主な操作が見えるかを見る。Chromium と WebKit
+- 区切り：予定 40 操作 → 実際 12 場面 × 2 ブラウザ（1 場面あたり 2〜6 操作）。使い捨てのテスト 11 本（1 章のコマンド 11）
+- 期待の根拠：PRD AC-17 の確かめ方（`scrollWidth` と ellipsis 0）、design 9（AX5 で主な操作が押せる、ダイアログの初期フォーカスと移動キー）、design D-18（幅 320 で横スクロール 0、ellipsis 不使用）、contracts/identifiers.md（主な操作の `data-testid`、見た目だけ隠したファイルの input の例外）
+- 主な操作として見たもの：S6 `task.next`、`task.skipped.history`。S7 `task.exhausted.advance`（allDone では 0 件が仕様。nextDone は記録のみ：両ブラウザで 1 件）、`task.exhausted.redo`。S8 `settings.export`、`settings.import`、`settings.redo`、`settings.stats.open`、`settings.history.open`、`settings.delete`（`settings.homeScreen.open` は iOS の Safari だけなので 0 件が仕様）。S9 `settings.stats.back`。S10 `history.row.answer`。ダイアログ `*.ok`、`*.cancel`。どの画面も `nav.history`、`nav.settings`
+- 結果（両ブラウザで同じ）：24 場面すべて `scrollWidth` 320 = `clientWidth` 320、はみ出す要素 0、ellipsis 0、隠れた文字 0、主な操作はすべて 1 件・見える・44 × 44 以上（最小は nav の 96 × 99、ボタンは 256 × 101〜152、ダイアログのボタンは 158 × 152〜204）・スクロールで表示域に収まる。ページの高さは S6 1,257〜1,353、S7 1,507〜1,971、S8 4,046、S9 2,833、S10 1,596〜1,962 px（初期表示に入る主な操作は nav と、S6 の `task.skipped.history`、S7 の `task.exhausted.redo`、S8 の `settings.history.open` など 1〜2 個。残りはスクロールで届く。幅 320 は初期表示の条件ではない：design D-45、8）。ダイアログ 2 つ：幅 256 で表示域の中、初期フォーカス「やめる」が表示域の中、移動キー 3 回で ok に届き表示域の中（ダイアログの中でスクロールして見える）。S9 の値は PRD AC-24 の期待と同じ（issued 6、completed 4、7 日 3、今週 2、2 件目以降 1）
+- 見つけた不具合：なし。探索テストの側の誤り 2 回（隠したファイルの input を切れに数えた、iOS だけの要素を必須にした）と、環境の負荷による WebKit の timeout 1 回（1 章のコマンド 11）。証拠：exploration/g3r3/320x200/（PNG 24 枚、結果の JSON 2 つ）、exploration/g3r3/explore-g3r3-320x200.spec.mjs.txt
 ### セッション 5（R5：SW が有効な後のオフライン）
 - r1（2026-11-03、e13d68f の実装）の exploration/R5.log（オフラインで `task.next`、advance、やり直し、送信と失敗の要求 0 件、manifest / icon / tasks.json / en.json / sw.js のオフライン応答）。HEAD では探索し直していない。HEAD の自動テスト AC-12（AC-33 の `task.next` を含む操作がオフラインで動き送信 0 件）と AC-23（再読み込みと新しいタブ）が同じ経路を覆う。13 章に書く
 
@@ -256,6 +273,7 @@ incomplete（axe が判定できなかったもの。違反ではない）：8 �
 | g3r4-screenshots-axe.log、g3r4-screenshots-axe-added.log、g3r3-screenshots-axe.log、g3r3-screenshots-axe-at100.log | 撮影と axe のログ | — | — |
 | g3r4-keyboard-tour-{chromium,webkit}.log、同 .stdout.log | キーボードの一巡 | — | AC-18 |
 | g3r3-explore.log、-2.log、-3.log、exploration/g3r3/、exploration/g3r3-explore*.json | 探索（8 章） | — | — |
+| g3r3-explore-320x200-1.log、-2.log、-3-load177.log、-webkit.log、exploration/g3r3-explore-320x200-*.json、exploration/g3r3/320x200/（PNG 24 枚、`{chromium,webkit}_EXPLORE_320x200_results.json`）、exploration/g3r3/explore-g3r3-320x200.spec.mjs.txt | 探索 4b（8 章。r3 の後の追記、design r10） | — | — |
 | g3r3-state-table.md | design 5.1 の 54 行の対応表（前半） | — | — |
 | g3r4-npm-test.log | backend の `npm test` | — | — |
 
@@ -274,6 +292,7 @@ AC の範囲の不具合はなし。
 | 2 | 撮影の道具の S4 at100 が 1 回「1 秒後も prev が残っている」（前半）。契約の撮り方に合わせて解決済み | — | — | — | 提案（道具） | verifier（済：tools/screenshots.mjs） |
 | 3 | headless の Chromium / WebKit は `persisted()` に false を返すので、注入なしの S8 でも `settings.storage.notPersisted` が出る（S8_settings_light.png）。実機で許可されれば消える（D-31 で S8 は毎回 `persisted()` を読む） | S8 を開く | — | — | 提案（撮影の環境） | G4 で Takuma が実機の見た目を確認 |
 | 4 | キーボードの一巡の「問題」2 件（`settings.privacy` に止まらない、ダイアログの Tab が BODY を通る）は仕様どおり（1 章のコマンド 7） | — | — | — | 提案（道具の判定の読み方） | — |
+| 5 | （r3 の後の追記）探索 4b の 3 回目で WebKit の 10 本が `page.goto` の段階で 60 秒を超えた。別の作業の iOS シミュレーターによる負荷（負荷平均 138〜177）で、worker 1・上限 300 秒で流し直すと 11/11 合格（1 章のコマンド 11）。製品の不具合ではない | 負荷平均 100 超の Mac で 5 workers | — | — | 提案（環境） | — |
 
 ## 12. PRD とテストの食い違い
 なし。この r3 で受け入れテスト（tests/、helpers/）は 1 行も直していない。

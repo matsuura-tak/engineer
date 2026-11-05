@@ -1,0 +1,24 @@
+# date: 2026-11-05 22:05:13 +0900
+# commit: a3affdc9351ffa811d066ba0d990381b60d12e3b
+# load before: 172.44 101.07 61.05（別の作業の iOS シミュレーターが CPU を占有。verifier のものではない）
+# command: npx playwright test tests/explore-g3r3-320x200.spec.mjs --project=webkit --workers=1 --timeout=300000 --retries=0 --reporter=list,json
+npm notice run npx
+npm notice run 'playwright' test tests/explore-g3r3-320x200.spec.mjs --project=webkit --workers=1 --timeout=300000 --retries=0 --reporter=list,json
+
+Running 11 tests using 1 worker
+
+  ✓   1 [webkit] › tests/explore-g3r3-320x200.spec.mjs:122:1 › EXPLORE_320x200_S6_too_hard（levelHint） (10.6s)
+  ✓   2 [webkit] › tests/explore-g3r3-320x200.spec.mjs:130:1 › EXPLORE_320x200_S6_levelChanged_note.last (2.9s)
+  ✓   3 [webkit] › tests/explore-g3r3-320x200.spec.mjs:143:1 › EXPLORE_320x200_S7_levelDone (2.4s)
+  ✓   4 [webkit] › tests/explore-g3r3-320x200.spec.mjs:152:1 › EXPLORE_320x200_S7_allDone (4.9s)
+  ✓   5 [webkit] › tests/explore-g3r3-320x200.spec.mjs:162:1 › EXPLORE_320x200_S7_seenNext (2.2s)
+  ✓   6 [webkit] › tests/explore-g3r3-320x200.spec.mjs:171:1 › EXPLORE_320x200_S7_nextDone (5.5s)
+  ✓   7 [webkit] › tests/explore-g3r3-320x200.spec.mjs:182:1 › EXPLORE_320x200_S8_settings (2.6s)
+  ✓   8 [webkit] › tests/explore-g3r3-320x200.spec.mjs:191:1 › EXPLORE_320x200_S9_stats (1.6s)
+  ✓   9 [webkit] › tests/explore-g3r3-320x200.spec.mjs:201:1 › EXPLORE_320x200_S10_history (2.1s)
+  ✓  10 [webkit] › tests/explore-g3r3-320x200.spec.mjs:214:1 › EXPLORE_320x200_dialog_delete (1.6s)
+  ✓  11 [webkit] › tests/explore-g3r3-320x200.spec.mjs:224:1 › EXPLORE_320x200_dialog_import (1.5s)
+
+  11 passed (56.4s)
+# exit: 0
+# load after: 134.46 106.57 66.61
