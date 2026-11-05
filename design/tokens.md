@@ -1,6 +1,6 @@
 # デザイントークン（今日の一手。ブラウザだけで動く Web アプリ）
 
-- 書いた役：designer　日付：2026-10-30　初版（001-daily-learning で導入）。**r8（2026-11-06）：仕様 r11（PRD r13 の FB2、Takuma の選択：ミルと案D「5 色」）に合わせ、1 に color.figure.accent と color.guide、3 に図の寸法 3 つ（size.figure.border、size.figure.border.accent、size.radius.figure）、4 に部品 5 行（選択肢、返しの区画、図、案内役、チェックボックス）を足し、1 の「箱を置かない」の例外に図の箱を足し、5 の動きに返しの区画の不透明度を足した。既存の値は変えていない。入力欄（textarea）の行は 001 では使わなくなったが、部品の定義として残す。**r2：G1 r1 の design-reviewer の指摘 3、5、10、11 を反映（color.overlay、リンクの最小幅、ホバーと押した瞬間、定義リストの使い所、ファイルの読み込みの部品）。r3：G1 r2 の design-reviewer の提案 1 を反映（4「リンク」の列挙にヘッダーのアプリ名 `app.name` を足した）。r4：Takuma の決定 D1（主操作の色は青。値は変えない）と D5（ホーム画面のアイコンの色）を受けて、1 にアイコンの 1 行。r5（2026-11-03）：G3 r1 の design-reviewer の指摘 4〜6 と提案 9、11 を受けて、1 に案内の枠の例外と color.warning の使い所、4 にボタンの幅の規則が及ぶ範囲、リンクと summary の左端、入力欄のエラーの枠、「案内」と「開閉」の行。値は変えていない。r6（2026-11-05）：仕様 r7（FB-2、FB-3）に合わせ、2 の text.title の「使う所」に累計の値を足した。新しいトークンは足さず、値も変えていない。r7（2026-11-05）：仕様 r8（Takuma の答え「控えめな演出を足す」。D-43）に合わせ、5 に動きのトークン 4 つ（motion.fade、motion.tick、motion.draw、motion.delay.tick）を足し、1 の color.success の使う所に完了の印と節目の文を足した。色と文字と余白の値は変えていない
+- 書いた役：designer　日付：2026-10-30　初版（001-daily-learning で導入）。**r9（2026-11-06）：仕様 r12 に合わせ、1 の color.warning の使う所から「答えの上限」を消し（キーは r11 で消えていた）、4 のホバーと押した瞬間の表に `aria-disabled="true"` の行を足した（design-reviewer G1 r5 の 8、11）。値は変えていない。** r8（2026-11-06）：仕様 r11（PRD r13 の FB2、Takuma の選択：ミルと案D「5 色」）に合わせ、1 に color.figure.accent と color.guide、3 に図の寸法 3 つ（size.figure.border、size.figure.border.accent、size.radius.figure）、4 に部品 5 行（選択肢、返しの区画、図、案内役、チェックボックス）を足し、1 の「箱を置かない」の例外に図の箱を足し、5 の動きに返しの区画の不透明度を足した。既存の値は変えていない。入力欄（textarea）の行は 001 では使わなくなったが、部品の定義として残す。**r2：G1 r1 の design-reviewer の指摘 3、5、10、11 を反映（color.overlay、リンクの最小幅、ホバーと押した瞬間、定義リストの使い所、ファイルの読み込みの部品）。r3：G1 r2 の design-reviewer の提案 1 を反映（4「リンク」の列挙にヘッダーのアプリ名 `app.name` を足した）。r4：Takuma の決定 D1（主操作の色は青。値は変えない）と D5（ホーム画面のアイコンの色）を受けて、1 にアイコンの 1 行。r5（2026-11-03）：G3 r1 の design-reviewer の指摘 4〜6 と提案 9、11 を受けて、1 に案内の枠の例外と color.warning の使い所、4 にボタンの幅の規則が及ぶ範囲、リンクと summary の左端、入力欄のエラーの枠、「案内」と「開閉」の行。値は変えていない。r6（2026-11-05）：仕様 r7（FB-2、FB-3）に合わせ、2 の text.title の「使う所」に累計の値を足した。新しいトークンは足さず、値も変えていない。r7（2026-11-05）：仕様 r8（Takuma の答え「控えめな演出を足す」。D-43）に合わせ、5 に動きのトークン 4 つ（motion.fade、motion.tick、motion.draw、motion.delay.tick）を足し、1 の color.success の使う所に完了の印と節目の文を足した。色と文字と余白の値は変えていない
 - 使い方：画面の仕様（design/<機能名>.md）と実装（CSS カスタムプロパティ）は、ここにある名前だけを使う。色の値を直接書かない。
 - 単位：CSS px。文字と余白は実装では rem（16 px = 1 rem）にして、ブラウザの文字サイズ設定と拡大に追従させる（調査 R-16、R-26）。
 - 根拠：design/001-daily-learning-research.md の R 番号と、原則 B-1〜B-6（.claude/skills/craft-designer/SKILL.md）。コントラスト比は WCAG 2.2 の式で計算した（計算スクリプトの出力は design/001-daily-learning.md の 9 に転記）。
@@ -20,7 +20,7 @@
 | color.border | 副操作のボタン、入力欄、印、区切りの枠 | #6B6B6B | #8C8C8C | #000000 | #FFFFFF | `--color-border` |
 | color.focus | キーボードのフォーカスの枠 | #1D4ED8 | #8AB4F8 | #0B3B9E | #A8C7FA | `--color-focus` |
 | color.success | 成功の知らせの文字（「書き出しました」）。r7：S4 の完了の印の線と、節目（7 / 30 / 100）の祝いの文の文字（design/001-daily-learning.md の D-43、D-36）。r8：正誤の返し「正解」の文字と印 `task.answer.mark`、正解の選択肢の印と「正解」の文字（D-47、D-48）。不正解には色を使わない | #1B6E3A | #7FD39A | #0E4D28 | #A6E3B5 | `--color-success` |
-| color.warning | 注意の文字（永続化を断られた、ホーム画面の案内の見出し、答えの上限、日付が変わった知らせ） | #7A4A00 | #F2C35B | #5A3600 | #F7D98B | `--color-warning` |
+| color.warning | 注意の文字（永続化を断られた、ホーム画面の案内の見出し、日付が変わった知らせ） | #7A4A00 | #F2C35B | #5A3600 | #F7D98B | `--color-warning` |
 | color.error | エラーの文字と枠、取り消せない操作のボタンの文字 | #B42318 | #F28B82 | #8A1A12 | #F7B1AB | `--color-error` |
 | color.figure.accent | 図の強調（r8。案D「5 色」）：`highlight` の箱の枠（3 px）と、そのラベルの文字（700）だけ。主操作、意味色、案内役には使わない（design/001-daily-learning.md の D-50、D-58） | #B45309 | #F2A33A | #7A3400 | #FFC877 | `--color-figure-accent` |
 | color.guide | 案内役ミルの色（r8。案D）：名前 `guide.name` の文字（text.small）と、台詞の左の 2 px の縦線だけ。絵（PNG）の体の色は #B48CE0（ライトとダークで同じ。輪郭だけ color.text に切り替える）で、ライトの文字と線には体の陰の色 #7E55C2 を使う（地と 5.30）。図の強調、主操作、意味色には使わない（D-53、D-54、D-58） | #7E55C2 | #B48CE0 | #5B2FA8 | #DCCBF5 | `--color-guide` |
@@ -105,6 +105,7 @@
 |---|---|---|
 | ホバー（`@media (hover: hover)` の中だけ。タッチでは出ない） | 文字に下線（`text-decoration: underline`、太さ 1 px）。塗り、枠、色は変えない | 下線の太さを 2 px（`text-decoration-thickness`）。色は変えない |
 | 押した瞬間（`:active`） | 塗りと文字の色を入れ替える。主操作：塗り color.action.onPrimary、文字と枠 color.action.primary。副操作：塗り color.text、文字 color.bg。取り消せない操作：塗り color.error、文字 color.bg。入れ替えた組の比は仕様 9 の表にある組と同じ（最小 6.57:1） | ホバーと同じ（下線 2 px） |
+| `aria-disabled="true"` のボタン（答えた後の選択肢 `task.choice`。仕様の D-47。r9） | ホバーの下線も、押した瞬間の入れ替えも当てない（`:hover` と `:active` の規則を `:not([aria-disabled="true"])` に限る）。見た目は答えた直後のまま（選んだ枠 2 px、正解の印と文字）。理由：入れ替えると正解の印 color.success と塗り color.text の比が 2.62（ライト）/ 1.47（ダーク）で読めず、下線は押せると誤って伝える（design-reviewer G1 r5 の 8） | — |
 | フォーカス（`:focus-visible`） | size.focus.width の `outline`、size.focus.offset、color.focus（3 の表。ホバーや押した瞬間と重なってもそのまま出す） | 同左 |
 | 無効（`disabled`） | 使わない。進めないときは無効にせず、エラーの文を出す（仕様の D-8） | — |
 | `forced-colors: active` | システム色に任せ、下線と枠だけ残す | 同左 |

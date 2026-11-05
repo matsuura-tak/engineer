@@ -1,7 +1,7 @@
 # 画面の図（文字）001-daily-learning
 
 design/001-daily-learning.md の補助。幅 320 CSS px（AC-17 の条件）での並びを文字で描く。
-`[ ]` は副操作のボタン（枠）、`[[ ]]` は主操作のボタン（塗り）、`<u>…</u>` はリンク（下線）。縦の線 `|` は本文の列の左右の線（space.4 の余白の内側）。`┌ ┐ └ ┘` は 1 px の枠（案内とダイアログ、入力欄）。色は付けない。r6（2026-11-03）：S1 の案内を枠で描き、S3 に「日付が変わった後」の図を足し、S8 と S10 の注記を直した（design-reviewer G3 r1 の 3、4、8、11）。r7（2026-11-05。仕様 r7、FB-1〜FB-3）：S2 に 1 問目（ヒント文）の図を足し、S3 に進み具合の行、S4 と S5 を累計・祝い・解説・今週・次の一手の並びに描き直し、S6 と S7（2 変種）の図を足し、S9 を 11 行にした。r8（2026-11-05。仕様 r8）：S1 の lead.1 と S8 の `settings.redo.note` を仕様 7 の r7 の文に直した（design-reviewer G1 r3 の要修正 3）。S2 の 2 問目の legend に「この領域で」。S4 に完了の印と `task.progress.done`、祝いの既定の文を `{count}` の形に。S5 を「解説をボタンの後ろ」の並びに描き直し（D-45）、`task.next.note.last` の注記。S6 に段階が変わった変種、S7 に `task.exhausted.nextDone` と再読み込みの注記。r9（2026-11-05。仕様 r9）：S4 の印と文字の間（space.2）、累計の value と prev の包み（D-43、提案 2）。S5 と S6 の `task.next.note.last` を次に出す組について言う文に（D-44 (2)、design-reviewer G1 r4 の要修正 1）。S6 に levelChanged と note.last が重なる注記。 **r11（2026-11-06。仕様 r11、PRD r13 の FB2）**：S1 にミル（案内役）と lead.1 / lead.3 の新しい文、S3 を「問 0 / 3」と「返し」の 2 図に描き直し、図の 6 型の図、S4 をまとめ（正答数、ミル、累計…）、S5 に正答数、S6 を申告 1 種類、S7 にミル、S8 に節「案内役」、S9 を 13 行、S10 に正答数と「選んだ答えを見る」。答えの欄、難しすぎ／簡単すぎ、「完了」ボタン、外で行う課題の印は消した。`┃` は図の強調の箱（3 px の color.figure.accent）。
+`[ ]` は副操作のボタン（枠）、`[[ ]]` は主操作のボタン（塗り）、`<u>…</u>` はリンク（下線）。縦の線 `|` は本文の列の左右の線（space.4 の余白の内側）。`┌ ┐ └ ┘` は 1 px の枠（案内とダイアログ、入力欄）。色は付けない。r12（2026-11-06。仕様 r12）：S2 にオフラインの行、S3 の返しを status の入れ物とミルの台詞 3 本に、注記を 1 文に、復元の規則、図の 6 型の横並びの条件、S5 / S6 / S7 のオフラインの行を消し、S8 の label、S10 の読めない行。r6（2026-11-03）：S1 の案内を枠で描き、S3 に「日付が変わった後」の図を足し、S8 と S10 の注記を直した（design-reviewer G3 r1 の 3、4、8、11）。r7（2026-11-05。仕様 r7、FB-1〜FB-3）：S2 に 1 問目（ヒント文）の図を足し、S3 に進み具合の行、S4 と S5 を累計・祝い・解説・今週・次の一手の並びに描き直し、S6 と S7（2 変種）の図を足し、S9 を 11 行にした。r8（2026-11-05。仕様 r8）：S1 の lead.1 と S8 の `settings.redo.note` を仕様 7 の r7 の文に直した（design-reviewer G1 r3 の要修正 3）。S2 の 2 問目の legend に「この領域で」。S4 に完了の印と `task.progress.done`、祝いの既定の文を `{count}` の形に。S5 を「解説をボタンの後ろ」の並びに描き直し（D-45）、`task.next.note.last` の注記。S6 に段階が変わった変種、S7 に `task.exhausted.nextDone` と再読み込みの注記。r9（2026-11-05。仕様 r9）：S4 の印と文字の間（space.2）、累計の value と prev の包み（D-43、提案 2）。S5 と S6 の `task.next.note.last` を次に出す組について言う文に（D-44 (2)、design-reviewer G1 r4 の要修正 1）。S6 に levelChanged と note.last が重なる注記。 **r11（2026-11-06。仕様 r11、PRD r13 の FB2）**：S1 にミル（案内役）と lead.1 / lead.3 の新しい文、S3 を「問 0 / 3」と「返し」の 2 図に描き直し、図の 6 型の図、S4 をまとめ（正答数、ミル、累計…）、S5 に正答数、S6 を申告 1 種類、S7 にミル、S8 に節「案内役」、S9 を 13 行、S10 に正答数と「選んだ答えを見る」。答えの欄、難しすぎ／簡単すぎ、「完了」ボタン、外で行う課題の印は消した。`┃` は図の強調の箱（3 px の color.figure.accent）。
 
 ## S1 diagnosis.start（iOS の Safari、非スタンドアロン、閉じた印なし）
 ```
@@ -68,6 +68,7 @@ design/001-daily-learning.md の補助。幅 320 CSS px（AC-17 の条件）で�
 |     正しく動くかを確かめ、壊れにくくする |
 |     方法                                |
 | ( ) Git とチーム開発                   |
+（r12：3 問目で領域のファイルが SW に無くオフラインのとき、`[[ 診断を終える ]]` の直上に p role=alert error.tasks.offline「課題のファイルをまだ取り込めていません。…」（color.error）と button task.next.retry「もう一度進む」。画面は 3 / 3 のまま、radio は保たれる。D-61）
 |     変更の記録と、ほかの人との共同作業  |
 |                                        |
 | [[ 次へ ]]                             |   主操作
@@ -121,9 +122,7 @@ design/001-daily-learning.md の補助。幅 320 CSS px（AC-17 の条件）で�
 | [ 値を確かめてから保存する           ] |   button task.choice（data-choice-index=1）
 | [ 保存してから値を確かめる           ] |   button task.choice（data-choice-index=2）。3 つは role=group task.question.choices の中（aria-labelledby は h2）
 |                                        |
-| 今日はやめておくと、この課題は答えた分  |   task.skip.note（text.small、secondary。D-26）
-| だけ履歴に残ります。続けたくなったら、  |
-| 次の一手に進めます。                    |
+| やめても、答えた分は履歴に残ります。    |   task.skip.note（text.small、secondary。1 文。task.skip の aria-describedby。r12。D-26）
 | [ 今日はやめておく ]                   |   button task.skip（副操作の形。列いっぱい。D-3）
 ```
 初期表示（幅 390、文字 100%）に、ヘッダー、ラベル、進み具合、題名、meta、導入の 3〜4 行と図の先頭が入る（仕様 8）。`guide.character` は 0 件（AC-31）。`task.insight.text` は DOM にない（AC-38）。
@@ -136,10 +135,10 @@ design/001-daily-learning.md の補助。幅 320 CSS px（AC-17 の条件）で�
 | [ ✓ 値を確かめてから保存する   正解      ] |   task.choice（data-choice-state=correct、aria-disabled=true。先頭に svg task.answer.mark（color.success、aria-hidden）、末尾に span task.choice.tag.correct（text.small、color.success））
 | [ 保存してから値を確かめる             ] |   task.choice（data-choice-state=none、aria-disabled=true。見た目は変えない）
 |                                        |
-| 惜しい                                 |   div task.question.feedback（不透明度 0→1、150 ms。reduce では即時）> p role=status task.answer.result.incorrect（text.heading、color.text。正解のときは「✓ 正解」で color.success）
-| ┌────┐  ミル                           |   aside guide.character（data-mood=incorrect、aria-label=ミル）：img guide.sprite 96×96（aria-hidden、pixelated）を左、右に p guide.name（text.small、color.guide）
-| │ ಠ_ಠ│  │もう一度、図と問題文を見て    |   p guide.say（text.body。左に 2 px の縦線 color.guide。文言 guide.incorrect）。幅 480 未満では絵の下に縦に積む
-| └────┘  │みましょう。                  |
+| 惜しい                                 |   div role=status aria-live=polite task.question.status（描いた時点から空に置く。r12。D-48）> p task.answer.result.incorrect（text.heading、color.text。正解のときは「✓ 正解」で color.success）
+| ┌────┐  ミル                           |   div task.question.feedback（不透明度 0→1、150 ms。reduce と復元では当てない）> aside guide.character（data-mood=incorrect、aria-label=ミル）：img guide.sprite 96×96（aria-hidden、pixelated）を左、右に p guide.name（text.small、color.guide）
+| │(・・)│  │もう一度、問題文を見てみま    |   p guide.say（text.body。左に 2 px の縦線 color.guide。文言 guide.incorrect.1。問 2、3 は .2、.3：D-55。r12）。幅 480 未満では絵の下に縦に積む
+| └────┘  │しょう。                      |
 |                                        |
 | 選んだ答えについて                     |   p task.question.explain.label.selected（text.small、secondary）
 | …選んだ選択肢の explain（120 字以内）… |   p task.question.explain（data-explain-for=selected。中身は explain と等しい）
@@ -147,18 +146,18 @@ design/001-daily-learning.md の補助。幅 320 CSS px（AC-17 の条件）で�
 | …正解の選択肢の explain…               |   p task.question.explain（data-explain-for=correct）
 | [[ 次の問題へ ]]                       |   button task.question.next（主操作。問 3 の後は task.summary.open「まとめへ」）
 |                                        |
-| 今日はやめておくと、…                   |   task.skip.note と task.skip は最後の問の下に残る
+| やめても、答えた分は履歴に残ります。    |   task.skip.note と task.skip は問 1、2 の後は最後の問の下に残り、問 3 に答えたら DOM から外す（D-3。r12）
 | [ 今日はやめておく ]                   |
 ```
-選択肢を押してから `data-answer-result` が付くまで 300 ms 以内（AC-41）。「次の問題へ」で問 2 が下に足され（問 1 の返しは残り、ミルは消える）、問 2 の h2 にフォーカスが移る（D-64）。再読み込みで復元した返しにはミルが出ない（D-53）。`showCharacter` が false なら `guide.character` は 0 件で、他は同じ。
+選択肢を押してから `data-answer-result` が付くまで 300 ms 以内（AC-41）。「次の問題へ」で問 2 が下に足され（問 1 の返しは残り、ミルは消える）、問 2 の h2 にフォーカスが移る（D-64）。再読み込みで復元した返し（答えた問が n 件）では、問 n の返しにだけミルが出て（表情はその問の結果）、問 n の「次の問題へ」は無く、問 n+1 が未回答で続く。フェードは当てず、フォーカスは動かさない（D-53、D-64。U-24。r12）。`showCharacter` が false なら `guide.character` は 0 件で、他は同じ。
 
-## 図の 6 型（r11。D-50、D-51。上：幅 480 以上、下：幅 480 未満。┃ は強調の箱）
+## 図の 6 型（r11。D-50、D-51。上：横並び（図の幅 600 以上かつ箱／子 3 個以下。r12）、下：縦（それ以外）。┃ は強調の箱）
 ```
 flow（箱と矢印 2〜5）           layers（積み重ね 2〜5）        compare（見出し 2 + 行 1〜3）
 ┌────┐ → ┃────┃ → ┌────┐        ┌──────────────┐                ┌──────────┬──────────┐
 └────┘   ┃────┃   └────┘        │ 画面         │                │ 同期     │ 非同期   │  見出し（700、下枠 2 px）
                                  ├──────────────┤                ├──────────┼──────────┤
-幅 480 未満：                    ┃ API          ┃  強調          │ 待つ     ┃ 待たない ┃  行（対。強調は 1 セル）
+縦（幅 600 未満か 4 個以上）：                    ┃ API          ┃  強調          │ 待つ     ┃ 待たない ┃  行（対。強調は 1 セル）
 ┌────┐                           ├──────────────┤                └──────────┴──────────┘
 └────┘                           │ データベース │                常に 2 列。ラベルは列の中で折り返す
   ↓                              └──────────────┘
@@ -172,10 +171,10 @@ sequence（番号つき 2〜5）        tree（親 1 + 子 2〜4）          spl
 (2) 確かめる   ← 強調：丸と      │ 親   │                        │ 入力 │
 (3) 送る         ラベルが橙      └──┬───┘                        └──┬───┘
 番号は CSS counter の ::before     ┌──┴─┬────┐   線 2 px（border）   → 子 1 ┃ → 子 2 ┃ ← 矢印は SVG
-常に縦                          ┌┴─┐┌┴─┐┌┴──┐                     幅 480 未満：縦に並べ、左の縦線から
+常に縦                          ┌┴─┐┌┴─┐┌┴──┐                     縦（幅 600 未満か 4 個以上）：縦に並べ、左の縦線から
                                 │子││子││子 │                     各子へ矢印（→）
                                 └──┘└──┘└───┘
-                                幅 480 未満：子を縦 1 列、左に縦の線と各子への短い横線
+                                縦（幅 600 未満か 4 個以上）：子を縦 1 列、左に縦の線と各子への短い横線
 ```
 どの型も `task.figure` に `background-color: var(--color-bg)` を明示し、線（`[data-figure-part="line"]`）の `border-color` / `stroke` と地の比を 3:1 以上にする（AC-44 の (a)。D-52）。文字は axe-core。図の中に `<img>` はない。
 
@@ -213,21 +212,19 @@ sequence（番号つき 2〜5）        tree（親 1 + 子 2〜4）          spl
 | 今週（月曜から）の完了日数：3 日        |   task.week
 | 明日も課題が 1 件出ます。続けるなら、次 |   task.next.note（組の最後なら task.next.note.last）
 | の一手に進めます。                      |
-| 次の課題のファイルをまだ取り込めていま  |   （オフラインで次の組が無いときだけ）p role=alert error.tasks.offline（color.error）+ button task.next.retry「もう一度進む」。D-61
-| せん。ネットにつないでから…            |
 | [ 次の一手に進む ]                     |   task.next（副操作の形。列いっぱい）
 | ひとこと解説                           |   h2 task.insight + task.insight.text（ボタンの後ろ：D-45）
 | …insight…                              |
 | <u>履歴を見る</u>                      |   task.done.history
 ```
-ミルは出ない（D-53）。再読み込みしても同じ。
+ミルは出ない（D-53）。再読み込みしても同じ。r12：次の課題は同じ領域のファイルの中なので、オフラインの行は無い（D-61）。
 
 ## S6 task.skipped（r11：申告は「今日はやめておく」の 1 種類。段階の文は消えた）
 ```
 | 今日はやめておきました                 |   h1 task.skipped.title（フォーカス）
 | 明日も課題が 1 件出ます。続けるなら、次 |   task.next.note（か .last）
 | の一手に進めます。                      |
-| [ 次の一手に進む ]                     |   task.next（オフラインで次の組が無ければ直上に error.tasks.offline + task.next.retry）
+| [ 次の一手に進む ]                     |   task.next（r12：オフラインの例外は無い。D-61）
 | <u>履歴を見る</u>                      |   task.skipped.history
 ```
 解説、累計、祝い、正答数、ミルは出さない。答えた分（answers、score）は履歴の行にだけ残る（S10）。
@@ -246,8 +243,6 @@ sequence（番号つき 2〜5）        tree（親 1 + 子 2〜4）          spl
 | を書いている（人に聞きながらでもよい）。|
 | （中級の課題は、前に出したものを除いて  |   task.exhausted.seenNext か .nextDone（条件つき。D-40）
 | 続きます。…）                          |
-| 次の課題のファイルをまだ取り込めていま  |   （オフラインで次の段階の組が無いときだけ）error.tasks.offline + task.next.retry。D-61
-| せん。…                                 |
 | [[ 中級に進む ]]                       |   task.exhausted.advance（主操作）
 | [ 別の領域を選ぶ ]                     |   task.exhausted.redo（副操作）
 ```
@@ -263,7 +258,7 @@ allDone：h1 `task.exhausted.allDone` → ミル → 累計 → `task.exhausted.
 | [ 診断をやり直す ]                     |
 | …注記…                                 |
 | 案内役                                 |   h2 settings.character.title（r11。D-56）
-| [x] 案内役のミルを表示する             |   input type=checkbox settings.character.show（checked=showCharacter）+ label settings.character.show.label（44 px）
+| [x] 案内役のミルを表示する             |   label settings.character.show（44 px。r12）> input type=checkbox settings.character.show.input（checked=showCharacter）
 | 非表示にしても、解説、累計、祝いの文は  |   p settings.character.note（text.small、secondary）
 | 出ます。                               |
 | ホーム画面                             |   h2（iOS の Safari だけ。r10 と同じ）
@@ -306,6 +301,11 @@ allDone：h1 `task.exhausted.allDone` → ミル → 累計 → `task.exhausted.
 | …題名…                                 |
 | 今日はやめておく ・ 3 問中 1 問          |
 | 2026-11-04                             |   none の行：report.none「申告なし」（日付が変わった課題）
+| 2026-11-03                             |   領域のファイルを読めない行（r12。D-61 (2)）：li に data-title-unavailable=true
+| frontend-basic-004                     |   history.row.taskTitle に題名の代わりに課題の ID
+| この領域のファイルをまだ取り込めていま  |   p history.row.unavailable（text.small、secondary。エラーの色にしない）
+| せん。題名と選んだ答えは、…             |
+| 完了 ・ 3 問中 2 問 ・ 役に立った       |   report、history.row.score、helpful は出す。details history.row.answers は出さない
 ```
 空：`history.empty` + 主操作 `history.empty.action`（r10 と同じ）。
 
