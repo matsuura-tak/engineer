@@ -8,6 +8,7 @@
   },
   "scripts": {
     "test": "playwright test",
+    "test:ac15": "playwright test --project=chromium-ac15 --no-deps --workers=1",
     "check:seeds": "node helpers/check-seeds.mjs && node helpers/check-seed-builders.mjs"
   },
   "devDependencies": {

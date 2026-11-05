@@ -54,12 +54,14 @@ async function waitOpaque(page, id) {
   await waitVisible(page, id);
   await page.waitForFunction((i) => { const el = document.querySelector(`[data-testid="${i}"]`); return !!el && getComputedStyle(el).opacity === '1'; }, id, { timeout: WAIT });
 }
-/** S4（task.rate）は演出が終わった後（描いてから 1 秒後）に撮る（design 5.1 の冒頭、contracts/test-hooks.md「完了の演出の確かめ方」）。
- *  待つのは時刻合わせでなく、演出（通常 550 ms、節目 950 ms）を終わらせるため。撮る直前に task.total.prev が 0 件（animationend で外れた）ことを確かめる。 */
+/** S4（task.rate）は演出が終わった後に撮る（design 5.1 の冒頭、contracts/test-hooks.md「完了の演出の確かめ方」の「スクリーンショット」の行）：
+ *  data-state が task.rate になってから 1 秒待ち、さらに task.total.prev が DOM から消える（件数 0。animationend で外れる）まで待つ。
+ *  1 秒は演出（通常 550 ms、節目 950 ms）を終わらせるためで、時刻合わせではない。1 秒は節目の 950 ms に対して余裕が 50 ms しかないので、
+ *  消えるまで待つことで撮影の時点を演出の終わりの後にそろえる（2026-11-05 の指揮役の決定）。上限 WAIT を過ぎても残っていれば error。 */
 async function settleS4(page) {
   await waitState(page, 'task.rate');
   await page.waitForTimeout(1000);
-  if ((await tid(page, 'task.total.prev').count()) !== 0) throw new Error('1 秒後も task.total.prev が残っている（演出が終わっていない）');
+  await page.waitForFunction(() => document.querySelectorAll('[data-testid="task.total.prev"]').length === 0, null, { timeout: WAIT });
 }
 /** 完了 → S4 → S5（評価は「今回は答えない」）。 */
 async function completeToDone(page) {
@@ -311,6 +313,13 @@ const SCENARIOS = [
     } },
   { name: 'S5_task.done', ac: 'AC-5、AC-31', normal: true, state: 'task.done',
     async run(context, page, env) { await injectSeed(context, AC14()); await open(page, env.baseURL, '2026-11-03'); await waitState(page, 'task.done'); } },
+  // design 5.1 #27：S4 で答えて着いた S5（D-45 の順）。#28（再読み込み後。同じ要素）は上の S5_task.done（seed を開く = 保存データから描く）が 4 通り。
+  { name: 'S5_task.done_afterRate', ac: 'AC-5、AC-9（design 5.1 #27：S4 で答えた直後）', state: 'task.done',
+    async run(context, page, env) {
+      await injectSeed(context, AC14()); await open(page, env.baseURL, '2026-11-04'); await waitState(page, 'task.today');
+      await tid(page, 'task.report.done').click(); await settleS4(page);
+      await tid(page, 'task.rate.helpful').click(); await waitState(page, 'task.done');
+    } },
   { name: 'S6_task.skipped_too_hard', ac: 'AC-7（levelHint あり）', normal: true, state: 'task.skipped',
     async run(context, page, env) {
       await injectSeed(context, AC14()); await open(page, env.baseURL, '2026-11-04'); await waitState(page, 'task.today');
@@ -331,6 +340,14 @@ const SCENARIOS = [
     async run(context, page, env) {
       const { seed, nextDate } = exhaustedSeed(env.tasks, { area: 'backend', level: 'intermediate', firstOpenDate: '2026-09-01' });
       await injectSeed(context, seed); await open(page, env.baseURL, nextDate); await waitState(page, 'task.exhausted');
+    } },
+  // design 5.1 #34：S7 allDone（上級を出し終えた）。5.1 の冒頭は levelDone と allDone を「通常」として 4 通りで撮ると決めている。
+  { name: 'S7_task.exhausted_allDone', ac: 'AC-10', normal: true, state: 'task.exhausted',
+    async run(context, page, env) {
+      const { seed, nextDate } = exhaustedSeed(env.tasks, { area: 'backend', level: 'advanced', firstOpenDate: '2026-09-01' });
+      await injectSeed(context, seed); await open(page, env.baseURL, nextDate); await waitState(page, 'task.exhausted');
+      await waitVisible(page, 'task.exhausted.allDone');
+      if ((await tid(page, 'task.exhausted.advance').count()) !== 0) throw new Error('allDone で task.exhausted.advance が 0 件でない');
     } },
   { name: 'S7_task.exhausted_dayChanged', ac: '—（design 5 S7、D-30：操作で日付をまたいだ知らせ）', normal: true, state: 'task.exhausted',
     async run(context, page, env) {
@@ -484,6 +501,21 @@ const SCENARIOS = [
     async openDialog(page) {
       await tid(page, 'settings.import.file').setInputFiles(contractFixturePath('data/v1/valid-export-three-completed.json'));
       await waitVisible(page, 'settings.import.confirm');
+    } },
+  // design 5.1 #45：settings.import.confirm で「置き換える」の保存が失敗 → ダイアログの中に error.storage.message と error.storage.retry（design 5 のダイアログの行）。
+  // エラーの状態なのでライトだけ。保存の失敗は W-9 の注入（setItem が 1 回だけ QuotaExceededError）。
+  { name: 'dialog_settings.import.confirm_error_storage', ac: '—（design 5.1 #45：import.confirm の保存の失敗）', state: 'settings', viewportOnly: true,
+    async run(context, page, env) {
+      await injectStorageFailure(context);
+      await injectSeed(context, AC14()); await open(page, env.baseURL, '2026-11-04'); await waitState(page, 'task.today');
+      await tid(page, 'nav.settings').click(); await waitState(page, 'settings');
+      await tid(page, 'settings.import.file').setInputFiles(contractFixturePath('data/v1/valid-export-three-completed.json'));
+      await waitVisible(page, 'settings.import.confirm');
+      await armStorageFailure(page);
+      await tid(page, 'settings.import.confirm.ok').click();
+      await waitVisible(page, 'error.storage.message');
+      if ((await tid(page, 'settings.import.confirm').count()) !== 1) throw new Error('保存の失敗の後にダイアログが残っていない');
+      if ((await tid(page, 'error.storage.retry').count()) !== 1) throw new Error('error.storage.retry が 1 件でない');
     } },
   { name: 'dialog_settings.delete.confirm', ac: 'AC-16', normal: true, state: 'settings', viewportOnly: true,
     dialog: { id: 'settings.delete.confirm', ok: 'settings.delete.confirm.ok', cancel: 'settings.delete.confirm.cancel' },

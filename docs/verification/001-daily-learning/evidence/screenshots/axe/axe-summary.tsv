@@ -28,6 +28,7 @@ chromium	S4_task.rate	light	task.rate	0	0		11	0		axe/chromium_S4_task.rate_light
 chromium	S4_task.rate_total11	light	task.rate	0	0		11	0		axe/chromium_S4_task.rate_total11_light.json
 chromium	S4_task.rate_at7	light	task.rate	0	0		11	0		axe/chromium_S4_task.rate_at7_light.json
 chromium	S4_task.rate_at30	light	task.rate	0	0		11	0		axe/chromium_S4_task.rate_at30_light.json
+chromium	S4_task.rate_at100	light	task.rate	0	0		11	0		axe/chromium_S4_task.rate_at100_light.json
 chromium	S4_error_storage	light	task.rate	0	0		14	0		axe/chromium_S4_error_storage_light.json
 chromium	S5_task.done	light	task.done	0	0		10	0		axe/chromium_S5_task.done_light.json
 chromium	S6_task.skipped_too_hard	light	task.skipped	0	0		10	0		axe/chromium_S6_task.skipped_too_hard_light.json
@@ -53,6 +54,7 @@ chromium	S8_import_error_version	light	settings	0	0		20	0		axe/chromium_S8_impor
 chromium	S8_import_error_schema	light	settings	0	0		20	0		axe/chromium_S8_import_error_schema_light.json
 chromium	S8_homeScreen_guide	light	settings	0	0		19	0		axe/chromium_S8_homeScreen_guide_light.json
 chromium	dialog_settings.import.confirm	light	settings	0	0		12	1	color-contrast(serious×1:p[data-testid="settings.import.confirm.body"])	axe/chromium_dialog_settings.import.confirm_light.json
+chromium	dialog_settings.import.confirm_error_storage	light	settings	0	0		15	2	color-contrast(serious×2:p[data-testid="settings.import.confirm.body"]|.msg-error)	axe/chromium_dialog_settings.import.confirm_error_storage_light.json
 chromium	dialog_settings.delete.confirm	light	settings	0	0		12	1	color-contrast(serious×1:p[data-testid="settings.delete.confirm.body"])	axe/chromium_dialog_settings.delete.confirm_light.json
 chromium	S9_settings.stats	light	settings.stats	0	0		10	0		axe/chromium_S9_settings.stats_light.json
 chromium	S9_settings.stats_zero	light	settings.stats	0	0		10	0		axe/chromium_S9_settings.stats_zero_light.json
@@ -113,10 +115,14 @@ webkit	S8_import_error_version	light	settings	0	0		20	0		axe/webkit_S8_import_er
 webkit	S8_import_error_schema	light	settings	0	0		20	0		axe/webkit_S8_import_error_schema_light.json
 webkit	S8_homeScreen_guide	light	settings	0	0		19	0		axe/webkit_S8_homeScreen_guide_light.json
 webkit	dialog_settings.import.confirm	light	settings	0	0		12	1	color-contrast(serious×1:p[data-testid="settings.import.confirm.body"])	axe/webkit_dialog_settings.import.confirm_light.json
+webkit	dialog_settings.import.confirm_error_storage	light	settings	0	0		15	0		axe/webkit_dialog_settings.import.confirm_error_storage_light.json
 webkit	dialog_settings.delete.confirm	light	settings	0	0		12	1	color-contrast(serious×1:p[data-testid="settings.delete.confirm.body"])	axe/webkit_dialog_settings.delete.confirm_light.json
 webkit	S9_settings.stats	light	settings.stats	0	0		10	0		axe/webkit_S9_settings.stats_light.json
 webkit	S9_settings.stats_zero	light	settings.stats	0	0		10	0		axe/webkit_S9_settings.stats_zero_light.json
 webkit	S10_history	light	history	0	0		17	0		axe/webkit_S10_history_light.json
 webkit	S10_history_answerOpen	light	history	0	0		17	0		axe/webkit_S10_history_answerOpen_light.json
 webkit	S10_history_empty	light	history	0	0		15	0		axe/webkit_S10_history_empty_light.json
-chromium	S4_task.rate_at100	light	task.rate	0	0		11	0		axe/chromium_S4_task.rate_at100_light.json
+chromium	S5_task.done_afterRate	light	task.done	0	0		10	0		axe/chromium_S5_task.done_afterRate_light.json
+chromium	S7_task.exhausted_allDone	light	task.exhausted	0	0		10	0		axe/chromium_S7_task.exhausted_allDone_light.json
+webkit	S5_task.done_afterRate	light	task.done	0	0		10	0		axe/webkit_S5_task.done_afterRate_light.json
+webkit	S7_task.exhausted_allDone	light	task.exhausted	0	0		10	0		axe/webkit_S7_task.exhausted_allDone_light.json

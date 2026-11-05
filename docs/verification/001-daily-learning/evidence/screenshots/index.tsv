@@ -54,6 +54,7 @@ S4_task.rate_at7_dark.png	chromium	390x844@2	dark	S4_task.rate_at7	AC-35（desig
 S4_task.rate_at7_ax5.png	chromium	390x844@2	ax5	S4_task.rate_at7	AC-35（design 5.1 #23 節目 7）	task.rate	task.rate	ja	32px	390/390	ok	
 S4_task.rate_at7_en.png	chromium	390x844@2	en	S4_task.rate_at7	AC-35（design 5.1 #23 節目 7）	task.rate	task.rate	en	16px	390/390	ok	
 S4_task.rate_at30_light.png	chromium	390x844@2	light	S4_task.rate_at30	AC-35（design 5.1 #24 節目 30）	task.rate	task.rate	ja	16px	390/390	ok	
+S4_task.rate_at100_light.png	chromium	390x844@2	light	S4_task.rate_at100	AC-35（design 5.1 #25 節目 100）	task.rate	task.rate	ja	16px	390/390	ok	
 S4_error_storage_light.png	chromium	390x844@2	light	S4_error_storage	—（design 5 S4 エラー）	task.rate	task.rate	ja	16px	390/390	ok	
 S5_task.done_light.png	chromium	390x844@2	light	S5_task.done	AC-5、AC-31	task.done	task.done	ja	16px	390/390	ok	
 S5_task.done_dark.png	chromium	390x844@2	dark	S5_task.done	AC-5、AC-31	task.done	task.done	ja	16px	390/390	ok	
@@ -98,6 +99,7 @@ dialog_settings.import.confirm_light.png	chromium	390x844@2	light	dialog_setting
 dialog_settings.import.confirm_dark.png	chromium	390x844@2	dark	dialog_settings.import.confirm	AC-20	settings	settings	ja	16px	390/390	ok	
 dialog_settings.import.confirm_ax5.png	chromium	390x844@2	ax5	dialog_settings.import.confirm	AC-20	settings	settings	ja	32px	390/390	ok	
 dialog_settings.import.confirm_en.png	chromium	390x844@2	en	dialog_settings.import.confirm	AC-20	settings	settings	en	16px	390/390	ok	
+dialog_settings.import.confirm_error_storage_light.png	chromium	390x844@2	light	dialog_settings.import.confirm_error_storage	—（design 5.1 #45：import.confirm の保存の失敗）	settings	settings	ja	16px	390/390	ok	
 dialog_settings.delete.confirm_light.png	chromium	390x844@2	light	dialog_settings.delete.confirm	AC-16	settings	settings	ja	16px	390/390	ok	
 dialog_settings.delete.confirm_dark.png	chromium	390x844@2	dark	dialog_settings.delete.confirm	AC-16	settings	settings	ja	16px	390/390	ok	
 dialog_settings.delete.confirm_ax5.png	chromium	390x844@2	ax5	dialog_settings.delete.confirm	AC-16	settings	settings	ja	32px	390/390	ok	
@@ -168,6 +170,7 @@ webkit/S8_import_error_schema_light.png	webkit	390x844@2	light	S8_import_error_s
 webkit/S8_homeScreen_guide_light.png	webkit	390x844@2	light	S8_homeScreen_guide	AC-21	settings	settings	ja	16px	390/390	ok	
 webkit/dialog_settings.import.confirm_light.png	webkit	390x844@2	light	dialog_settings.import.confirm	AC-20	settings	settings	ja	16px	390/390	ok	
 webkit/dialog_settings.import.confirm_ax5.png	webkit	390x844@2	ax5	dialog_settings.import.confirm	AC-20	settings	settings	ja	32px	390/390	ok	
+webkit/dialog_settings.import.confirm_error_storage_light.png	webkit	390x844@2	light	dialog_settings.import.confirm_error_storage	—（design 5.1 #45：import.confirm の保存の失敗）	settings	settings	ja	16px	390/390	ok	
 webkit/dialog_settings.delete.confirm_light.png	webkit	390x844@2	light	dialog_settings.delete.confirm	AC-16	settings	settings	ja	16px	390/390	ok	
 webkit/dialog_settings.delete.confirm_ax5.png	webkit	390x844@2	ax5	dialog_settings.delete.confirm	AC-16	settings	settings	ja	32px	390/390	ok	
 webkit/S9_settings.stats_light.png	webkit	390x844@2	light	S9_settings.stats	AC-24	settings.stats	settings.stats	ja	16px	390/390	ok	
@@ -175,4 +178,10 @@ webkit/S9_settings.stats_zero_light.png	webkit	390x844@2	light	S9_settings.stats
 webkit/S10_history_light.png	webkit	390x844@2	light	S10_history	AC-5、AC-19	history	history	ja	16px	390/390	ok	
 webkit/S10_history_answerOpen_light.png	webkit	390x844@2	light	S10_history_answerOpen	AC-19、AC-32	history	history	ja	16px	390/390	ok	
 webkit/S10_history_empty_light.png	webkit	390x844@2	light	S10_history_empty	AC-16（design 5 S10 空）	history	history	ja	16px	390/390	ok
-S4_task.rate_at100_light.png	chromium	390x844@2	light	S4_task.rate_at100	AC-35（design 5.1 #25 節目 100）	task.rate	task.rate	ja	16px	390/390	ok	
+S5_task.done_afterRate_light.png	chromium	390x844@2	light	S5_task.done_afterRate	AC-5、AC-9（design 5.1 #27：S4 で答えた直後）	task.done	task.done	ja	16px	390/390	ok	
+S7_task.exhausted_allDone_light.png	chromium	390x844@2	light	S7_task.exhausted_allDone	AC-10	task.exhausted	task.exhausted	ja	16px	390/390	ok	
+S7_task.exhausted_allDone_dark.png	chromium	390x844@2	dark	S7_task.exhausted_allDone	AC-10	task.exhausted	task.exhausted	ja	16px	390/390	ok	
+S7_task.exhausted_allDone_ax5.png	chromium	390x844@2	ax5	S7_task.exhausted_allDone	AC-10	task.exhausted	task.exhausted	ja	32px	390/390	ok	
+S7_task.exhausted_allDone_en.png	chromium	390x844@2	en	S7_task.exhausted_allDone	AC-10	task.exhausted	task.exhausted	en	16px	390/390	ok	
+webkit/S5_task.done_afterRate_light.png	webkit	390x844@2	light	S5_task.done_afterRate	AC-5、AC-9（design 5.1 #27：S4 で答えた直後）	task.done	task.done	ja	16px	390/390	ok	
+webkit/S7_task.exhausted_allDone_light.png	webkit	390x844@2	light	S7_task.exhausted_allDone	AC-10	task.exhausted	task.exhausted	ja	16px	390/390	ok	

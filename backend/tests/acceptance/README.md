@@ -10,7 +10,8 @@ verifier が PRD（docs/prd/001-daily-learning.md）、design/、contracts/ だ�
 cd backend/tests/acceptance
 npm ci                                   # 依存は contracts/dependencies.md の 3 件だけ（版を固定）
 npx playwright install chromium webkit   # ブラウザのバイナリ
-npx playwright test                      # 判定の実行。再試行は 0（retries: 0）
+npx playwright test                      # 判定の実行。再試行は 0（retries: 0）。AC-15 は chromium と webkit の全件が終わった後に 1 本だけ動く（下）
+npm run test:ac15                        # AC-15 だけ（= playwright test --project=chromium-ac15 --no-deps --workers=1）。揺れの確認は --repeat-each=5 を足す
 ```
 
 - global-setup.mjs が `node backend/scripts/build.mjs --out <一時フォルダ>/dist --version 2026-11-30.1` で配布物を 1 回ビルドし（出力先は mkdtemp の一時フォルダ。backend/dist は使わず、終わったら消す）、各ワーカーが `server/static-server.mjs` で `http://127.0.0.1:<port>/engineer/` の下に配ります（GitHub Pages と同じパスとヘッダー）。
@@ -20,11 +21,12 @@ npx playwright test                      # 判定の実行。再試行は 0（re
 - 揺れの確認（G3）：同じコマンドを 5 回。1 回でも落ちればその AC は未検証。
 - seed の検査：`npm run check:seeds`（seeds/ の JSON が contracts/schemas/data.schema.json と data.md の 8 に合うか）。
 - 1 つの AC だけ：`npx playwright test -g AC8_`、1 つのブラウザだけ：`--project=chromium`。
+- AC-15（読み込みの時間）は他のテストと並列にしない（contracts/test-hooks.md「W-11 AC-15 の制限」、2026-11-05 の指揮役の決定）。project `chromium-ac15` が `dependencies: ['chromium', 'webkit']` で全件の後に動き（他の worker は止まっている）、テストは 1 本で project の fullyParallel は false。chromium と webkit の project は `ac15-` を対象にしない。dependencies の project に失敗があると Playwright は chromium-ac15 を動かさず skipped と数えるので、そのときの AC-15 の結果は `npm run test:ac15` で別に取る。
 
 ## 構成
 | 場所 | 中身 |
 |---|---|
-| playwright.config.mjs | projects は chromium と webkit。timezoneId Asia/Tokyo、locale ja-JP。AC-15（CDP の制限）は chromium だけ（webkit は `ac15-` を対象外） |
+| playwright.config.mjs | projects は chromium、webkit、chromium-ac15（AC-15 だけ。dependencies で全件の後に 1 本だけ動く：W-11）。timezoneId Asia/Tokyo、locale ja-JP。AC-15（CDP の制限）は chromium だけ（chromium と webkit は `ac15-` を対象外） |
 | global-setup.mjs | 配布物のビルド（1 回。一時フォルダに出し、teardown で消す）。結果を env で各ワーカーに渡す |
 | server/static-server.mjs | テスト用の静的サーバー（node の組み込みだけ。gzip、`Cache-Control: max-age=600`、Content-Type、`/engineer` → `/engineer/` の 301、404、実行中の差し替え `setRoot`） |
 | helpers/fixtures.mjs | worker ごとのサーバーと baseURL |
