@@ -1,7 +1,7 @@
 # 技術設計メモ 001-daily-learning：診断と今日の学習（今日の一手）
 
-- 書いた役：tech-lead　日付：2026-10-30（2026-11-05 に PRD r10 と design r8 に合わせて書き直した。Takuma の FB 1 回目の作り直し）
-- PRD：docs/prd/001-daily-learning.md（r10、AC-1〜AC-40）　デザイン：design/001-daily-learning.md（r8、文言 174 キー）　契約：contracts/（HTTP の API はないので OpenAPI はない。一覧は contracts/README.md）
+- 書いた役：tech-lead　日付：2026-10-30（2026-11-05 に PRD r10 と design r8 に合わせて書き直した。Takuma の FB 1 回目の作り直し。同じ日に PRD r11 と design r9 に追従）
+- PRD：docs/prd/001-daily-learning.md（r11、AC-1〜AC-40）　デザイン：design/001-daily-learning.md（r9、文言 174 キー、差し込みのあるキー 26）　契約：contracts/（HTTP の API はないので OpenAPI はない。一覧は contracts/README.md）
 - 読み替え：型の「operationId」は「契約のファイルと項目」、「iOS」は「ブラウザ（Safari 17 以上、Chrome の最新 2 版）」に読み替える。spectral と oasdiff は使えないので、JSON Schema の検査と見本のテストで代える（指揮役の裁定 E2）。
 - Takuma の決定 D1〜D10（2026-10-30。docs/approvals/001-daily-learning-G0.md の末尾）と、FB 1 回目（docs/approvals/001-daily-learning-FB1.md）、指揮役の決定（docs/approvals/delegation.md の 2026-11-05：Q12〜Q19、S7 の再読み込み、予算の割り直し）を反映した。一覧は 10。
 
@@ -53,7 +53,7 @@ operationId は全行「なし（端末のみ）」。代わりに「データ�
 | AC-23 | S0 → S3 / S5 | なし（端末のみ） | contracts/service-worker.md、W-12、W-13 | 受け入れ 2：再読み込みと新しいタブ |
 | AC-24 | S9 | なし（端末のみ） | data.md の 9（days-completed-week と extra-completed を足した）、identifiers.md の 4 の `data-stat-*`、fixtures/seeds/seed-ac24-stats.json（PRD r10 の Given：11-04 に完了 2 行、11-06 に no_time。W-7） | 受け入れ 2 |
 | AC-25 | S8 | なし（端末のみ） | data.md の 6 と 7（版を先に見る）、fixtures/data/invalid-newer-version.json | 受け入れ 2 |
-| AC-26 | S1 | なし（端末のみ） | schemas/strings.schema.json（174 キー必須、他を拒む、差し込み 25 キーの名前）、strings.md の 2 と 3 | 受け入れ 2：locale ja-JP／en-US |
+| AC-26 | S1 | なし（端末のみ） | schemas/strings.schema.json（174 キー必須、他を拒む、差し込み 26 キーの名前。r9 で `task.next.note.last` に `{area}`、`{level}`）、strings.md の 2 と 3 | 受け入れ 2：locale ja-JP／en-US |
 | AC-27 | S1、S2、S3、S5、S7、S8 | なし（端末のみ） | contracts/dependencies.md（@axe-core/playwright 4.14.0） | 受け入れ 2：axe の JSON を証拠に |
 | AC-28 | S0、S8 | なし（端末のみ） | service-worker.md、`data-build-version`、test-hooks.md の「AC-28 の配布物の差し替え」 | 受け入れ 2：2 秒おき 3 回 |
 | AC-29 | なし | なし（端末のみ） | tasks.schema.json（`mode`、`tools`、in_app の URL の禁止）、組ごとの 20%（W-6） | 受け入れ JSON |
@@ -100,18 +100,18 @@ flowchart LR
 - ブラウザの外に出る通信は、配布物の GET だけ（初回と、SW の更新の確認）。利用者のデータを送る矢印はない（AC-12、AC-23）。
 
 ## 4. 契約の変更と互換性
-HTTP の operation はない。代わりに契約のファイルの一覧（main に契約はなく、すべて新規。r8 の変更はコミット c2a19ba、a608b71、0406818）：
+HTTP の operation はない。代わりに契約のファイルの一覧（main に契約はなく、すべて新規。r8 の変更はコミット c2a19ba、a608b71、0406818。design r9 への追従は 79e33f3）：
 | 契約 | 足す / 変える | AC | 認証 | 作る POST の Idempotency-Key |
 |---|---|---|---|---|
 | schemas/tasks.schema.json | 足す（r8 で `insight` を必須に） | AC-3、AC-4、AC-29、AC-30、AC-34、AC-38 | 不要（端末のみ） | 対象外 |
 | schemas/data.schema.json | 足す（r8 で years に `never`。同じ日付の行を許す） | AC-5〜AC-11、AC-13、AC-14、AC-16、AC-19〜AC-25、AC-32、AC-33、AC-35〜AC-37、AC-40 | 不要 | 対象外 |
-| schemas/strings.schema.json | 足す（r8 で 174 キー、差し込み 25 キー） | AC-26、AC-35、AC-39 | 不要 | 対象外 |
+| schemas/strings.schema.json | 足す（r8 で 174 キー。r9 で差し込み 26 キー：`task.next.note.last` に `{area}`、`{level}`） | AC-26、AC-35、AC-39 | 不要 | 対象外 |
 | data.md、strings.md、identifiers.md、test-hooks.md、service-worker.md、budgets.md | 足す（r8 で data.md の 2、4、5、8、9、strings.md の 7、budgets.md の 1、2、5 など） | 全 AC | 不要 | 対象外 |
 | fixtures/（52 件）、tools/check-schemas.mjs | 足す（r8 で 11 件足した） | 上と同じ | 不要 | 対象外 |
 
 - spectral の出力：未検査（OpenAPI なし。指揮役の裁定 E2）。
 - oasdiff breaking の出力：未検査（OpenAPI なし）。main に契約はなく、すべて新規。
-- 代わりの検査：`cd backend && npm run -s check:contracts`（= `node ../contracts/tools/check-schemas.mjs`、ajv 8.20.0、node v24.22.1）。2026-11-05 の出力（全文）：
+- 代わりの検査：`cd backend && npm run -s check:contracts`（= `node ../contracts/tools/check-schemas.mjs`、ajv 8.20.0、node v24.22.1）。2026-11-05 の出力（全文。design r9 への追従の後に取り直した）：
 ```
 ajv 8.20.0（Ajv2020、strict）
 OK  メタスキーマ data.schema.json
@@ -172,7 +172,7 @@ OK  tasks/invalid-minutes-16.json 期待：落ちる → 落ちた（data/tasks/
 OK  tasks/invalid-unknown-mode.json 期待：落ちる → 落ちた（data/tasks/0/mode must be equal to one of the allowed values）
 OK  tasks/valid-insight-120-codepoints.json 期待：通る → 通った
 OK  tasks/valid-sample.json 期待：通る → 通った
-OK  strings/valid-ja.json と valid-en.json の差し込みの名前がすべてのキーでそろう（差し込みのあるキー 25 個）
+OK  strings/valid-ja.json と valid-en.json の差し込みの名前がすべてのキーでそろう（差し込みのあるキー 26 個）
 見本 52 件、期待と違う結果 0 件
 exit=0
 ```
@@ -394,3 +394,10 @@ PRD r10 と design r8 に合わせた書き直し（2026-11-05、tech-lead。G1 
 - 6：反応に AC-33、転送量に新しい枠、JS のファイル、動き、タイマーの行（今の 3 か所を grep で数えた）を足した。
 - 7：新しい境界なしの 1 行を足した。8：Task Continued、Level Completed、Level Advanced を足した（16 件）。9：r8 の依存の変更なし。10：ADR 0002 と 0003 の改訂、未確認の項目を r8 に合わせた。
 - 自分では合格にしない。reviewer に反論を出してもらう（特に ADR 0002 の (e)：公開前に版 1 のまま ID の意味を変えること）。
+
+G1 reviewer r2 の要修正 3 件と提案の直し（2026-11-05、tech-lead。docs/reviews/001-daily-learning-G1-reviewer-r2.md）：
+- 冒頭：PRD r11、design r9 にした。2 の AC-26 の行と 4 の表：差し込みを 26 キーにした。4：check-schemas の出力を取り直して貼った（差し込み 26 個、見本 52 件、0 件、終了コード 0）。
+- test-hooks.md の W-7 の AC-14 の 2 通り目を PRD r11 に合わせた（やり直し → S3 のまま → 完了 → `task.next` → 同じ日に新しい領域の S3、`data-task-nth-today` は 2）。6-2 と 6-3 の参照も今の順に直した。
+- ADR 0002：(e) の手当てを、使ったすべてのブラウザとホーム画面の Web アプリでの削除と、書き出しファイルでの確かめにした。検討した案に (h) と (e) との比較を足した。ID の固定テストを G4 の reviewer の確認項目にした。
+- contracts/README.md の 146 を 174 に、identifiers.md の 3 の radio に `area.*.desc` を足した。CLAUDE.md の見本の件数に今の 52 件を添えた。
+- 自分では合格にしない。reviewer に反論を出してもらう（特に (e) と (h) の比較）。

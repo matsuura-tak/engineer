@@ -78,11 +78,11 @@ verifier G0 r3 の W-1〜W-16 を、名前と値まで決めたものです。�
   - `history` の古い順に、`backend-intermediate-001` と `002` を `level: "intermediate"` の `too_hard` で 2 日（この 2 行で初級に下がった形。data.md の 5 の 3）。続けて本番の課題集の `backend-beginner-*` をすべて（v1 は 14 件）`level: "beginner"` で入れる。申告は `done` などにし、`too_easy` を 2 行続けない（続けると段階の規則で中級に上がる形になり、`levels` と食い違う）。
   - 時刻は最後の行の翌日に固定して開く。目標の組（`backend`、`beginner`）の未出が 0 件なので S7（data.md の 4 の 6-4）、`levels` が `beginner` なので levelDone。次の段階の組（`backend`、`intermediate`）に未出が 12 件あり、`history` に中級の行があるので `task.exhausted.seenNext` が 1 つ（data.md の 5「S7 の変種と補足の 1 文」）。
   - 対の確かめ（任意）：中級の 2 行を外すと補足なし、中級の 14 件をすべて `history` に入れると `task.exhausted.nextDone`。
-- AC-14 の seed は 2 通り（PRD r7 の AC-14 の確かめ方。Q11 は A）。
+- AC-14 の seed は 2 通り（PRD r11 の AC-14 の確かめ方。Q11 は A。2 通り目は PRD r8 で「翌日」から「同じ日に次へ進む」に変わった）。
   - 1 通り目（`task.exhausted` からやり直す）：出し終えた履歴（完了 3 件を含む）。AC-10 と同じく本番の課題集から作る（今の組の課題をすべて `history` に入れ、そのうち直近 3 日の 3 件を `done` にする）。PRD の Given「今日の課題はまだ出していない」は、data.md の 4 の 6-4 の下では、目標の組を出し終えた日（`task.exhausted`）にしか作れないため。固定の seed は置かない（課題集の中身に依存するため）。
-  - 2 通り目（`task.today` からやり直す）：fixtures/seeds/seed-ac14-three-completed.json の形（完了 3 件、最後の行は 2026-11-03、`current` なし）で開き、`task.today` とその `data-task-id` を確かめてからやり直す。時刻は最後の行より後の日（例 2026-11-04）に固定する（2026-11-03 に開くと 4 の 6-2 で `task.done` になる）。やり直しで選ぶ領域は seed の `backend` 以外にする。
-    - やり直しの直後：data.md の 2 の表（今日の課題を出した後のやり直しは `current` を書かない）と、終えた後の行き先（同じ 2）により、4 の 6-3 で `task.today` のままで `data-task-id` はやり直しの前と同じ。
-    - 翌日（例 2026-11-05）に固定して開く：4 の 6-1 で前日の課題が `report: "none"` の行に移り、6-4 で新しい `diagnosis.area` と `levels` の課題が出る（`data-task-area` が新しく選んだ領域）。完了した課題は 3 件のまま（`none` は完了でない。S10 の行は 4 行になる）。
+  - 2 通り目（`task.today` からやり直す）：fixtures/seeds/seed-ac14-three-completed.json の形（完了 3 件、最後の行は 2026-11-03、`current` なし）で開き、`task.today` とその `data-task-id` を確かめてからやり直す。時刻は最後の行より後の日（例 2026-11-04）に固定する（2026-11-03 に開くと 4 の 6-3 で `task.done` になる。6-2 と 6-3 の順は 2026-11-05 に入れ替えた）。やり直しで選ぶ領域は seed の `backend` 以外にする。
+    - やり直しの直後：data.md の 2 の表（今日の課題を出した後のやり直しは `current` を書かない）と、終えた後の行き先（同じ 2）により、今日の `current` が残るので 4 の 6-2 で `task.today` のまま。確かめること：S3 のまま、`data-task-id` がやり直しの前と同じ、`data-task-area` は `backend` のまま。S10 の完了（`data-report="done"`）は 3 行のまま。
+    - 続けて同じ日のうちに（時刻は動かさない）、その課題を完了（`task.report.done`）→ S4（`task.rate`。`task.rate.helpful` などで答えるか閉じる）→ S5（`task.done`）→ `task.next` を押す（design の 2 の AC-14 の行と同じ流れ）：4 の「操作で出すとき」で新しい `diagnosis.area` と `levels` の組から選び、S3 です。確かめること：`data-task-area` が新しく選んだ領域、`data-task-nth-today` が `2`（今日の完了の行 1 + 1。data.md の 9）、`data-task-id` がやり直しの前の課題と違う。完了した課題はこのとき 4 件（PRD の Then の「3 件のまま」は、完了を押す前のやり直しの直後に確かめる）。
   - seed-ac14-three-completed.json は 1 通り目の Given を満たさない（開くと今日の課題が出る）。完了 3 件の履歴の見本として、AC-14 の 2 通り目のほか AC-5、AC-16 などにも使う。
 
 ## W-8 履歴の読み出し

@@ -16,7 +16,7 @@
 - iOS のビルド、iOS のテスト：なし（iOS のアプリは作らない。stacks は backend だけ）
 - バックエンドのテスト（app.json の backend_test の案。Takuma の決定 D8 で Takuma が main で入れる。2026-11-03 の時点で app.json の backend_test はまだ空。2026-11-03 に backend/ で終了コード 0。実行の記録は docs/verification/001-daily-learning/evidence/npm-test-after-ac20-fix.log。下の個別のコマンドは tech-lead も同じ日に動かした）：
   `cd backend && npm ci && npm test`
-  - `npm test` の中身（ADR 0001 の scripts）：契約の検査 → 単体テスト → 受け入れテスト（`test:acceptance` が受け入れテストのフォルダで npm ci とブラウザの入れ方までする）。結果：見本 41 件 OK、単体 85/85、受け入れ 133 passed
+  - `npm test` の中身（ADR 0001 の scripts）：契約の検査 → 単体テスト → 受け入れテスト（`test:acceptance` が受け入れテストのフォルダで npm ci とブラウザの入れ方までする）。結果（2026-11-03）：見本 41 件 OK（2026-11-05 の今は 52 件。下の契約の検査）、単体 85/85、受け入れ 133 passed
   - Linux の CI で WebKit の OS のライブラリ（`npx playwright install-deps`）が要るかは未確認（ADR 0004）
 - 受け入れテスト（依存は受け入れテストのフォルダの package.json だけ。ADR 0004）：
   `cd backend/tests/acceptance && npm ci && npx playwright install chromium webkit && npx playwright test`（2026-11-03 に `--list` で `Total: 133 tests in 16 files`。全件合格は上のログ）

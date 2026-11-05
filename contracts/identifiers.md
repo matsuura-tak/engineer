@@ -36,7 +36,7 @@
 決まり：
 - 見える文字を持つ要素の `data-testid` は、その文字の文言キーと同じです。文言キーは 174 個で、一覧は 6 にあります（機械で読める原本は schemas/strings.schema.json の `required`）。
 - 例外：変種の文言キー 5 個（`task.cheer.default`、`task.cheer.at7`、`task.cheer.at30`、`task.cheer.at100`、`task.next.note.last`）は `data-testid` に使いません。要素の `data-testid` は固定で（`task.cheer`、`task.next.note`）、中の文字だけがどれか 1 つの変種になります（design の 6、D-36、D-44）。テストは文字（ja.json / en.json の値）か `data-milestone`（4）で変種を見分けます。
-- radio は `<input type="radio">` に `data-testid` を付けます（`area.*`、`level.beginner`／`level.intermediate`／`level.advanced`、`years.*`）。`value` は 5 の ID です。ラベルの文字に別の `data-testid` は付けません。`level.*.desc` はラベルの中の説明の要素に付けます。
+- radio は `<input type="radio">` に `data-testid` を付けます（`area.*`、`level.beginner`／`level.intermediate`／`level.advanced`、`years.*`）。`value` は 5 の ID です。ラベルの文字に別の `data-testid` は付けません。`area.*.desc` と `level.*.desc` はラベルの中の説明の要素に付けます（選択肢の名前とヒント文は同じ label の中。design の 9、AC-39）。
 - 出さない要素は DOM に置きません（`hidden` 属性や CSS で隠すだけにしない）。例：`in_app` の課題では `task.external.badge` が 0 件。閉じたダイアログも DOM から外します。例外は、見た目だけ隠したファイルの input（`home.standalone.importFile`、`settings.import.file`）です。
 - 1 つの状態の中で、同じ `data-testid` は 1 つだけです。例外は繰り返す行（`history.row` とその中の要素、`task.external.tools.item`）です。
 - 片方だけを出す組：`task.today.label`（その日の 1 件目）と `task.today.label.nth`（2 件目以降）、`task.skipped.levelHint` と `task.skipped.levelChanged`（同じ申告が 2 回続いて段階が変わったとき）、`task.exhausted.seenNext` と `task.exhausted.nextDone`（多くて 1 つ。D-40）。出さない方は DOM に置きません。
