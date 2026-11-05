@@ -1,0 +1,230 @@
+HEAD: 53155c8d851befbd61ea9d2b2e8c91db51a09ae5
+command: cd backend/tests/acceptance && npx playwright test --reporter=line
+date: 2026-11-05 20:28:37 +0900
+retries: 0（playwright.config.mjs のまま。--retries は付けない）
+npm notice run npx
+npm notice run 'playwright' test --reporter=line
+
+Running 219 tests using 5 workers
+
+[1/219] [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_backend_intermediate
+[2/219] [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_frontend_beginner
+[3/219] [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_git_advanced
+[4/219] [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:12:1 › AC1_初めて開くと診断が始まり3問で終わる_進み具合n/3_切り替え500ms以内
+[5/219] [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:17:1 › AC3_課題集の全件が4要素を持ち所要時間が1〜15分
+[6/219] [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:35:1 › AC4_課題集は210件以上で初級と中級の12組が14件以上_上級の6組が7件以上_IDの重複が0件
+[7/219] [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:54:1 › BUDGET2_本文4要素と解説の字数の平均が480字以下
+[8/219] [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:64:1 › BUDGET2_課題集はgzip後105000バイト以下
+[9/219] [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:73:1 › AC29_各組でexternalが20%以下_in_appにURLもtoolsもなく_externalはtoolsが1件以上
+[10/219] [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:22:1 › AC5_完了するとtask.rateになり_答えるとtask.done_同じ日に再読み込みしてもtask.doneのままで_task.nextを押さない限りissuedは4のまま
+[11/219] [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:52:1 › AC5_完了して答えずに再読み込みするとtask.doneになり_issuedは4のまま
+[12/219] [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:67:1 › AC6_翌日には過去に出した課題のIDと一致しない課題が出る
+[13/219] [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:89:3 › AC7_too_hardを申告するとtask.skippedになり履歴に残り_再読み込みしてもtask.skippedのままで_task.nextを押さない限りissuedは4のまま
+[14/219] [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:89:3 › AC7_too_easyを申告するとtask.skippedになり履歴に残り_再読み込みしてもtask.skippedのままで_task.nextを押さない限りissuedは4のまま
+[15/219] [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:89:3 › AC7_no_timeを申告するとtask.skippedになり履歴に残り_再読み込みしてもtask.skippedのままで_task.nextを押さない限りissuedは4のまま
+[16/219] [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:111:1 › AC9_役に立ったを選ぶとtask.doneになり_再び聞かれず_履歴のdata-helpfulがhelpful
+[17/219] [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:125:1 › AC9_立たなかったを選ぶと履歴のdata-helpfulがnot_helpful
+[18/219] [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:136:1 › AC9_選ばずに再読み込みするとtask.doneになり_履歴のdata-helpfulがunanswered
+[19/219] [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:149:1 › AC9_今回は答えないを押すとtask.doneになり_履歴のdata-helpfulがunanswered
+[20/219] [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_1通り目_中で難しすぎ難しすぎ→初
+[21/219] [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_2通り目_中で簡単すぎ簡単すぎ→上
+[22/219] [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_3通り目_中で難しすぎ1回だけ→中のまま
+[23/219] [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_4通り目_中で簡単すぎ1回だけ→中のまま
+[24/219] [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_5a通り目_中で難しすぎ完了難しすぎ→中のまま
+[25/219] [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_5b通り目_中で難しすぎ今日はできない難しすぎ→中のまま
+[26/219] [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_6通り目_初で難しすぎ2回連続→初のまま
+[27/219] [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_7通り目_上で簡単すぎ2回連続→上のまま
+[28/219] [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_8通り目_中で難しすぎ_none_難しすぎ→初（noneは数えず流れも切らない）
+[29/219] [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_9通り目_上で2回難しすぎで中になった翌日に中で難しすぎ1回→中のまま
+[30/219] [chromium] › tests/ac08-level-rule.spec.mjs:56:1 › AC8_10通り目_中で同じ日に難しすぎ2件_task.nextで同じ日の次がbeginner
+[31/219] [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:53:3 › AC10_初級を出し終えて翌日に読み込むと_levelDoneと次の段階へ進むと別の領域を選ぶが出て_進むと同じ日にintermediateのtask.today
+[32/219] [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:81:3 › AC10_上級を出し終えて翌日に読み込むと_allDoneと別の領域を選ぶが出て次の段階へ進むは0件_同じ領域と段階でやり直すと同じ日に再びtask.exhausted
+[33/219] [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:53:3 › AC10_初級を出し終えて同じ日にtask.nextを押すと_levelDoneと次の段階へ進むと別の領域を選ぶが出て_進むと同じ日にintermediateのtask.today
+[34/219] [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:81:3 › AC10_上級を出し終えて同じ日にtask.nextを押すと_allDoneと別の領域を選ぶが出て次の段階へ進むは0件_同じ領域と段階でやり直すと同じ日に再びtask.exhausted
+[35/219] [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:103:1 › AC30_in_appを出し終えた翌日はexternalの課題が出て_印と要る道具が題名と同じ画面に見える
+[36/219] [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:145:1 › AC30_in_appの課題を出した日はdata-task-modeがin_appで印が0件
+[37/219] [chromium] › tests/ac11-ac13-storage.spec.mjs:8:1 › AC11_2問目の保存が失敗してもerror.storage.messageと選択が残り_やり直すと3問目に進み課題が回答と一致する
+[38/219] [chromium] › tests/ac11-ac13-storage.spec.mjs:44:1 › AC13_persistを断られても完了と再読み込みでtask.done_履歴1件_設定にnotPersistedと書き出しがある
+[39/219] [chromium] › tests/ac11-ac13-storage.spec.mjs:97:1 › AC13_印のない保存データで今日の行がある日にtask.nextで課題を出すと_保存にdevice.persistRequestedが入りpersistは1回_再読み込みでは0回
+[40/219] [chromium] › tests/ac11-ac13-storage.spec.mjs:124:1 › AC13_印のない保存データで初級を出し終えた日にtask.nextではpersistを呼ばず_advanceで課題を出すと保存にdevice.persistRequestedが入りpersistは1回
+[41/219] [chromium] › tests/ac12-ac23-offline.spec.mjs:12:1 › AC12_オフラインでもAC-1_AC-2_AC-5_AC-9_AC-33の操作が動き_送信は0件
+[42/219] [chromium] › tests/ac12-ac23-offline.spec.mjs:60:1 › AC12_オフラインでもAC-7の申告が動き_送信は0件
+[43/219] [chromium] › tests/ac12-ac23-offline.spec.mjs:125:1 › AC23_task.todayを表示した後にオフラインで再読み込みと新しいタブ_3秒以内に同じdata-task-id_送信0件
+[44/219] [chromium] › tests/ac12-ac23-offline.spec.mjs:133:1 › AC23_task.doneを表示した後にオフラインで再読み込みと新しいタブ_3秒以内にtask.done_送信0件
+[45/219] [chromium] › tests/ac14-ac16-redo-delete.spec.mjs:6:1 › AC14_今日の課題を出していない日に設定からやり直して別の領域を選ぶと_新しい領域の課題が出て完了の履歴は3件のまま
+[46/219] [chromium] › tests/ac14-ac16-redo-delete.spec.mjs:44:1 › AC14_今日の課題が出ている日に設定からやり直して別の領域を選んでも_同じdata-task-idのtask.todayのままで完了の履歴は3件_完了してtask.nextを押すと同じ日に新しい領域の課題が出る
+[47/219] [chromium] › tests/ac14-ac16-redo-delete.spec.mjs:106:1 › AC16_すべてのデータを削除すると再読み込みでdiagnosis.startになり_やり直した後の履歴は0件
+[48/219] [chromium] › tests/ac15-load-time.spec.mjs:7:1 › AC15_遅い回線とCPU4倍の制限でキャッシュなしに開き_data-debug-load-msが5回とも2000以下
+[49/219] [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:75:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_diagnosis.start_横スクロール0_切り詰め0_操作できる要素がすべて押せる
+[50/219] [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:75:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.today_横スクロール0_切り詰め0_操作できる要素がすべて押せる
+[51/219] [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:75:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.done_横スクロール0_切り詰め0_操作できる要素がすべて押せる
+[52/219] [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:75:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.exhausted.levelDone_横スクロール0_切り詰め0_操作できる要素がすべて押せる
+[53/219] [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:118:1 › AC18_移動キー(Tab系)とEnter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上
+[54/219] [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:180:3 › AC27_diagnosis.start_axe-coreでserious以上の違反が0件
+[55/219] [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:180:3 › AC27_diagnosis.question_axe-coreでserious以上の違反が0件
+[56/219] [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:180:3 › AC27_task.today_axe-coreでserious以上の違反が0件
+[57/219] [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:180:3 › AC27_task.done_axe-coreでserious以上の違反が0件
+[58/219] [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:180:3 › AC27_task.exhausted.levelDone_axe-coreでserious以上の違反が0件
+[59/219] [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:180:3 › AC27_task.exhausted.allDone_axe-coreでserious以上の違反が0件
+[60/219] [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:180:3 › AC27_settings_axe-coreでserious以上の違反が0件
+[61/219] [chromium] › tests/ac19-ac20-ac25-export-import.spec.mjs:12:1 › AC19_書き出すとJSONが1つダウンロードされ_診断_段階_履歴3件（50文字のanswer）_初めて開いた日_版番号を含む
+[62/219] [chromium] › tests/ac19-ac20-ac25-export-import.spec.mjs:48:1 › AC20_保存データのないブラウザで読み込むと_診断と段階が同じで履歴3件（answerも同じ）_状態はtask.todayかtask.done
+[63/219] [chromium] › tests/ac19-ac20-ac25-export-import.spec.mjs:91:1 › AC25_版番号が新しいファイルはerror.import.messageで拒み_履歴1件と診断と状態は変わらない
+[64/219] [chromium] › tests/ac21-ac22-home-screen.spec.mjs:21:3 › AC-21 iPhone の Safari の偽装 › AC21_iOS_Safariでは診断の前に案内が出て_閉じると再読み込みしても出ず_設定から再び開ける
+[65/219] [chromium] › tests/ac21-ac22-home-screen.spec.mjs:47:3 › AC-21 iPadOS の Safari の偽装（Mac の UA と maxTouchPoints > 1） › AC21_iPadOS_Safari（MacのUAとmaxTouchPoints5）でも診断の前に案内が出る
+[66/219] [chromium] › tests/ac21-ac22-home-screen.spec.mjs:58:1 › AC21_UAを偽装しないChromiumとWebKitでは案内が0回出る
+[67/219] [chromium] › tests/ac21-ac22-home-screen.spec.mjs:70:1 › AC22_スタンドアロンで初めて開くと読み込みの案内が出て_再読み込みでも出て_ファイルを読み込むとAC-20の状態になる
+[68/219] [chromium] › tests/ac24-stats.spec.mjs:23:1 › AC24_統計の11の値が期待どおりで_数値9つと日付1つは同じ文字が見え_真偽値はfirstDayCompleted.yesの文言が見える
+[69/219] [chromium] › tests/ac26-language.spec.mjs:40:3 › AC-26 locale en-US › AC26_en-USではdiagnosis.startの文言が英語の文言ファイルと一致し_キーの差が0件
+[70/219] [chromium] › tests/ac26-language.spec.mjs:47:3 › AC-26 locale ja-JP › AC26_ja-JPではdiagnosis.startの文言が日本語の文言ファイルと一致する
+[71/219] [chromium] › tests/ac28-update.spec.mjs:17:1 › AC28_差し替え後2秒おきの再読み込み3回以内でdata-build-versionが新版になり_旧版に戻らず_履歴3件と診断と段階は同じ
+[72/219] [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:31:1 › AC31_診断済みで開くと操作0回でtask.todayが見え_題名と4要素と答えの欄と4つの申告が同じ画面にあり_重なる要素0件
+[73/219] [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:51:1 › AC31_今日の課題を完了済みなら操作0回でtask.doneが見え_重なる要素0件
+[74/219] [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:79:1 › AC32_200文字を入力して再読み込みすると_同じdata-task-idで答えがそのまま入っている
+[75/219] [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:88:1 › AC32_200文字を入力してタブを閉じ新しいタブで開くと_同じdata-task-idで答えがそのまま入っている
+[76/219] [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:98:1 › AC32_翌日に開くと新しい課題の答えの欄は空で_前日の200文字は書き出しのnoneの行のanswerに残る
+[77/219] [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:117:1 › AC32_画面を開いたまま翌日になった後に読み込まずに完了を押すと_完了は記録されず翌日の課題の答えの欄は空で_前日の200文字は書き出しのnoneの行のanswerに残る
+[78/219] [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:144:1 › AC32_200文字を入力して保存を待たずに画面を開いたまま翌日になった後に完了を押すと_前日の200文字は書き出しのnoneの行のanswerに残り翌日の課題の答えの欄は空
+[79/219] [chromium] › tests/ac33-next.spec.mjs:37:3 › AC33_task.doneからtask.nextで1秒以内に同じ日の2件目と3件目が出て_IDは過去と違い_組は同じ_issuedが1ずつ増え_再読み込みでも同じID_ダイアログ0件
+[80/219] [chromium] › tests/ac33-next.spec.mjs:37:3 › AC33_task.skippedからtask.nextで1秒以内に同じ日の2件目と3件目が出て_IDは過去と違い_組は同じ_issuedが1ずつ増え_再読み込みでも同じID_ダイアログ0件
+[81/219] [chromium] › tests/ac34-ac38-tasks-json-r8.spec.mjs:15:1 › AC34_初級の全件がminutes10以下で6語が0件でexternalのtoolsがブラウザか開発者ツールを含む
+[82/219] [chromium] › tests/ac34-ac38-tasks-json-r8.spec.mjs:41:1 › AC38_課題集の全件のinsightが前後の空白を除いて1〜120字で改行とバッククォートを含まない
+[83/219] [chromium] › tests/ac35-ac37-done-screen.spec.mjs:74:3 › AC35_累計6で完了するとtask.rateとtask.doneに累計7が見え_task.cheerのdata-milestoneが7で文言がtask.cheer.at7
+[84/219] [chromium] › tests/ac35-ac37-done-screen.spec.mjs:74:3 › AC35_累計10で完了するとtask.rateとtask.doneに累計11が見え_task.cheerのdata-milestoneがnoneで文言がtask.cheer.default
+[85/219] [chromium] › tests/ac35-ac37-done-screen.spec.mjs:74:3 › AC35_累計29で完了するとtask.rateとtask.doneに累計30が見え_task.cheerのdata-milestoneが30で文言がtask.cheer.at30
+[86/219] [chromium] › tests/ac35-ac37-done-screen.spec.mjs:74:3 › AC35_累計99で完了するとtask.rateとtask.doneに累計100が見え_task.cheerのdata-milestoneが100で文言がtask.cheer.at100
+[87/219] [chromium] › tests/ac35-ac37-done-screen.spec.mjs:97:1 › AC35_ja.jsonとen.jsonの全キーの値に連続途切れ逃したstreakmissedが0件
+[88/219] [chromium] › tests/ac35-ac37-done-screen.spec.mjs:121:3 › DESIGN_D43 完了の演出（prefers-reduced-motion: reduce） › DESIGN_D43_reduceで完了するとtask.rateのgetAnimationsが0件でtask.total.prevが0件_task.rate.markはあり累計は最終の値
+[89/219] [chromium] › tests/ac35-ac37-done-screen.spec.mjs:147:1 › DESIGN_D43_reduceでないとき完了直後のtask.rateにgetAnimationsが1件以上あり_累計は描いた直後から最終の値
+[90/219] [chromium] › tests/ac35-ac37-done-screen.spec.mjs:171:1 › AC36_3件出した翌日のtask.todayのdata-progress-indexが4でtotalが14で_同じ2つの数がtask.progressの文言に見える
+[91/219] [chromium] › tests/ac35-ac37-done-screen.spec.mjs:191:1 › AC37_金曜にtask.nextで出た課題を完了するとtask.doneのtask.weekと統計のdays-completed-weekが3でextraは1のまま_翌週の月曜は0
+[92/219] [chromium] › tests/ac35-ac37-done-screen.spec.mjs:224:1 › AC38_task.todayではtask.insight.textが0件で_完了するとtask.rateとtask.doneにその課題のinsightが見え_再読み込みしても見える
+[93/219] [chromium] › tests/ac35-ac37-done-screen.spec.mjs:258:1 › AC38_難しすぎを申告したtask.skippedではtask.insight.textが0件
+[94/219] [chromium] › tests/ac39-ac40-diagnosis-r8.spec.mjs:21:1 › AC39_1問目の6つの領域にarea.descの説明が見え_jaとenの文言ファイルで6件とも1〜40字
+[95/219] [chromium] › tests/ac39-ac40-diagnosis-r8.spec.mjs:50:3 › AC-39 幅 320 CSS px（AC-17 と同じ条件） › AC39_幅320で1問目を表示するとscrollWidthが320以下
+[96/219] [chromium] › tests/ac39-ac40-diagnosis-r8.spec.mjs:60:1 › AC40_3問目の選択肢が5つでyears.neverのvalueがneverで_選んで終えると書き出しのdiagnosis.yearsがnever
+[97/219] [chromium] › tests/design-d30-day-changed.spec.mjs:53:1 › DESIGN_D30_画面を開いたまま翌日になった後に完了を押すと_翌日のS3の先頭にtask.dayChangedが1件でフォーカスがあり_入力では消えず_次の操作と再読み込みで消える
+[98/219] [chromium] › tests/design-d30-day-changed.spec.mjs:89:1 › DESIGN_D30_task.rateのまま翌日になった後に役に立ったを押すと_評価は記録されずhelpfulはunansweredのままで_翌日のS3にtask.dayChangedが1件
+[99/219] [chromium] › tests/design-d30-day-changed.spec.mjs:114:1 › DESIGN_D30_最後の課題を開いたまま翌日になった後に完了を押すと_task.exhaustedの先頭にtask.dayChangedが1件でフォーカスがあり_前の課題はnoneの行に移る
+[100/219] [chromium] › tests/design-d30-day-changed.spec.mjs:183:1 › DESIGN_D30_知らせのあるS3で申告の保存が失敗してS3に留まっても_task.dayChangedは次の操作の始めに0件になりerror.storage.messageが出て_やり直すとtask.rate
+[101/219] [chromium] › tests/design-d30-day-changed.spec.mjs:148:1 › DESIGN_U15_初回の診断の2問目を23時59分に出して0時1分に確定すると_そのまま3問目に進み_firstOpenDateは1問目の日でcompletedOnと課題の日付は確定した日
+[102/219] [chromium] › tests/design-d30-day-changed.spec.mjs:206:1 › DESIGN_D30_task.today.dayChanged_axe-coreでserious以上の違反が0件
+[103/219] [chromium] › tests/design-d31-persisted-wait.spec.mjs:31:1 › DESIGN_D31_persistedが1000msまでに返らないと_S8は上限の後にsettings.storage.notPersistedなしで描かれ_後から返っても描き直さず_pageerrorは0件
+[104/219] [chromium] › tests/design-d31-persisted-wait.spec.mjs:61:1 › DESIGN_D31_S8から入ったやり直しのS2でdiagnosis.cancelの直後にdiagnosis.nextを押すと_下書きのまま2問目に進みpageerror0件で_遅れてS8は描かれず_もう一度やめると後の待ちだけがS8を描く
+[105/219] [chromium] › tests/design-d31-persisted-wait.spec.mjs:110:1 › DESIGN_D31_S8から入ったやり直しのS2でdiagnosis.cancelの直後に未選択のままdiagnosis.nextを押すと_error.diagnosis.requiredが出て1問目のままで_答えが返った後も遅れてS8は描かれず_もう一度やめると後の待ちだけがS8を描く
+[106/219] [chromium] › tests/design-d40-d44-next-note.spec.mjs:14:1 › DESIGN_D40_初級を出し終え中級の行があり中級に未出が残るS7はlevelDoneにseenNextが1件でnextDoneが0件_advanceで未出の中級の最小IDが出る
+[107/219] [chromium] › tests/design-d40-d44-next-note.spec.mjs:38:1 › DESIGN_D40_初級と中級を出し終えて段階が初級のS7はlevelDoneにnextDoneが1件でseenNextが0件_advanceで中級のS7になり補足は0件
+[108/219] [chromium] › tests/design-d40-d44-next-note.spec.mjs:61:1 › DESIGN_D44_組の13件を出した翌日に14件目を完了したS5のtask.next.noteはnote.lastの文で_task.nextでS7
+[109/219] [chromium] › tests/design-d40-d44-next-note.spec.mjs:87:1 › DESIGN_D44_未出が残るS5のtask.next.noteは通常の文
+[110/219] [chromium] › tests/design-d40-d44-next-note.spec.mjs:96:1 › DESIGN_D44_初級を出し終えて中級に進んだ後に中級で難しすぎを2回申告したS6はlevelChangedの後にnote.lastが初級の文で出る
+[111/219] [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:12:1 › AC1_初めて開くと診断が始まり3問で終わる_進み具合n/3_切り替え500ms以内
+[112/219] [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_backend_intermediate
+[113/219] [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_frontend_beginner
+[114/219] [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_git_advanced
+[115/219] [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:17:1 › AC3_課題集の全件が4要素を持ち所要時間が1〜15分
+[116/219] [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:35:1 › AC4_課題集は210件以上で初級と中級の12組が14件以上_上級の6組が7件以上_IDの重複が0件
+[117/219] [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:54:1 › BUDGET2_本文4要素と解説の字数の平均が480字以下
+[118/219] [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:64:1 › BUDGET2_課題集はgzip後105000バイト以下
+[119/219] [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:73:1 › AC29_各組でexternalが20%以下_in_appにURLもtoolsもなく_externalはtoolsが1件以上
+[120/219] [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:52:1 › AC5_完了して答えずに再読み込みするとtask.doneになり_issuedは4のまま
+[121/219] [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:22:1 › AC5_完了するとtask.rateになり_答えるとtask.done_同じ日に再読み込みしてもtask.doneのままで_task.nextを押さない限りissuedは4のまま
+[122/219] [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:67:1 › AC6_翌日には過去に出した課題のIDと一致しない課題が出る
+[123/219] [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:89:3 › AC7_too_hardを申告するとtask.skippedになり履歴に残り_再読み込みしてもtask.skippedのままで_task.nextを押さない限りissuedは4のまま
+[124/219] [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:89:3 › AC7_too_easyを申告するとtask.skippedになり履歴に残り_再読み込みしてもtask.skippedのままで_task.nextを押さない限りissuedは4のまま
+[125/219] [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:89:3 › AC7_no_timeを申告するとtask.skippedになり履歴に残り_再読み込みしてもtask.skippedのままで_task.nextを押さない限りissuedは4のまま
+[126/219] [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:111:1 › AC9_役に立ったを選ぶとtask.doneになり_再び聞かれず_履歴のdata-helpfulがhelpful
+[127/219] [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:125:1 › AC9_立たなかったを選ぶと履歴のdata-helpfulがnot_helpful
+[128/219] [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:136:1 › AC9_選ばずに再読み込みするとtask.doneになり_履歴のdata-helpfulがunanswered
+[129/219] [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:149:1 › AC9_今回は答えないを押すとtask.doneになり_履歴のdata-helpfulがunanswered
+[130/219] [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_1通り目_中で難しすぎ難しすぎ→初
+[131/219] [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_2通り目_中で簡単すぎ簡単すぎ→上
+[132/219] [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_3通り目_中で難しすぎ1回だけ→中のまま
+[133/219] [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_4通り目_中で簡単すぎ1回だけ→中のまま
+[134/219] [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_5a通り目_中で難しすぎ完了難しすぎ→中のまま
+[135/219] [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_5b通り目_中で難しすぎ今日はできない難しすぎ→中のまま
+[136/219] [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_6通り目_初で難しすぎ2回連続→初のまま
+[137/219] [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_7通り目_上で簡単すぎ2回連続→上のまま
+[138/219] [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_8通り目_中で難しすぎ_none_難しすぎ→初（noneは数えず流れも切らない）
+[139/219] [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_9通り目_上で2回難しすぎで中になった翌日に中で難しすぎ1回→中のまま
+[140/219] [webkit] › tests/ac08-level-rule.spec.mjs:56:1 › AC8_10通り目_中で同じ日に難しすぎ2件_task.nextで同じ日の次がbeginner
+[141/219] [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:81:3 › AC10_上級を出し終えて翌日に読み込むと_allDoneと別の領域を選ぶが出て次の段階へ進むは0件_同じ領域と段階でやり直すと同じ日に再びtask.exhausted
+[142/219] [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:53:3 › AC10_初級を出し終えて翌日に読み込むと_levelDoneと次の段階へ進むと別の領域を選ぶが出て_進むと同じ日にintermediateのtask.today
+[143/219] [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:53:3 › AC10_初級を出し終えて同じ日にtask.nextを押すと_levelDoneと次の段階へ進むと別の領域を選ぶが出て_進むと同じ日にintermediateのtask.today
+[144/219] [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:81:3 › AC10_上級を出し終えて同じ日にtask.nextを押すと_allDoneと別の領域を選ぶが出て次の段階へ進むは0件_同じ領域と段階でやり直すと同じ日に再びtask.exhausted
+[145/219] [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:103:1 › AC30_in_appを出し終えた翌日はexternalの課題が出て_印と要る道具が題名と同じ画面に見える
+[146/219] [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:145:1 › AC30_in_appの課題を出した日はdata-task-modeがin_appで印が0件
+[147/219] [webkit] › tests/ac11-ac13-storage.spec.mjs:8:1 › AC11_2問目の保存が失敗してもerror.storage.messageと選択が残り_やり直すと3問目に進み課題が回答と一致する
+[148/219] [webkit] › tests/ac11-ac13-storage.spec.mjs:44:1 › AC13_persistを断られても完了と再読み込みでtask.done_履歴1件_設定にnotPersistedと書き出しがある
+[149/219] [webkit] › tests/ac11-ac13-storage.spec.mjs:97:1 › AC13_印のない保存データで今日の行がある日にtask.nextで課題を出すと_保存にdevice.persistRequestedが入りpersistは1回_再読み込みでは0回
+[150/219] [webkit] › tests/ac11-ac13-storage.spec.mjs:124:1 › AC13_印のない保存データで初級を出し終えた日にtask.nextではpersistを呼ばず_advanceで課題を出すと保存にdevice.persistRequestedが入りpersistは1回
+[151/219] [webkit] › tests/ac12-ac23-offline.spec.mjs:12:1 › AC12_オフラインでもAC-1_AC-2_AC-5_AC-9_AC-33の操作が動き_送信は0件
+[152/219] [webkit] › tests/ac12-ac23-offline.spec.mjs:60:1 › AC12_オフラインでもAC-7の申告が動き_送信は0件
+[153/219] [webkit] › tests/ac12-ac23-offline.spec.mjs:125:1 › AC23_task.todayを表示した後にオフラインで再読み込みと新しいタブ_3秒以内に同じdata-task-id_送信0件
+[154/219] [webkit] › tests/ac12-ac23-offline.spec.mjs:133:1 › AC23_task.doneを表示した後にオフラインで再読み込みと新しいタブ_3秒以内にtask.done_送信0件
+[155/219] [webkit] › tests/ac14-ac16-redo-delete.spec.mjs:6:1 › AC14_今日の課題を出していない日に設定からやり直して別の領域を選ぶと_新しい領域の課題が出て完了の履歴は3件のまま
+[156/219] [webkit] › tests/ac14-ac16-redo-delete.spec.mjs:44:1 › AC14_今日の課題が出ている日に設定からやり直して別の領域を選んでも_同じdata-task-idのtask.todayのままで完了の履歴は3件_完了してtask.nextを押すと同じ日に新しい領域の課題が出る
+[157/219] [webkit] › tests/ac14-ac16-redo-delete.spec.mjs:106:1 › AC16_すべてのデータを削除すると再読み込みでdiagnosis.startになり_やり直した後の履歴は0件
+[158/219] [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:75:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_diagnosis.start_横スクロール0_切り詰め0_操作できる要素がすべて押せる
+[159/219] [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:75:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.today_横スクロール0_切り詰め0_操作できる要素がすべて押せる
+[160/219] [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:75:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.done_横スクロール0_切り詰め0_操作できる要素がすべて押せる
+[161/219] [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:75:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.exhausted.levelDone_横スクロール0_切り詰め0_操作できる要素がすべて押せる
+[162/219] [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:118:1 › AC18_移動キー(Tab系)とEnter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上
+[163/219] [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:180:3 › AC27_diagnosis.start_axe-coreでserious以上の違反が0件
+[164/219] [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:180:3 › AC27_diagnosis.question_axe-coreでserious以上の違反が0件
+[165/219] [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:180:3 › AC27_task.today_axe-coreでserious以上の違反が0件
+[166/219] [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:180:3 › AC27_task.done_axe-coreでserious以上の違反が0件
+[167/219] [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:180:3 › AC27_task.exhausted.levelDone_axe-coreでserious以上の違反が0件
+[168/219] [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:180:3 › AC27_task.exhausted.allDone_axe-coreでserious以上の違反が0件
+[169/219] [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:180:3 › AC27_settings_axe-coreでserious以上の違反が0件
+[170/219] [webkit] › tests/ac19-ac20-ac25-export-import.spec.mjs:12:1 › AC19_書き出すとJSONが1つダウンロードされ_診断_段階_履歴3件（50文字のanswer）_初めて開いた日_版番号を含む
+[171/219] [webkit] › tests/ac19-ac20-ac25-export-import.spec.mjs:48:1 › AC20_保存データのないブラウザで読み込むと_診断と段階が同じで履歴3件（answerも同じ）_状態はtask.todayかtask.done
+[172/219] [webkit] › tests/ac19-ac20-ac25-export-import.spec.mjs:91:1 › AC25_版番号が新しいファイルはerror.import.messageで拒み_履歴1件と診断と状態は変わらない
+[173/219] [webkit] › tests/ac21-ac22-home-screen.spec.mjs:21:3 › AC-21 iPhone の Safari の偽装 › AC21_iOS_Safariでは診断の前に案内が出て_閉じると再読み込みしても出ず_設定から再び開ける
+[174/219] [webkit] › tests/ac21-ac22-home-screen.spec.mjs:47:3 › AC-21 iPadOS の Safari の偽装（Mac の UA と maxTouchPoints > 1） › AC21_iPadOS_Safari（MacのUAとmaxTouchPoints5）でも診断の前に案内が出る
+[175/219] [webkit] › tests/ac21-ac22-home-screen.spec.mjs:58:1 › AC21_UAを偽装しないChromiumとWebKitでは案内が0回出る
+[176/219] [webkit] › tests/ac21-ac22-home-screen.spec.mjs:70:1 › AC22_スタンドアロンで初めて開くと読み込みの案内が出て_再読み込みでも出て_ファイルを読み込むとAC-20の状態になる
+[177/219] [webkit] › tests/ac24-stats.spec.mjs:23:1 › AC24_統計の11の値が期待どおりで_数値9つと日付1つは同じ文字が見え_真偽値はfirstDayCompleted.yesの文言が見える
+[178/219] [webkit] › tests/ac26-language.spec.mjs:40:3 › AC-26 locale en-US › AC26_en-USではdiagnosis.startの文言が英語の文言ファイルと一致し_キーの差が0件
+[179/219] [webkit] › tests/ac26-language.spec.mjs:47:3 › AC-26 locale ja-JP › AC26_ja-JPではdiagnosis.startの文言が日本語の文言ファイルと一致する
+[180/219] [webkit] › tests/ac28-update.spec.mjs:17:1 › AC28_差し替え後2秒おきの再読み込み3回以内でdata-build-versionが新版になり_旧版に戻らず_履歴3件と診断と段階は同じ
+[181/219] [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:31:1 › AC31_診断済みで開くと操作0回でtask.todayが見え_題名と4要素と答えの欄と4つの申告が同じ画面にあり_重なる要素0件
+[182/219] [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:51:1 › AC31_今日の課題を完了済みなら操作0回でtask.doneが見え_重なる要素0件
+[183/219] [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:79:1 › AC32_200文字を入力して再読み込みすると_同じdata-task-idで答えがそのまま入っている
+[184/219] [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:88:1 › AC32_200文字を入力してタブを閉じ新しいタブで開くと_同じdata-task-idで答えがそのまま入っている
+[185/219] [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:98:1 › AC32_翌日に開くと新しい課題の答えの欄は空で_前日の200文字は書き出しのnoneの行のanswerに残る
+[186/219] [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:117:1 › AC32_画面を開いたまま翌日になった後に読み込まずに完了を押すと_完了は記録されず翌日の課題の答えの欄は空で_前日の200文字は書き出しのnoneの行のanswerに残る
+[187/219] [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:144:1 › AC32_200文字を入力して保存を待たずに画面を開いたまま翌日になった後に完了を押すと_前日の200文字は書き出しのnoneの行のanswerに残り翌日の課題の答えの欄は空
+[188/219] [webkit] › tests/ac33-next.spec.mjs:37:3 › AC33_task.doneからtask.nextで1秒以内に同じ日の2件目と3件目が出て_IDは過去と違い_組は同じ_issuedが1ずつ増え_再読み込みでも同じID_ダイアログ0件
+[189/219] [webkit] › tests/ac33-next.spec.mjs:37:3 › AC33_task.skippedからtask.nextで1秒以内に同じ日の2件目と3件目が出て_IDは過去と違い_組は同じ_issuedが1ずつ増え_再読み込みでも同じID_ダイアログ0件
+[190/219] [webkit] › tests/ac34-ac38-tasks-json-r8.spec.mjs:15:1 › AC34_初級の全件がminutes10以下で6語が0件でexternalのtoolsがブラウザか開発者ツールを含む
+[191/219] [webkit] › tests/ac34-ac38-tasks-json-r8.spec.mjs:41:1 › AC38_課題集の全件のinsightが前後の空白を除いて1〜120字で改行とバッククォートを含まない
+[192/219] [webkit] › tests/ac35-ac37-done-screen.spec.mjs:74:3 › AC35_累計6で完了するとtask.rateとtask.doneに累計7が見え_task.cheerのdata-milestoneが7で文言がtask.cheer.at7
+[193/219] [webkit] › tests/ac35-ac37-done-screen.spec.mjs:74:3 › AC35_累計10で完了するとtask.rateとtask.doneに累計11が見え_task.cheerのdata-milestoneがnoneで文言がtask.cheer.default
+[194/219] [webkit] › tests/ac35-ac37-done-screen.spec.mjs:74:3 › AC35_累計29で完了するとtask.rateとtask.doneに累計30が見え_task.cheerのdata-milestoneが30で文言がtask.cheer.at30
+[195/219] [webkit] › tests/ac35-ac37-done-screen.spec.mjs:74:3 › AC35_累計99で完了するとtask.rateとtask.doneに累計100が見え_task.cheerのdata-milestoneが100で文言がtask.cheer.at100
+[196/219] [webkit] › tests/ac35-ac37-done-screen.spec.mjs:97:1 › AC35_ja.jsonとen.jsonの全キーの値に連続途切れ逃したstreakmissedが0件
+[197/219] [webkit] › tests/ac35-ac37-done-screen.spec.mjs:121:3 › DESIGN_D43 完了の演出（prefers-reduced-motion: reduce） › DESIGN_D43_reduceで完了するとtask.rateのgetAnimationsが0件でtask.total.prevが0件_task.rate.markはあり累計は最終の値
+[198/219] [webkit] › tests/ac35-ac37-done-screen.spec.mjs:147:1 › DESIGN_D43_reduceでないとき完了直後のtask.rateにgetAnimationsが1件以上あり_累計は描いた直後から最終の値
+[199/219] [webkit] › tests/ac35-ac37-done-screen.spec.mjs:171:1 › AC36_3件出した翌日のtask.todayのdata-progress-indexが4でtotalが14で_同じ2つの数がtask.progressの文言に見える
+[200/219] [webkit] › tests/ac35-ac37-done-screen.spec.mjs:191:1 › AC37_金曜にtask.nextで出た課題を完了するとtask.doneのtask.weekと統計のdays-completed-weekが3でextraは1のまま_翌週の月曜は0
+[201/219] [webkit] › tests/ac35-ac37-done-screen.spec.mjs:224:1 › AC38_task.todayではtask.insight.textが0件で_完了するとtask.rateとtask.doneにその課題のinsightが見え_再読み込みしても見える
+[202/219] [webkit] › tests/ac35-ac37-done-screen.spec.mjs:258:1 › AC38_難しすぎを申告したtask.skippedではtask.insight.textが0件
+[203/219] [webkit] › tests/ac39-ac40-diagnosis-r8.spec.mjs:21:1 › AC39_1問目の6つの領域にarea.descの説明が見え_jaとenの文言ファイルで6件とも1〜40字
+[204/219] [webkit] › tests/ac39-ac40-diagnosis-r8.spec.mjs:50:3 › AC-39 幅 320 CSS px（AC-17 と同じ条件） › AC39_幅320で1問目を表示するとscrollWidthが320以下
+[205/219] [webkit] › tests/ac39-ac40-diagnosis-r8.spec.mjs:60:1 › AC40_3問目の選択肢が5つでyears.neverのvalueがneverで_選んで終えると書き出しのdiagnosis.yearsがnever
+[206/219] [webkit] › tests/design-d30-day-changed.spec.mjs:53:1 › DESIGN_D30_画面を開いたまま翌日になった後に完了を押すと_翌日のS3の先頭にtask.dayChangedが1件でフォーカスがあり_入力では消えず_次の操作と再読み込みで消える
+[207/219] [webkit] › tests/design-d30-day-changed.spec.mjs:89:1 › DESIGN_D30_task.rateのまま翌日になった後に役に立ったを押すと_評価は記録されずhelpfulはunansweredのままで_翌日のS3にtask.dayChangedが1件
+[208/219] [webkit] › tests/design-d30-day-changed.spec.mjs:114:1 › DESIGN_D30_最後の課題を開いたまま翌日になった後に完了を押すと_task.exhaustedの先頭にtask.dayChangedが1件でフォーカスがあり_前の課題はnoneの行に移る
+[209/219] [webkit] › tests/design-d30-day-changed.spec.mjs:148:1 › DESIGN_U15_初回の診断の2問目を23時59分に出して0時1分に確定すると_そのまま3問目に進み_firstOpenDateは1問目の日でcompletedOnと課題の日付は確定した日
+[210/219] [webkit] › tests/design-d30-day-changed.spec.mjs:183:1 › DESIGN_D30_知らせのあるS3で申告の保存が失敗してS3に留まっても_task.dayChangedは次の操作の始めに0件になりerror.storage.messageが出て_やり直すとtask.rate
+[211/219] [webkit] › tests/design-d30-day-changed.spec.mjs:206:1 › DESIGN_D30_task.today.dayChanged_axe-coreでserious以上の違反が0件
+[212/219] [webkit] › tests/design-d31-persisted-wait.spec.mjs:31:1 › DESIGN_D31_persistedが1000msまでに返らないと_S8は上限の後にsettings.storage.notPersistedなしで描かれ_後から返っても描き直さず_pageerrorは0件
+[213/219] [webkit] › tests/design-d31-persisted-wait.spec.mjs:61:1 › DESIGN_D31_S8から入ったやり直しのS2でdiagnosis.cancelの直後にdiagnosis.nextを押すと_下書きのまま2問目に進みpageerror0件で_遅れてS8は描かれず_もう一度やめると後の待ちだけがS8を描く
+[214/219] [webkit] › tests/design-d31-persisted-wait.spec.mjs:110:1 › DESIGN_D31_S8から入ったやり直しのS2でdiagnosis.cancelの直後に未選択のままdiagnosis.nextを押すと_error.diagnosis.requiredが出て1問目のままで_答えが返った後も遅れてS8は描かれず_もう一度やめると後の待ちだけがS8を描く
+[215/219] [webkit] › tests/design-d40-d44-next-note.spec.mjs:14:1 › DESIGN_D40_初級を出し終え中級の行があり中級に未出が残るS7はlevelDoneにseenNextが1件でnextDoneが0件_advanceで未出の中級の最小IDが出る
+[216/219] [webkit] › tests/design-d40-d44-next-note.spec.mjs:38:1 › DESIGN_D40_初級と中級を出し終えて段階が初級のS7はlevelDoneにnextDoneが1件でseenNextが0件_advanceで中級のS7になり補足は0件
+[217/219] [webkit] › tests/design-d40-d44-next-note.spec.mjs:61:1 › DESIGN_D44_組の13件を出した翌日に14件目を完了したS5のtask.next.noteはnote.lastの文で_task.nextでS7
+[218/219] [webkit] › tests/design-d40-d44-next-note.spec.mjs:87:1 › DESIGN_D44_未出が残るS5のtask.next.noteは通常の文
+[219/219] [webkit] › tests/design-d40-d44-next-note.spec.mjs:96:1 › DESIGN_D44_初級を出し終えて中級に進んだ後に中級で難しすぎを2回申告したS6はlevelChangedの後にnote.lastが初級の文で出る
+  219 passed (51.5s)
+exit code: 0

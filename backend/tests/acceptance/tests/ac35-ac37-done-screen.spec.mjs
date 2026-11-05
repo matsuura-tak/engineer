@@ -124,9 +124,21 @@ test.describe('DESIGN_D43 完了の演出（prefers-reduced-motion: reduce）', 
     await openWithCompleted({ context, page, baseURL, request, n: 6 });
     await app.tid(page, 'task.report.done').click();
     await app.expectState(page, 'task.rate');
-    const m = await page.evaluate(() => ({ animations: document.getAnimations().length, prev: document.querySelectorAll('[data-testid="task.total.prev"]').length }));
+    // reduce でない側と同じく、S4 に着いた直後の 1 回の evaluate で累計のテキストも読む（契約「完了の演出の確かめ方」：reduce の有無によらず、S4 に着いた直後に読んだ値が最終の値。
+    // 後の expectTotalAndCheer の toHaveText は繰り返し待つので、JS で数え上げる作りを見逃す。tech-lead G2 r5 の提案。r10）
+    const m = await page.evaluate(() => {
+      const el = document.querySelector('[data-testid="task.total.value"]');
+      return {
+        animations: document.getAnimations().length,
+        prev: document.querySelectorAll('[data-testid="task.total.prev"]').length,
+        total: el?.getAttribute('data-stat-completed') ?? null,
+        text: el?.textContent ?? null,
+      };
+    });
     expect(m.animations, 'document.getAnimations().length').toBe(0);
     expect(m.prev, 'task.total.prev の件数').toBe(0);
+    expect(m.total, '描いた直後の data-stat-completed').toBe('7');
+    expect(m.text?.trim(), '描いた直後の task.total.value のテキスト（最終の値）').toBe(app.fill(app.text(ja, 'task.total.value'), { count: 7 }));
     await expect(app.tid(page, 'task.rate.mark')).toHaveCount(1);
     await expectTotalAndCheer(page, ja, { count: 7, milestone: '7', cheerKey: 'task.cheer.at7' });
   });

@@ -153,8 +153,10 @@ test('AC18_移動キー(Tab系)とEnter_Spaceだけで診断から完了まで�
   await activate('diagnosis.next', 'Enter', 'Q2 次へ');
   await expect(progress).toHaveAttribute('data-question-index', '3');
 
-  await activate('years.lt1', 'Space', 'Q3 radio');
-  await expect(app.tid(page, 'years.lt1')).toBeChecked();
+  // 3 問目の radio は 5 つで先頭が `years.never`（PRD AC-40、design r9 の D-41 と 6 章）。radio の組は Tab 系で止まる所が先頭の 1 つだけなので、
+  // PRD AC-18 の When（Tab、Shift+Tab、Enter、Space だけ。矢印キーは含まれない）の中で選べるのは先頭。先頭を Space で選ぶ（r10）
+  await activate('years.never', 'Space', 'Q3 radio');
+  await expect(app.tid(page, 'years.never')).toBeChecked();
   await activate('diagnosis.finish', 'Enter', 'Q3 診断を終える');
   await app.expectState(page, 'task.today');
 

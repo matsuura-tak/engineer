@@ -26,13 +26,14 @@ export function distTasks() {
  * W-7 の確かめ：seed の history の各行と current について、taskId が課題集にあり、行の area と level が ID の <領域>-<段階> と同じ。
  * 違えば seed の誤りとして例外（テストの誤りを、アプリの不具合と取り違えないため）。
  */
-export function assertSeedTaskIds(seed, tasks, label = 'seed') {
+export function assertSeedTaskIds(seed, tasks, label = 'seed', { idsMayBeMissing = false } = {}) {
   const ids = new Set(tasks.tasks.map((t) => t.id));
   const rows = [...(seed.history ?? []).map((r, i) => [`history[${i}]`, r]), ...(seed.current ? [['current', seed.current]] : [])];
   const bad = [];
   for (const [where, r] of rows) {
     const [area, level] = String(r.taskId).split('-');
-    if (!ids.has(r.taskId)) bad.push(`${where} の taskId ${r.taskId} が課題集にない`);
+    // idsMayBeMissing（W-7 の例外「課題集に ID がない行」）でも、ID の前半と行の area / level が同じかは必ず確かめる（tech-lead G2 r5 の提案。r10）
+    if (!idsMayBeMissing && !ids.has(r.taskId)) bad.push(`${where} の taskId ${r.taskId} が課題集にない`);
     if (r.area !== area || r.level !== level) bad.push(`${where} の area/level ${r.area}/${r.level} が ID ${r.taskId} の <領域>-<段階> と違う`);
   }
   if (bad.length) throw new Error(`${label} が W-7 の ID の決まりに合わない（seed の誤り）：\n${bad.join('\n')}`);
@@ -71,15 +72,23 @@ export function contractFixturePath(rel) {
  * localStorage のキー kyounoitte:data に seed を書く。addInitScript は読み込みのたびに動くので、印のキーで 1 回だけにする（W-7）。
  * W-9 の失敗の注入より先に登録すること。
  * 入れる前に、data.schema.json と、W-7 の ID の決まり（各 taskId が配布物の課題集にあり、行の area / level が ID の <領域>-<段階> と同じ）を確かめる。
- * 課題集にない ID をわざと入れるテスト（data.md の 5「課題集に ID がない行」）だけ、allowIdsNotInTasks に理由の文字列を渡して ID の確かめを外す。
- * そのテストは testInfo.annotations にも同じ理由を書くこと（W-7「そのテストは注釈にそう書く」）。
+ * 課題集にない ID をわざと入れるテスト（data.md の 5「課題集に ID がない行」）だけ、allowIdsNotInTasks に理由の文字列と testInfo を渡す。
+ * 外れるのは「ID が課題集にある」の確かめだけで、行の area / level が ID の <領域>-<段階> と同じかは理由があっても確かめる（W-7 が認める例外は「課題集にない ID」だけ）。
+ * 理由は injectSeed の中で testInfo.annotations に書く（W-7「そのテストは注釈にそう書く」を強制する。tech-lead G2 r5 の提案。r10）。
  */
-export async function injectSeed(context, seed, { allowIdsNotInTasks } = {}) {
+export async function injectSeed(context, seed, { allowIdsNotInTasks, testInfo } = {}) {
   assertValid('data', seed, 'seed');
   if (allowIdsNotInTasks === undefined) {
     assertSeedTaskIds(seed, distTasks(), 'seed');
-  } else if (typeof allowIdsNotInTasks !== 'string' || allowIdsNotInTasks.trim() === '') {
-    throw new Error('allowIdsNotInTasks には、課題集にない ID をわざと入れる理由を文字列で書く（W-7 の例外）');
+  } else {
+    if (typeof allowIdsNotInTasks !== 'string' || allowIdsNotInTasks.trim() === '') {
+      throw new Error('allowIdsNotInTasks には、課題集にない ID をわざと入れる理由を文字列で書く（W-7 の例外）');
+    }
+    if (!testInfo || !Array.isArray(testInfo.annotations)) {
+      throw new Error('allowIdsNotInTasks を使うときは testInfo も渡す（理由を注釈に書くため。W-7「そのテストは注釈にそう書く」）');
+    }
+    assertSeedTaskIds(seed, distTasks(), 'seed', { idsMayBeMissing: true });
+    testInfo.annotations.push({ type: 'W-7 の例外（課題集にない ID）', description: allowIdsNotInTasks });
   }
   await context.addInitScript(
     ({ key, mark, json }) => {

@@ -6,6 +6,7 @@
 import { readdirSync, readFileSync, mkdtempSync, rmSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { SEEDS_DIR, CONTRACT_FIXTURES_DIR, DIST_VERSION } from './paths.mjs';
 import { validate } from './schema.mjs';
 import { buildDist } from './build.mjs';
@@ -39,7 +40,8 @@ export function idErrors(doc, tasks) {
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+// main の判定は pathToFileURL で比べる（フォルダのパスに空白や非 ASCII があると `file://${argv[1]}` の素の文字列は percent-encoding された import.meta.url と一致せず、何も検査せずに終了コード 0 で終わる。reviewer G2 r3 の提案。r10）
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   let tmp = null;
   if (!process.env.KYOUNOITTE_DIST) {
     tmp = mkdtempSync(path.join(os.tmpdir(), 'kyounoitte-check-seeds-'));

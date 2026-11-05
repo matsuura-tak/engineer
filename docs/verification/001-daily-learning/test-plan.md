@@ -214,6 +214,7 @@ contracts/ にないつなぎ口はない。
 | 全状態 | tools/screenshots.mjs（5.1 の 54 行 × 幅 2 × ライト / ダーク、通常は en と AX5 も） | evidence/screenshots/ |
 
 ## 8. 赤の証拠（実装の前に落ちたこと）
+- 実装の後半（53155c8）の後の全体の実行（緑）：docs/verification/001-daily-learning/evidence/r9-green.log（`npx playwright test --reporter=line`、再試行なし、1 回。先頭に HEAD とコマンド）。seed の自己検査は r9-check-seeds.log と r10-check-seeds.log。件数は 10 章の r10 の末尾
 - ログ：docs/verification/001-daily-learning/evidence/r8-red.log（前半の 7 ファイル、Chromium と WebKit）と r8-red-2.log（後半。全体を `npx playwright test` で 1 回、再試行なし）、r8-red-3.log（r9。G2 の判定の直しの後に全体を 1 回、再試行なし。件数と分類は 10 章の r9）。seed の自己検査は r9-check-seeds.log
 - 実行したコマンドと終了コード：5 章の「前半の分だけ」のコマンド。結果は 10 章の r8 の記録と報告に書く
 - 落ちた理由：実装が G3 PASS 時点（27509e4）のままで、r8 の要素（`task.next`、`task.exhausted.levelDone` / `allDone` / `advance`、`data-task-nth-today`、`settings.stats.daysCompletedWeek.value` など）がなく、課題集が 126 件のため。詳しくは 10 章
@@ -261,6 +262,18 @@ contracts/ にないつなぎ口はない。
 - 文言を `ja[key]` で直接引いていた 46 か所（ac01、ac08、ac10、ac21、ac24、ac35、ac39、design-d30、design-d40-d44）を helpers/app.mjs の `text(ja, key)` にした（期待の値は同じ。キーがないときの赤の理由がそろう）。
 - tools/screenshots.mjs、tools/keyboard-tour.mjs：ビルドした配布物を KYOUNOITTE_DIST に入れる 1 行（injectSeed の ID の確かめのため）。
 - 実行（evidence/r8-red-3.log。`npx playwright test --reporter=line`、再試行なし、1 回）：219 本中 123 passed、96 failed（48 本 × chromium / webkit）、skipped 0。終了コード 1。r8-red-2.log と同じ件数。落ちた 48 本の最初の Error はすべて「実装が G3 PASS 時点（27509e4）のままで r8 の機能がない」：課題集に insight がなく 126 件（AC-3、AC-4、AC-28、AC-30、AC-34、AC-38）、中級が 7 件で completedSeed が「未出を残せない」で止まる（AC-35 の 10 / 29 / 99、DESIGN_D43 の reduce でない方）、文言キー `area.*.desc` / `task.next.note` / `task.exhausted.levelDone` がない（AC-26、AC-35 の語、AC-39、DESIGN_D40、DESIGN_D44 の 2 本）、識別子 `task.next` / `data-task-nth-today` / `data-progress-*` / `settings.stats.daysCompletedWeek.value` / `task.exhausted.levelDone` / `allDone` / `years.never` がない（AC-5〜AC-8、AC-10、AC-12〜AC-14、AC-17、AC-24、AC-27、AC-33、AC-35 の 6、AC-36、AC-37、AC-40、DESIGN_D30、DESIGN_D43 の reduce、DESIGN_D44 の 13 件）。テストの誤り（構文、import、つなぎ口の名前違い、seed の ID の確かめ、KYOUNOITTE_DIST）で落ちたものは 0 件（grep で確認。マッチは helpers/app.mjs の注釈の引用だけ）。AC-33 の新しい期待の ID と DESIGN_D43 の新しいテキストの確かめは、その手前（`data-task-nth-today` がない、seed を作れない）で止まるため、この課題集ではまだ動いていない。
+
+### r10（2026-11-05。実装の後半（53155c8）の後。AC-18 の 3 問目と、G2 の判定 tech-lead r5・reviewer r3 の提案 3 件）
+- tests/ac17-ac18-ac27-a11y.spec.mjs（AC18_ の 1 本）：3 問目で Space で選ぶ radio を `years.lt1` から先頭の `years.never` に変えた。根拠：PRD AC-40（経験年数の選択肢に「まだコードを書いたことがない」がある）と design r9（D-41「3 問目の先頭に `years.never`」、6 章、7 章の表の 383 行目）で 3 問目の radio が 5 つになり先頭が `years.never` になった。radio の組は移動キー（Tab 系）で止まる所が組の 1 つだけなので、`years.lt1` には Tab 系では届かない。矢印キーで `years.lt1` に移る形は採らない：PRD AC-18 の When は「Tab、Shift+Tab、Enter、Space だけで 3 問に答え」で矢印キーを含まず、contracts/test-hooks.md「キーボードの移動キー（AC-18）」も次へ／前へ（Tab 系）と確定（Enter、Space）しか定めていない。Then（`task.done` に到達、操作した要素が `:focus-visible`、枠 3 px 以上）と確かめる操作の数は変えていない。AC-18 の期待（2 章の表の行）は変わらない。
+- tests/ac35-ac37-done-screen.spec.mjs（DESIGN_D43_ の reduce の側。tech-lead r5 の提案）：reduce でない側と同じく、S4 に着いた直後の 1 回の evaluate で `task.total.value` の `data-stat-completed`（7）と textContent（`fill(task.total.value, { count: 7 })`）も読んで比べる（test-hooks.md「完了の演出の確かめ方」：reduce の有無によらず S4 に着いた直後に読んだ値が最終の値）。後の expectTotalAndCheer（toHaveText は繰り返し待つ）はそのまま。
+- helpers/seed.mjs（injectSeed。tech-lead r5 の提案）：`allowIdsNotInTasks: '<理由>'` を渡しても、行の `area` / `level` が ID の `<領域>-<段階>` と同じかは確かめる（外れるのは「ID が課題集にある」だけ。W-7 が認める例外は「課題集にない ID」だけ）。`testInfo` を必須にし、理由の注釈（type「W-7 の例外（課題集にない ID）」）を injectSeed の中で足す（W-7「そのテストは注釈にそう書く」を強制）。使うテストは今も 0 本。否定の確かめ（evidence/r10-injectseed-negative.log）：理由あり・testInfo なしは例外、理由あり・ID なし・組が一致は通って注釈 1 件、理由あり・組が不一致は例外（data.schema.json の if/then が先に捕まえる）、理由なし・ID なしは W-7 の例外、正しい seed は通る。
+- helpers/check-seeds.mjs（reviewer r3 の提案）：main の判定を `import.meta.url === pathToFileURL(process.argv[1]).href` にした（パスに空白や非 ASCII があっても静かに終了コード 0 にならない）。`npm run check:seeds` が main を動かすこと（結果を出すこと）は evidence/r10-check-seeds.log で確かめた。
+- 実行のログの先頭に `git rev-parse HEAD` と実行したコマンドを入れる（tech-lead r5 の提案。r10-check-seeds.log と r9-green.log から）。
+- 実行（HEAD 53155c8、2026-11-05）：
+  - 全体（evidence/r9-green.log。`npx playwright test --reporter=line`、再試行なし、1 回）：219 本（23 ファイル × chromium / webkit）、219 passed、0 failed、0 skipped、51.5 秒、終了コード 0。直す前は AC18_ の chromium / webkit の 2 件が `years.lt1` にフォーカスが来ず落ちていた（指揮役の報告：217 / 219）。
+  - 繰り返し（evidence/r10-repeat5.log。`--repeat-each 5 -g 'AC18_|DESIGN_D43_reduceで完了'`、再試行なし）：AC18_ と DESIGN_D43_（reduce）の 2 本 × 2 エンジン × 5 回 = 20 passed、0 failed、終了コード 0。
+  - seed の自己検査（evidence/r10-check-seeds.log。`npm run check:seeds`）：課題集 210 件、seed 18 件・期待と違う結果 0 件、自己検査 21 件・期待と違う結果 0 件、OK 39 行、終了コード 0。
+  - 4 章の検査（tests と helpers を grep）：sleep 系 0 件、skip / fixme / only 0 件、再試行 0 件（`retry` の 5 件はすべて識別子 `error.storage.retry`、playwright.config.mjs は `retries: 0`）、表示の文字で探す 0 件（`getByRole('dialog')` の 2 件は AC-31 と AC-33 の「ダイアログが 0 件」を数えるためで、要素を文字で探していない）、実装の import 0 件、PRD の AC 40 個とテストの名前の AC 番号 40 個が一致（diff 空）。
 
 ### r7 まで
 - r7（2026-11-04）：DESIGN_D31_ を 1 本足した（155 本）。r6：G2 の判定 tech-lead r3 と reviewer r3、契約の更新（f40c61a）に合わせた。r5：design r6（D-30、D-31、U-14、U-15）と契約（3b7068a、3689e3d）に合わせた。r4：PRD r7 の AC-14 の 2 通り目。r3：G2 の tech-lead r2 の「時間の計り方」。r2：G2 の r1 の指摘。r1：最初の版（AC-1〜AC-32）。
