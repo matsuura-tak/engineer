@@ -38,3 +38,4 @@
 - 2026-11-03 001-daily-learning G3 verifier r1 PASS（32 AC 合格、133 本、5 回繰り返し 445 本、axe 違反 0）。design-reviewer r1 FAIL（11/16。S6 と S0 loading の 4 通りのスクリーンショットの不足、見た目の差 3 件、日付が変わったときの知らせなし）。直しは designer → tech-lead → backend-engineer → reviewer → verifier → design-reviewer r2（docs/reviews/001-daily-learning-G3-design-reviewer-r1.md）
 - 2026-11-04 001-daily-learning G3 PASS（verifier r2：32 AC 合格、155 本、5 回繰り返し 555 本、axe 違反 0。design-reviewer r2：16/16）。.claude と .github の差分 0。backend 用の CI はまだない（D8 と .github は Takuma）。Takuma の FB 待ち、その後マージ待ち（docs/reviews/001-daily-learning-G3-verifier-r2.md、G3-design-reviewer-r2.md）
 - 2026-11-05 001-daily-learning Takuma の FB 1 回目（初級を未経験に、1 日 1 問をやめる、面白さを調べて入れる）。PRD の範囲が変わるので G0 に戻し、G0〜G3 をやり直す。PR #4 は下書きに戻す（docs/approvals/001-daily-learning-FB1.md）
+- 2026-11-05 組織の更新（/ai-org:update）は Takuma の指示で「タイミングを見て」行う。いまはキットもリポジトリも 0.2.0 で差なし。001 のマージ後、次の /feature の前に版を確かめ、新しければ更新する。未追跡の .agents/、.codex/、AGENTS.md は Takuma の片付け待ち
