@@ -36,13 +36,26 @@ const SCREENS = {
     await app.open(page, baseURL);
     await app.expectState(page, 'task.done');
   },
-  'task.exhausted': async ({ context, page, baseURL, request }) => {
+  // task.exhausted の 2 変種（PRD r11 の AC-27。identifiers.md の 2：h1 で見分ける）。levelDone は初級を出し終えた seed（design 5.1 #32。補足の 1 文なし）、allDone は上級を出し終えた seed（#34）。
+  'task.exhausted.levelDone': async ({ context, page, baseURL, request }) => {
     const tasks = await app.loadTasks(request);
-    const { seed, nextDate } = exhaustedSeed(tasks, { area: 'backend', level: 'intermediate', firstOpenDate: '2026-09-01' });
+    const { seed, nextDate } = exhaustedSeed(tasks, { area: 'backend', level: 'beginner', firstOpenDate: '2026-09-01' });
     await injectSeed(context, seed);
     await app.fixDate(page, nextDate);
     await app.open(page, baseURL);
     await app.expectState(page, 'task.exhausted');
+    await expect(app.tid(page, 'task.exhausted.levelDone')).toHaveCount(1);
+    await expect(app.tid(page, 'task.exhausted.advance')).toHaveCount(1);
+  },
+  'task.exhausted.allDone': async ({ context, page, baseURL, request }) => {
+    const tasks = await app.loadTasks(request);
+    const { seed, nextDate } = exhaustedSeed(tasks, { area: 'backend', level: 'advanced', firstOpenDate: '2026-09-01' });
+    await injectSeed(context, seed);
+    await app.fixDate(page, nextDate);
+    await app.open(page, baseURL);
+    await app.expectState(page, 'task.exhausted');
+    await expect(app.tid(page, 'task.exhausted.allDone')).toHaveCount(1);
+    await expect(app.tid(page, 'task.exhausted.advance')).toHaveCount(0);
   },
   settings: async ({ context, page, baseURL }) => {
     await injectSeed(context, loadContractFixture(SEED));
@@ -57,7 +70,8 @@ const SCREENS = {
 test.describe('AC-17 幅 320 CSS px（deviceScaleFactor 2）', () => {
   test.use({ viewport: { width: 320, height: 568 }, deviceScaleFactor: 2 });
 
-  for (const state of ['diagnosis.start', 'task.today', 'task.done', 'task.exhausted']) {
+  // PRD AC-17 の 4 状態。task.exhausted は levelDone の変種（test-plan 2 章）
+  for (const state of ['diagnosis.start', 'task.today', 'task.done', 'task.exhausted.levelDone']) {
     test(`AC17_${state}_横スクロール0_切り詰め0_操作できる要素がすべて押せる`, async ({ context, page, baseURL, request }, testInfo) => {
       await SCREENS[state]({ context, page, baseURL, request });
       await app.shot(page, testInfo, `AC17_${state}_320`);
@@ -159,7 +173,8 @@ test('AC18_移動キー(Tab系)とEnter_Spaceだけで診断から完了まで�
 
 // ---- AC-27 ----
 // PRD AC-27 の Given の 6 画面だけ。S3 の変種（知らせ task.dayChanged のある task.today）は design の「AC にない状態」なので DESIGN_D30_ で別に監査する（W-6、tech-lead G2 r3 の要修正）
-for (const state of ['diagnosis.start', 'diagnosis.question', 'task.today', 'task.done', 'task.exhausted', 'settings']) {
+// PRD r11 の AC-27：6 つの画面、task.exhausted は levelDone と allDone の 2 変種（表示は 7 つ）
+for (const state of ['diagnosis.start', 'diagnosis.question', 'task.today', 'task.done', 'task.exhausted.levelDone', 'task.exhausted.allDone', 'settings']) {
   test(`AC27_${state}_axe-coreでserious以上の違反が0件`, async ({ context, page, baseURL, request }, testInfo) => {
     await SCREENS[state]({ context, page, baseURL, request });
     const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();

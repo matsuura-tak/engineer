@@ -202,3 +202,94 @@ export function exhaustedSeed(tasks, { area, level, firstOpenDate, only, reportF
   const seed = makeSeed({ area, level, firstOpenDate, rows });
   return { seed, list, lastDate: addDays(firstOpenDate, list.length - 1), nextDate: addDays(firstOpenDate, list.length) };
 }
+
+// ---- r8 後半で足した seed の組み立て（test-hooks.md W-7「AC-35 の seed」「design の 5.1 #33」、data.md の 5「S7 の変種と補足の 1 文」） ----
+
+/** 領域 × 段階の組を固定の順に並べたもの（他の組の行を使うときの順。目標の組は呼び出し側が除く）。 */
+export const AREAS = ['backend', 'frontend', 'database', 'infra', 'testing', 'git'];
+export const LEVELS = ['beginner', 'intermediate', 'advanced'];
+
+/**
+ * 完了の行を n 行持つ seed（AC-35 の 10、29、99 件。W-7 の決まり）：
+ *   - 1 つの ID は 1 回だけ。目標の組（area / level）からは最大 maxFromTarget 件（既定 13。未出を 1 件以上残す）を新しい方に置き、
+ *     残りは他の組の ID を古い方に置く（組の順は AREAS × LEVELS で目標の組を除く）。
+ *   - 他の領域の行を入れた領域は、その領域の `levels` に最後の行の段階を入れる。
+ *   - 日付は古い順に 1 日 1 行（firstOpenDate から）。時刻は最後の行の翌日（nextDate）に固定して開く。
+ * 戻り値：{ seed, lastDate, nextDate, targetIds（目標の組で使った ID）, nextId（開いたときに出るはずの目標の組の最小の未出 ID） }
+ */
+export function completedSeed(tasks, { n, area, level, firstOpenDate, maxFromTarget = 13 }) {
+  const target = tasksOf(tasks, area, level);
+  if (target.length <= maxFromTarget) throw new Error(`目標の組 ${area}/${level} が ${target.length} 件で、未出を残せない`);
+  const fromTarget = Math.min(n, maxFromTarget);
+  const fromOthers = n - fromTarget;
+  const others = [];
+  for (const a of AREAS) {
+    for (const l of LEVELS) {
+      if (a === area && l === level) continue;
+      for (const t of tasksOf(tasks, a, l)) others.push(t);
+    }
+  }
+  if (others.length < fromOthers) throw new Error(`他の組の課題が ${others.length} 件しかなく、${fromOthers} 件を置けない`);
+  const otherRows = others.slice(0, fromOthers);
+  const targetRows = target.slice(0, fromTarget);
+  const rows = [...otherRows, ...targetRows].map((t) => ({ taskId: t.id, report: 'done', mode: t.mode, helpful: 'helpful' }));
+  const levels = { [area]: level };
+  for (const t of otherRows) levels[t.area] = t.level; // 最後の行の段階が残る（古い順に上書き）
+  const seed = makeSeed({ area, level, firstOpenDate, rows, levels });
+  seed.device = { persistRequested: true };
+  assertValid('data', seed, 'completedSeed');
+  return {
+    seed,
+    lastDate: addDays(firstOpenDate, rows.length - 1),
+    nextDate: addDays(firstOpenDate, rows.length),
+    targetIds: targetRows.map((t) => t.id),
+    nextId: target[fromTarget].id,
+  };
+}
+
+/**
+ * design 5.1 #33（S7 levelDone に `task.exhausted.seenNext`）の seed（W-7 の作り方）：
+ *   diagnosis は area / intermediate、levels[area] は beginner、current なし。history の古い順に、中級の最初の 2 件を `too_hard`（level intermediate）で 2 日、
+ *   続けて初級の全件を `done`（level beginner）。時刻は最後の行の翌日に固定して開くと、初級を出し終えているので S7、levels が beginner なので levelDone、
+ *   中級に未出が残り、history に中級の行があるので seenNext が 1 つ（data.md の 5「S7 の変種と補足の 1 文」）。
+ */
+export function seenNextSeed(tasks, { area, firstOpenDate }) {
+  const mid = tasksOf(tasks, area, 'intermediate');
+  const low = tasksOf(tasks, area, 'beginner');
+  if (mid.length < 3 || low.length < 1) throw new Error(`課題集に ${area} の中級 3 件以上と初級 1 件以上がない`);
+  const rows = [
+    ...mid.slice(0, 2).map((t) => ({ taskId: t.id, report: 'too_hard', mode: t.mode, level: 'intermediate' })),
+    ...low.map((t) => ({ taskId: t.id, report: 'done', mode: t.mode, level: 'beginner', helpful: 'helpful' })),
+  ];
+  const seed = makeSeed({ area, level: 'intermediate', firstOpenDate, rows, levels: { [area]: 'beginner' } });
+  return { seed, nextDate: addDays(firstOpenDate, rows.length), midUnissued: mid.length - 2 };
+}
+
+/**
+ * design 5.1 #53（S7 levelDone に `task.exhausted.nextDone`）の seed：初級と中級の両方を出し終え、段階が初級。
+ *   history の古い順に中級の全件（level intermediate、done）、続けて初級の全件（level beginner、done）。levels[area] は beginner。
+ */
+export function nextDoneSeed(tasks, { area, firstOpenDate }) {
+  const mid = tasksOf(tasks, area, 'intermediate');
+  const low = tasksOf(tasks, area, 'beginner');
+  if (mid.length < 1 || low.length < 1) throw new Error(`課題集に ${area} の中級と初級がない`);
+  const rows = [
+    ...mid.map((t) => ({ taskId: t.id, report: 'done', mode: t.mode, level: 'intermediate', helpful: 'helpful' })),
+    ...low.map((t) => ({ taskId: t.id, report: 'done', mode: t.mode, level: 'beginner', helpful: 'helpful' })),
+  ];
+  const seed = makeSeed({ area, level: 'intermediate', firstOpenDate, rows, levels: { [area]: 'beginner' } });
+  return { seed, nextDate: addDays(firstOpenDate, rows.length) };
+}
+
+/**
+ * design 5.1 #54（S6 で `task.skipped.levelChanged` と `task.next.note.last` が重なる）の seed：初級を出し終えて中級に進んだ形。
+ *   history は初級の全件（level beginner、done）、levels[area] は intermediate、diagnosis は area / intermediate。時刻は最後の行の翌日に固定して開くと中級の 1 件目が出る。
+ */
+export function beginnerDoneAtIntermediateSeed(tasks, { area, firstOpenDate }) {
+  const low = tasksOf(tasks, area, 'beginner');
+  const mid = tasksOf(tasks, area, 'intermediate');
+  if (low.length < 1 || mid.length < 3) throw new Error(`課題集に ${area} の初級 1 件以上と中級 3 件以上がない`);
+  const rows = low.map((t) => ({ taskId: t.id, report: 'done', mode: t.mode, level: 'beginner', helpful: 'helpful' }));
+  const seed = makeSeed({ area, level: 'intermediate', firstOpenDate, rows, levels: { [area]: 'intermediate' } });
+  return { seed, nextDate: addDays(firstOpenDate, rows.length), mid };
+}

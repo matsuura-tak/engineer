@@ -251,8 +251,15 @@ export async function loadTasks(request) {
   return res.json();
 }
 
-/** {n} の差し込み（strings.md の 3。plural は使わないキーだけに使う）。 */
+/** 文言ファイルの値（W-14）。キーがなければ、TypeError でなく「キーがない」と分かる形で落とす（実装が古くてキーがないときの赤の理由を読めるように）。 */
+export function text(strings, key) {
+  if (typeof strings?.[key] !== 'string') throw new Error(`文言ファイルにキー ${key} がない（機能がまだない、または strings.schema の required と食い違う）`);
+  return strings[key];
+}
+
+/** {n} の差し込み（strings.md の 3。plural は使わないキーだけに使う）。template が文字列でなければ「キーがない」として落とす。 */
 export function fill(template, values) {
+  if (typeof template !== 'string') throw new Error(`差し込む文言がない（文言ファイルにキーがない）：${String(template)}。差し込み ${JSON.stringify(values)}`);
   return template.replace(/\{(\w+)\}/g, (m, k) => (k in values ? String(values[k]) : m));
 }
 

@@ -1,7 +1,7 @@
 // AC-11：保存に失敗しても入力は失われない（W-9 の失敗の注入）。AC-13：保存の永続化を断っても使える（W-9 の拒否の注入）。
 import { test, expect } from '../helpers/fixtures.mjs';
 import * as app from '../helpers/app.mjs';
-import { injectStorageFailure, armStorageFailure, injectPersistDenied, readPersistCalls, readStoredData } from '../helpers/seed.mjs';
+import { injectStorageFailure, armStorageFailure, injectPersistDenied, readPersistCalls, readStoredData, injectSeed, loadContractFixture, exhaustedSeed } from '../helpers/seed.mjs';
 
 const TODAY = '2026-11-03';
 
@@ -90,4 +90,60 @@ test('AC13_persistを断られても完了と再読み込みでtask.done_履歴1
   expect(await readPersistCalls(page), '翌日の S3 の後の persist() の回数').toBe(0);
   expect((await readStoredData(page))?.device?.persistRequested, '翌日も device.persistRequested は true のまま').toBe(true);
   testInfo.annotations.push({ type: 'persist() の呼び出し（再読み込み後）', description: '同じ日の task.done で 0 回、翌日の task.today で 0 回' });
+});
+
+// AC-13 の続き（contracts/data.md の 11、test-hooks.md W-9「印のない『あり』の seed」）：今日の課題（current）を作る保存はどれも、印がなければ device.persistRequested: true を含め、
+// その S3 を描いた後に persist() を 1 回呼ぶ。task.next と task.exhausted.advance の保存もその対象。印のない seed で、今日の行がある日（開いても current を作らない：4 の 6-3）に開いて確かめる。
+test('AC13_印のない保存データで今日の行がある日にtask.nextで課題を出すと_保存にdevice.persistRequestedが入りpersistは1回_再読み込みでは0回', async ({ context, page, baseURL }, testInfo) => {
+  await injectPersistDenied(context);
+  const seed = loadContractFixture('seeds/seed-ac14-three-completed.json');
+  expect(seed.device, 'seed に印がない').toBeUndefined();
+  await injectSeed(context, seed);
+  await app.fixDate(page, '2026-11-03'); // 最後の行の日：6-3 で task.done（保存なし）
+  await app.open(page, baseURL);
+  await app.expectState(page, 'task.done');
+  expect(await readPersistCalls(page), '今日の行で開いた直後（current を作らない）').toBe(0);
+  expect((await readStoredData(page))?.device?.persistRequested, '開いた直後は印がない').not.toBe(true);
+
+  await app.next(page);
+  expect((await app.readTask(page)).nthToday).toBe('2');
+  await expect.poll(() => readPersistCalls(page), { timeout: app.WAIT_MS }).toBe(1);
+  const stored = await readStoredData(page);
+  expect(stored?.device?.persistRequested, 'task.next の保存に device.persistRequested').toBe(true);
+  expect(stored?.device ?? {}).not.toHaveProperty('persistGranted');
+  expect(stored?.current?.date).toBe('2026-11-03');
+  testInfo.annotations.push({ type: 'persist()', description: `task.next の後に 1 回。device: ${JSON.stringify(stored?.device)}` });
+
+  await page.reload();
+  await app.expectState(page, 'task.today');
+  await app.goSettings(page);
+  await expect(app.tid(page, 'settings.storage.notPersisted')).toBeVisible();
+  expect(await readPersistCalls(page), '再読み込み後は求め直さない').toBe(0);
+});
+
+test('AC13_印のない保存データで初級を出し終えた日にtask.nextではpersistを呼ばず_advanceで課題を出すと保存にdevice.persistRequestedが入りpersistは1回', async ({ context, page, baseURL, request }, testInfo) => {
+  await injectPersistDenied(context);
+  const tasks = await app.loadTasks(request);
+  const { seed, lastDate } = exhaustedSeed(tasks, { area: 'backend', level: 'beginner', firstOpenDate: '2026-09-01' });
+  expect(seed.device).toBeUndefined();
+  await injectSeed(context, seed);
+  await app.fixDate(page, lastDate); // 最後の行の日：6-3 で task.done
+  await app.open(page, baseURL);
+  await app.expectState(page, 'task.done');
+  expect(await readPersistCalls(page)).toBe(0);
+
+  await app.next(page, { to: 'task.exhausted' }); // 選べないので保存しない（data.md の 4「操作で出すとき」）
+  expect(await readPersistCalls(page), 'task.exhausted では呼ばない').toBe(0);
+  expect((await readStoredData(page))?.device?.persistRequested, 'task.exhausted では印を書かない').not.toBe(true);
+
+  await app.tid(page, 'task.exhausted.advance').click();
+  await app.expectState(page, 'task.today');
+  const task = await app.readTask(page);
+  expect(task.level).toBe('intermediate');
+  await expect.poll(() => readPersistCalls(page), { timeout: app.WAIT_MS }).toBe(1);
+  const stored = await readStoredData(page);
+  expect(stored?.device?.persistRequested, 'advance の保存に device.persistRequested').toBe(true);
+  expect(stored?.device ?? {}).not.toHaveProperty('persistGranted');
+  expect(stored?.levels?.backend).toBe('intermediate');
+  testInfo.annotations.push({ type: 'persist()', description: `advance の後に 1 回。device: ${JSON.stringify(stored?.device)}` });
 });

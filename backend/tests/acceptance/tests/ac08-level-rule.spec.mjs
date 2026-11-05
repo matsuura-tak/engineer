@@ -49,3 +49,53 @@ for (const c of CASES) {
     await app.shot(page, testInfo, `AC8_${c.no}_task.today_${DAY2}`);
   });
 }
+
+// 10 通り目（PRD r11。r8 で足した）：「中」で同じ日に「難しすぎ」を 2 件続けて申告し（1 件目の後に task.next で 2 件目を出す）、2 件目の後に task.next を押すと、同じ日に出る次の課題が「初」。
+// seed は contracts/fixtures/seeds/seed-ac8-intermediate-same-day.json（段階は中、前日 2026-11-02 の完了 1 行だけ）。時刻は 2026-11-03 に固定したまま動かさない（W-7、data.md の 5）。
+// 途中の S6 は、1 回目が task.skipped.levelHint、2 回目が task.skipped.levelChanged（{level} は初級。design D-44、data.md の 9「段階が変わった」）。
+test('AC8_10通り目_中で同じ日に難しすぎ2件_task.nextで同じ日の次がbeginner', async ({ context, page, baseURL, request }, testInfo) => {
+  const ja = await app.loadStrings(request, 'ja');
+  const seed = loadContractFixture('seeds/seed-ac8-intermediate-same-day.json');
+  const issued = seed.history.map((r) => r.taskId);
+  await injectSeed(context, seed);
+  await app.fixDate(page, DAY1);
+  await app.open(page, baseURL);
+  await app.expectState(page, 'task.today');
+  const first = await app.readTask(page);
+  expect(first.level).toBe('intermediate');
+  expect(first.nthToday).toBe('1');
+  expect(issued).not.toContain(first.id);
+  issued.push(first.id);
+
+  await app.tid(page, 'task.report.tooHard').click();
+  await app.expectState(page, 'task.skipped');
+  await expect(app.tid(page, 'task.skipped.levelHint')).toHaveCount(1);
+  await expect(app.tid(page, 'task.skipped.levelChanged')).toHaveCount(0);
+
+  await app.next(page);
+  const second = await app.readTask(page);
+  expect(second.nthToday).toBe('2');
+  expect(second.level, '2 件目はまだ中').toBe('intermediate');
+  expect(issued).not.toContain(second.id);
+  issued.push(second.id);
+
+  await app.tid(page, 'task.report.tooHard').click();
+  await app.expectState(page, 'task.skipped');
+  await expect(app.tid(page, 'task.skipped.levelChanged')).toHaveCount(1);
+  await expect(app.tid(page, 'task.skipped.levelChanged')).toHaveText(app.fill(ja['task.skipped.levelChanged'], { level: ja['level.beginner'] }));
+  await expect(app.tid(page, 'task.skipped.levelHint')).toHaveCount(0);
+  await app.shot(page, testInfo, 'AC8_10_task.skipped_levelChanged');
+
+  await app.next(page);
+  const third = await app.readTask(page);
+  testInfo.annotations.push({ type: 'data-task-level', description: `${first.id}（${first.level}）→ ${second.id}（${second.level}）→ ${third.id}（${third.level}）` });
+  expect(third.nthToday).toBe('3');
+  expect(third.area).toBe('backend');
+  expect(third.level, '同じ日の 3 件目の data-task-level').toBe('beginner');
+  expect(issued).not.toContain(third.id);
+  await app.shot(page, testInfo, 'AC8_10_task.today_beginner_same_day');
+
+  await page.reload();
+  await app.expectState(page, 'task.today');
+  expect((await app.readTask(page)).id, '再読み込みしても同じ ID').toBe(third.id);
+});

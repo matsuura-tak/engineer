@@ -19,6 +19,7 @@ import { DIST_VERSION, STORAGE_KEY, SEEDED_MARK } from '../helpers/paths.mjs';
 import {
   injectSeed, injectStorageFailure, armStorageFailure, injectPersistDenied, injectStandalone,
   loadSeed, loadContractFixture, contractFixturePath, exhaustedSeed, makeSeed, tasksOf, addDays,
+  completedSeed, seenNextSeed, nextDoneSeed, beginnerDoneAtIntermediateSeed,
 } from '../helpers/seed.mjs';
 
 const args = Object.fromEntries(process.argv.slice(2).map((a, i, arr) => (a.startsWith('--') ? [a.slice(2), arr[i + 1]] : [])).filter((x) => x.length));
@@ -52,6 +53,18 @@ async function waitVisible(page, id) {
 async function waitOpaque(page, id) {
   await waitVisible(page, id);
   await page.waitForFunction((i) => { const el = document.querySelector(`[data-testid="${i}"]`); return !!el && getComputedStyle(el).opacity === '1'; }, id, { timeout: WAIT });
+}
+/** S4（task.rate）は演出が終わった後（描いてから 1 秒後）に撮る（design 5.1 の冒頭、contracts/test-hooks.md「完了の演出の確かめ方」）。
+ *  待つのは時刻合わせでなく、演出（通常 550 ms、節目 950 ms）を終わらせるため。撮る直前に task.total.prev が 0 件（animationend で外れた）ことを確かめる。 */
+async function settleS4(page) {
+  await waitState(page, 'task.rate');
+  await page.waitForTimeout(1000);
+  if ((await tid(page, 'task.total.prev').count()) !== 0) throw new Error('1 秒後も task.total.prev が残っている（演出が終わっていない）');
+}
+/** 完了 → S4 → S5（評価は「今回は答えない」）。 */
+async function completeToDone(page) {
+  await tid(page, 'task.report.done').click(); await waitState(page, 'task.rate');
+  await tid(page, 'task.rate.close').click(); await waitState(page, 'task.done');
 }
 async function rawStorage(context, value) {
   await context.addInitScript(({ key, mark, value }) => {
@@ -254,16 +267,44 @@ const SCENARIOS = [
       await tid(page, 'task.report.done').click();
       await waitVisible(page, 'error.storage.message');
     } },
-  { name: 'S4_task.rate', ac: 'AC-5、AC-9', normal: true, state: 'task.rate',
+  { name: 'S4_task.rate', ac: 'AC-5、AC-9（累計 4）', state: 'task.rate',
     async run(context, page, env) {
       await injectSeed(context, AC14()); await open(page, env.baseURL, '2026-11-04'); await waitState(page, 'task.today');
-      await tid(page, 'task.report.done').click(); await waitState(page, 'task.rate');
+      await tid(page, 'task.report.done').click(); await settleS4(page);
+    } },
+  // design 5.1 #22〜#25（r8）：S4 の通常（累計 11、task.cheer.default）と節目 7 / 30 / 100。seed は W-7「AC-35 の seed」（6 件は見本、10 / 29 / 99 件は completedSeed）。1 秒後に撮る。
+  { name: 'S4_task.rate_total11', ac: 'AC-35（design 5.1 #22 通常）', normal: true, state: 'task.rate',
+    async run(context, page, env) {
+      const { seed, nextDate } = completedSeed(env.tasks, { n: 10, area: 'backend', level: 'intermediate', firstOpenDate: '2026-01-01' });
+      await injectSeed(context, seed); await open(page, env.baseURL, nextDate); await waitState(page, 'task.today');
+      await tid(page, 'task.report.done').click(); await settleS4(page);
+      if ((await tid(page, 'task.cheer').getAttribute('data-milestone')) !== 'none') throw new Error('累計 11 で data-milestone が none でない');
+    } },
+  { name: 'S4_task.rate_at7', ac: 'AC-35（design 5.1 #23 節目 7）', normal: true, state: 'task.rate',
+    async run(context, page, env) {
+      await injectSeed(context, loadContractFixture('seeds/seed-ac35-six-completed.json')); await open(page, env.baseURL, '2026-11-07'); await waitState(page, 'task.today');
+      await tid(page, 'task.report.done').click(); await settleS4(page);
+      if ((await tid(page, 'task.cheer').getAttribute('data-milestone')) !== '7') throw new Error('累計 7 で data-milestone が 7 でない');
+    } },
+  { name: 'S4_task.rate_at30', ac: 'AC-35（design 5.1 #24 節目 30）', state: 'task.rate',
+    async run(context, page, env) {
+      const { seed, nextDate } = completedSeed(env.tasks, { n: 29, area: 'backend', level: 'intermediate', firstOpenDate: '2026-01-01' });
+      await injectSeed(context, seed); await open(page, env.baseURL, nextDate); await waitState(page, 'task.today');
+      await tid(page, 'task.report.done').click(); await settleS4(page);
+      if ((await tid(page, 'task.cheer').getAttribute('data-milestone')) !== '30') throw new Error('累計 30 で data-milestone が 30 でない');
+    } },
+  { name: 'S4_task.rate_at100', ac: 'AC-35（design 5.1 #25 節目 100）', state: 'task.rate',
+    async run(context, page, env) {
+      const { seed, nextDate } = completedSeed(env.tasks, { n: 99, area: 'backend', level: 'intermediate', firstOpenDate: '2026-01-01' });
+      await injectSeed(context, seed); await open(page, env.baseURL, nextDate); await waitState(page, 'task.today');
+      await tid(page, 'task.report.done').click(); await settleS4(page);
+      if ((await tid(page, 'task.cheer').getAttribute('data-milestone')) !== '100') throw new Error('累計 100 で data-milestone が 100 でない');
     } },
   { name: 'S4_error_storage', ac: '—（design 5 S4 エラー）', state: 'task.rate',
     async run(context, page, env) {
       await injectStorageFailure(context);
       await injectSeed(context, AC14()); await open(page, env.baseURL, '2026-11-04'); await waitState(page, 'task.today');
-      await tid(page, 'task.report.done').click(); await waitState(page, 'task.rate');
+      await tid(page, 'task.report.done').click(); await settleS4(page);
       await armStorageFailure(page);
       await tid(page, 'task.rate.helpful').click();
       await waitVisible(page, 'error.storage.message');
@@ -301,6 +342,80 @@ const SCENARIOS = [
       await injectSeed(context, seed); await open(page, env.baseURL, day); await waitState(page, 'task.today');
       await page.clock.setFixedTime(jst(addDays(day, 1), '00:05:00'));
       await tid(page, 'task.report.done').click(); await waitState(page, 'task.exhausted'); await waitVisible(page, 'task.dayChanged');
+    } },
+  // ---- design 5.1 の r8 / r9 で足した状態（#16、#29、#33、#36、#50〜#54）。seed の作り方は test-hooks.md W-7 と data.md の 5、9 ----
+  { name: 'S3_task.today_nth2', ac: 'AC-33（design 5.1 #16 同じ日の 2 件目）', state: 'task.today',
+    async run(context, page, env) {
+      await injectSeed(context, AC14()); await open(page, env.baseURL, '2026-11-04'); await waitState(page, 'task.today');
+      await completeToDone(page);
+      await tid(page, 'task.next').click(); await waitState(page, 'task.today'); await waitVisible(page, 'task.today.label.nth');
+      if ((await tid(page, 'task.today').getAttribute('data-task-nth-today')) !== '2') throw new Error('data-task-nth-today が 2 でない');
+    } },
+  { name: 'S5_error_storage_next', ac: '—（design 5.1 #29：S5 で task.next の保存の失敗）', state: 'task.done',
+    async run(context, page, env) {
+      await injectStorageFailure(context);
+      await injectSeed(context, AC14()); await open(page, env.baseURL, '2026-11-03'); await waitState(page, 'task.done');
+      await armStorageFailure(page);
+      await tid(page, 'task.next').click();
+      await waitVisible(page, 'error.storage.message');
+    } },
+  { name: 'S6_error_storage_next', ac: '—（design 5.1 #50：S6 で task.next の保存の失敗）', state: 'task.skipped',
+    async run(context, page, env) {
+      await injectStorageFailure(context);
+      await injectSeed(context, AC14()); await open(page, env.baseURL, '2026-11-04'); await waitState(page, 'task.today');
+      await tid(page, 'task.report.tooHard').click(); await waitState(page, 'task.skipped');
+      await armStorageFailure(page);
+      await tid(page, 'task.next').click();
+      await waitVisible(page, 'error.storage.message');
+    } },
+  { name: 'S5_task.done_note.last', ac: '—（design 5.1 #51：task.next.note.last。D-44）', state: 'task.done',
+    async run(context, page, env) {
+      const total = tasksOf(env.tasks, 'backend', 'intermediate').length;
+      const { seed, nextDate } = completedSeed(env.tasks, { n: total - 1, area: 'backend', level: 'intermediate', firstOpenDate: '2026-06-01', maxFromTarget: total - 1 });
+      await injectSeed(context, seed); await open(page, env.baseURL, nextDate); await waitState(page, 'task.today');
+      await completeToDone(page);
+      await waitVisible(page, 'task.next.note');
+      if (!(await tid(page, 'task.next.note').textContent()).includes('すべて出し終えています')) throw new Error('task.next.note が note.last の文でない');
+    } },
+  { name: 'S6_task.skipped_levelChanged', ac: 'AC-8 10 通り目（design 5.1 #52：task.skipped.levelChanged。D-44）', state: 'task.skipped',
+    async run(context, page, env) {
+      await injectSeed(context, loadContractFixture('seeds/seed-ac8-intermediate-same-day.json')); await open(page, env.baseURL, '2026-11-03'); await waitState(page, 'task.today');
+      await tid(page, 'task.report.tooHard').click(); await waitState(page, 'task.skipped');
+      await tid(page, 'task.next').click(); await waitState(page, 'task.today');
+      await tid(page, 'task.report.tooHard').click(); await waitState(page, 'task.skipped');
+      await waitVisible(page, 'task.skipped.levelChanged');
+      if ((await tid(page, 'task.skipped.levelHint').count()) !== 0) throw new Error('levelChanged と levelHint が両方ある');
+    } },
+  { name: 'S6_task.skipped_levelChanged_note.last', ac: '—（design 5.1 #54：levelChanged + task.next.note.last。D-44 (2)）', state: 'task.skipped',
+    async run(context, page, env) {
+      const { seed, nextDate } = beginnerDoneAtIntermediateSeed(env.tasks, { area: 'backend', firstOpenDate: '2026-06-01' });
+      await injectSeed(context, seed); await open(page, env.baseURL, nextDate); await waitState(page, 'task.today');
+      await tid(page, 'task.report.tooHard').click(); await waitState(page, 'task.skipped');
+      await tid(page, 'task.next').click(); await waitState(page, 'task.today');
+      await tid(page, 'task.report.tooHard').click(); await waitState(page, 'task.skipped');
+      await waitVisible(page, 'task.skipped.levelChanged'); await waitVisible(page, 'task.next.note');
+      if (!(await tid(page, 'task.next.note').textContent()).includes('すべて出し終えています')) throw new Error('task.next.note が note.last の文でない');
+    } },
+  { name: 'S7_task.exhausted_seenNext', ac: '—（design 5.1 #33：levelDone + task.exhausted.seenNext。D-40）', state: 'task.exhausted',
+    async run(context, page, env) {
+      const { seed, nextDate } = seenNextSeed(env.tasks, { area: 'backend', firstOpenDate: '2026-06-01' });
+      await injectSeed(context, seed); await open(page, env.baseURL, nextDate); await waitState(page, 'task.exhausted');
+      await waitVisible(page, 'task.exhausted.seenNext');
+    } },
+  { name: 'S7_task.exhausted_nextDone', ac: '—（design 5.1 #53：levelDone + task.exhausted.nextDone。D-40）', state: 'task.exhausted',
+    async run(context, page, env) {
+      const { seed, nextDate } = nextDoneSeed(env.tasks, { area: 'backend', firstOpenDate: '2026-06-01' });
+      await injectSeed(context, seed); await open(page, env.baseURL, nextDate); await waitState(page, 'task.exhausted');
+      await waitVisible(page, 'task.exhausted.nextDone');
+    } },
+  { name: 'S7_error_storage_advance', ac: '—（design 5.1 #36：S7 で task.exhausted.advance の保存の失敗）', state: 'task.exhausted',
+    async run(context, page, env) {
+      await injectStorageFailure(context);
+      const { seed, nextDate } = exhaustedSeed(env.tasks, { area: 'backend', level: 'beginner', firstOpenDate: '2026-09-01' });
+      await injectSeed(context, seed); await open(page, env.baseURL, nextDate); await waitState(page, 'task.exhausted');
+      await armStorageFailure(page);
+      await tid(page, 'task.exhausted.advance').click();
+      await waitVisible(page, 'error.storage.message');
     } },
   { name: 'S8_settings', ac: 'AC-13、AC-19、AC-28', normal: true, state: 'settings',
     async run(context, page, env) {
