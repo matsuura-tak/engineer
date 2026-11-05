@@ -1,7 +1,8 @@
 # デザイン調査 001-daily-learning：診断と今日の学習（今日の一手）
 
-- 対象の PRD：docs/prd/001-daily-learning.md（r5、G0 承認済み）
+- 対象の PRD：docs/prd/001-daily-learning.md（r10。r1 の調査は r5 を対象に書いた）
 - 書いた役：designer　日付：2026-10-30（R-27〜R-31 は 2026-11-03 に、G3 r1 の design-reviewer の指摘を直すために足した。仕様 r6 より先に書いた。R-1〜R-26 と 1〜7 は変えていない）
+- **r2（2026-11-05）**：Takuma の FB 1 回目（docs/approvals/001-daily-learning-FB1.md。FB-1 初級＝未経験、FB-2 同じ日に続けて進む、FB-3 面白さとワクワク）を反映した PRD r10 に合わせ、6 つの問い（1 の 10〜15）を足して調べた。R-32〜R-64 を足した（既存の R の番号と本文は変えていない）。1〜7 は「r2 の追記」の見出しで足し、r1 の本文は残した。r1 の「差をつける点 2」（S5/S6 は次の課題もストリークも見せず 1 文で終える）と仕様 r6 の D-4 は FB-2、FB-3 と食い違うので、6 の r2 の追記で置き換えた。仕様（design/001-daily-learning.md）の書き直しはこの調査の後に行う（この r2 では書いていない）。
 - この文書は仕様（design/001-daily-learning.md）より先に書く。仕様の決定は、8 の R 番号を根拠に引く。
 - 見られなかったもの、開けなかったページは「見ていない」と書く。推測で埋めない。
 - 読み替え：このアプリは iOS アプリではなく、ブラウザだけで動く Web アプリ（静的 HTML/CSS/JS、GitHub Pages、サーバーなし、ログインなし）。型の「App Store の評価」は「公開されている評価や利用者数」、「権限の求め方」は「通知や保存の許可（`navigator.storage.persist()`、Web Push）とアカウント登録の求め方」に読み替えた。原則の根拠は HIG に加えて WCAG 2.2 と WAI-ARIA APG の URL を使う（PRD の AC-27 は axe-core の WCAG 2.1 AA 監査）。HIG の2ページ（Design principles、Accessibility）は開いたが本文が取れなかったので、HIG の文言は引用しない（8 の末尾）。
@@ -17,8 +18,15 @@
   7. 日英の文言：調子（5）と、英語で長くなっても崩れない並び（AC-26）
   8. ダークモードと文字サイズ：OS の設定に従う形（独自の切り替えを持つか）、本文の最小サイズ、320 CSS px での並び（AC-17）、フォーカスの枠（AC-18）、コントラスト（AC-27）
   9. ブランドの性格語と、競合に対する「差をつける点」
-- 関係する受け入れ条件（AC 番号）：AC-1、AC-2（診断と1件目）、AC-3、AC-30（課題の4要素と外で行う印）、AC-5、AC-7、AC-9（申告と評価の流れ）、AC-10（尽きたとき）、AC-11、AC-25（エラー）、AC-13（永続化を断られたとき）、AC-16、AC-19、AC-20（設定：削除、書き出し、読み込み）、AC-17、AC-18、AC-27（アクセシビリティ）、AC-21、AC-22（ホーム画面の案内）、AC-24（統計）、AC-26（英語）、AC-31（操作0回）、AC-32（答えの欄）
-- 範囲の外：課題集の中身（pdm と Takuma）、保存の方式と ID（tech-lead の ADR と contracts/）、Service Worker の作り（AC-23、AC-28 は画面に出ない）。
+  - r2 の追記（PRD r10。FB-1〜FB-3）：
+  10. 完了した直後の画面（`task.rate` と `task.done`）：祝いの動き、言葉、累計の見せ方、節目（7、30、100 件）を、連続記録を持たない形で、前庭障害（動きを減らす設定）と罪悪感への配慮を保ってどう出すか（AC-35）
+  11. 「次の一手に進む」：続けて学ぶ導線を、完了画面と申告した画面（`task.skipped`）にどう置くか。押させすぎず、止めやすい形（AC-33。PRD の Q15 は上限なし）
+  12. 修了と進級：段階の進み具合「n / N 件目」（AC-36）、段階の修了、次の段階に進む画面（`task.exhausted` の 2 変種。AC-10）の見せ方
+  13. 未経験の人向けの入口：領域の 1 行説明（AC-39）、経験年数「まだコードを書いたことがない」（AC-40）、段階の説明、専門用語の扱い、最初の 1 件の不安を減らす見せ方
+  14. ひとこと解説（`insight`）を完了の後にだけ出す見せ方。答えの写しに見えない形（AC-38）
+  15. 今週の完了日（月曜始まり）の見せ方。途切れや「逃した」を感じさせない形（AC-37）
+- 関係する受け入れ条件（AC 番号）：AC-1、AC-2（診断と1件目）、AC-3、AC-30（課題の4要素と外で行う印）、AC-5、AC-7、AC-9（申告と評価の流れ）、AC-10（尽きたとき）、AC-11、AC-25（エラー）、AC-13（永続化を断られたとき）、AC-16、AC-19、AC-20（設定：削除、書き出し、読み込み）、AC-17、AC-18、AC-27（アクセシビリティ）、AC-21、AC-22（ホーム画面の案内）、AC-24（統計）、AC-26（英語）、AC-31（操作0回）、AC-32（答えの欄）。r2 で足した：AC-10（修了と進級。r8 で書き直し）、AC-33（次の一手に進む）、AC-35（累計と祝い）、AC-36（n / N 件目）、AC-37（今週の完了日）、AC-38（ひとこと解説）、AC-39（領域の説明）、AC-40（経験年数の未経験）
+- 範囲の外：課題集の中身（pdm と Takuma）、保存の方式と ID（tech-lead の ADR と contracts/）、Service Worker の作り（AC-23、AC-28 は画面に出ない）。r2 でも同じ。初級 84 件の本文と全件の `insight` の中身は pdm と Takuma（AC-34、AC-38 の全件検査は verifier と指揮役）。
 
 ## 2. ターゲット（仮説）
 人に聞いた調査ではなく、PRD とレビューなどから立てた仮説として書く（PRD の Q8 は回答なしのため、すべて［推測］に当たる）。
@@ -34,6 +42,13 @@
   - ダークモード：OS の設定に従う（R-22）。動きを減らす設定では切り替えのアニメーションを消すか不透明度の変化だけにする（R-23）。
   - 色だけで意味を伝えない：外で行う印、保存済みの印、申告の結果は、文字とアイコンを併記する（R-7 の High Contrast Mode の例。R-15 の「状態」の条項）。
   - 読み上げ：答えの欄の「保存しました」のような状態の知らせは、フォーカスを奪わずに `role="status"` で伝える（R-19）。
+
+### 2.1 r2 の追記（FB-1〜FB-3 で広がった対象。仮説）
+- 誰が（仮説を広げた）：主の対象に「コードをほとんど書いたことがない人」（段階「初級」）を足す（docs/prd/product.md r5、PRD r10 の 2）。Progate の対象と重なる層で、「当たり前のように専門用語を使ってきて腹が立ちました」（PRD の E-12、2020-03-19）が入口の不満。未経験の読者は手元にいない（PRD 6 の実現性の行）ので、文言は NN/g の「技術用語は先に説明する」（R-55）と GOV.UK のヒント文の型（R-54）で代える。
+- 使う場面（足した）：「休日にまとめて進めたい日」（PRD 2 の Job ストーリー。FB-2）。通勤の 15 分だけでなく、腰を据えて 3 件以上続ける日がある。続ける操作は、1 件ごとに完了画面を経て「次の一手に進む」を押す（AC-33）ので、完了画面が 1 日に何度も出る。何度も出る画面は、動きで待たせない（R-32「Let people cancel motion」、R-41「down-time animations ... frustrate」）。
+- 起こしたい感情（足した）：終えた直後に「小さな発見があった」（`insight`。PRD 2 の気持ちの面）と「前に進んだ数が増えた」（累計、n / N）。途切れや失う恐れは起こさない（PRD の E-15、E-16。R-46 の「a missing day reads like an error you want to fix」の逆）。FB-3 の「ワクワク」は、ここでは「次に出る解説と次の段階を見たくなる」こと（白帽の達成と有能感。PRD の E-16、E-17）と読み、演出の派手さではなく「返ってくるもの」で作る（5 の r2 の性格語「手応え」）。
+- 見た目の好み（変えない）：色は少なく、密度は低く。未経験が入っても、R-13（教育水準が高いほどカラフルさの好みが下がる）の仮定は対象の主（エンジニア志望か在職）に残る。Progate の「にんじゃわんこ」「ひつじ仙人」（R-50）のようなキャラクターは PRD の S-9 で v1 では捨てた。
+- アクセシビリティで必要なこと（足した）：祝いの動きは `prefers-reduced-motion: reduce` で消す（R-33、R-38、R-40）。自動で動く要素は 5 秒を超えない（R-39）。累計の数字を大きく出すときも、文字だけで意味が分かるラベルを付ける（R-34「Make sure all feedback is accessible」）。
 
 ## 3. 競合
 直接の競合を4本。PRD の 3 にある候補（Enki、Mimo、Sololearn、Progate、Exercism、freeCodeCamp、roadmap.sh）から、「毎日・短時間」を掲げる2本（Enki、Mimo）と、ブラウザで完結する Web の2本（Exercism、roadmap.sh）を選んだ。価格とレビューの不満は PRD の 3 にあるので繰り返さず、見た目と操作の比較だけを足す。すべて 2026-10-30 に確認。アプリの画面そのものは App Store の画面写真が文字で取れないので見ていない。公式サイトと App Store の本文、ヘルプセンターの一覧から読めたことだけを書く。
@@ -52,6 +67,28 @@
 | App Store の評価（Web 読み替え：公開されている評価と利用者数） | App Store US 4.8 / 1.1K 件（R-2） | App Store JP 4.8 / 1,033 件（R-3） | Trustpilot 2.3 / 18 件（PRD の 3）。トラックのページに「848,745 students」（R-4） | 「3.2M registered users」「371K GitHub stars」（R-5） |
 | 悪い点（レビューの不満の上位3つ、R 番号。価格と教材の古さは PRD の 3 にあるので、見た目と操作に関わるものだけ） | (1)「just how busy the screen is」（2024-11-01）。(2)「The progress bar on top when you scroll down is a little distracting too」（同）。(3)「It isn't the most beginner friendly application」（2023-04-17）（R-2） | (1) ハートが 0 になると進めない（「the number of hearts will be 0」。PRD の E-4 と同じレビュー）。(2) ストリークを切らすと「Streak repair」をストアの「coin」で買う（ヘルプの一覧。記事本文は 403 で見ていない。R-3）。(3) 日本語がない（PRD の E-5） | (1) 主要な動線が登録とメンター待ちに依存（PRD の E-6）。(2) 85 言語のテキスト一覧に絞り込みがない（R-4）。(3)「CLI-first」で、画面の中だけでは終えにくい設計（R-4） | (1) 96 本の地図を並べ、「今日何をするか」を決めない（R-5。PRD の E-1）。(2) 毎日の計画やスケジュールの仕組みがない（地図のページに「daily」「schedule」の記述なし。R-5）。(3) 進み具合の記録は登録の誘い（「Register yourself」）とセット（R-5） |
 
+### 3.1 r2 の比較：完了の直後、続ける導線、修了と進級、未経験の入口、解説、週（2026-11-05 に確認）
+PRD r10 の 3 の候補から、FB-3 の「面白さ」の作りを持つ 4 本（Duolingo、Mimo、Sololearn、Brilliant）と、FB-1 の未経験の層を持つ日本の 2 本（Progate、paiza）、修了と解放の型を持つ Exercism を比べた。価格と教材の不満は PRD の 3 と E-12〜E-18 にあるので繰り返さず、見た目と操作だけを足す。アプリの中の画面は、Duolingo だけ第三者の画面集の説明文（画像の代替テキスト。R-44）から読めた。それ以外は公式サイト、App Store の本文、ヘルプの記事から読めたことだけを書き、見られなかった欄は「見ていない」と書く。
+
+| 項目 | Duolingo | Mimo | Sololearn | Brilliant | Progate | paiza ラーニング | Exercism |
+|---|---|---|---|---|---|---|---|
+| URL（r2 で開いたもの） | R-42、R-43、R-44、R-45 | R-48 | R-49 | R-47 | R-50 | R-51 | R-52 |
+| 完了した直後の画面 | 完了 → 「total XP, accuracy, and speed」の指標カードと「Claim XP」→ 連続記録の画面（Duo が回って炎になる動き。節目の日だけ特別な動き）→ クエスト達成 → 報酬の宝箱、と 4 画面以上が続く（R-43、R-44）。新規の学習者の 7 日後の残存が +1.7%（R-43） | 見ていない。説明文は「stay motivated with streaks and leaderboards」。レビュー（2024-10-06、評価 5）：「"Next heart in _:__:__" message pops up, disrupting the flow of learning」（R-48） | 見ていない。説明文に XP、連続記録、バッジの記述なし。「beginner-friendly courses」（R-49） | 見ていない。連続記録は「the number of consecutive days」をホームに出す。守れなければ「your streak resets to 0」（R-47） | 見ていない。説明文「学んでいくことでレベルアップしていくので、ゲーム感覚でさくさく学習を進めていくことができます」。レビュー（2019-01-14）「レベルシステムが目玉の要素の一つなのにアプリでまた1からは萎えてしまいます」（R-50） | 見ていない（問題集の一覧は読み込みに失敗。スキルチェックは「テスト結果はＳ〜Ｅの6段階で評価されます」。R-51） | 見ていない（R-52 は解放の規則だけ） |
+| 祝いの動きと節目 | 節目は 1 週間、1 か月、100 日、1 年（前の版は 50、100、365 日の風船）。節目の日だけ「Fire Duo」（不死鳥）の動き。共有カード「I just reached a streak!」（R-42）。数字は「2,655 Day streak」のように大きく、炎のアイコン（R-46） | 見ていない | 見ていない | 見ていない | 見ていない | 見ていない | 見ていない |
+| 続ける導線（次へ） | 各画面に「Continue」。完了から次の活動まで「Continue」を 4 回以上（R-44）。第三者の批評に「two obligatory clicks feel excessive」（検索の抜粋のみ。本文は見ていない。R-44） | 見ていない。ハートが 0 になると待つ（R-48、PRD の E-4） | 見ていない | 見ていない。1 日に 3 問か 1 レッスンで連続記録が延びる（R-47） | 見ていない。トップは登録が先（「無料会員登録」「まずは無料ではじめる」。R-50） | 「メニューは上から順番に解いていくとレベルアップできるようにまとめられた問題集です」（R-51） | Learning Mode：「complete Learning Exercises to unlock further Learning and Practice Exercises」。Practice Mode は全部が最初から開く。切り替えは「...」メニュー（R-52） |
+| 修了と進級の見せ方 | 見ていない（R-45 の実績は「trophies on a shelf」） | 見ていない。「earn certificates」（R-48） | 見ていない。PRD の E-18 に修了証 | 見ていない | 「入門から実務レベルまで」のコース列（R-50）。レベルの数値の仕組みは見ていない | ランク S〜E に 1 行の定義（E「チュートリアル終了」「実装スキルは未知数です」、D「プログラミングの基礎知識を学んだ状態です」、C「基本的な実装スキル」）。「ランクアップのためのチャレンジは一度のみ」（R-51） | 概念の演習を終えると次が開く（R-52）。達成の画面は見ていない |
+| 未経験の入口 | 見ていない | 「Go from beginner to developer」「beginner-friendly interactive lessons」（R-48）。日本語なし（PRD の E-5） | 「Perfect for beginners & pros alike」。レビュー（2025-05-08）「簡単なところから教えてくれるので初心者も続けやすい」（R-49） | 見ていない | 「未経験でも、独学でも大丈夫」「ゼロからでもエンジニアになれる」「イラスト中心のスライドで学ぶ」「プログラミングを学んだことがなくても大丈夫」（R-50）。不満は専門用語（PRD の E-12） | ランク E は「チュートリアル(標準入力での値の取得)終了時に取得できるランク」（R-51）。未経験の入口はスキルチェックの外（見ていない） | 「Sign up」が先（R-4）。未経験向けの文言は見ていない |
+| 解説の出し方 | 見ていない | 見ていない | 見ていない | 見ていない（レッスンの説明ページは本文が取れなかった） | 「スライドで知識を学んだら、実際にプログラムを書いて」（先に説明、後に演習。R-50） | 見ていない | 見ていない |
+| 週・暦の見せ方 | 連続記録の画面に「weekly progress tracker with Monday completed」、ダッシュボードに月のカレンダー（R-44）。カレンダーは「Days highlighted in orange: 1 through 13 ... The 14th is gray」で、抜けた日が灰色（R-46） | 見ていない | 見ていない | カレンダーや週の表示の記述なし（R-47） | 見ていない | 見ていない | 見ていない |
+| 不安や圧になる所（r2 で見えた分） | 抜けた日の灰色と「a missing day reads like an error you want to fix」（R-46）。連続記録と通知の不満は PRD の E-13 | ハートの待ち時間がレッスンの流れを切る（R-48） | — | 「resets to 0」（R-47） | アプリで「また 1 から」（R-50） | ランクアップのチャレンジが 1 回だけ（R-51） | — |
+
+読み取り（仕様に渡す）：
+- 完了の直後に「返すもの」を置くのは全競合の型だが、Duolingo はそれを 4 画面以上に分け、毎回「Continue」を押させる（R-44）。1 日に何件も進める日（FB-2）にこれを繰り返すと、R-41 の「down-time animations」と R-60 の「nagging」に近づく。当アプリは完了の直後を 1 画面（`task.rate`）に収め、「次の一手に進む」は 1 つの副操作にする。
+- 節目は「少ない日だけ特別」が Duolingo の作り（R-42、R-43）。当アプリも 7、30、100 件だけ文を変え、それ以外は同じ 1 文にする（AC-35）。動きは入れない（R-32、R-33、R-38）。
+- 抜けた日を灰色で見せる暦（R-46）は、PRD 10 の「途切れを見せない」に反する。今週の完了日は日数だけで、曜日の並びやドットを出さない（AC-37）。
+- 進級の型は paiza の「順に解くとレベルアップ」と Exercism の「終えると次が開く」（R-51、R-52）。どちらも段階の定義を 1 行で持つ（paiza の S〜E）。当アプリは段階の説明を診断の選択肢と修了の画面で同じ 1 行にする。
+- 未経験の入口は、Progate が「大丈夫」「ゼロから」と安心の言葉を先に置く（R-50）が、不満は用語（PRD の E-12）。安心の言葉より、用語を本文で説明すること（R-55）と、選択肢のヒント文（R-54）で受ける。
+
 ## 4. 手本（別カテゴリー）
 - 名前と選んだ理由：Wordle（NYT Games。ワードゲーム）。「1日1つ」「開いたらすぐ本題」「登録なし、広告なし」で始まり、1日あたりの利用時間を短く保つことを意図して設計された。NYT のゲーム本体と NYT ヘルプのページは取得できなかった（Claude Code が nytimes.com を開けない）ので、Wikipedia と設計の解説記事から確かめた（R-6、R-7）。
 - 取り入れる考え方（R 番号）：
@@ -60,6 +97,12 @@
   - 色は意味にだけ使う。黄と緑の2色だけに意味を持たせ、色覚に配慮した High Contrast Mode では「replaces yellow and green with blue and orange」（R-7）。このアプリは成功、警告、エラーの意味色にだけ色を使い、印には文字を併記する。
   - データと注意を奪わない正直さ。「It's not trying to do anything shady with your data or your eyeballs」（R-6）。このアプリの「ブラウザの外に送らない」（PRD 1）と「ストリークとハートを置かない」（PRD 10）はこの線にある。
   - 取り入れないもの：共有用の絵文字グリッド（「these emoji results don't support text-to-speech」の指摘。R-7）と、NYT 移行後に加わった「account logins to track stats」（R-6）。このアプリの統計はブラウザの中だけで、共有はスクリーンショット（PRD 13）。
+  - r2 の注記：Wordle の「1 日 1 つで終わる」はそのままでは FB-2（同じ日に続ける）と合わない。残すのは「開いたら本題」「色は意味にだけ」「データを奪わない」の 3 つで、「1 日 1 つ」は「毎日 1 つは自動で出る。続けるかは本人が決める」（PRD の P-2）に読み替える。
+
+### 4.1 r2 で足した手本：GOV.UK の確認ページ（行政サービス。完了の直後の画面の型）
+- 選んだ理由：取引を終えた直後の画面を「何が終わったか」と「次に何が起きるか」で組む型が、競合の「Continue」の連鎖（R-44）の対極にある。登録も課金もない公共サービスなので、「押させる」動機がない。
+- 取り入れる考え方（R-53）：確認ページは「at the end of a transaction」に 1 つ。必ず入れるのは「details of what happens next and when」と「links to information or services that users are likely to need next」。再読み込みやブックマークで戻れること（「allow them to return to the page, whenever possible」）。当アプリの `task.done` は、終えた事実（累計、解説）→ 次に起きること（「次の一手に進む」か「明日も 1 件出る」）→ 次に要るもの（履歴）の順に置き、再読み込みしても同じ画面に戻る（PRD 11 の冒頭の規則）。
+- 取り入れないもの：参照番号、連絡先、フィードバックのリンク、PDF の保存（当アプリには取引がない）。
 
 ## 5. ブランドの性格語と文言の調子
 性格語は4語。NN/g は「a set of 3–7 words that express the essence of your Brand」を選び、語ごとに意味を定めて文言、書体に当てることを勧める（R-12）。
@@ -70,6 +113,9 @@
 | 静か | 色は意味色だけ、動きは最小、飾りと絵文字を置かない（R-2 の「busy」の不満、R-13）。通知もハートも急かさない（PRD 10） | 冷たい、素っ気ない。完了の瞬間には一言の労い（「今日も前に進みました」のような、確かめられる事実の言い方）を置く |
 | 正直 | 「ブラウザの外に送らない」「課題が尽きた」「データは引き継がれない」を隠さず言う（AC-10、AC-21、AC-22。R-6）。「最高」「かんたん」のような確かめられない言い方をしない（docs/prd/product.md の「避けること」） | 不安を煽る。警告はエラーの見た目にしない（R-10 の「Warnings should not look like errors」） |
 | 手早い | 開いて2秒・操作0回で課題（AC-15、AC-31）。診断は3問・1画面1問（R-8）。文は短く、動詞のボタン | 雑。答えの欄は急がせず、保存は黙って行い、状態だけ知らせる（R-19） |
+| 手応え（r2 で足した。FB-3） | 終えた直後に、その課題でいちばん大事な 1 文（`insight`）と、前に進んだ数（累計、この段階の n / N）が返ってくる（PRD の S-6、S-7。R-56 の staged disclosure、R-57 の「retrieval の後に確かめる」、PRD の E-16 の白帽「達成」）。節目（7、30、100 件）と段階の修了は、同じ場所で文だけが変わる（R-42、R-43 の「節目の日だけ特別」） | 派手な演出（紙吹雪、キャラクター、拡大の動き。R-32、R-33、R-41）。失う恐れで動かす数字（連続日数、灰色の抜けた日。R-46、PRD の E-15）。押させるための「Continue」の連鎖（R-44、R-60） |
+
+- r2 の注記：「静か」の「意味しないこと」にある「完了の瞬間には一言の労い」は、r2 では「手応え」が受け持つ。「静か」は動きと色と飾りについての語で、終えた直後に返すものを減らす語ではない。4 語から 5 語にした（NN/g の 3〜7 語の範囲。R-12）。
 
 文言の調子（NN/g の4軸。R-11）
 - かしこまる ⇔ くだける：やや「かしこまる」寄り。です・ます調で、絵文字と感嘆符を使わない。競合3本（Enki、Mimo、Exercism）が「くだける」側に寄っている（R-2、R-3、R-4）ので、対象（仕事で書いている人）に合わせて逆に置く。
@@ -77,6 +123,7 @@
 - ていねい ⇔ ちゃかす：「ていねい」。申告の文言は本人を責めない（「今日はできない」は選択肢として並べ、理由を聞かない）。
 - 淡々 ⇔ 熱っぽい：「淡々」。「10x faster」（R-2）や「Commit to your growth」（R-5）のような煽りを使わない。例外は完了の直後の1文だけで、そこも事実を言う。
 - 英語の調子：同じ位置（plain、direct、no exclamation marks）。英語のボタンは動詞始まり（Start、Done、Export）。
+- r2 の追記（祝いと申告の後の言葉）：HIG の Writing は「exercising and reached a goal」の場面で「light and congratulatory」に調子を寄せてよいとし、同時に「just saying "Send" often works better than "Let's do it!"」「Interjections like "oops!" or "uh-oh" are typically unnecessary and can sound insincere」と言う（R-35）。当アプリの祝いは「数えられる事実を言う 1 文」（例：7 件目を終えました）にし、感嘆符、絵文字、「すごい」のような評価の語は使わない。「今日はできない」の後は、労いも励ましも置かず、事実（見送った。次はいつでも進める）だけを言う。罪悪感で動かす言い回し（confirmshaming：「No, I don't want to stay alive」。R-60）と、断っても出続ける催促（nagging。R-60）は使わない。「連続」「途切れ」「逃した」、英語の「streak」「missed」は文言ファイルに 0 件（AC-35）。
 
 ## 6. 合わせる当たり前と、差をつける点
 - 合わせる当たり前（利用者がほかのアプリで覚えた型）と R 番号：
@@ -95,6 +142,19 @@
   2. **「今日はここまで」と言い切る終わりの画面**。`task.done` と `task.skipped` は、次の課題もストリークも見せず、「今日の一手は終わりです。次は明日」と1文で終える（R-6 の「spend only three minutes」の意図、PRD 10 のストリーク非採用）。完了の直後の `task.rate` は1問だけで、答えなくても閉じられる（AC-9）。決定的な瞬間は「完了を押したあと、画面が静かになる」こと。
   - どちらも、デザインの採点と判断（見た目の良さではなく「迷わない」「終われる」）に結び付く。仕様では `task.today` と `task.done` の2画面に表れる。
 
+### 6.1 r2 の追記（FB-2、FB-3 で変わった点）
+- 合わせる当たり前（足した）：
+  - 終えた直後に「返すもの」（指標、解説、進み具合）を 1 画面で見せる（R-44 の Duolingo の完了画面、R-53 の確認ページ）。ただし画面を分けて「Continue」を重ねない。
+  - 節目は少ない日だけ特別にする（R-42、R-43）。
+  - 進み具合は「n / N」の文字で出す（GOV.UK のタスクリストは「Completed」を文字で示す。R-65。HIG の progress indicator は待ち時間用の一時的な部品なので、学習の進み具合には使わない。R-37）。
+  - 選択肢の補足はヒント文（1 文、句点なし、リンクなし。R-54）。
+  - 動きは短く、取り消せて、`prefers-reduced-motion` で消える（R-32、R-33、R-38、R-40）。
+- 差をつける点（r1 の 2 を置き換える）：
+  2. **終えた直後に、静かに返ってくる「手応え」**。`task.rate`（と `task.done`）は、紙吹雪も「Continue」の連鎖もなく、1 画面に「ひとこと解説」と累計（n 件目）と「役に立ったか」の問いだけを置く。競合は完了を 4 画面以上の演出と報酬に分け（R-44）、連続記録の数字で次の日を縛る（R-46、R-47）。当アプリの決定的な瞬間は「『完了』を押した 0.5 秒後に、その課題でいちばん大事な 1 文が読め、累計が 1 増えている」こと（AC-35、AC-38）。「次の一手に進む」は同じ画面の末尾に副操作として 1 つだけ置き、押さなければ「明日も 1 件出る」で終われる（AC-33、PRD の P-2）。
+  - r1 の「今日はここまでと言い切る」は、FB-2（同じ日に続ける）で成り立たなくなったので取り下げる。「終われる」こと自体は残す：主操作にしない、確認や催促を出さない（R-60）、再読み込みしても同じ画面（R-53）。
+  - 差をつける点 1（課題そのものがホーム画面）は変えない。n / N と「次の一手」が入っても、開いた直後の `task.today` に重なる要素は 0 件のまま（AC-31）。
+- 仕様で表れる画面：`task.today`（n / N）、`task.rate` と `task.done`（手応え、次の一手）、`task.skipped`（次の一手。労いなし）、`task.exhausted`（修了と進級）、`diagnosis.question`（ヒント文）、`settings.stats`（今週の完了日）。
+
 ## 7. 方向性の2案
 | | 案A「一枚の紙」 | 案B「進み具合の盤」 |
 |---|---|---|
@@ -104,6 +164,16 @@
 | 選んだか、その理由 | **選ぶ**。差をつける点1と2（課題がホーム、終わりを言い切る）を最も直接に形にできる。コントラストと 320 px の並び（R-14、R-16）も、文字だけの構成が最も壊れにくい。弱点は「地味で、続ける動機が画面にない」ことだが、PRD の P-2 は「開けば課題」「書きかけから再開」で続けやすさを作る方針なので、見た目の仕掛けに頼らない | 選ばない。理由：PRD 10 の「連続記録を採らない」に近づく。1画面に主役が2つになり B-2 に反する。独自の色を領域分だけ持つと、ライト、ダーク、高コントラストの3通りのコントラストを 6 領域 × 3 で確かめる手間が増える（R-14） |
 
 案A の中で、統計の画面（`settings.stats`）だけは例外として数字を大きく置く（13 の指標の報告用スクリーンショットになるため。AC-24）。ここでも色は使わず、値は定義リストの形で、ラベルと値の対を縦に並べる（320 px でも崩れない。R-16）。
+
+### 7.1 r2 の見直し（FB-3「面白さ」を受けて、案A のまま何を足すか）
+| | 案A'「一枚の紙に、手応えを足す」（r2 で選ぶ） | 案B'「進み具合の盤と祝いの動き」（r1 の案B を FB-3 に合わせて再検討） |
+|---|---|---|
+| ひとことで | 案A の構成はそのまま。完了の直後の画面にだけ、解説（本文と同じ文字）と累計の数字（大きい文字 1 行）と「次の一手に進む」（副操作）を足す。`task.today` の題名の上に「この段階の n / N 件目」を 1 行。祝いは文が変わるだけで、動きは不透明度の変化までに限る | 完了時に紙吹雪か記号の動き、累計を輪で見せ、今週を 7 つのドットで見せる。節目はキャラクターか大きな図で祝う |
+| 性格語との合い方 | 「手応え」を文と数字で作る。「静か」「ひとつ」「正直」「手早い」を保つ | 「手応え」は作れるが「静か」に反する。ドットは「途切れ」を見せ「正直」（連続記録を採らない）にも反する |
+| ターゲットとの合い方 | 1 日に何件も進める日（FB-2）に、完了画面が何度出ても待たされない（R-32、R-41）。動きを減らす設定の人に別の見た目を用意しなくて済む（R-38、R-40）。カラフルさを好まない仮定（R-13）に合う | 節目の動きには Duolingo の +1.7% の例（R-43）があるが、連続記録と一体の数字で、当アプリの累計に同じ効き目がある証拠はない［推測］。絵の工数は 3 週に入らない（PRD の S-9） |
+| 選んだか、その理由 | **選ぶ**。FB-3 の「ワクワク」を「次の解説と次の段階を見たくなる」（返ってくるもの）で作り、演出に頼らない。足す要素はすべて文字で、AC-35〜AC-38 の自動テストで数えられる | 選ばない。PRD 10（連続記録、ペット、変動する報酬を採らない）と 6 の害の行 (3)（累計や節目が新しい圧になる）に反する方向。動きを入れるなら R-32、R-38、R-39 の 3 条件（短い、取り消せる、設定で消える）を全部満たす必要があり、文だけの案より確かめる手間が増える |
+
+未解決（仕様で決める前に Takuma に聞く候補）：累計の数字を「大きい文字」で出す（統計の画面と同じ例外）か、本文と同じ大きさで出すか。案A' は「大きい文字 1 行」を提案するが、r1 の「飾りは置かない」との線引きは見た目の判断なので報告の「未解決」に書く。
 
 ## 8. 発見の一覧
 | R | 発見（引用は「」で） | 出典 URL | 確認日 |
@@ -139,6 +209,40 @@
 | R-29 | web.dev「Persistent storage」。Chromium は確認を出さずに判断し、「if a site is considered important, the persistent storage permission is automatically granted」。基準は「How high is the level of site engagement?」「Has the site been installed or bookmarked?」「Has the site been granted permission to show notifications?」。「If the request was denied, it can be requested again later and will be evaluated using the same heuristics」。今の状態は「Calling navigator.storage.persisted() returns a Promise that resolves with a boolean」。Firefox は「prompts the user with a UI popup」（確認が出る）。Safari の挙動の記述はない（15.2 で対応とだけ） | https://web.dev/articles/persistent-storage | 2026-11-03 |
 | R-30 | NN/g「The Principle of Common Region」（2020-07-12）。「items within a boundary are perceived as a group」で、同じ性質か働きを持つと受け取られる。枠や地の色の箱は構造を早く見せるが、使いすぎると散らかるので、多くの場合は余白だけで足りる。枠で囲むのは「閉じる」で消える範囲を示す案内 1 か所だけに限る根拠 | https://www.nngroup.com/articles/common-region/ | 2026-11-03 |
 | R-31 | MDN `StorageManager.persisted()`。「returns a Promise that resolves to true if your site's storage bucket is persistent」。Baseline「Widely available」「has been available across browsers since December 2021」（対応ブラウザの版の表は取れなかった。Safari 17 で使えるかは実機で未確認） | https://developer.mozilla.org/en-US/docs/Web/API/StorageManager/persisted | 2026-11-03 |
+| R-32 | HIG Motion（r2。HTML は本文が取れず、Apple のドキュメント配信用 JSON `https://developer.apple.com/tutorials/data/design/human-interface-guidelines/motion.json` から本文を取り出した。以下 R-33〜R-37 も同じ経路）。「Add motion purposefully, supporting the experience without overshadowing it. Don't add motion for the sake of adding motion. Gratuitous or excessive animation can distract people and may make them feel disconnected or physically uncomfortable」「Make motion optional. Not everyone can or wants to experience the motion in your app or game, so it's essential to avoid using it as the only way to communicate important information」「Aim for brevity and precision in feedback animations」「In apps, generally avoid adding motion to UI interactions that occur frequently」「Let people cancel motion. As much as possible, don't make people wait for an animation to complete before they can do anything, especially if they have to experience the animation more than once」 | https://developer.apple.com/design/human-interface-guidelines/motion | 2026-11-05 |
+| R-33 | HIG Accessibility（Motion の節。JSON 経路）。「People who are prone to these effects can turn on the Reduce Motion accessibility setting. When this setting is active, ensure your app or game responds by reducing automatic and repetitive animations, including zooming, scaling, and peripheral motion」。他の手当て：「Tightening animation springs to reduce bounce effects」「Replacing transitions in x-, y-, and z-axes with fades to avoid motion」「Avoiding animating into and out of blurs」 | https://developer.apple.com/design/human-interface-guidelines/accessibility | 2026-11-05 |
+| R-34 | HIG Feedback（JSON 経路）。「Make sure all feedback is accessible. ... when you provide feedback using color, text, sound, and haptics, people can receive it whether they silence their device, look away from the screen, or use VoiceOver」「Consider integrating status feedback into your interface」「When it makes sense, confirm that a significant action or task has completed」「It's generally best to reserve this type of confirmation for activities that are sufficiently important — because people typically expect their action or task to succeed, they only need to know when it doesn't」 | https://developer.apple.com/design/human-interface-guidelines/feedback | 2026-11-05 |
+| R-35 | HIG Writing（JSON 経路）。「Match your tone to the context. ... Are they exercising and reached a goal? Or are they trying to make a payment and received an error?」、Apple Watch の 2 例のうち「In the second, the tone is light and congratulatory」。「Choose simple, plain language and write with accessibility and localization in mind, avoiding jargon」「put the most important information first」「When labeling buttons and links, it's almost always best to use a verb. ... just saying "Send" often works better than "Let's do it!"」「Make it clear when a flow is complete by using language like "Done."」「Avoid using we altogether」「Provide clear next steps on any blank screens」「avoid blame, and be clear about what someone can do to fix it. ... Interjections like "oops!" or "uh-oh" are typically unnecessary and can sound insincere」 | https://developer.apple.com/design/human-interface-guidelines/writing | 2026-11-05 |
+| R-36 | HIG Onboarding（JSON 経路）。「if onboarding is necessary, design a flow that's fast, fun, and optional」「Teach through interactivity」「Consider providing a collection of context-specific tips instead of a single onboarding flow. ... A context-specific tip can also help people learn better because it lets them concentrate on a single action or task before encountering new information」「if you try to teach too much, people can feel overwhelmed and may be less likely to remember what they learned」「Postpone nonessential setup flows or customization steps」 | https://developer.apple.com/design/human-interface-guidelines/onboarding | 2026-11-05 |
+| R-37 | HIG Progress indicators（JSON 経路）。「All progress indicators are transient, appearing only while an operation is ongoing and disappearing after it completes」「When possible, use a determinate progress indicator」「Be as accurate as possible when reporting advancement」「Avoid vague terms like loading or authenticating」。学習の進み具合（n / N 件目）は「operation」ではないので、この部品の対象外。文字で出す根拠 | https://developer.apple.com/design/human-interface-guidelines/progress-indicators | 2026-11-05 |
+| R-38 | WCAG 2.2 SC 2.3.3 Animation from Interactions（AAA）。「Motion animation triggered by interaction can be disabled, unless the animation is essential to the functionality or the information being conveyed」。motion animation は「addition of steps between conditions to create the illusion of movement」で、色、ぼかし、不透明度の変化は大きさ・形・位置を変えなければ含まない。「Some users experience distraction or nausea from animated content」。満たす技術は C39（CSS `prefers-reduced-motion`）と SCR40（JS） | https://www.w3.org/WAI/WCAG22/Understanding/animation-from-interactions.html | 2026-11-05 |
+| R-39 | WCAG 2.2 SC 2.2.2 Pause, Stop, Hide（A）。自動で始まり、5 秒を超え、他の内容と並んで出る「moving, blinking, scrolling」には「pause, stop, or hide」の手段が要る。「The intent of this success criterion is to avoid distracting users during their interaction with a web page」。祝いの動きを入れるなら 5 秒未満で 1 回 | https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide.html | 2026-11-05 |
+| R-40 | WebKit ブログ「Responsive Design for Motion」（2017-05-15）。`prefers-reduced-motion` は「serve alternate animations that avoid motion sickness triggers experienced by some site visitors」のため。「people with vestibular disorders have an acute sensitivity to certain motion triggers」。引き金は「Visual scaling or zooming animations」「spiraling or spinning movements」「multi-speed or multi-directional movement」（parallax）、「Horizontal movement in the peripheral field of vision」。代案は「consider serving an alternate, simpler animation, or display another visual indicator」 | https://webkit.org/blog/7551/responsive-design-for-motion/ | 2026-11-05 |
+| R-41 | NN/g「Animation for Attention and Comprehension」。「Animation in UX must be unobtrusive, brief, and subtle」「a short animation can ensure that users see the feedback」。害：「if irrelevant to the task at hand, it can substantially degrade the user experience」「these down-time animations that often frustrate participants in usability testing」「using animation to hijack the users' attention or create a fear of loss is a dark pattern」。具体的な秒数の推奨はない | https://www.nngroup.com/articles/animation-purpose-ux/ | 2026-11-05 |
+| R-42 | Duolingo ブログ「You're on fire! Or, how we brought the streak milestone to life」（Kurt Hartfelder、2022-01-21）。節目は 1 週間、1 か月、100 日、1 年「and beyond」。前の版は Duo が 50、100、365 の風船を持つ絵。新しい版は Duo が不死鳥になる「Fire Duo」の動きで、節目を「power ups」のように扱う。学習者に「something to look forward to」を与える意図。共有カード「I just reached a streak!」。結果は「more people are keeping their streaks alive and celebrating milestones」で、数字はない | https://blog.duolingo.com/streak-milestone-design-animation | 2026-11-05 |
+| R-43 | Duolingo ブログ「How the Duolingo streak builds habit」（Osman Mansur、2022-01-31）。連続記録を延ばした後の画面に新しい動き（Duo と日数 → Duo が回って炎になる）。「a particularly awesome animation on select milestone days」。新規の学習者が 7 日後も使っている確率が「+1.7%」。連続記録と一体の動きの効き目で、累計の数字に同じ効き目がある証拠ではない | https://blog.duolingo.com/how-duolingo-streak-builds-habit | 2026-11-05 |
+| R-44 | Duolingo の画面集（screensdesign。第三者。画像の代替テキストから読めた分だけで、画面そのものは見ていない）。レッスン完了：「Lesson completion screen displaying performance metrics including total XP, accuracy, and speed, with a Claim XP button」。続く画面：「a two-day streak challenge, weekly progress tracker with Monday completed, and a Continue button」「Daily Quest complete notification with a 2/2 progress bar, gem counter, and a Continue button」「Reward screen with a treasure chest illustration ... 10 gems were earned, and a continue button」「Streak dashboard ... a monthly calendar view for March 2025」。完了から次の活動まで「Continue」が 4 画面以上続く。検索の抜粋（creativiii のブログ。本文は見ていない）に「Even in the paid app, two obligatory clicks feel excessive」 | https://screensdesign.com/apps/duolingo-language-lessons/ | 2026-11-05 |
+| R-45 | Duolingo ブログ「Start earning brand-new Achievements on Duolingo!」（2023-12-11）。実績は「like trophies on a shelf」でプロフィールに置く。Personal records（Daily Most XP、Perfect Lessons、Longest Streak）。設計の原則や数字の記述はない | https://blog.duolingo.com/achievement-badges | 2026-11-05 |
+| R-46 | Mobbin「Streaks are about losing」（859 件の連続記録のデザイン調査。PRD の E-16 と同じ記事を、r2 では暦と節目の見せ方について読んだ）。数字は「2,655」に「Day streak」と炎のアイコン。暦は「May 2026. Days highlighted in orange: 1 through 13, a clean unbroken chain」「The 14th is gray」。「When the streak is mostly unbroken, a missing day reads like an error you want to fix」。同じ型の例に Apple Fitness のリング、GitHub の contribution graph、習慣トラッカーの暦。Finch は「When you miss a day, it doesn't blank it or X it out」「A missed day doesn't look like a blank. It looks like something you can still fix」。Duolingo は条件を 1 レッスンに下げた（PRD の E-14 と同じ） | https://mobbin.com/blog/streaks-are-about-losing-a-study-of-859-streak-designs | 2026-11-05 |
+| R-47 | Brilliant ヘルプ「What is a streak?」。「the number of consecutive days you've learned on Brilliant」。延ばす条件は 1 日に 3 問か 1 つの concept。ホームに日数。Streak Charge は自動で使われ、「If no protection applies, your streak resets to 0」。暦や週の表示の記述はない | https://brilliant.org/help/using-brilliant/what-is-a-streak | 2026-11-05 |
+| R-48 | Mimo（App Store US）。説明文「Track progress, earn certificates, and stay motivated with streaks and leaderboards」「Go from beginner to developer with structured paths」「Start with beginner-friendly interactive lessons」。XP、daily goals、leagues の語は説明文にない。レビュー（2024-10-06、評価 5）「It's frustrating when the "Next heart in _:__:__" message pops up, disrupting the flow of learning」、（2020-08-16）「when I only have one heart left, I just end up quitting the lesson and choosing a different one」。完了画面の記述は見ていない | https://apps.apple.com/us/app/mimo-learn-coding-programming/id1133960732 | 2026-11-05 |
+| R-49 | Sololearn（App Store JP）。説明文に XP、連続記録、daily goals、バッジ、修了証、リーダーボードの語はなく、「beginner-friendly courses」「Perfect for beginners & pros alike」。レビュー（2025-05-08）「簡単なところから教えてくれるので初心者も続けやすい。」、（2018-07-10）「他言語の経験はあるが python は良く知らないレベルの人にはちょうどよいと思う。」。完了画面の記述は見ていない | https://apps.apple.com/jp/app/sololearn-learn-to-code/id1210079064 | 2026-11-05 |
+| R-50 | Progate。公式サイト：「未経験でも、独学でも大丈夫」「文系出身、異業種からの転職。ゼロからでもエンジニアになれる。」「紙の本よりも直感的で、動画よりも学びやすい、「スライド学習」を採用しました。」「イラスト中心のスライドで学ぶ」「「楽しい」と「興味」の2つがあれば続けられる。」、CTA「まずは無料ではじめる」「無料会員登録」「ログイン」。最初の画面は登録かログイン。専門用語、レベルアップ、達成感の語はトップにない。App Store JP：「学んでいくことでレベルアップしていくので、ゲーム感覚でさくさく学習を進めていくことができます。」「プログラミングを学んだことがなくても大丈夫。」「「にんじゃわんこ」や「ひつじ仙人」と一緒に、プログラミングを楽しく学びましょう。」、評価 3.8 / 1,180 件。レビュー（2019-01-14）「レベルシステムが目玉の要素の一つなのにアプリでまた1からは萎えてしまいます。」。画面写真は見ていない | https://progate.com/ 、https://apps.apple.com/jp/app/progate/id1335868128 | 2026-11-05 |
+| R-51 | paiza。スキルチェックのランク：「採点後、受験した問題のランクと点数に基づき、テスト結果はＳ〜Ｅの6段階で評価されます。」。S「計算機科学に精通し、処理量を見積もった上で最適なアルゴリズムを設計、実装するスキルがあります。」（上位 1%）、A「複雑なロジックを限られた時間内で設計、実装できる。」（上位 10%）、B「実用的なロジックを時間内に実装するスキルがあります。」（上位 30%）、C「コードを書く基本スキルがあります。」（上位 60%）、D「プログラミングの基礎知識を学んだ状態です。」「実装できるロジックは限定的です。」、E「チュートリアル(標準入力での値の取得)終了時に取得できるランクです。」「実装スキルは未知数です。」。「ランクアップのためのチャレンジは一度のみ」。レベルアップ問題集：「メニューは上から順番に解いていくとレベルアップできるようにまとめられた問題集です」。問題の一覧は「問題セット・メニュー一覧を読み込めませんでした」で見ていない。ランクアップの祝いの画面は見ていない | https://paiza.jp/challenges/info 、https://paiza.jp/works/mondai | 2026-11-05 |
+| R-52 | Exercism Docs「Unlocking Exercises」。「Requiring Learning Exercises to be completed to unlock more exercises is called Learning Mode」（Learning Exercises のあるトラックの既定）。「complete Learning Exercises to unlock further Learning and Practice Exercises」。「Practice Mode is the opposite, where all exercises are unlocked from the start」。切り替えはトラックのページの「...」から「Disable Learning Mode」。修了の画面の記述はない | https://exercism.org/docs/building/product/unlocking-exercises | 2026-11-05 |
+| R-53 | GOV.UK Design System「Confirmation pages」。「You should use a confirmation page at the end of a transaction」。必ず入れるもの：「a reference number, if there is one」「details of what happens next and when」「contact details for the service」「links to information or services that users are likely to need next」「a link to your feedback page」「a way for users to save a record of the transaction」。「Some users will bookmark the confirmation page as a form of receipt. You should allow them to return to the page, whenever possible」 | https://design-system.service.gov.uk/patterns/confirmation-pages/ | 2026-11-05 |
+| R-54 | GOV.UK Design System「Radios」。「You can add hints to radio items to provide additional information about the options」「Keep each hint to a single short sentence, without any full stops」「Screen readers will read out the entire text when users interact with an item」「Do not use links in hint text」。並び：「Order radio options alphabetically by default」、頻度順は「extreme caution as it can reinforce bias」。「you should include 'None of the above' or 'I do not know' if they are valid options」 | https://design-system.service.gov.uk/components/radios/ | 2026-11-05 |
+| R-55 | NN/g「Plain Language Is for Everyone, Even Experts」（Hoa Loranger、2017-10-08）。「even highly educated online readers crave succinct information that is easy to scan, just like everyone else」「If you must use technical terms that your target readers may not know, explain them first」「Jargon is helpful, however, when it communicates a concept clearly understood by specialized user groups」。副の読者向けの補足は別の層（リンクなど）に置く。文は「no more than 15–20 words」 | https://www.nngroup.com/articles/plain-language-experts/ | 2026-11-05 |
+| R-56 | NN/g「Progressive Disclosure」（Jakob Nielsen、2006-12-03）。「defers advanced or rarely used features to a secondary screen」「the very fact that something appears on the initial display tells users that it's important」。Staged disclosure は「users step through a linear sequence of options」で、「you can divide a task into distinct steps that have little interaction」ときに向く。「考える → 答える → 解説を読む」の順は staged disclosure | https://www.nngroup.com/articles/progressive-disclosure/ | 2026-11-05 |
+| R-57 | The Learning Scientists「Learn how to Study Using... Retrieval Practice」（2016-06-23）。「Retrieval practice involves recreating something you've learned in the past from your memory」「This process of retrieving makes the information more retrievable later」「After practicing retrieval, it is best to then check your book and notes from class」。解説を「答えた後」に出す根拠（先に出すと retrieval にならない） | https://www.learningscientists.org/blog/2016/6/23-1 | 2026-11-05 |
+| R-58 | WAI-ARIA APG Disclosure（Show/Hide）。「A disclosure is a widget that enables content to be either collapsed (hidden) or expanded (visible)」。Enter と Space で切り替え、見えているとき `aria-expanded="true"`。解説を折りたたむなら `<details>`/`<summary>` でこの型になるが、開く操作が 1 つ増える | https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/ | 2026-11-05 |
+| R-59 | MDN `<progress>`。「displays an indicator showing the completion progress of a task, typically displayed as a progress bar」。`value` と `max`。「In most cases you should provide an accessible label when using <progress>」「Text placed between the element's tags is not an accessible label」。Baseline「Widely available」（2015-07 から）。n / N を棒で出すなら `<label>` が要る。文字だけなら不要 | https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/progress | 2026-11-05 |
+| R-60 | Deceptive Patterns（Harry Brignull）。Confirmshaming：「The user is emotionally manipulated into doing something that they would not otherwise have done」、例は通知の拒否ボタン「No, I don't want to stay alive」「No, I prefer to bleed to death」。Nagging：「adversarial resource depletion」、例は Instagram（2018）の通知の催促で、拒否の選択肢が「Not Now」だけで出続けた（Gray et al., 2018） | https://www.deceptive.design/types/confirmshaming 、https://www.deceptive.design/types/nagging | 2026-11-05 |
+| R-61 | MDN `Intl.Locale.prototype.getWeekInfo()`。`firstDay` は「An integer between 1 (Monday) and 7 (Sunday) indicating the first day of the week for the locale」。例：en-GB は `firstDay: 1`、he は 7。Baseline 2026「Newly available」（Safari 17 では使えない前提）。手元の Node v24.22.1（ICU）で実測：`ja-JP` と `ja` と `en-US` は `{"firstDay":7,"weekend":[6,7]}`（日曜始まり）、`en-GB` は `firstDay: 1`。日本のロケールの暦の慣習は日曜始まりで、PRD の「月曜始まり」（AC-37）は ISO 8601（R-62）の週。曜日の並びを出さない限り衝突しないが、文言に「月曜から」を明記する必要がある | https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Locale/getWeekInfo | 2026-11-05 |
+| R-62 | Wikipedia「ISO week date」。「Weeks start with Monday and end on Sunday」「The US system has weeks from Sunday through Saturday」。日本の記述はない | https://en.wikipedia.org/wiki/ISO_week_date | 2026-11-05 |
+| R-63 | Apple サポート「Track daily activity with Apple Watch」。Weekly Summary は「The summary includes a daily average and weekly total of the progress you've made toward closing your rings」。「You can earn awards for personal records, streaks, and major milestones」。iPhone の Fitness で「Summary → Activity rings → Calendar」で日を選ぶ。抜けた日が暦でどう見えるかは、このページには書かれておらず見ていない（R-46 の Mobbin が「Apple Fitness のリング」を抜けが見える型の例に挙げる） | https://support.apple.com/108359 | 2026-11-05 |
+| R-64 | Finch（公式トップ）。「Daily self-care is finally fun — take care of your pet by taking care of yourself!」「Your new self-care best friend.」。圧や罪悪感についての文言、抜けた日の扱い、進み具合の見せ方はトップにない（抜けた日の「fix」の見せ方は R-46 の Mobbin の記述だけ） | https://finchcare.com/ | 2026-11-05 |
+| R-65 | GOV.UK Design System「Task list」（patterns/task-list-pages は 410 で、components/task-list に移っていた）。「displays all the tasks a user needs to do」。状態は「Completed」を黒い文字（背景なし）、「Incomplete」を青いタグで示す。「Users can only move on from the task list when all tasks are shown as 'Completed'」。「n of N」の文言の例はない | https://design-system.service.gov.uk/components/task-list/ | 2026-11-05 |
 
 ### 8.1 決めたいことごとの示唆（仕様に渡す。決定そのものは design/001-daily-learning.md で行う）
 | 決めたいこと（1 の番号） | 示唆 | 根拠 |
@@ -151,6 +255,12 @@
 | 6 統計の見せ方 | 1画面に 9 つの値を定義リストで縦に並べ、ラベルは 13 の指標の名前と同じ語。グラフは使わない（色と2次元が増える）。スクリーンショット1枚に収まる高さを目安 | R-16、案A、AC-24 |
 | 7 日英 | です・ます、絵文字なし、ボタンは動詞。英語は Start / Done / Too hard / Too easy / Not today / Export / Import。英語で長くなる箇所（申告の4ボタン、設定の項目）は最初から縦並び | R-11、5 の調子、AC-26 |
 | 8 ダークモードと文字 | OS の設定に従い、独自の切り替えなし。`color-scheme: light dark`。本文 16 px 以上、行間 1.6〜1.7、14 px 未満なし。書体はシステムの sans-serif（Web フォントは初回転送 150 KB 以内の PRD 12 の枠に入らない可能性が高いため。Noto Sans JP の実際の転送量は見ていない）。フォーカスの枠 2 px 以上で 3:1 以上。主操作は 44×44 px 以上 | R-14、R-15、R-17、R-22、R-23、R-26、AC-17、AC-18、AC-27 |
+| 10 完了した直後の画面（r2） | `task.rate` を 1 画面で組む：h1（完了の事実）→ 累計の 1 行（「これまでに完了：7 件」。数字は本文より大きい text style 1 段。色は使わない）→ 節目のときだけ文が変わる祝いの 1 文（7、30、100 件は別キー。それ以外は「n 件目を終えました」のような事実の 1 文）→ ひとこと解説（14）→ 「役に立ったか」の問い → 末尾に「次の一手に進む」（副操作）と今週の完了日（15）。`task.done` も同じ要素（問いを除く）。動き：入れない。入れるとしても不透明度の変化 1 回・0.3 秒以内・操作を待たせない・`prefers-reduced-motion: reduce` で消す。紙吹雪、拡大、キャラクター、音は置かない。文言に感嘆符、絵文字、評価の語（「すごい」）を使わない。「今日はできない」の後（`task.skipped`）は労いも励ましも置かず、事実だけ | R-32、R-33、R-34、R-35、R-38、R-39、R-40、R-41、R-42、R-43、R-44、R-46、R-53、R-60、AC-35、6.1 の差をつける点 2 |
+| 11 「次の一手に進む」（r2） | `task.done` と `task.skipped` の末尾に副操作（枠線のボタン）を 1 つ。主操作（塗り）にしない。前に「明日も 1 件出ます」の趣旨の 1 文（止めやすさ。Q15 の C「3 件目の後に出す」ではなく、常に同じ位置に同じ 1 文）。押した後の確認、催促、「もう 1 件どうですか」の再表示は置かない。3 件目まで同じ見た目（AC-33 の「確認のダイアログ 0 件」）。押すと `task.today` に同期で描き、フォーカスを h1 へ（R-28 の型） | R-44（Continue の連鎖の逆）、R-53、R-60、R-32（何度も出る画面に動きを足さない）、AC-33、PRD の P-2 と Q15 |
+| 12 修了と進級（r2） | `task.today` の題名の上に「この段階の n / N 件目」を 1 行（S2 の「質問 1 / 3」と同じ位置、同じ text style）。棒（`<progress>`）は使わない（HIG の progress indicator は待ち時間用で一時的。文字なら 320 px でも崩れない）。`task.exhausted` の初・中：h1「初級の課題をすべて終えました」の趣旨 ＋ 累計 ＋ 主操作「中級に進む」（次の段階の名前を入れる）＋ 副操作「別の領域を選ぶ」。上級：h1「この領域の課題をすべて終えました」＋「新しい課題は次の版で足します」＋ 副操作「別の領域を選ぶ」だけ。段階の説明は診断の選択肢（13）と同じ 1 行をここにも出す（paiza の S〜E の 1 行定義の型）。「難しすぎ」で下がった先が修了済みのときは、次に進む先の段階名をそのまま言う（責めない、隠さない） | R-37、R-59、R-51、R-52、R-65、R-35（avoid blame）、R-53、AC-10、AC-36 |
+| 13 未経験の入口（r2） | 領域の選択肢にヒント文（1 文、句点なし、リンクなし、40 字以内。`area.<ID>.desc`）。経験年数は「まだコードを書いたことがない」を先頭に置く（数直線の順。頻度順ではない）。段階の説明は PRD 9 の趣旨（初級「コードをほとんど書いたことがない」、中級「仕事や学習でコードを書いている（人に聞きながらでもよい）」、上級「設計を決め、人に教えている」）で、自己評価の問いの選択肢に同じ 1 行を付ける。`diagnosis.start` の導入文「すでにコードを書いているエンジニア向けです」（PRD の E-21）を「コードを書いたことがなくても使えます」の趣旨に変える。最初の 1 件の不安は、別の説明画面を足さず（HIG onboarding の「context-specific tips」）、課題本文の「やり方」で用語を 1 文で説明する（AC-34。中身は pdm）。画面の文言でも専門用語（「リポジトリ」「API」）を領域名と説明に使わない | R-54、R-55、R-36、R-35（plain language）、R-50（Progate の「大丈夫」より用語の説明）、R-8、AC-39、AC-40、PRD の E-12、E-21 |
+| 14 ひとこと解説（r2） | `task.rate` と `task.done` に、見出し「ひとこと解説」（「答え」「正解」の語を使わない）＋ 本文と同じ text style の 1〜2 文。折りたたまない（`<details>` は開く操作が増える）。`task.today` の DOM には置かない（AC-38 の 0 件）。`task.skipped` には出さない。位置は累計と祝いの直後、「役に立ったか」の問いの直前（解説を読んでから答える） | R-56（staged disclosure）、R-57（retrieval の後に確かめる）、R-58（折りたたみを使わない理由）、AC-38 |
+| 15 今週の完了日（r2） | 文と数字だけ：「今週（月曜から）完了した日：3 日」。曜日の並び、7 つのドット、灰色の抜けた日、先週の値は出さない。`task.done` の末尾と `settings.stats` の定義リストに同じ 1 行。英語は「Days completed this week (from Monday): 3」。月曜始まりは ISO 8601 の週で、`ja-JP` のロケールの慣習（日曜始まり）と違うので「月曜から」を省かない | R-46（灰色の抜けの逆）、R-61、R-62、R-63、R-16、AC-37 |
 
 見られなかったもの：
 - 競合4本のアプリ内の画面（App Store の画面写真は説明が取れず、アプリは開けない）。タップ数と空の状態は4本とも「見ていない」。
@@ -159,13 +269,25 @@
 - Exercism の未登録での演習画面（ページに記述がない）。
 - roadmap.sh の地図の図そのもの（文字で取れない）。
 - NYT の Wordle 本体と NYT ヘルプ（nytimes.com、help.nytimes.com は取得できない）。Medium（uxdesign.cc）の Wordle 記事（403）、Webflow のブログ（ヘッダーエラー）。
-- Apple HIG の Design principles と Accessibility のページ（開いたが本文が取れなかった。HIG の文言は引用せず、WCAG と B-n で代える）。
+- Apple HIG の Design principles と Accessibility のページ（r1 では開いたが本文が取れなかった。r2 では Accessibility、Motion、Feedback、Onboarding、Progress indicators、Writing の 6 ページを、HTML ではなく Apple のドキュメント配信用 JSON（`https://developer.apple.com/tutorials/data/design/human-interface-guidelines/<page>.json`）から本文を取り出して引用した：R-32〜R-37。Design principles は r2 では開いていない）。
 - Noto Sans JP の Web フォントの転送量（確かめていない）。
+- r2 で見られなかったもの：
+  - HIG の 5 ページの HTML（WebFetch では題名しか取れない。JSON 経路で代えた）。
+  - Khan Academy のサポート記事「How do Khan Academy's Mastery levels work?」（en-us と tr のどちらも 403。検索の抜粋にある Familiar / Proficient / Mastered の定義は本文で確かめていないので R に入れていない）。
+  - Brilliant の「About Brilliant lessons」（Notion のページ。本文が取れなかった）。解説の出し方は見ていない。
+  - GOV.UK の「Writing for GOV.UK」（guidance.publishing.service.gov.uk に移っており、writing-guidelines は本文が取れず、use-clear-language は 404）。平易な言葉の根拠は NN/g（R-55）と HIG Writing（R-35）で代えた。
+  - GOV.UK の「Task list pages」（410。components/task-list で代えた：R-65）。
+  - Duolingo、Mimo、Sololearn、Brilliant、Progate、paiza、Exercism のアプリ内の完了画面そのもの（Duolingo だけ第三者の画像の代替テキスト：R-44）。Duolingo ブログ「streak celebration parties」は開いていない。
+  - paiza のレベルアップ問題集の一覧（読み込みに失敗）とランクアップの祝いの画面。
+  - Apple Fitness の暦で抜けた日がどう見えるか（R-63 のページに記述なし）。
+  - 第三者の批評（creativiii「two obligatory clicks feel excessive」）の本文（検索の抜粋のみ。R-44 に抜粋と明記）。
+  - 累計や節目が連続記録と同じだけ続ける効き目を持つかの証拠（R-43 の +1.7% は連続記録の動きの数字。累計の数字は見つけていない。PRD 8 の反論 (b) と同じ）。
 
 ## 確かめ（提出前に designer が印を付ける。design-reviewer はこれを信じずに確かめる）
-- [x] R が5つ以上あり、どれにも出典 URL と確認日がある（R-1〜R-26 は 2026-10-30、R-27〜R-31 は 2026-11-03）
-- [x] 競合を2つ以上と、手本を1つ調べた。不満は引用と URL 付き（競合4本：Enki、Mimo、Exercism、roadmap.sh。手本：Wordle）
-- [x] ターゲットは「仮説」と書き、根拠に R 番号がある
-- [x] 性格語ごとに「意味しないこと」がある
-- [x] 差をつける点が1から2個ある（2個）
-- [x] 方向性の2案と、選ばなかった理由がある
+- [x] R が5つ以上あり、どれにも出典 URL と確認日がある（R-1〜R-26 は 2026-10-30、R-27〜R-31 は 2026-11-03、R-32〜R-65 は 2026-11-05）
+- [x] 競合を2つ以上と、手本を1つ調べた。不満は引用と URL 付き（r1：競合4本 Enki、Mimo、Exercism、roadmap.sh と手本 Wordle。r2：競合 7 本 Duolingo、Mimo、Sololearn、Brilliant、Progate、paiza、Exercism の見た目と操作の比較（3.1）と、手本 GOV.UK の確認ページ（4.1））
+- [x] ターゲットは「仮説」と書き、根拠に R 番号がある（r2 の追記は 2.1）
+- [x] 性格語ごとに「意味しないこと」がある（r2 で「手応え」を足した）
+- [x] 差をつける点が1から2個ある（2個。r2 で 2 を置き換えた：6.1）
+- [x] 方向性の2案と、選ばなかった理由がある（r1 の 7 と、r2 の 7.1）
+- [x] r2：6 つの問い（1 の 10〜15）それぞれに R 番号と原則（HIG の URL か WCAG）の根拠があり、8.1 に示唆を書いた。見られなかったものは「見ていない」と書いた
