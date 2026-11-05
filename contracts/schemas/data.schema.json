@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:kyounoitte:schema:data:1",
   "title": "保存データ＝書き出しファイル＝seed（formatVersion 1）",
-  "description": "localStorage のキー kyounoitte:data に入れる JSON 文字列の形。書き出しファイルと受け入れテストの seed も同じ形（device だけは書き出しに含めない）。読み方、移し方、起動時の判定は contracts/data.md。firstOpenDate は「なし」の区分（diagnosis、levels、history が空）でだけ省ける（allOf の 3 つ目）。AC-5〜AC-11、AC-13、AC-14、AC-16、AC-19〜AC-25、AC-32。",
+  "description": "localStorage のキー kyounoitte:data に入れる JSON 文字列の形。書き出しファイルと受け入れテストの seed も同じ形（device だけは書き出しに含めない）。読み方、移し方、起動時の判定は contracts/data.md。firstOpenDate は「なし」の区分（diagnosis、levels、history が空）でだけ省ける（allOf の 3 つ目）。AC-5〜AC-11、AC-13、AC-14、AC-16、AC-19〜AC-25、AC-32、AC-33、AC-35〜AC-37、AC-40。",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -40,12 +40,13 @@
         },
         "years": {
           "enum": [
+            "never",
             "lt1",
             "1to3",
             "3to5",
             "gte5"
           ],
-          "description": "3 問目：経験年数。段階の規則には使わない"
+          "description": "3 問目：経験年数。never は「まだコードを書いたことがない」（AC-40）。段階の規則には使わない。never は最初の公開の前に足したので formatVersion は 1 のまま（ADR 0002）"
         },
         "completedOn": {
           "$ref": "#/$defs/date",
@@ -303,7 +304,7 @@
     "history": {
       "type": "array",
       "maxItems": 20000,
-      "description": "申告した課題と、申告のないまま日付が変わった課題。古い順に足す",
+      "description": "申告した課題と、申告のないまま日付が変わった課題。日付の古い順に足す。同じ日付の行は出した順に何行でも並ぶ（同じ日の「次の一手に進む」。AC-33）。書き手の決まりは contracts/data.md の 8",
       "items": {
         "$ref": "#/$defs/row"
       }

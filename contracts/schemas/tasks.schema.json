@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:kyounoitte:schema:tasks:1",
   "title": "課題集（backend/public/data/tasks.json）",
-  "description": "同梱の課題集。AC-3、AC-4、AC-29、AC-30。決まりは contracts/strings.md と contracts/budgets.md。件数、組ごとの件数、external の割合、ID の重複、平均の文字数は JSON Schema で書けないので受け入れテストで数える（contracts/test-hooks.md の W-6）。",
+  "description": "同梱の課題集。AC-3、AC-4、AC-29、AC-30。決まりは contracts/strings.md と contracts/budgets.md。件数、組ごとの件数、external の割合、ID の重複、平均の文字数、初級の決まり（AC-34）は JSON Schema で書けないので受け入れテストで数える（contracts/test-hooks.md の W-6、contracts/strings.md の 6）。insight は AC-38。",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -61,7 +61,8 @@
         "why",
         "how",
         "goal",
-        "tools"
+        "tools",
+        "insight"
       ],
       "properties": {
         "id": {
@@ -141,6 +142,17 @@
             "pattern": "\\S"
           },
           "description": "要る道具。external は 1 件以上、in_app は 0 件"
+        },
+        "insight": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120,
+          "pattern": "\\S",
+          "not": {
+            "type": "string",
+            "pattern": "[\\r\\n`]"
+          },
+          "description": "ひとこと解説（AC-38）。1〜120 字（コードポイントで数える）。改行とバッククォートを含めない（画面では <p> 1 つに textContent でそのまま入れ、行内のコードにしない：contracts/strings.md の 5）。task.today と task.skipped では DOM に置かず、task.rate と task.done でだけ出す"
         }
       },
       "allOf": [

@@ -42,12 +42,19 @@
     "area.infra",
     "area.testing",
     "area.git",
+    "area.backend.desc",
+    "area.frontend.desc",
+    "area.database.desc",
+    "area.infra.desc",
+    "area.testing.desc",
+    "area.git.desc",
     "level.beginner",
     "level.beginner.desc",
     "level.intermediate",
     "level.intermediate.desc",
     "level.advanced",
     "level.advanced.desc",
+    "years.never",
     "years.lt1",
     "years.1to3",
     "years.3to5",
@@ -61,6 +68,8 @@
     "error.storage.retry",
     "task.dayChanged",
     "task.today.label",
+    "task.today.label.nth",
+    "task.progress",
     "task.meta",
     "task.external.badge",
     "task.external.tools.label",
@@ -81,16 +90,33 @@
     "task.rate.helpful",
     "task.rate.notHelpful",
     "task.rate.close",
+    "task.total.label",
+    "task.total.value",
+    "task.progress.done",
+    "task.cheer.default",
+    "task.cheer.at7",
+    "task.cheer.at30",
+    "task.cheer.at100",
+    "task.insight",
     "task.done.title",
-    "task.done.message",
     "task.done.task",
+    "task.week",
+    "task.next.note",
+    "task.next.note.last",
+    "task.next",
     "task.done.history",
     "task.skipped.title",
-    "task.skipped.message",
     "task.skipped.levelHint",
+    "task.skipped.levelChanged",
     "task.skipped.history",
-    "task.exhausted.message",
-    "task.exhausted.detail",
+    "task.exhausted.levelDone",
+    "task.exhausted.levelDone.detail",
+    "task.exhausted.next",
+    "task.exhausted.seenNext",
+    "task.exhausted.nextDone",
+    "task.exhausted.advance",
+    "task.exhausted.allDone",
+    "task.exhausted.allDone.detail",
     "task.exhausted.redo",
     "settings.title",
     "settings.data.title",
@@ -134,6 +160,8 @@
     "settings.stats.firstDayCompleted.yes",
     "settings.stats.firstDayCompleted.no",
     "settings.stats.daysCompleted7d",
+    "settings.stats.daysCompletedWeek",
+    "settings.stats.extraCompleted",
     "settings.stats.helpful",
     "settings.stats.rated",
     "settings.stats.tooHard",
@@ -286,6 +314,24 @@
     "area.git": {
       "$ref": "#/$defs/plain"
     },
+    "area.backend.desc": {
+      "$ref": "#/$defs/plain"
+    },
+    "area.frontend.desc": {
+      "$ref": "#/$defs/plain"
+    },
+    "area.database.desc": {
+      "$ref": "#/$defs/plain"
+    },
+    "area.infra.desc": {
+      "$ref": "#/$defs/plain"
+    },
+    "area.testing.desc": {
+      "$ref": "#/$defs/plain"
+    },
+    "area.git.desc": {
+      "$ref": "#/$defs/plain"
+    },
     "level.beginner": {
       "$ref": "#/$defs/plain"
     },
@@ -302,6 +348,9 @@
       "$ref": "#/$defs/plain"
     },
     "level.advanced.desc": {
+      "$ref": "#/$defs/plain"
+    },
+    "years.never": {
       "$ref": "#/$defs/plain"
     },
     "years.lt1": {
@@ -352,6 +401,38 @@
         }
       ],
       "description": "差し込み：{date}"
+    },
+    "task.today.label.nth": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{nth[,}]"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{date[,}]"
+        }
+      ],
+      "description": "差し込み：{nth}、{date}"
+    },
+    "task.progress": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{index[,}]"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{total[,}]"
+        }
+      ],
+      "description": "差し込み：{index}、{total}"
     },
     "task.meta": {
       "allOf": [
@@ -439,10 +520,65 @@
     "task.rate.close": {
       "$ref": "#/$defs/plain"
     },
-    "task.done.title": {
+    "task.total.label": {
       "$ref": "#/$defs/plain"
     },
-    "task.done.message": {
+    "task.total.value": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{count[,}]"
+        }
+      ],
+      "description": "差し込み：{count}"
+    },
+    "task.progress.done": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{index[,}]"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{total[,}]"
+        }
+      ],
+      "description": "差し込み：{index}、{total}"
+    },
+    "task.cheer.default": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{count[,}]"
+        }
+      ],
+      "description": "差し込み：{count}。S4、S5 の task.cheer。累計が 7、30、100 以外。{count} は task.total.value と同じ整数（contracts/identifiers.md の 3。要素の data-testid には使わない）"
+    },
+    "task.cheer.at7": {
+      "$ref": "#/$defs/plain",
+      "description": "S4、S5 の task.cheer。累計が 7（AC-35。要素の data-testid には使わない）"
+    },
+    "task.cheer.at30": {
+      "$ref": "#/$defs/plain",
+      "description": "S4、S5 の task.cheer。累計が 30（AC-35。要素の data-testid には使わない）"
+    },
+    "task.cheer.at100": {
+      "$ref": "#/$defs/plain",
+      "description": "S4、S5 の task.cheer。累計が 100（AC-35。要素の data-testid には使わない）"
+    },
+    "task.insight": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.done.title": {
       "$ref": "#/$defs/plain"
     },
     "task.done.task": {
@@ -457,26 +593,155 @@
       ],
       "description": "差し込み：{title}"
     },
+    "task.week": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{days[,}]"
+        }
+      ],
+      "description": "差し込み：{days}"
+    },
+    "task.next.note": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.next.note.last": {
+      "$ref": "#/$defs/plain",
+      "description": "S5、S6 の task.next.note の要素に入れる変種（task.next を押すと S7 になるとき。contracts/data.md の 9。要素の data-testid には使わない）"
+    },
+    "task.next": {
+      "$ref": "#/$defs/plain"
+    },
     "task.done.history": {
       "$ref": "#/$defs/plain"
     },
     "task.skipped.title": {
       "$ref": "#/$defs/plain"
     },
-    "task.skipped.message": {
-      "$ref": "#/$defs/plain"
-    },
     "task.skipped.levelHint": {
       "$ref": "#/$defs/plain"
+    },
+    "task.skipped.levelChanged": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{level[,}]"
+        }
+      ],
+      "description": "差し込み：{level}"
     },
     "task.skipped.history": {
       "$ref": "#/$defs/plain"
     },
-    "task.exhausted.message": {
-      "$ref": "#/$defs/plain"
+    "task.exhausted.levelDone": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{area[,}]"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{level[,}]"
+        }
+      ],
+      "description": "差し込み：{area}、{level}"
     },
-    "task.exhausted.detail": {
-      "$ref": "#/$defs/plain"
+    "task.exhausted.levelDone.detail": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{total[,}]"
+        }
+      ],
+      "description": "差し込み：{total}"
+    },
+    "task.exhausted.next": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{nextLevel[,}]"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{desc[,}]"
+        }
+      ],
+      "description": "差し込み：{nextLevel}、{desc}"
+    },
+    "task.exhausted.seenNext": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{nextLevel[,}]"
+        }
+      ],
+      "description": "差し込み：{nextLevel}"
+    },
+    "task.exhausted.nextDone": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{nextLevel[,}]"
+        }
+      ],
+      "description": "差し込み：{nextLevel}"
+    },
+    "task.exhausted.advance": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{nextLevel[,}]"
+        }
+      ],
+      "description": "差し込み：{nextLevel}"
+    },
+    "task.exhausted.allDone": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{area[,}]"
+        }
+      ],
+      "description": "差し込み：{area}"
+    },
+    "task.exhausted.allDone.detail": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{total[,}]"
+        }
+      ],
+      "description": "差し込み：{total}"
     },
     "task.exhausted.redo": {
       "$ref": "#/$defs/plain"
@@ -649,6 +914,12 @@
       "$ref": "#/$defs/plain"
     },
     "settings.stats.daysCompleted7d": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.daysCompletedWeek": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.extraCompleted": {
       "$ref": "#/$defs/plain"
     },
     "settings.stats.helpful": {

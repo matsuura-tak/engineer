@@ -47,11 +47,12 @@
       "area": "backend",
       "level": "intermediate",
       "mode": "in_app",
-      "report": "no_time",
-      "answer": ""
+      "report": "done",
+      "answer": "",
+      "helpful": "unanswered"
     },
     {
-      "date": "2026-11-06",
+      "date": "2026-11-04",
       "taskId": "backend-intermediate-005",
       "area": "backend",
       "level": "intermediate",
@@ -59,6 +60,15 @@
       "report": "done",
       "answer": "",
       "helpful": "unanswered"
+    },
+    {
+      "date": "2026-11-06",
+      "taskId": "backend-intermediate-006",
+      "area": "backend",
+      "level": "intermediate",
+      "mode": "in_app",
+      "report": "no_time",
+      "answer": ""
     }
   ]
 }
