@@ -13,9 +13,9 @@ PRD 12（速さ、配布、対応ブラウザ）と AC-15、AC-17 を、作り�
 | 部分 | 上限（gzip 後のバイト） | 根拠 |
 |---|---|---|
 | 殻（HTML、CSS、すべての JS、sw.js） | 32,000 | 2026-11-04 に 26,000 から上げた（下の「枠の見直し」）。内訳は JS（sw.js を含む）の上限 26,000 と、HTML と CSS の 6,000。G2 r3 の実装で 25,794（JS 22,135、CSS 2,794、HTML 865）。最初の根拠は spike の殻の約 15,800 バイト（60 KB の代わりの JS を含む） |
-| 文言（ja.json と en.json の 2 つ） | 8,000 | 約 6,600。fixtures/strings の 146 キーの見本を `JSON.stringify` で詰めて `zlib.gzipSync(level 9)` にすると 3,554 + 3,016 = 6,570（node v24.22.1）。同じものを Apple の gzip 487.40.2 の `gzip -9` にすると 3,516 + 3,047 = 6,563（2026-11-04。145 キーのときは 2026-10-30 に 6,470 と 6,440） |
+| 文言（ja.json と en.json の 2 つ） | 9,000 | 2026-11-05 に 8,000 から上げた（下の「枠の見直し（2026-11-05）」）。fixtures/strings の 174 キーの見本で 4,301 + 3,696 = 7,997（`JSON.stringify` で詰めて `zlib.gzipSync(level 9)`、node v24.22.1、2026-11-05）。それより前の値：約 6,600。fixtures/strings の 146 キーの見本を `JSON.stringify` で詰めて `zlib.gzipSync(level 9)` にすると 3,554 + 3,016 = 6,570（node v24.22.1）。同じものを Apple の gzip 487.40.2 の `gzip -9` にすると 3,516 + 3,047 = 6,563（2026-11-04。145 キーのときは 2026-10-30 に 6,470 と 6,440） |
 | ホーム画面のアイコン `icon-180.png` と `manifest.webmanifest`（Takuma の決定 D5。6） | 4,000 | 2026-11-04 に 10,000 から下げた（下の「枠の見直し」）。180 × 180 の 2 色の PNG 1 枚（design 8 の想定は 2 KB 前後。実物は生 2,107 バイト）と、7 項目の JSON（生 231 バイト）。G2 r3 の実装で 2 つの gzip 後の合計 2,173 |
-| 課題集 tasks.json | 106,000 | 252 件 × 平均 600 字の合成で 106,113（spike） |
+| 課題集 tasks.json | 105,000 | 2026-11-05 に 106,000 から下げた（下の「枠の見直し（2026-11-05）」）。G1 r3 の spike で、210 件・解説 120 字の合成が約 75,100、252 件版が約 92,700 |
 
 - 枠の見直し（2026-11-04、tech-lead。reviewer G2 r3 の提案と指揮役の決定。合計 150,000 は変えない）：
   - 前の枠：殻 26,000、文言 8,000、アイコンと manifest 10,000、課題集 106,000（合計 150,000）。今の枠：殻 32,000、文言 8,000、アイコンと manifest 4,000、課題集 106,000（合計 150,000）。
@@ -24,15 +24,22 @@ PRD 12（速さ、配布、対応ブラウザ）と AC-15、AC-17 を、作り�
   - 動かさなかった枠：課題集の 106,000 は 2 の「1 件の本文の平均 600 字以下」の 252 件版から決めた値（spike で 106,113）で、下げると 2 の上限（pdm の下書きの約束）も下げることになる。文言の 8,000 は 146 キーで 6,610 で、残りの 1,390 は新しい文言のために残す。
   - 守ること：JS が 26,000 を超えたら、殻の枠の中でも ADR 0001 の見直す条件に当たる（ビルドの道具を足すかを決め直す）。殻の枠を超えそうになったら、先に文言の余りを移すかを tech-lead が決め、課題集の枠からは取らない。
   - 合わせて直したもの：6 のアイコンの生の大きさの上限も 4,000 にした（gzip しても PNG はほとんど縮まないため、生の上限が枠より大きいと枠が意味を持たない）。design/001-daily-learning.md の D-29、8、10 の「10,000 バイト以下」は designer が直す（G2 r3 の後の報告）。
+- 枠の見直し（2026-11-05、tech-lead。G1 tech-lead r2 の 4 と、指揮役の決定「予算の割り直し」：docs/approvals/delegation.md の 2026-11-05。合計 150,000 は変えない。PRD AC-4 の「上限の値は tech-lead が見直す」に当たる）：
+  - 前の枠：殻 32,000、文言 8,000、アイコンと manifest 4,000、課題集 106,000。今の枠：殻 32,000、文言 9,000、アイコンと manifest 4,000、課題集 105,000（合計 150,000）。
+  - なぜ：文言は r8 で 170 キーを超え、8,000 の枠の 98% になった。課題集は 252 件版の見込み約 92,700 に約 12,000 の余りがあるので、そこから 1,000 を移した。
+  - 殻の 32,000（JS 26,000 ＋ HTML と CSS 6,000）は変えない。r8 の処理を足した JS の見込みは約 24,100〜24,800［推測。G1 tech-lead r2 の spike］で、ADR 0001 の 26,000 の線が先に効く。
+  - 未対応：backend/scripts/check-budget.mjs の枠の表（文言 8,000、課題集 106,000）は backend-engineer が直す。この表は合否に使わず（合計だけで判定）、出力の「枠内」の印が変わるだけ。
 - 初めての訪問では SW が同じファイルを `cache: 'reload'` でもう一度取るので、実際の通信は最大でこの 2 倍です。SW の登録は最初の画面を描いた後なので、AC-15 の 2 秒には入りません（service-worker.md の 1）。
 
 ## 2. 課題集の長さ（pdm が下書きを始める前に知らせる。指揮役の裁定 E5）
 - 1 件ごとの上限（スキーマで落とす）：題名 60 字、なぜ今これか 200 字、やり方 400 字、完了の目安 200 字、道具は 5 件まで・各 40 字。所要時間は 1〜15 の整数。
 - 全体の上限（受け入れテストで数える。JSON Schema では書けない）：
-  - 4 つの本文（title、why、how、goal）の字数の合計を件数で割った値が 600 以下。v1 の 126 件版も、公開後の 252 件版も。
-  - tasks.json の gzip 後の大きさが 106,000 バイト以下。
+  - 4 つの本文（title、why、how、goal）と解説（insight、AC-38）の 5 つの字数の合計を件数で割った値が 480 以下。v1 の 210 件版も、上級を足す 252 件版も（2026-11-05 に「4 つの本文で 600 以下」から直した）。
+  - tasks.json の gzip 後の大きさが 105,000 バイト以下。
+  - 字数は JS の文字列の長さではなく、コードポイントの数（`[...str].length`）で数える。
   - この 2 つのテストの名前は `BUDGET2_` で始めます（test-hooks.md の W-6）。PRD の AC ではないので `AC<番号>_` の名前を付けず、G3 の AC の表に混ぜません。検証レポートでは「予算」の行として別に書きます。
-- 1 件の本文が平均で約 650 字を超えると、252 件版で 150 KB を超えます（tech-lead G1 r1 の spike）。
+- 480 の根拠：G1 r3 の spike で、平均約 410 字の 252 件版が約 92,700 バイト、600 字で約 125,300 バイト。この間を直線とみると、105,000 に収まる平均は約 480 字です［推測。実物の下書きの値は G2 で数える］。本当の歯止めは gzip の大きさのテストで、平均はその手前の約束です（pdm の下書きの目安）。
+- 前の値（4 つの本文で平均 600 字、106,000 バイト）は 126 件と 252 件の前の課題集で決めたもの（tech-lead G1 r1 の spike）。
 
 ## 3. CSP（本番の HTML の `<meta http-equiv="Content-Security-Policy">` に 1 つだけ）
 ```
@@ -67,6 +74,20 @@ default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img
 | `<dialog closedby>` | なし（iOS） | Escape は `cancel` イベント |
 
 - 使ってよい（同じ互換データで Safari 17 以下）：ES modules、`<link rel="modulepreload">`（17）、`<dialog>` と `showModal`（15.4）、`StorageManager.persist` と `persisted`（15.2。persisted は https://github.com/mdn/browser-compat-data の api/StorageManager.json で 2026-11-04 に確認）、`Blob.text`（14）、`Intl.PluralRules`（13）、`Set.prototype.union`（17）、`URL.canParse`（17）、`structuredClone`（15.4）、`:has()`（15.4）、`overflow-wrap: anywhere`（15.4）、`display-mode` のメディアクエリ（13）。
+- 完了の演出で使う（design の D-43。MDN の互換データ @mdn/browser-compat-data 8.1.8 の main を 2026-11-05 に引いた値。どれも Safari 17.0 より前から使える）：
+
+| 機能 | Safari（macOS、iOS は mirror） | Chrome | 根拠 |
+|---|---|---|---|
+| SVG の `pathLength` 属性（`<path>`） | 14 | 50 | https://github.com/mdn/browser-compat-data/blob/main/svg/elements/path.json の `pathLength`。https://developer.mozilla.org/docs/Web/SVG/Reference/Attribute/pathLength |
+| SVG の `pathLength` 属性（`<circle>`） | 14 | 57 | https://github.com/mdn/browser-compat-data/blob/main/svg/elements/circle.json の `pathLength` |
+| CSS の `@keyframes`（接頭辞なし） | 9 | 43 | https://github.com/mdn/browser-compat-data/blob/main/css/at-rules/keyframes.json 。https://developer.mozilla.org/docs/Web/CSS/Reference/At-rules/@keyframes |
+| CSS の `animation`（接頭辞なし） | 9 | 43 | https://github.com/mdn/browser-compat-data/blob/main/css/properties/animation.json |
+| CSS の `stroke-dashoffset` と `stroke-dasharray` | 4 | 1 | https://github.com/mdn/browser-compat-data/blob/main/css/properties/stroke-dashoffset.json と stroke-dasharray.json。長さの値なので @keyframes で補間される（https://drafts.csswg.org/fill-stroke-3/#stroke-dashoffset ） |
+| `@media (prefers-reduced-motion)` と `matchMedia` での読み | 10.1 | 74 | https://github.com/mdn/browser-compat-data/blob/main/css/at-rules/media.json の `prefers-reduced-motion`。https://developer.mozilla.org/docs/Web/CSS/Reference/At-rules/@media/prefers-reduced-motion |
+
+  - 互換データには「@keyframes で stroke-dashoffset を動かす」組み合わせの行がない。Playwright の WebKit 27.2 と Chromium 156 で、`pathLength="1"`、`stroke-dasharray: 1`、`stroke-dashoffset` 1 → 0 の 400 ms のアニメーションが動き、`reducedMotion: 'reduce'` では動かないことを確かめた（test-hooks.md の「完了の演出の確かめ方」の spike）。WebKit 27.2 は Safari 17.0 ではないので、Safari 17 の実機での見た目は G4 で Takuma が確かめる（未確認）。
+  - 実機で `pathLength` が効かなかったときの代わり：`pathLength` を外し、`stroke-dasharray` と `stroke-dashoffset` の始めの値に実長を書く。チェック `M6 12.5l4 4L18 8` は √32 + √136.25 ≈ 17.33（spike の `getTotalLength()` も両方で 17.33）、円 `r="10.5"` は 2π × 10.5 ≈ 65.97（`getTotalLength()` は WebKit 65.98、Chromium 65.55 の近似なので、計算した値を使う）。少し長めの値（チェック 18、円 66）にしても見た目は同じ。
+  - アニメーションは `@media (prefers-reduced-motion: no-preference)` の中か、JS が `matchMedia('(prefers-reduced-motion: reduce)').matches` で付けるクラスだけで付ける（design の D-43）。
 - 効かなくても困らないもの：`accent-color`（Safari 26.2）は radio がシステムの色になるだけ。`prefers-reduced-transparency`（Safari にない）は半透明のままになるだけ。
 - reviewer は G2 で、上の「使わない」を grep で探します。
 

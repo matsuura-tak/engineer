@@ -41,8 +41,12 @@ verifier G0 r3 の W-1〜W-16 を、名前と値まで決めたものです。�
 
 ## W-6 課題集のスキーマと検査
 - スキーマ：contracts/schemas/tasks.schema.json。ajv（`ajv/dist/2020`、strict）で本番の tasks.json を検査する（AC-3、AC-29 の大半）。
-- スキーマの外なので、テストのコードで数えるもの：件数（v1 は 126 以上、足す版は 252 以上）、18 の組ごとの件数（7 以上 / 14 以上）、ID の重複 0（AC-4）、組ごとの external の割合 20% 以下（AC-29）、本文の平均 600 字以下と gzip 後 106,000 バイト以下（budgets.md の 2）。
-- budgets.md の 2 の予算のテストは、名前を `BUDGET2_` で始めます（例 `BUDGET2_本文の平均は600字以下`）。`AC<番号>_` の名前を付けず、G3 の AC の表に混ぜません。検証レポートでは AC の表とは別の「予算」の行に、合否と値を書きます。
+- スキーマの外なので、テストのコードで数えるもの（2026-11-05 に直した。Takuma の決定 Q17、指揮役の決定「予算の割り直し」：docs/approvals/delegation.md）：
+  - 件数：v1 は 210 以上。上級を足す 252 件版（12-14 の予定）は 252 以上。
+  - 18 の組ごとの件数：v1 は初級 14 以上、中級 14 以上、上級 7 以上。252 件版はどの組も 14 以上。
+  - ID の重複 0（AC-4）、組ごとの external の割合 20% 以下（AC-29）、初級の決まり（AC-34。語の検査は strings.md の 7）。
+  - 予算（budgets.md の 2）：4 要素（title、why、how、goal）と解説（insight）の字数の合計を件数で割った値が 480 以下、tasks.json の gzip 後が 105,000 バイト以下。
+- budgets.md の 2 の予算のテストは、名前を `BUDGET2_` で始めます（例 `BUDGET2_本文と解説の平均は480字以下`、`BUDGET2_課題集はgzip後105000バイト以下`）。`AC<番号>_` の名前を付けず、G3 の AC の表に混ぜません。検証レポートでは AC の表とは別の「予算」の行に、合否と値を書きます。
 - design の「AC にない状態」（design/001-daily-learning.md の 2 の表の下と 10 の決定。例：D-30 の知らせ `task.dayChanged`、U-15）だけを確かめるテストは、名前を `DESIGN_<design の番号>_` で始めます（例 `DESIGN_D30_…`、`DESIGN_U15_…`）。`AC<番号>_` の名前を付けず、AC のループ（例：AC-27 の「6 つの画面」）にも足さず、G3 の AC の表に混ぜません。検証レポートでは AC の表とは別の「design の状態」の行に合否を書きます（`BUDGET2_` と同じ扱い。G2 tech-lead r3 の提案 4）。
 
 ## W-7 データの投入（seed）
@@ -53,8 +57,27 @@ verifier G0 r3 の W-1〜W-16 を、名前と値まで決めたものです。�
   ```
   アプリは自分のキー以外に触らない（data.md の 1）ので、印は削除（AC-16）の後も残り、seed は入れ直されない。
 - seed の setItem は、W-9 の失敗の注入より先に登録する（失敗は印を立てた後の 1 回だけなので seed は落ちないが、順番も守る）。
-- AC-24 の seed は、時刻を固定する日（2026-11-06）の行を `history` に入れる。入れないと、開いたときにアプリがその日の課題を出し、`issued` が 1 増える（data.md の 4 の 6）。見本：fixtures/seeds/seed-ac24-stats.json。
-- AC-8 の seed の各行の `level` は、その課題が出たときの段階にする（PRD 11 の AC-8 の確かめ方、data.md の 5）。見本は fixtures/seeds/ の `seed-ac8-*`（3 件。対応は data.md の 5 の表）。9 通り目の seed だけは、`levels` が `intermediate` で古い 2 行の `level` が `advanced` になる。
+- 課題 ID の参照（2026-11-05 の付け替えの後。旧初級 → `<領域>-intermediate-001`〜`007`、旧中級 → `<領域>-intermediate-008`〜`014`、新しい初級（未経験向け）→ `<領域>-beginner-001`〜`014`、上級は変えない。ADR 0002 への記録は G1 tech-lead r2 の (m) で別に行う）：
+  - seed の行と `current` の `taskId` は、本番の tasks.json にある ID だけにする。テストは seed を入れる前に、各 `taskId` が課題集にあり、行の `area` と `level` が ID の `<領域>-<段階>` と同じことを確かめ、違えば seed の誤りとして落とす。例外は、課題集にない ID をわざと入れるテスト（data.md の 5「課題集に ID がない行」）だけで、そのテストは注釈にそう書く。
+  - ID は組の中の番号として使う。課題の中身（題名、本文、型、道具）を ID で決め打ちしない。付け替えで同じ ID の中身が変わったため（例：`backend-intermediate-001` の中身は旧初級の 1 件目）。中身が要るときは、テストの中で課題集から ID で引く。
+  - 次に出る ID の期待値は、data.md の 5 の選び方（組の ID のうち `history` にも `current` にもない最も小さいもの）を本番の課題集に当てて求める。fixtures/seeds/ の見本は、どれも `backend-intermediate-` の 001 から古い順に使い、中級は 14 件あるので、付け替えの後もそのまま使える。
+  - 付け替えの前に作った seed のうち `*-beginner-*` を使うものは、中身が新しい初級に変わった。段階の規則だけを見る seed はそのまま使えるが、中身や件数（旧初級は 7 件）に頼る seed は作り直す。
+- AC-24 の seed（PRD r10）：fixtures/seeds/seed-ac24-stats.json。初めて開いた日 2026-11-01、`current` なし、6 行（11-01 完了・役に立った、11-02 難しすぎ、11-03 完了・役に立った、11-04 完了・未回答を 2 行、11-06 今日はできない）。時刻を 2026-11-06 に固定して開くと、今日の行があるので `task.skipped`（data.md の 4 の 6-3）で、`issued` は 6 のまま。今日の行を入れないと、開いたときにアプリがその日の課題を出し、`issued` が 1 増える（4 の 6-4）。期待値は PRD の AC-24 の Then（days-completed-7d 3、days-completed-week 2、extra-completed 1 など。数え方は data.md の 9）。AC-37 もこの seed から始める。
+- AC-35 の seed は 4 通り（PRD の AC-35 の確かめ方）。完了の行が 6、10、29、99 の seed で開き、今日の課題を画面で完了して、S4 の累計 7、11、30、100 と `task.cheer` の `data-milestone`（7、`none`、30、100）と文言を比べる。
+  - 6 件：fixtures/seeds/seed-ac35-six-completed.json（2026-11-01〜11-06 に `backend-intermediate-001`〜`006` を 1 日 1 件完了。`device.persistRequested` は true）。時刻を 2026-11-07 に固定して開くと S3 で `backend-intermediate-007` が出る。
+  - 10、29、99 件：固定の見本は置かず、verifier が同じ形で作る。決まり：
+    - 完了の行（`report: "done"`）を n 行。1 つの ID は 1 回だけ（data.md の 8）。
+    - 目標の組（`backend`、`intermediate`）には未出を 1 件以上残す（開いたときに今日の課題を出すため）。目標の組からは 13 件まで使い、残りは他の組の ID を使う（99 件は 1 領域の 35 件を超えるので、3 領域以上にまたがる）。他の組の行を古い方に、目標の組の行を新しい方に置く。他の領域の行を入れるときは、その領域の `levels` に最後の行の段階を入れる（data.md の 8 は `levels[diagnosis.area]` だけを求めるが、アプリが書く形に寄せる）。
+    - 日付は古い順で、同じ日に何行並べてもよい（data.md の 8）。どの行も `firstOpenDate` 以上。時刻は最後の行の翌日に固定する（最後の行の日に開くと 4 の 6-3 で `task.done` になる）。
+    - ajv に通し、統計の `data-stat-completed` が n であることを完了の前に確かめる。
+- AC-36 の seed：fixtures/seeds/seed-ac36-three-issued.json（目標の組 `backend` / `intermediate` の 001〜003 の 3 行：完了、難しすぎ、`none`。最後の行は 2026-11-03）。時刻を 2026-11-04 に固定して開くと S3 で、`data-task-id` は `backend-intermediate-004`、`data-progress-index` は 4、`data-progress-total` は課題集のその組の件数（v1 は 14。data.md の 9）。
+- AC-8 の seed の各行の `level` は、その課題が出たときの段階にする（PRD 11 の AC-8 の確かめ方、data.md の 5）。見本は fixtures/seeds/ の `seed-ac8-*`（4 件：1、8、9、10 通り目。対応は data.md の 5 の表）。残りの 6 通り（2〜7 通り目）は verifier が同じ形で作る。9 通り目の seed だけは、`levels` が `intermediate` で古い 2 行の `level` が `advanced` になる。
+  - 10 通り目（PRD r10）：seed-ac8-intermediate-same-day.json（段階は中、前日 2026-11-02 の完了 1 行だけ。申告の履歴は入れない）。時刻を 2026-11-03 に固定したまま、画面で難しすぎ → `task.next` → 難しすぎ → `task.next` と進め、最後の S3 の `data-task-level` が `beginner`（途中の状態と文言は data.md の 5）。時刻は動かさない。
+- design の 5.1 #33（S7 levelDone で `task.exhausted.seenNext` がある状態。design/001-daily-learning.md の 5.1）：固定の見本は置かない（課題集の中身に依存するため。AC-10 と同じ）。作り方：
+  - `diagnosis` は `backend` / `intermediate`、`levels.backend` は `beginner`、`current` なし。
+  - `history` の古い順に、`backend-intermediate-001` と `002` を `level: "intermediate"` の `too_hard` で 2 日（この 2 行で初級に下がった形。data.md の 5 の 3）。続けて本番の課題集の `backend-beginner-*` をすべて（v1 は 14 件）`level: "beginner"` で入れる。申告は `done` などにし、`too_easy` を 2 行続けない（続けると段階の規則で中級に上がる形になり、`levels` と食い違う）。
+  - 時刻は最後の行の翌日に固定して開く。目標の組（`backend`、`beginner`）の未出が 0 件なので S7（data.md の 4 の 6-4）、`levels` が `beginner` なので levelDone。次の段階の組（`backend`、`intermediate`）に未出が 12 件あり、`history` に中級の行があるので `task.exhausted.seenNext` が 1 つ（data.md の 5「S7 の変種と補足の 1 文」）。
+  - 対の確かめ（任意）：中級の 2 行を外すと補足なし、中級の 14 件をすべて `history` に入れると `task.exhausted.nextDone`。
 - AC-14 の seed は 2 通り（PRD r7 の AC-14 の確かめ方。Q11 は A）。
   - 1 通り目（`task.exhausted` からやり直す）：出し終えた履歴（完了 3 件を含む）。AC-10 と同じく本番の課題集から作る（今の組の課題をすべて `history` に入れ、そのうち直近 3 日の 3 件を `done` にする）。PRD の Given「今日の課題はまだ出していない」は、data.md の 4 の 6-4 の下では、目標の組を出し終えた日（`task.exhausted`）にしか作れないため。固定の seed は置かない（課題集の中身に依存するため）。
   - 2 通り目（`task.today` からやり直す）：fixtures/seeds/seed-ac14-three-completed.json の形（完了 3 件、最後の行は 2026-11-03、`current` なし）で開き、`task.today` とその `data-task-id` を確かめてからやり直す。時刻は最後の行より後の日（例 2026-11-04）に固定する（2026-11-03 に開くと 4 の 6-2 で `task.done` になる）。やり直しで選ぶ領域は seed の `backend` 以外にする。
@@ -90,13 +113,13 @@ verifier G0 r3 の W-1〜W-16 を、名前と値まで決めたものです。�
 - serviceWorkers は既定（allow）のまま。初めての訪問では SW はまだ動いておらず、登録は画面を描いた後（service-worker.md の 1）。
 - 監査の道具 @axe-core/playwright（AC-27）は contracts/dependencies.md にある。
 
-## 時間の計り方（AC-1、AC-2、AC-23 の秒数）
+## 時間の計り方（AC-1、AC-2、AC-23、AC-33 の秒数）
 G2 tech-lead r2 の要修正への決定です。今の `expect(...).toHaveAttribute` で終わりを待つ形は、Playwright の確かめる間隔（270 ms を過ぎると 500 ms おき）の分だけ値が長くなるので使いません。
-- 決定：文書が変わらない区間（AC-1、AC-2。AC-12 で同じ操作を計るときも）は、ページの中で計る（案 (a)）。文書が変わる区間（AC-23 の再読み込みと新しいタブ）は、テストの側の時計と 20 ms おきの `expect.poll` で計る。
-- AC-15 との違い：AC-15 の `data-debug-load-ms`（W-10）はアプリが出す値で、時計を固定しないテストで読む。AC-1、AC-2、AC-23 の値はテストが計る値で、アプリは何も書かない。本番の配布物には何も入れない。
+- 決定：文書が変わらない区間（AC-1、AC-2、AC-33。AC-12 で同じ操作を計るときも）は、ページの中で計る（案 (a)）。文書が変わる区間（AC-23 の再読み込みと新しいタブ）は、テストの側の時計と 20 ms おきの `expect.poll` で計る。
+- AC-15 との違い：AC-15 の `data-debug-load-ms`（W-10）はアプリが出す値で、時計を固定しないテストで読む。AC-1、AC-2、AC-23、AC-33 の値はテストが計る値で、アプリは何も書かない。本番の配布物には何も入れない。
 - 値は ms の整数（小数は切り上げ）で annotation に残し、G3 の証拠にする。合否は「値 ≤ 上限」。
 
-### 文書が変わらない区間（AC-1、AC-2）
+### 文書が変わらない区間（AC-1、AC-2、AC-33）
 1. 仕掛け：計る文書で、最初に計る click の前に `page.evaluate` で 1 回だけ入れる（再読み込みしたら入れ直す）。記録はテスト側の変数 `globalThis.__acceptanceTiming` に置く（W-9 の印と同じく、アプリは読まない）。
 2. 始点：`window` に capture 段の `click` リスナー（`addEventListener('click', h, { capture: true })`）を置き、`performance.now()` と、`event.target.closest('[data-testid]')` の `data-testid` を記録する。始点にするのは、計る操作の testid（下の表）の click のうち最後の 1 件。radio の `check()` も click を出す（spike 1 で `area.backend` の click も記録された）ので、testid で分ける。
 3. 終点：`new MutationObserver(cb).observe(document, { subtree: true, childList: true, attributes: true, attributeFilter: ['data-state', 'data-question-index'] })`。cb では変化の記録でなく、その時点の DOM を読む（`<html>` の `data-state` と、`[data-testid="diagnosis.progress"]` の `data-question-index`。なければ null）。前の記録から変わったら、`performance.now()` と一緒に記録する。childList も見るのは、アプリが要素を作り直す実装でも取りこぼさないため（spike 1 は作り直す実装で計った）。
@@ -107,6 +130,9 @@ G2 tech-lead r2 の要修正への決定です。今の `expect(...).toHaveAttri
    | 始める → 1 問目 | `diagnosis.start.begin` | `data-state` が `diagnosis.question`、`data-question-index` が `1` | 500 ms |
    | n 問目 → n+1 問目（n＝1、2） | `diagnosis.next` | `data-state` が `diagnosis.question`、`data-question-index` が n+1 | 500 ms |
    | 3 問目 → 課題 | `diagnosis.finish` | `data-state` が `task.today` | 1,000 ms（AC-2） |
+   | 次の一手に進む → 課題（`task.done` からと `task.skipped` から） | `task.next` | `data-state` が `task.today` | 1,000 ms（AC-33） |
+
+   AC-33 は同じ文書で 2 件目と 3 件目を続けて出すので、`task.next` を押すたびに 1 つの値を取る（始点はその回の click、終点はそれより後で条件を満たす最初の記録）。間に「完了」などで `data-state` が `task.rate` や `task.done` に変わるので、前の回の `task.today` は終点に使われない。再読み込みの確かめ（AC-33 の「再読み込みしても同じ」）の後に続けて計るときは、1 の仕掛けを入れ直す。目標の組を出し終えて `task.exhausted` になったら終点の記録がないので「計れなかった」で落ちる（AC-33 の Given の「未出が 2 件以上」を seed で満たす）。
 
 5. 値＝終点 − 始点。差を取った後で、今の expect で状態と中身を確かめる（expect は正しさの確かめで、時間には使わない）。始点か終点の記録がなければ「計れなかった」として落とす（null や 0 を通さない）。
 6. 終点は DOM が変わった時刻で、画面に塗られる次のフレーム（60 Hz で約 17 ms）は含めない。AC-15 の `data-debug-load-ms` も `data-state` を書いた直後の時刻なので、定義をそろえる。`data-state` はその状態の DOM を入れ終えた後に書く（identifiers.md の 1）ので、終点の時点で中身はある。
@@ -174,6 +200,19 @@ G2 tech-lead r2 の要修正への決定です。今の `expect(...).toHaveAttri
   - WebKit のソースの裏付け（動かしたのではなく、読んだもの。2026-10-31 に取得した main）：Source/WebCore/page/EventHandler.cpp の `tabsToAllFormControls` は、`PLATFORM(COCOA)` 以外では常に true（5129-5157 行。「We always allow tabs to all controls」）。Option+Tab で向きを反転するのも Cocoa だけ（`eventInvertsTabsToLinksClientCallResult`、5097-5105 行）。`defaultTabEventHandler` が移動を止めるのは Ctrl と Meta だけで、Alt は止めない（5482-5504 行）。リンクに移るかを決める TabsToLinks の既定は GTK と WPE で true（Source/WTF/Scripts/Preferences/UnifiedWebPreferences.yaml の 6207-6215 行）。
   - 読めること：Linux の WebKit では、`Tab` でも `Alt+Tab` でも、ボタン、radio、リンクに移る。今のキーの表（WebKit は `Alt+Tab`）のままで回れる見込み。
   - 残ること：Playwright の Linux 版 WebKit が、これらの既定を変えていないかはソースからは分からない。実際に動かしての確認は、上のとおり最初の CI に残す。
+
+## 完了の演出の確かめ方（AC-35、design の D-43 と 5.1）
+アプリは演出のためのつなぎ口を持ちません。テストはブラウザの仕組みだけで確かめます。
+- 動きを減らす設定：コンテキストの `reducedMotion: 'reduce'`（`browser.newContext({ reducedMotion: 'reduce' })`）か `page.emulateMedia({ reducedMotion: 'reduce' })`（https://playwright.dev/docs/api/class-page#page-emulate-media ）。どちらでも `matchMedia('(prefers-reduced-motion: reduce)').matches` が true になる。
+- reduce のとき：「完了」を押して `data-state` が `task.rate`（S4）になった直後に、`page.evaluate(() => document.getAnimations().length)` が 0、`[data-testid="task.total.prev"]` の件数が 0。`task.rate.mark` はある（形は完成したもの）。
+- reduce でないとき：S4 に着いた直後は `document.getAnimations().length` が 1 以上（印の線。CSS の animation-fill-mode が forwards か both なら、終わった後も getAnimations に残る：下の spike）。件数の上限は決めない（作りで変わるため）。
+- `task.total.value` のテキストは、reduce の有無によらず、S4 に着いた直後に読んだ値が最終の値（新しい累計の文言。`data-stat-completed` も同じ値）。途中の値は `task.total.prev`（`aria-hidden`）にだけある。
+- スクリーンショット（5.1 の S4 の行）：reduce でない設定で、`data-state` が `task.rate` になってから 1 秒（`page.waitForTimeout(1000)`）待って撮る。演出は通常 550 ms、節目 950 ms で止まる（design/tokens.md の 5）。撮る直前に `task.total.prev` の件数が 0（`animationend` で外れた）ことを確かめる。`page.screenshot` は既定（`animations: 'allow'`）のまま撮る。`expect(page).toHaveScreenshot` は既定が `'disabled'`（終わりまで早送りする）なので、使うなら `animations: 'allow'` を渡す（backend/tests/acceptance/node_modules の playwright の型定義で確認。https://playwright.dev/docs/api/class-page#page-screenshot ）。
+- W-3 の setFixedTime の下でも、CSS のアニメーションは実際の時間で進む（固定されるのは `Date`。ページの `performance.now()` は W-3 の置き換えでも差は進む）。
+- spike（tech-lead、2026-11-05。リポジトリの外。Playwright の Chromium 156.0.8078.4 と WebKit 27.2。D-43 と同じ SVG（`pathLength="1"` のチェックと円、`stroke-dasharray: 1`、`@keyframes` で `stroke-dashoffset` 1 → 0、400 ms、fill both、`@media (prefers-reduced-motion: no-preference)` の中だけでアニメーションを付ける））：
+  - 両方で `path.pathLength.baseVal` が 1、始めの `stroke-dashoffset` が 1px、600 ms 後に 0px、アニメーションは 2 件で `finished`（currentTime 400）のまま残る。
+  - `reducedMotion: 'reduce'` では両方で `getAnimations()` が 0 件、`stroke-dashoffset` は最初から 0px。
+  - WebKit は Safari 17 そのものではない（budgets.md の 5）。
 
 ## AC-31 の重なる要素の数え方
 `data-state="task.today"`（と `task.done`）を、操作 0 回で読んだ後に：

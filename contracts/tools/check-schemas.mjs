@@ -3,8 +3,8 @@
 // 1. contracts/schemas/*.schema.json を JSON Schema 2020-12 のメタスキーマで検査し、strict で組み立てる。
 // 2. contracts/fixtures/ の見本を検査する。valid-* と seed-* は通り、invalid-* は落ちるのが正しい。
 // 3. data の valid-* と seed-* は、スキーマの外の決まり（contracts/data.md の 8「書き手が守る決まり」）も満たす。
-// 4. strings の valid-* は語の検査（contracts/strings.md の 6、AC-35）に通り、valid-ja と valid-en は差し込みの名前がキーごとにそろう。
-// 5. tasks の valid-* は ID が重ならず、初級の決まり（contracts/strings.md の 6、AC-34）を満たす。
+// 4. strings の valid-* は語の検査（contracts/strings.md の 7、AC-35）に通り、valid-ja と valid-en は差し込みの名前がキーごとにそろう。
+// 5. tasks の valid-* は ID が重ならず、初級の決まり（contracts/strings.md の 7、AC-34）を満たす。
 // 期待と違う結果が 1 件でもあれば終了コード 1。
 import { createRequire } from 'node:module';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
@@ -53,7 +53,7 @@ function semantic(doc) {
   return errs;
 }
 
-// 語の検査（contracts/strings.md の 6）。語を変えるときは strings.md と一緒に直す。
+// 語の検査（contracts/strings.md の 7）。語を変えるときは strings.md と一緒に直す。
 const AC35_JA = ['連続', '途切れ', '逃した'];
 const AC35_EN = /\b(streak|missed)\b/i;
 const AC34_WORDS = ['自分のAPI', '自分のリポジトリ', '自分のサービス', '自分のチーム', '実務で', '業務で'];
