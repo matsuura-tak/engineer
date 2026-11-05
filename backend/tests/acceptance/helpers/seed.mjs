@@ -5,6 +5,52 @@ import path from 'node:path';
 import { SEEDS_DIR, CONTRACT_FIXTURES_DIR, STORAGE_KEY, SEEDED_MARK } from './paths.mjs';
 import { assertValid } from './schema.mjs';
 
+/**
+ * 配布物の課題集（data/tasks.json）。seed の ID を照らすため（W-7「seed の行と current の taskId は、本番の tasks.json にある ID だけにする」）。
+ * 場所は global-setup.mjs（または tools/ の main）が KYOUNOITTE_DIST に入れたビルドの出力。実装のモジュールは読まず、配布物のデータだけを読む。
+ * 1 プロセスで 1 回だけ読む。
+ */
+let distTasksCache = null;
+export function distTasks() {
+  if (distTasksCache) return distTasksCache;
+  const dist = process.env.KYOUNOITTE_DIST;
+  if (!dist) throw new Error('配布物の場所（KYOUNOITTE_DIST）がないので seed の ID を課題集と照らせない（global-setup.mjs か tools の main が入れる）');
+  // ここでは ID を照らすためだけに読む（tasks.schema.json に通すのは AC-3 のテストの仕事。古い課題集でも ID の確かめはできるようにする）
+  const doc = JSON.parse(readFileSync(path.join(dist, 'data', 'tasks.json'), 'utf8'));
+  if (!Array.isArray(doc?.tasks) || doc.tasks.some((t) => typeof t?.id !== 'string')) throw new Error('dist/data/tasks.json の tasks が ID を持つ配列でない');
+  distTasksCache = doc;
+  return distTasksCache;
+}
+
+/**
+ * W-7 の確かめ：seed の history の各行と current について、taskId が課題集にあり、行の area と level が ID の <領域>-<段階> と同じ。
+ * 違えば seed の誤りとして例外（テストの誤りを、アプリの不具合と取り違えないため）。
+ */
+export function assertSeedTaskIds(seed, tasks, label = 'seed') {
+  const ids = new Set(tasks.tasks.map((t) => t.id));
+  const rows = [...(seed.history ?? []).map((r, i) => [`history[${i}]`, r]), ...(seed.current ? [['current', seed.current]] : [])];
+  const bad = [];
+  for (const [where, r] of rows) {
+    const [area, level] = String(r.taskId).split('-');
+    if (!ids.has(r.taskId)) bad.push(`${where} の taskId ${r.taskId} が課題集にない`);
+    if (r.area !== area || r.level !== level) bad.push(`${where} の area/level ${r.area}/${r.level} が ID ${r.taskId} の <領域>-<段階> と違う`);
+  }
+  if (bad.length) throw new Error(`${label} が W-7 の ID の決まりに合わない（seed の誤り）：\n${bad.join('\n')}`);
+  return seed;
+}
+
+/**
+ * data.md の 5 の選び方：組は a = diagnosis.area、L = levels[a]（なければ diagnosis.level）。候補は area = a かつ level = L で、ID が history のどの行にも current にもないもの。
+ * 選ぶのは ID が最も小さいもの。候補がなければ null（S7）。extraIssued は、seed の後に画面で出した ID（AC-33 の期待値を求めるときに使う）。
+ */
+export function pickNext(tasks, data, extraIssued = []) {
+  const a = data.diagnosis.area;
+  const L = data.levels?.[a] ?? data.diagnosis.level;
+  const used = new Set([...data.history.map((r) => r.taskId), ...(data.current ? [data.current.taskId] : []), ...extraIssued]);
+  const candidates = tasks.tasks.filter((t) => t.area === a && t.level === L && !used.has(t.id)).map((t) => t.id).sort();
+  return candidates.length ? candidates[0] : null;
+}
+
 /** 自分のフォルダ（seeds/）の seed を読み、ajv に通してから返す。 */
 export function loadSeed(name) {
   const doc = JSON.parse(readFileSync(path.join(SEEDS_DIR, name), 'utf8'));
@@ -24,9 +70,17 @@ export function contractFixturePath(rel) {
 /**
  * localStorage のキー kyounoitte:data に seed を書く。addInitScript は読み込みのたびに動くので、印のキーで 1 回だけにする（W-7）。
  * W-9 の失敗の注入より先に登録すること。
+ * 入れる前に、data.schema.json と、W-7 の ID の決まり（各 taskId が配布物の課題集にあり、行の area / level が ID の <領域>-<段階> と同じ）を確かめる。
+ * 課題集にない ID をわざと入れるテスト（data.md の 5「課題集に ID がない行」）だけ、allowIdsNotInTasks に理由の文字列を渡して ID の確かめを外す。
+ * そのテストは testInfo.annotations にも同じ理由を書くこと（W-7「そのテストは注釈にそう書く」）。
  */
-export async function injectSeed(context, seed) {
+export async function injectSeed(context, seed, { allowIdsNotInTasks } = {}) {
   assertValid('data', seed, 'seed');
+  if (allowIdsNotInTasks === undefined) {
+    assertSeedTaskIds(seed, distTasks(), 'seed');
+  } else if (typeof allowIdsNotInTasks !== 'string' || allowIdsNotInTasks.trim() === '') {
+    throw new Error('allowIdsNotInTasks には、課題集にない ID をわざと入れる理由を文字列で書く（W-7 の例外）');
+  }
   await context.addInitScript(
     ({ key, mark, json }) => {
       if (!localStorage.getItem(mark)) {
@@ -233,17 +287,26 @@ export function completedSeed(tasks, { n, area, level, firstOpenDate, maxFromTar
   const otherRows = others.slice(0, fromOthers);
   const targetRows = target.slice(0, fromTarget);
   const rows = [...otherRows, ...targetRows].map((t) => ({ taskId: t.id, report: 'done', mode: t.mode, helpful: 'helpful' }));
+  // 他の「領域」の行を入れた領域だけ、その領域の levels に最後の行の段階を入れる（古い順に上書き）。
+  // 目標の領域の levels は目標の段階のまま（同じ領域の別の段階の行で上書きしない。G2 tech-lead r4 と reviewer r2 の重大：
+  // 上書きすると data.md の 5 の L = levels[a] が変わり、n=29 で backend-advanced-003 が出て、n=99 では上級を出し終えて S7 になる）。
   const levels = { [area]: level };
-  for (const t of otherRows) levels[t.area] = t.level; // 最後の行の段階が残る（古い順に上書き）
+  for (const t of otherRows) if (t.area !== area) levels[t.area] = t.level;
   const seed = makeSeed({ area, level, firstOpenDate, rows, levels });
   seed.device = { persistRequested: true };
   assertValid('data', seed, 'completedSeed');
+  const nextId = target[fromTarget].id;
+  // 作った seed に data.md の 5 の選び方を当てた結果が nextId と同じことを、ここで確かめる（違えば seed の作り方の誤り）
+  const picked = pickNext(tasks, seed);
+  if (picked !== nextId) {
+    throw new Error(`completedSeed(n=${n}) の誤り：data.md の 5 の選び方では ${picked ?? '候補なし（S7）'} が出るが、nextId は ${nextId}（levels=${JSON.stringify(levels)}）`);
+  }
   return {
     seed,
     lastDate: addDays(firstOpenDate, rows.length - 1),
     nextDate: addDays(firstOpenDate, rows.length),
     targetIds: targetRows.map((t) => t.id),
-    nextId: target[fromTarget].id,
+    nextId,
   };
 }
 

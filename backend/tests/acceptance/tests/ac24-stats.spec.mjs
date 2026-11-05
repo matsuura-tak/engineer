@@ -41,7 +41,7 @@ test('AC24_統計の11の値が期待どおりで_数値9つと日付1つは同�
     await expect(dd, testId).toHaveCount(1);
     await expect(dd, `${attr}`).toHaveAttribute(attr, value);
     if (attr === 'data-stat-first-day-completed') {
-      await expect(dd).toHaveText(ja['settings.stats.firstDayCompleted.yes']);
+      await expect(dd).toHaveText(app.text(ja, 'settings.stats.firstDayCompleted.yes'));
     } else {
       await expect(dd).toHaveText(value);
     }

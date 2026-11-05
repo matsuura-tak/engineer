@@ -20,9 +20,9 @@ test('DESIGN_D40_初級を出し終え中級の行があり中級に未出が残
   await app.fixDate(page, nextDate);
   await app.open(page, baseURL);
   await app.expectState(page, 'task.exhausted');
-  await expect(app.tid(page, 'task.exhausted.levelDone')).toHaveText(app.fill(ja['task.exhausted.levelDone'], { area: ja[`area.${AREA}`], level: ja['level.beginner'] }));
+  await expect(app.tid(page, 'task.exhausted.levelDone')).toHaveText(app.fill(app.text(ja, 'task.exhausted.levelDone'), { area: app.text(ja, `area.${AREA}`), level: app.text(ja, 'level.beginner') }));
   await expect(app.tid(page, 'task.exhausted.seenNext')).toHaveCount(1);
-  await expect(app.tid(page, 'task.exhausted.seenNext')).toHaveText(app.fill(ja['task.exhausted.seenNext'], { nextLevel: ja['level.intermediate'] }));
+  await expect(app.tid(page, 'task.exhausted.seenNext')).toHaveText(app.fill(app.text(ja, 'task.exhausted.seenNext'), { nextLevel: app.text(ja, 'level.intermediate') }));
   await expect(app.tid(page, 'task.exhausted.seenNext')).toBeVisible();
   await expect(app.tid(page, 'task.exhausted.nextDone')).toHaveCount(0);
   await expect(app.tid(page, 'task.exhausted.advance')).toHaveCount(1);
@@ -43,16 +43,16 @@ test('DESIGN_D40_初級と中級を出し終えて段階が初級のS7はlevelDo
   await app.fixDate(page, nextDate);
   await app.open(page, baseURL);
   await app.expectState(page, 'task.exhausted');
-  await expect(app.tid(page, 'task.exhausted.levelDone')).toHaveText(app.fill(ja['task.exhausted.levelDone'], { area: ja[`area.${AREA}`], level: ja['level.beginner'] }));
+  await expect(app.tid(page, 'task.exhausted.levelDone')).toHaveText(app.fill(app.text(ja, 'task.exhausted.levelDone'), { area: app.text(ja, `area.${AREA}`), level: app.text(ja, 'level.beginner') }));
   await expect(app.tid(page, 'task.exhausted.nextDone')).toHaveCount(1);
-  await expect(app.tid(page, 'task.exhausted.nextDone')).toHaveText(app.fill(ja['task.exhausted.nextDone'], { nextLevel: ja['level.intermediate'] }));
+  await expect(app.tid(page, 'task.exhausted.nextDone')).toHaveText(app.fill(app.text(ja, 'task.exhausted.nextDone'), { nextLevel: app.text(ja, 'level.intermediate') }));
   await expect(app.tid(page, 'task.exhausted.nextDone')).toBeVisible();
   await expect(app.tid(page, 'task.exhausted.seenNext')).toHaveCount(0);
   await app.shot(page, testInfo, 'DESIGN_D40_task.exhausted_nextDone');
 
   await app.tid(page, 'task.exhausted.advance').click();
   await app.expectState(page, 'task.exhausted');
-  await expect(app.tid(page, 'task.exhausted.levelDone')).toHaveText(app.fill(ja['task.exhausted.levelDone'], { area: ja[`area.${AREA}`], level: ja['level.intermediate'] }));
+  await expect(app.tid(page, 'task.exhausted.levelDone')).toHaveText(app.fill(app.text(ja, 'task.exhausted.levelDone'), { area: app.text(ja, `area.${AREA}`), level: app.text(ja, 'level.intermediate') }));
   await expect(app.tid(page, 'task.exhausted.seenNext')).toHaveCount(0);
   await expect(app.tid(page, 'task.exhausted.nextDone')).toHaveCount(0);
   await expect(app.tid(page, 'task.exhausted.advance')).toHaveCount(1);
@@ -76,7 +76,7 @@ test('DESIGN_D44_組の13件を出した翌日に14件目を完了したS5のtas
   await app.expectState(page, 'task.done');
   const note = app.tid(page, 'task.next.note');
   await expect(note).toHaveCount(1);
-  await expect(note).toHaveText(app.fill(ja['task.next.note.last'], { area: ja[`area.${AREA}`], level: ja['level.intermediate'] }));
+  await expect(note).toHaveText(app.fill(app.text(ja, 'task.next.note.last'), { area: app.text(ja, `area.${AREA}`), level: app.text(ja, 'level.intermediate') }));
   await expect(app.tid(page, 'task.progress.done')).toHaveAttribute('data-progress-index', String(total));
   await expect(app.tid(page, 'task.progress.done')).toHaveAttribute('data-progress-total', String(total));
   await app.shot(page, testInfo, 'DESIGN_D44_task.done_note.last');
@@ -118,11 +118,11 @@ test('DESIGN_D44_初級を出し終えて中級に進んだ後に中級で難し
   await app.tid(page, 'task.report.tooHard').click();
   await app.expectState(page, 'task.skipped');
   await expect(app.tid(page, 'task.skipped.levelChanged')).toHaveCount(1);
-  await expect(app.tid(page, 'task.skipped.levelChanged')).toHaveText(app.fill(ja['task.skipped.levelChanged'], { level: ja['level.beginner'] }));
+  await expect(app.tid(page, 'task.skipped.levelChanged')).toHaveText(app.fill(app.text(ja, 'task.skipped.levelChanged'), { level: app.text(ja, 'level.beginner') }));
   await expect(app.tid(page, 'task.skipped.levelHint')).toHaveCount(0);
   const note = app.tid(page, 'task.next.note');
   await expect(note).toHaveCount(1);
-  await expect(note).toHaveText(app.fill(ja['task.next.note.last'], { area: ja[`area.${AREA}`], level: ja['level.beginner'] }));
+  await expect(note).toHaveText(app.fill(app.text(ja, 'task.next.note.last'), { area: app.text(ja, `area.${AREA}`), level: app.text(ja, 'level.beginner') }));
   // 文書順：levelChanged の後に note（design 5.1 #54）
   expect(await page.evaluate(() => {
     const a = document.querySelector('[data-testid="task.skipped.levelChanged"]');
@@ -132,6 +132,6 @@ test('DESIGN_D44_初級を出し終えて中級に進んだ後に中級で難し
   await app.shot(page, testInfo, 'DESIGN_D44_task.skipped_levelChanged_note.last');
 
   await app.next(page, { to: 'task.exhausted' });
-  await expect(app.tid(page, 'task.exhausted.levelDone')).toHaveText(app.fill(ja['task.exhausted.levelDone'], { area: ja[`area.${AREA}`], level: ja['level.beginner'] }));
+  await expect(app.tid(page, 'task.exhausted.levelDone')).toHaveText(app.fill(app.text(ja, 'task.exhausted.levelDone'), { area: app.text(ja, `area.${AREA}`), level: app.text(ja, 'level.beginner') }));
   await expect(app.tid(page, 'task.exhausted.seenNext'), '中級に未出が残り履歴に中級の行があるので seenNext').toHaveCount(1);
 });

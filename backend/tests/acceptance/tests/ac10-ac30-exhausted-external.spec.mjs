@@ -56,7 +56,7 @@ for (const via of ['reload', 'next']) {
     const { nthAfterAdvance } = await reachExhausted({ context, page, baseURL, tasks, level: 'beginner', via });
 
     await expect(app.tid(page, 'task.exhausted.levelDone')).toHaveCount(1);
-    await expect(app.tid(page, 'task.exhausted.levelDone')).toHaveText(app.fill(ja['task.exhausted.levelDone'], { area: ja[`area.${AREA}`], level: ja['level.beginner'] }));
+    await expect(app.tid(page, 'task.exhausted.levelDone')).toHaveText(app.fill(app.text(ja, 'task.exhausted.levelDone'), { area: app.text(ja, `area.${AREA}`), level: app.text(ja, 'level.beginner') }));
     await expect(app.tid(page, 'task.exhausted.allDone')).toHaveCount(0);
     await expect(app.tid(page, 'task.exhausted.advance')).toHaveCount(1);
     await expect(app.tid(page, 'task.exhausted.redo')).toHaveCount(1);
@@ -84,7 +84,7 @@ for (const via of ['reload', 'next']) {
     await reachExhausted({ context, page, baseURL, tasks, level: 'advanced', via });
 
     await expect(app.tid(page, 'task.exhausted.allDone')).toHaveCount(1);
-    await expect(app.tid(page, 'task.exhausted.allDone')).toHaveText(app.fill(ja['task.exhausted.allDone'], { area: ja[`area.${AREA}`] }));
+    await expect(app.tid(page, 'task.exhausted.allDone')).toHaveText(app.fill(app.text(ja, 'task.exhausted.allDone'), { area: app.text(ja, `area.${AREA}`) }));
     await expect(app.tid(page, 'task.exhausted.levelDone')).toHaveCount(0);
     await expect(app.tid(page, 'task.exhausted.advance')).toHaveCount(0);
     await expect(app.tid(page, 'task.exhausted.redo')).toHaveCount(1);
@@ -132,7 +132,7 @@ test('AC30_in_appを出し終えた翌日はexternalの課題が出て_印と要
   expect(task.mode).toBe('external');
   await expect(app.tid(page, 'task.today.title')).toHaveText(expected.title);
   await expect(app.tid(page, 'task.external.badge')).toBeVisible();
-  await expect(app.tid(page, 'task.external.badge')).toHaveText(ja['task.external.badge']);
+  await expect(app.tid(page, 'task.external.badge')).toHaveText(app.text(ja, 'task.external.badge'));
   const items = app.tid(page, 'task.external.tools.item');
   await expect(items).toHaveCount(expected.tools.length);
   for (let i = 0; i < expected.tools.length; i++) {

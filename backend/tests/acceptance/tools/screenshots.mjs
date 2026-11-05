@@ -616,6 +616,7 @@ async function capture(browserName, browser, scenario, variantName, env, rows, a
 async function main() {
   const tmp = mkdtempSync(path.join(os.tmpdir(), 'kyounoitte-shots-'));
   const dist = buildDist({ out: path.join(tmp, 'dist'), version: DIST_VERSION });
+  process.env.KYOUNOITTE_DIST = dist; // injectSeed が seed の ID を配布物の課題集と照らす（W-7）
   const server = await createStaticServer({ root: dist });
   const tasks = JSON.parse(readFileSync(path.join(dist, 'data', 'tasks.json'), 'utf8'));
   const env = { baseURL: server.url, tasks };

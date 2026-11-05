@@ -19,7 +19,7 @@ async function expectDayChangedNotice(page, firstTestIdOfScreen, ja) {
   await expect(notice).toHaveCount(1);
   await expect(notice).toBeVisible();
   await expect(notice).toHaveAttribute('role', 'status');
-  await expect(notice).toHaveText(ja['task.dayChanged']);
+  await expect(notice).toHaveText(app.text(ja, 'task.dayChanged'));
   await expect.poll(() => page.evaluate(() => document.activeElement?.getAttribute('data-testid') ?? null), { timeout: app.WAIT_MS }).toBe('task.dayChanged');
   const precedes = await page.evaluate(
     (id) => {

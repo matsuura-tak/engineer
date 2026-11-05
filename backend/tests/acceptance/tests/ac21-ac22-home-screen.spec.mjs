@@ -12,7 +12,7 @@ async function expectGuideSteps(page, ja) {
   await expect(app.tid(page, 'home.addToHomeScreen')).toHaveCount(1);
   await expect(app.tid(page, 'home.addToHomeScreen.steps')).toHaveCount(1);
   for (const n of [1, 2, 3, 4]) await expect(app.tid(page, `home.addToHomeScreen.steps.${n}`)).toBeVisible();
-  await expect(app.tid(page, 'home.addToHomeScreen.steps.4')).toHaveText(ja['home.addToHomeScreen.steps.4']);
+  await expect(app.tid(page, 'home.addToHomeScreen.steps.4')).toHaveText(app.text(ja, 'home.addToHomeScreen.steps.4'));
 }
 
 test.describe('AC-21 iPhone の Safari の偽装', () => {
@@ -76,7 +76,7 @@ test('AC22_スタンドアロンで初めて開くと読み込みの案内が出
   await app.expectState(page, 'diagnosis.start');
 
   await expect(app.tid(page, 'home.standalone.import')).toBeVisible();
-  await expect(app.tid(page, 'home.standalone.import')).toHaveText(ja['home.standalone.import']);
+  await expect(app.tid(page, 'home.standalone.import')).toHaveText(app.text(ja, 'home.standalone.import'));
   await expect(app.tid(page, 'home.standalone.importButton')).toHaveCount(1);
   await expect(app.tid(page, 'diagnosis.start.begin')).toHaveCount(1);
   await expect(app.tid(page, 'home.addToHomeScreen')).toHaveCount(0);

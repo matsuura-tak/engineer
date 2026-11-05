@@ -30,7 +30,7 @@ test('AC39_1問目の6つの領域にarea.descの説明が見え_jaとenの文�
     const desc = app.tid(page, key);
     await expect(desc, key).toHaveCount(1);
     await expect(desc, key).toBeVisible();
-    await expect(desc, key).toHaveText(ja[key]);
+    await expect(desc, key).toHaveText(app.text(ja, key));
     // 説明は選択肢と同じ label の中（identifiers.md の 3）
     await expect(desc.locator('xpath=ancestor::label[1]'), `${key} の label`).toHaveCount(1);
     await expect(app.tid(page, `area.${a}`)).toHaveCount(1);
@@ -72,7 +72,7 @@ test('AC40_3問目の選択肢が5つでyears.neverのvalueがneverで_選んで
   for (const y of YEARS) await expect(app.tid(page, `years.${y}`), `years.${y}`).toHaveCount(1);
   const never = app.tid(page, 'years.never');
   await expect(never).toHaveAttribute('value', 'never');
-  await expect(never.locator('xpath=ancestor::label[1]'), 'years.never のラベル').toContainText(ja['years.never']);
+  await expect(never.locator('xpath=ancestor::label[1]'), 'years.never のラベル').toContainText(app.text(ja, 'years.never'));
   expect(await radios.evaluateAll((els) => els.filter((e) => e.value === 'never').length), 'value が never の radio').toBe(1);
   await app.shot(page, testInfo, 'AC40_diagnosis.question_3');
 

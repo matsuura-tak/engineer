@@ -38,7 +38,7 @@ test('AC1_初めて開くと診断が始まり3問で終わる_進み具合n/3_�
   for (let n = 1; n <= 3; n++) {
     await expect(progress).toHaveAttribute('data-question-index', String(n));
     await expect(progress).toHaveAttribute('data-question-total', '3');
-    await expect(progress).toHaveText(app.fill(ja['diagnosis.progress'], { n, total: 3 }));
+    await expect(progress).toHaveText(app.fill(app.text(ja, 'diagnosis.progress'), { n, total: 3 }));
     lastIndex = n;
     await app.shot(page, testInfo, `AC1_diagnosis.question_${n}`);
     await app.tid(page, answers[n - 1]).check();

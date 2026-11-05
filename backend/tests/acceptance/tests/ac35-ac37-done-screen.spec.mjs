@@ -49,16 +49,16 @@ async function expectTotalAndCheer(page, ja, { count, milestone, cheerKey }) {
   const total = app.tid(page, 'task.total.value');
   await expect(total).toHaveCount(1);
   await expect(total).toHaveAttribute('data-stat-completed', String(count));
-  await expect(total).toHaveText(app.fill(ja['task.total.value'], { count }));
+  await expect(total).toHaveText(app.fill(app.text(ja, 'task.total.value'), { count }));
   await expect(total).toBeVisible();
   const cheer = app.tid(page, 'task.cheer');
   await expect(cheer).toHaveCount(1);
   await expect(cheer).toHaveAttribute('data-milestone', milestone);
-  const expected = cheerKey === 'task.cheer.default' ? app.fill(ja[cheerKey], { count }) : ja[cheerKey];
+  const expected = cheerKey === 'task.cheer.default' ? app.fill(app.text(ja, cheerKey), { count }) : app.text(ja, cheerKey);
   await expect(cheer).toHaveText(expected);
   await expect(cheer).toBeVisible();
   if (cheerKey !== 'task.cheer.default') {
-    expect(expected, '節目の文言は節目でないとき（task.cheer.default）と異なる').not.toBe(app.fill(ja['task.cheer.default'], { count }));
+    expect(expected, '節目の文言は節目でないとき（task.cheer.default）と異なる').not.toBe(app.fill(app.text(ja, 'task.cheer.default'), { count }));
   }
 }
 
@@ -138,12 +138,19 @@ test('DESIGN_D43_reduceでないとき完了直後のtask.rateにgetAnimations�
   await openWithCompleted({ context, page, baseURL, request, n: 10 });
   await app.tid(page, 'task.report.done').click();
   await app.expectState(page, 'task.rate');
-  const m = await page.evaluate(() => ({
-    animations: document.getAnimations().length,
-    total: document.querySelector('[data-testid="task.total.value"]')?.getAttribute('data-stat-completed') ?? null,
-  }));
+  // S4 に着いた直後の同じ evaluate の中で、属性とテキストの両方を読む（契約「完了の演出の確かめ方」：task.total.value のテキストは描いた直後に読んだ値が最終の値。
+  // 文字が数え上げる演出だと、後の toHaveText は繰り返し待つので通ってしまうため、ここで 1 回読んだ値で比べる）
+  const m = await page.evaluate(() => {
+    const el = document.querySelector('[data-testid="task.total.value"]');
+    return {
+      animations: document.getAnimations().length,
+      total: el?.getAttribute('data-stat-completed') ?? null,
+      text: el?.textContent ?? null,
+    };
+  });
   expect(m.animations, 'S4 に着いた直後の document.getAnimations().length').toBeGreaterThanOrEqual(1);
   expect(m.total, '描いた直後の data-stat-completed').toBe('11');
+  expect(m.text?.trim(), '描いた直後の task.total.value のテキスト（最終の値）').toBe(app.fill(app.text(ja, 'task.total.value'), { count: 11 }));
   await expect(app.tid(page, 'task.rate.mark')).toHaveCount(1);
   await expect(app.tid(page, 'task.total.prev')).toHaveCount(0);
   await expectTotalAndCheer(page, ja, { count: 11, milestone: 'none', cheerKey: 'task.cheer.default' });
@@ -165,7 +172,7 @@ test('AC36_3件出した翌日のtask.todayのdata-progress-indexが4でtotalが
   const progress = app.tid(page, 'task.progress');
   await expect(progress).toHaveCount(1);
   await expect(progress).toBeVisible();
-  await expect(progress).toHaveText(app.fill(ja['task.progress'], { index: 4, total: 14 }));
+  await expect(progress).toHaveText(app.fill(app.text(ja, 'task.progress'), { index: 4, total: 14 }));
   await app.shot(page, testInfo, 'AC36_task.today_progress_4_of_14');
 });
 
@@ -185,7 +192,7 @@ test('AC37_金曜にtask.nextで出た課題を完了するとtask.doneのtask.w
   const week = app.tid(page, 'task.week');
   await expect(week).toHaveCount(1);
   await expect(week).toHaveAttribute('data-stat-days-completed-week', '3');
-  await expect(week).toHaveText(app.fill(ja['task.week'], { days: 3 }));
+  await expect(week).toHaveText(app.fill(app.text(ja, 'task.week'), { days: 3 }));
   await expect(week).toBeVisible();
   await app.shot(page, testInfo, 'AC37_task.done_week3');
   const stats = await app.readStats(page);
@@ -221,7 +228,7 @@ test('AC38_task.todayではtask.insight.textが0件で_完了するとtask.rate�
   await expect(app.tid(page, 'task.insight.text')).toHaveCount(1);
   await expect(app.tid(page, 'task.insight.text')).toHaveText(insight);
   await expect(app.tid(page, 'task.insight.text')).toBeVisible();
-  await expect(app.tid(page, 'task.insight')).toHaveText(ja['task.insight']);
+  await expect(app.tid(page, 'task.insight')).toHaveText(app.text(ja, 'task.insight'));
   await app.shot(page, testInfo, 'AC38_task.rate_insight');
 
   await app.tid(page, 'task.rate.helpful').click();

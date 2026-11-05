@@ -50,6 +50,7 @@ async function tabTo(page, id, max = 60) {
 async function main() {
   const tmp = mkdtempSync(path.join(os.tmpdir(), 'kyounoitte-kbd-'));
   const dist = buildDist({ out: path.join(tmp, 'dist'), version: DIST_VERSION });
+  process.env.KYOUNOITTE_DIST = dist; // injectSeed が seed の ID を配布物の課題集と照らす（W-7）
   const server = await createStaticServer({ root: dist });
   const browser = await (browserName === 'webkit' ? webkit : chromium).launch();
   const context = await browser.newContext({ viewport: { width: 390, height: 844 }, locale: 'ja-JP', timezoneId: 'Asia/Tokyo' });

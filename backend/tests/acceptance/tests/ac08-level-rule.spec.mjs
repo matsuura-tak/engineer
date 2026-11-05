@@ -82,7 +82,7 @@ test('AC8_10通り目_中で同じ日に難しすぎ2件_task.nextで同じ日�
   await app.tid(page, 'task.report.tooHard').click();
   await app.expectState(page, 'task.skipped');
   await expect(app.tid(page, 'task.skipped.levelChanged')).toHaveCount(1);
-  await expect(app.tid(page, 'task.skipped.levelChanged')).toHaveText(app.fill(ja['task.skipped.levelChanged'], { level: ja['level.beginner'] }));
+  await expect(app.tid(page, 'task.skipped.levelChanged')).toHaveText(app.fill(app.text(ja, 'task.skipped.levelChanged'), { level: app.text(ja, 'level.beginner') }));
   await expect(app.tid(page, 'task.skipped.levelHint')).toHaveCount(0);
   await app.shot(page, testInfo, 'AC8_10_task.skipped_levelChanged');
 
