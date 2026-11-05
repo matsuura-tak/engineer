@@ -9,7 +9,7 @@ import { injectSeed, loadContractFixture } from '../helpers/seed.mjs';
 
 const SEED = 'seeds/seed-ac14-three-completed.json';
 
-test('AC12_オフラインでもAC-1_AC-2_AC-5_AC-9の操作が動き_送信は0件', async ({ context, page, baseURL }, testInfo) => {
+test('AC12_オフラインでもAC-1_AC-2_AC-5_AC-9_AC-33の操作が動き_送信は0件', async ({ context, page, baseURL }, testInfo) => {
   await app.fixDate(page, '2026-11-03');
   await app.open(page, baseURL);
   await app.expectState(page, 'diagnosis.start');
@@ -34,8 +34,21 @@ test('AC12_オフラインでもAC-1_AC-2_AC-5_AC-9の操作が動き_送信は0
   await app.expectState(page, 'task.rate');
   await app.tid(page, 'task.rate.helpful').click();
   await app.expectState(page, 'task.done');
+
+  // AC-33（PRD r11 の AC-12 の When に足された）：task.done から「次の一手に進む」→ 1 秒以内に task.today、ID は違い、nth-today は 2、組は同じ
+  await app.next(page);
+  const nextMs = await app.readInterval(page, { startTestId: 'task.next', state: 'task.today' });
+  testInfo.annotations.push({ type: '次の一手に進む → 課題 ms', description: String(nextMs) });
+  expect(nextMs, 'task.next → task.today（AC-33 の 1 秒）').toBeLessThanOrEqual(1000);
+  const second = await app.readTask(page);
+  expect(second.id).not.toBe(task.id);
+  expect(second.nthToday).toBe('2');
+  expect(second.area).toBe('infra');
+  expect(second.level).toBe('intermediate');
+
   await app.goHistory(page);
   const rows = await app.readHistoryRows(page);
+  expect(rows).toHaveLength(1);
   expect(rows[0]).toMatchObject({ taskId: task.id, report: 'done', helpful: 'helpful' });
   await app.shot(page, testInfo, 'AC12_offline_history');
 

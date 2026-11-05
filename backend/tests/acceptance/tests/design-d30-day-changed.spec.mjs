@@ -135,7 +135,7 @@ test('DESIGN_D30_最後の課題を開いたまま翌日になった後に完了
   await app.fixDate(page, addDays(day, 1), '00:05:00');
   await app.tid(page, 'task.report.done').click();
   await app.expectState(page, 'task.exhausted');
-  await expectDayChangedNotice(page, 'task.exhausted.message', ja);
+  await expectDayChangedNotice(page, 'task.exhausted.levelDone', ja);
   await expect(app.tid(page, 'task.exhausted.redo')).toHaveCount(1);
   await app.shot(page, testInfo, 'DESIGN_D30_task.exhausted_dayChanged');
 

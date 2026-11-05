@@ -29,7 +29,11 @@ export async function open(page, baseURL) {
 
 export const tid = (page, id) => page.getByTestId(id);
 
-/** 今日の課題の素性（W-5）。 */
+/**
+ * 今日の課題の素性（W-5、identifiers.md の 4）。
+ * r8（PRD r11）で足した 3 つ：nthToday（data-task-nth-today。その日の何件目か。AC-33）、progressIndex / progressTotal
+ * （data-progress-index / -total。表示中の課題の組で何件目か と その組の総数。AC-36）。属性がなければ null（実装が古いと null になり、期待の値と比べて落ちる）。
+ */
 export async function readTask(page) {
   const el = tid(page, 'task.today');
   await expect(el).toHaveCount(1);
@@ -38,8 +42,54 @@ export async function readTask(page) {
     area: await el.getAttribute('data-task-area'),
     level: await el.getAttribute('data-task-level'),
     mode: await el.getAttribute('data-task-mode'),
+    nthToday: await el.getAttribute('data-task-nth-today'),
+    progressIndex: await el.getAttribute('data-progress-index'),
+    progressTotal: await el.getAttribute('data-progress-total'),
     title: (await tid(page, 'task.today.title').textContent())?.trim(),
   };
+}
+
+/**
+ * 「次の一手に進む」（task.next。PRD 11 の冒頭、AC-33）を押して、to の状態（既定 task.today。組を出し終えていれば task.exhausted）を待つ。
+ * 時間（AC-33 の 1 秒）は、同じ文書で armTiming を呼んでいれば readInterval({ startTestId: 'task.next', state: 'task.today' }) で読む
+ * （契約「時間の計り方」の表の「次の一手に進む → 課題」の行）。この関数は押して待つだけで、時間は読まない。
+ */
+export async function next(page, { to = 'task.today', timeout = WAIT_MS } = {}) {
+  await expect(tid(page, 'task.next')).toHaveCount(1);
+  await tid(page, 'task.next').click();
+  await expectState(page, to, timeout);
+}
+
+/** 統計の 11 の属性名（identifiers.md の 4、data.md の 9）。data-testid → data-stat-*。 */
+export const STAT_ATTRS = {
+  'settings.stats.firstOpenDate.value': 'data-stat-first-open-date',
+  'settings.stats.issued.value': 'data-stat-issued',
+  'settings.stats.completed.value': 'data-stat-completed',
+  'settings.stats.firstDayCompleted.value': 'data-stat-first-day-completed',
+  'settings.stats.daysCompleted7d.value': 'data-stat-days-completed-7d',
+  'settings.stats.daysCompletedWeek.value': 'data-stat-days-completed-week',
+  'settings.stats.extraCompleted.value': 'data-stat-extra-completed',
+  'settings.stats.helpful.value': 'data-stat-helpful',
+  'settings.stats.rated.value': 'data-stat-rated',
+  'settings.stats.tooHard.value': 'data-stat-too-hard',
+  'settings.stats.noTime.value': 'data-stat-no-time',
+};
+
+/**
+ * 設定 → 統計（settings.stats）を開き、11 の data-stat-* を読む（W-15）。戻り値のキーは属性名（例 'data-stat-issued'）。
+ * 画面は settings.stats のまま戻る。元の画面に戻るには再読み込み（起動時の判定で今日の状態に戻る。data.md の 4）。
+ */
+export async function readStats(page) {
+  if ((await readState(page)) !== 'settings') await goSettings(page);
+  await tid(page, 'settings.stats.open').click();
+  await expectState(page, 'settings.stats');
+  const out = {};
+  for (const [testId, attr] of Object.entries(STAT_ATTRS)) {
+    const dd = tid(page, testId);
+    await expect(dd, testId).toHaveCount(1);
+    out[attr] = await dd.getAttribute(attr);
+  }
+  return out;
 }
 
 /**

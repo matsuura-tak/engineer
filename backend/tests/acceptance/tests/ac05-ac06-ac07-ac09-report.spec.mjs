@@ -1,6 +1,7 @@
-// AC-5：完了すると、その日はもう課題が出ない。AC-6：翌日には過去に出していない課題が出る。
-// AC-7：難しすぎ・簡単すぎ・今日はできない → task.skipped。AC-9：「役に立った」は完了の直後に 1 回だけ聞く。
+// AC-5：完了の後は、求めない限り次の課題は出ない（r8）。AC-6：翌日には過去に出していない課題が出る。
+// AC-7：難しすぎ・簡単すぎ・今日はできない → task.skipped。求めない限り次の課題は出ない（r8）。AC-9：「役に立った」は完了の直後に 1 回だけ聞く。
 // seed は contracts/fixtures/seeds/seed-ac14-three-completed.json（3 件完了、11-01〜11-03）。2026-11-04 に固定して開くと今日の課題が出る。
+// 「出した件数」は統計の data-stat-issued（data.md の 9：history の行数 + current があれば 1）。開いた直後は 3 + 1 = 4 で、申告の後も task.next を押さない限り 4 のまま。
 import { test, expect } from '../helpers/fixtures.mjs';
 import * as app from '../helpers/app.mjs';
 import { injectSeed, loadContractFixture } from '../helpers/seed.mjs';
@@ -8,6 +9,7 @@ import { injectSeed, loadContractFixture } from '../helpers/seed.mjs';
 const SEED = 'seeds/seed-ac14-three-completed.json';
 const SEEDED_IDS = ['backend-intermediate-001', 'backend-intermediate-002', 'backend-intermediate-003'];
 const TODAY = '2026-11-04';
+const ISSUED_AFTER_OPEN = '4';
 
 async function openToday(context, page, baseURL, day = TODAY) {
   await injectSeed(context, loadContractFixture(SEED));
@@ -17,13 +19,19 @@ async function openToday(context, page, baseURL, day = TODAY) {
   return app.readTask(page);
 }
 
-test('AC5_完了するとtask.rateになり_答えるとtask.done_同じ日に再読み込みしてもtask.doneのまま', async ({ context, page, baseURL }, testInfo) => {
+test('AC5_完了するとtask.rateになり_答えるとtask.done_同じ日に再読み込みしてもtask.doneのままで_task.nextを押さない限りissuedは4のまま', async ({ context, page, baseURL }, testInfo) => {
   const task = await openToday(context, page, baseURL);
+  expect(task.nthToday, 'その日の 1 件目').toBe('1');
+  expect((await app.readStats(page))['data-stat-issued'], '開いた直後の issued').toBe(ISSUED_AFTER_OPEN);
+  await page.reload();
+  await app.expectState(page, 'task.today');
+
   await app.tid(page, 'task.report.done').click();
   await app.expectState(page, 'task.rate');
   await app.shot(page, testInfo, 'AC5_task.rate');
   await app.tid(page, 'task.rate.helpful').click();
   await app.expectState(page, 'task.done');
+  await expect(app.tid(page, 'task.next'), '「次の一手に進む」が 1 つ（押さない）').toHaveCount(1);
   await app.shot(page, testInfo, 'AC5_task.done');
 
   await page.reload();
@@ -31,10 +39,29 @@ test('AC5_完了するとtask.rateになり_答えるとtask.done_同じ日に�
   await expect(app.tid(page, 'task.today')).toHaveCount(0);
   await page.reload();
   await app.expectState(page, 'task.done');
+  expect((await app.readStats(page))['data-stat-issued'], '完了して再読み込みした後の issued（変わらない）').toBe(ISSUED_AFTER_OPEN);
 
+  await page.reload();
+  await app.expectState(page, 'task.done');
   await app.goHistory(page);
   const rows = await app.readHistoryRows(page);
+  expect(rows).toHaveLength(4);
   expect(rows[0]).toMatchObject({ taskId: task.id, date: TODAY, report: 'done' });
+});
+
+test('AC5_完了して答えずに再読み込みするとtask.doneになり_issuedは4のまま', async ({ context, page, baseURL }) => {
+  const task = await openToday(context, page, baseURL);
+  await app.tid(page, 'task.report.done').click();
+  await app.expectState(page, 'task.rate');
+  await page.reload();
+  await app.expectState(page, 'task.done');
+  await expect(app.tid(page, 'task.today')).toHaveCount(0);
+  await expect(app.tid(page, 'task.next')).toHaveCount(1);
+  expect((await app.readStats(page))['data-stat-issued']).toBe(ISSUED_AFTER_OPEN);
+  await page.reload();
+  await app.expectState(page, 'task.done');
+  await app.goHistory(page);
+  expect((await app.readHistoryRows(page))[0]).toMatchObject({ taskId: task.id, date: TODAY, report: 'done', helpful: 'unanswered' });
 });
 
 test('AC6_翌日には過去に出した課題のIDと一致しない課題が出る', async ({ context, page, baseURL }) => {
@@ -51,6 +78,7 @@ test('AC6_翌日には過去に出した課題のIDと一致しない課題が�
   const next = await app.readTask(page);
   expect([...SEEDED_IDS, first.id]).not.toContain(next.id);
   expect(next.area).toBe('backend');
+  expect(next.nthToday, '翌日の 1 件目').toBe('1');
 });
 
 for (const [button, report] of [
@@ -58,10 +86,11 @@ for (const [button, report] of [
   ['task.report.tooEasy', 'too_easy'],
   ['task.report.noTime', 'no_time'],
 ]) {
-  test(`AC7_${report}を申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない`, async ({ context, page, baseURL }, testInfo) => {
+  test(`AC7_${report}を申告するとtask.skippedになり履歴に残り_再読み込みしてもtask.skippedのままで_task.nextを押さない限りissuedは4のまま`, async ({ context, page, baseURL }, testInfo) => {
     const task = await openToday(context, page, baseURL);
     await app.tid(page, button).click();
     await app.expectState(page, 'task.skipped');
+    await expect(app.tid(page, 'task.next'), '「次の一手に進む」が 1 つ（押さない）').toHaveCount(1);
     await app.shot(page, testInfo, `AC7_task.skipped_${report}`);
 
     await app.goHistory(page);
@@ -72,6 +101,10 @@ for (const [button, report] of [
     await page.reload();
     await app.expectState(page, 'task.skipped');
     await expect(app.tid(page, 'task.today')).toHaveCount(0);
+    await expect(app.tid(page, 'task.next')).toHaveCount(1);
+    expect((await app.readStats(page))['data-stat-issued'], '申告して再読み込みした後の issued（変わらない）').toBe(ISSUED_AFTER_OPEN);
+    await page.reload();
+    await app.expectState(page, 'task.skipped');
   });
 }
 

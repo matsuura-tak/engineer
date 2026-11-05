@@ -204,14 +204,20 @@ const SCENARIOS = [
       await tid(page, 'task.report.done').click(); await waitState(page, 'task.today'); await waitVisible(page, 'task.dayChanged');
       if ((await tid(page, 'task.answer').inputValue()) !== '') throw new Error('翌日の答えの欄が空でない');
     } },
-  { name: 'S3_task.today_backend-beginner-005', ac: 'AC-17（長いインラインコード）', narrow: true, narrowOnly: true, state: 'task.today',
+  { name: 'S3_task.today_longest_inline_code', ac: 'AC-17（長いインラインコード）', narrow: true, narrowOnly: true, state: 'task.today',
     async run(context, page, env) {
-      const seed = makeSeed({ area: 'backend', level: 'beginner', firstOpenDate: '2026-10-31',
-        rows: ['001', '002', '003', '004'].map((n) => ({ taskId: `backend-beginner-${n}`, report: 'done', helpful: 'helpful' })) });
+      // W-7：課題の中身を ID で決め打ちしない。本文（why、how、goal）のインラインコード（バッククォート）が最も長い課題を課題集から引き、
+      // 同じ組でそれより小さい ID を done の行にした seed で開く（data.md の 5：候補のうち ID が最小のものが出る）。
+      const longest = env.tasks.tasks
+        .map((t) => ({ t, len: Math.max(0, ...[t.why, t.how, t.goal].join('\n').split('`').filter((_, i) => i % 2 === 1).map((c) => [...c].length)) }))
+        .sort((a, b) => b.len - a.len || (a.t.id < b.t.id ? -1 : 1))[0].t;
+      const before = tasksOf(env.tasks, longest.area, longest.level).filter((t) => t.id < longest.id);
+      const seed = makeSeed({ area: longest.area, level: longest.level, firstOpenDate: '2026-09-01',
+        rows: before.map((t) => ({ taskId: t.id, report: 'done', mode: t.mode, helpful: 'helpful' })) });
       await injectSeed(context, seed);
-      await open(page, env.baseURL, '2026-11-04'); await waitState(page, 'task.today');
+      await open(page, env.baseURL, addDays('2026-09-01', before.length)); await waitState(page, 'task.today');
       const id = await tid(page, 'task.today').getAttribute('data-task-id');
-      if (id !== 'backend-beginner-005') throw new Error(`期待した課題でない：${id}`);
+      if (id !== longest.id) throw new Error(`期待した課題でない：${id}（期待 ${longest.id}）`);
     } },
   { name: 'S3_task.today_external', ac: 'AC-30', state: 'task.today', extra: ['en'] /* design 9：task.external.badge「Outside the browser」 */,
     async run(context, page, env) {
@@ -280,7 +286,7 @@ const SCENARIOS = [
       await tid(page, 'task.report.noTime').click(); await waitState(page, 'task.skipped');
       if ((await tid(page, 'task.skipped.levelHint').count()) !== 0) throw new Error('no_time で levelHint が出た');
     } },
-  { name: 'S7_task.exhausted', ac: 'AC-10', normal: true, state: 'task.exhausted',
+  { name: 'S7_task.exhausted_levelDone', ac: 'AC-10', normal: true, state: 'task.exhausted',
     async run(context, page, env) {
       const { seed, nextDate } = exhaustedSeed(env.tasks, { area: 'backend', level: 'intermediate', firstOpenDate: '2026-09-01' });
       await injectSeed(context, seed); await open(page, env.baseURL, nextDate); await waitState(page, 'task.exhausted');

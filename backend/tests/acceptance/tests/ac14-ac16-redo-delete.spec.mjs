@@ -41,10 +41,11 @@ test('AC14_今日の課題を出していない日に設定からやり直して
   expect(rows).toHaveLength(list.length);
 });
 
-test('AC14_今日の課題が出ている日に設定からやり直して別の領域を選んでも_その日は同じdata-task-idのtask.todayのままで完了の履歴は3件_翌日は新しい領域の課題が出る', async ({ context, page, baseURL }, testInfo) => {
-  // 2 通り目（PRD r7 の AC-14 の Then。11 の冒頭「診断のやり直し」：その日にすでに課題を出していれば、やり直しても新しい課題は出さず、新しい診断は翌日の課題から効く）。
+test('AC14_今日の課題が出ている日に設定からやり直して別の領域を選んでも_同じdata-task-idのtask.todayのままで完了の履歴は3件_完了してtask.nextを押すと同じ日に新しい領域の課題が出る', async ({ context, page, baseURL }, testInfo) => {
+  // 2 通り目（PRD r11 の AC-14 の Then。11 の冒頭「診断のやり直し」：まだ申告していない今日の課題があればそのまま残り（ID は変わらない）、
+  // 申告の後に「次の一手に進む」で出す課題から新しい診断に従う）。
   // seed は契約の見本 seed-ac14-three-completed.json（完了 3 件、最後の行は 2026-11-03、current なし）。W-7 の AC-14 の 2 通り目の行のとおり
-  // 最後の行より後の日 2026-11-04 に固定して開く（2026-11-03 だと 4 の 6-2 で task.done になる）。やり直しで選ぶ領域は seed の backend 以外（frontend）。
+  // 最後の行より後の日 2026-11-04 に固定して開く（2026-11-03 だと 4 の 6-3 で task.done になる）。やり直しで選ぶ領域は seed の backend 以外（frontend）。時刻は動かさない。
   const seed = loadContractFixture('seeds/seed-ac14-three-completed.json');
   expect(seed.history.filter((r) => r.report === 'done'), 'seed の完了は 3 件').toHaveLength(3);
   expect(seed.history.at(-1).date).toBe('2026-11-03');
@@ -57,6 +58,7 @@ test('AC14_今日の課題が出ている日に設定からやり直して別の
   const before = await app.readTask(page);
   expect(before.id).toBeTruthy();
   expect(before.area).toBe('backend');
+  expect(before.nthToday).toBe('1');
   testInfo.annotations.push({ type: 'やり直しの前', description: `2026-11-04 の task.today：${before.id}（${before.area}/${before.level}）` });
 
   // When：設定から診断をやり直し、別の領域（frontend）を選んで 3 問に答える
@@ -65,36 +67,40 @@ test('AC14_今日の課題が出ている日に設定からやり直して別の
   await app.expectState(page, 'diagnosis.question');
   await app.diagnose(page, { area: 'frontend', level: 'beginner', years: '1to3' });
 
-  // Then（その日）：task.today のままで data-task-id がやり直しの前と同じ（新しい課題は出ない）
+  // Then：task.today のままで data-task-id がやり直しの前と同じ（新しい課題は出ない）
   await app.expectState(page, 'task.today');
   const after = await app.readTask(page);
   expect(after.id).toBe(before.id);
   expect(after.area).toBe('backend');
   await app.shot(page, testInfo, 'AC14_task.today_same_id_after_redo');
 
-  // Then（その日）：履歴の完了は 3 件のまま（S10 に出るのは history だけで、今日の課題は出ない。W-8）
+  // Then：履歴の完了は 3 件のまま（S10 に出るのは history だけで、今日の課題は出ない。W-8）
   await app.goHistory(page);
-  const rowsSameDay = await app.readHistoryRows(page);
-  expect(rowsSameDay.filter((r) => r.report === 'done')).toHaveLength(3);
-  expect(rowsSameDay).toHaveLength(3);
+  const rowsAfterRedo = await app.readHistoryRows(page);
+  expect(rowsAfterRedo.filter((r) => r.report === 'done')).toHaveLength(3);
+  expect(rowsAfterRedo).toHaveLength(3);
 
-  // Then（翌日）：端末の日付を翌日にして開くと task.today の data-task-area が新しく選んだ領域（frontend）
-  await app.fixDate(page, '2026-11-05');
+  // Then：その課題を完了して「次の一手に進む」を押すと、同じ日のうちに task.today の data-task-area が新しく選んだ領域（frontend）
   await page.reload();
   await app.expectState(page, 'task.today');
-  const nextDay = await app.readTask(page);
-  expect(nextDay.area).toBe('frontend');
-  expect(nextDay.level).toBe('beginner');
-  expect(nextDay.id).not.toBe(before.id);
-  await app.shot(page, testInfo, 'AC14_task.today_frontend_next_day');
+  expect((await app.readTask(page)).id).toBe(before.id);
+  await app.tid(page, 'task.report.done').click();
+  await app.expectState(page, 'task.rate');
+  await app.tid(page, 'task.rate.helpful').click();
+  await app.expectState(page, 'task.done');
+  await app.next(page);
+  const sameDay = await app.readTask(page);
+  expect(sameDay.area).toBe('frontend');
+  expect(sameDay.level).toBe('beginner');
+  expect(sameDay.id).not.toBe(before.id);
+  expect(sameDay.nthToday, '今日の 2 件目').toBe('2');
+  await app.shot(page, testInfo, 'AC14_task.today_frontend_same_day');
 
-  // 翌日の履歴：完了は 3 件のまま。前日の課題は申告のないまま日付が変わったので report none の行（4 行目）になる（PRD 11 の冒頭「連続」の定義の none の行、data.md 4 の 6-1）
+  // 履歴：完了は 4 件（やり直しの前の課題を完了した分）。新しい課題（current）は S10 に出ない
   await app.goHistory(page);
-  const rowsNextDay = await app.readHistoryRows(page);
-  expect(rowsNextDay.filter((r) => r.report === 'done')).toHaveLength(3);
-  expect(rowsNextDay).toHaveLength(4);
-  const yesterday = rowsNextDay.find((r) => r.date === '2026-11-04');
-  expect(yesterday).toMatchObject({ taskId: before.id, report: 'none' });
+  const rowsSameDay = await app.readHistoryRows(page);
+  expect(rowsSameDay.filter((r) => r.report === 'done')).toHaveLength(4);
+  expect(rowsSameDay[0]).toMatchObject({ taskId: before.id, date: '2026-11-04', report: 'done' });
 });
 
 test('AC16_すべてのデータを削除すると再読み込みでdiagnosis.startになり_やり直した後の履歴は0件', async ({ context, page, baseURL }, testInfo) => {
