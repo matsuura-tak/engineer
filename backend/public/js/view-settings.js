@@ -135,6 +135,8 @@ const STAT_ROWS = [
   ['completed', 'completed'],
   ['firstDayCompleted', 'first-day-completed'],
   ['daysCompleted7d', 'days-completed-7d'],
+  ['daysCompletedWeek', 'days-completed-week'],
+  ['extraCompleted', 'extra-completed'],
   ['helpful', 'helpful'],
   ['rated', 'rated'],
   ['tooHard', 'too-hard'],

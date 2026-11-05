@@ -1,6 +1,6 @@
 // 起動と画面の切り替え（contracts/data.md の 4 の判定順、identifiers.md の data-state）。
 import { h, link } from './dom.js';
-import { ymd, ymdShift } from './dates.js';
+import { ymd } from './dates.js';
 import { pickLang, format } from './i18n.js';
 import { openStore, save, removeAll } from './store.js';
 import * as R from './rules.js';
@@ -61,14 +61,14 @@ function isIosSafari() {
   return ios && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua);
 }
 
-// 操作の入口（data.md の 4、design の D-30）
-function act(fn) {
+// 操作の入口（data.md の 4、D-30、U-17）
+function act(fn, op = '') {
   return (ev) => {
     if (ev && typeof ev.preventDefault === 'function' && ev.type !== 'change') ev.preventDefault();
     app.seq += 1;
     clearNotice();
     if (app.checkDay && today() !== app.day) {
-      dayChanged();
+      dayChanged(op);
       return;
     }
     fn(ev);
@@ -81,7 +81,7 @@ function clearNotice() {
 }
 
 // data.md の 4「画面を開いたまま日付が変わったとき」
-function dayChanged() {
+function dayChanged(op) {
   const a = app.answer;
   let held = null;
   if (a) {
@@ -91,7 +91,7 @@ function dayChanged() {
   }
   app.draft = null;
   closeDialog();
-  decide({ focus: true, held, dayChanged: true });
+  decide({ focus: true, held, dayChanged: true, op });
 }
 
 function commit(next, onOk, onFail) {
@@ -185,7 +185,7 @@ function route(opts = {}) {
     saveFailed = !save(app.storage, r.data);
   }
   if (r.issued) track('Task Issued');
-  showDay(r.state, { focus: opts.focus, saveFailed, dayChanged: opts.dayChanged === true });
+  showDay(r.state, { focus: opts.focus, saveFailed, dayChanged: opts.dayChanged === true && R.showsDayChanged(opts.op, r.state) });
   if (r.askPersist) askPersist();
 }
 
@@ -330,6 +330,8 @@ function showToday(opts = {}) {
   const view = todayScreen(t, {
     task,
     current,
+    nth: R.nthToday(app.data),
+    progress: R.progressOfCurrent(app.data, app.tasks),
     onInput: () => {
       const a = app.answer;
       if (!a) return;
@@ -403,20 +405,60 @@ function showRate() {
 function showDone(opts = {}) {
   const row = R.rowOn(app.data.history, today());
   const title = row ? app.byId.get(row.taskId)?.title ?? row.taskId : '';
-  const view = doneScreen(t, { title, onHistory: act(() => showHistory({ focus: true })) });
+  const view = doneScreen(t, {
+    title,
+    note: R.nextNote(app.data, app.tasks),
+    onNext: act(() => onNext(view), 'task.next'),
+    onHistory: act(() => showHistory({ focus: true })),
+  });
   render('task.done', view.node, { focus: opts.focus ? view.focus : null });
 }
 
 function showSkipped(opts = {}) {
-  const row = R.rowOn(app.data.history, today());
-  const view = skippedScreen(t, { report: row?.report, onHistory: act(() => showHistory({ focus: true })) });
+  const view = skippedScreen(t, {
+    notice: R.levelNotice(app.data, today()),
+    note: R.nextNote(app.data, app.tasks),
+    onNext: act(() => onNext(view), 'task.next'),
+    onHistory: act(() => showHistory({ focus: true })),
+  });
   render('task.skipped', view.node, { focus: opts.focus ? view.focus : null });
 }
 
 function showExhausted(opts = {}) {
-  const view = exhaustedScreen(t, { onRedo: act(() => startRedo('exhausted')) });
+  const view = exhaustedScreen(t, {
+    info: R.exhaustedInfo(app.data, app.tasks),
+    onAdvance: act(() => onAdvance(view), 'task.exhausted.advance'),
+    onRedo: act(() => startRedo('exhausted')),
+  });
   render('task.exhausted', view.node, { focus: opts.focus ? view.focus : null, lead: opts.dayChanged ? dayChangedNotice(t) : null });
   if (opts.saveFailed) view.showError('startup', retryStartupSave(view));
+}
+
+// data.md の 4「操作で出す」と 2 の失敗
+function issueByAction(r, view, where, onSaved = () => {}) {
+  const marked = R.markPersist(r, canRequestPersist(navigator.storage));
+  if (!marked.changed) {
+    showDay(marked.state, { focus: true });
+    return;
+  }
+  commit(
+    marked.data,
+    () => {
+      onSaved();
+      if (marked.issued) track('Task Issued');
+      showDay(marked.state, { focus: true });
+      if (marked.askPersist) askPersist();
+    },
+    (retry) => view.showError(where, retry),
+  );
+}
+
+function onNext(view) {
+  issueByAction(R.nextTask(app.data, today(), app.tasks), view, 'next');
+}
+
+function onAdvance(view) {
+  issueByAction(R.advanceLevel(app.data, today(), app.tasks), view, 'advance', () => track('Level Changed'));
 }
 
 function makeImporter(buttonTestid, fileTestid, primary) {
@@ -547,7 +589,7 @@ function showStats(opts = {}) {
   const now = new Date();
   const view = statsScreen(t, {
     today: ymd(now),
-    values: R.stats(app.data, ymd(now), ymdShift(now, -6)),
+    values: R.stats(app.data, now),
     onBack: act(() => showSettings({ focus: true })),
   });
   render('settings.stats', view.node, { focus: opts.focus ? view.focus : null });

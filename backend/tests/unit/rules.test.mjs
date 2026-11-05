@@ -73,7 +73,7 @@ test('AC-8 契約の seed 3 件（1、8、9 通り目）が data.md の 5 の表
   }
 });
 
-test('変わった段階は翌日から効く（申告した日は新しい課題を出さない）', () => {
+test('変わった段階は次に出す課題から効く：申告した日の再読み込みは S6 のまま、同じ日の task.next で新しい段階（data.md の 5 の 4）', () => {
   const s = seed('seed-ac8-intermediate-one-too-hard.json');
   const day3 = R.startOfDay(s, '2026-11-03', TASKS);
   const after = R.reportTask(day3.data, 'too_hard', '');
@@ -82,6 +82,11 @@ test('変わった段階は翌日から効く（申告した日は新しい課�
   assert.equal(sameDay.state, 'task.skipped');
   assert.equal(sameDay.issued, false);
   assert.equal(sameDay.data.current, undefined);
+  const next = R.nextTask(after, '2026-11-03', TASKS);
+  assert.equal(next.state, 'task.today');
+  assert.equal(next.data.current.level, 'beginner');
+  assert.equal(next.data.current.date, '2026-11-03');
+  assert.deepEqual(validateData(next.data), []);
 });
 
 test('pickTask は目標の組で、出していない課題のうち ID が最小のもの（AC-6）', () => {
@@ -145,9 +150,10 @@ test('診断：1 問目で firstOpenDate を書き、領域を変えると 2 問
   const c = R.answerInitial(b, 1, 'git', '2026-11-02');
   assert.equal(c.diagnosis.level, undefined);
   assert.equal(c.firstOpenDate, '2026-11-01');
-  const done = R.finishInitial(R.answerInitial(c, 2, 'beginner', '2026-11-02'), 'lt1', '2026-11-02', TASKS);
+  const done = R.finishInitial(R.answerInitial(c, 2, 'beginner', '2026-11-02'), 'never', '2026-11-02', TASKS);
   assert.equal(done.state, 'task.today');
   assert.equal(done.data.current.taskId, 'git-beginner-001');
+  assert.equal(done.data.diagnosis.years, 'never', 'AC-40');
   assert.equal(R.classify(done.data), 'exists');
   assert.deepEqual(validateData(done.data), []);
 });
@@ -175,26 +181,57 @@ test('書き出しは device を除き、読み込みは今のブラウザの de
   assert.deepEqual(replaced.history, out.history);
 });
 
-test('統計の 9 つの値（AC-24、data.md の 9）を seed-ac24-stats で数える', () => {
+test('統計の 11 の値（AC-24、data.md の 9）：seed-ac24-stats を 2026-11-06（金）に数えると PRD の Then どおり', () => {
   const s = seed('seed-ac24-stats.json');
-  const today = s.current?.date ?? s.history.at(-1).date;
-  const d = new Date(`${today}T12:00:00`);
-  const weekStart = new Date(d.getFullYear(), d.getMonth(), d.getDate() - 6);
-  const ws = `${weekStart.getFullYear()}-${String(weekStart.getMonth() + 1).padStart(2, '0')}-${String(weekStart.getDate()).padStart(2, '0')}`;
-  const st = R.stats(s, today, ws);
-  const h = s.history;
-  assert.equal(st.issued, h.length + (s.current ? 1 : 0));
-  assert.equal(st.completed, h.filter((r) => r.report === 'done').length);
-  assert.equal(st.tooHard, h.filter((r) => r.report === 'too_hard').length);
-  assert.equal(st.noTime, h.filter((r) => r.report === 'no_time').length);
-  assert.equal(st.rated, h.filter((r) => ['helpful', 'not_helpful'].includes(r.helpful)).length);
-  assert.ok(st.daysCompleted7d <= 7);
-  assert.equal(st.firstOpenDate, s.firstOpenDate);
+  assert.deepEqual(R.stats(s, new Date(2026, 10, 6, 9, 0)), {
+    firstOpenDate: '2026-11-01',
+    issued: 6,
+    completed: 4,
+    firstDayCompleted: true,
+    daysCompleted7d: 3,
+    daysCompletedWeek: 2,
+    extraCompleted: 1,
+    helpful: 2,
+    rated: 2,
+    tooHard: 1,
+    noTime: 1,
+  });
+  const opened = R.startOfDay(s, '2026-11-06', TASKS);
+  assert.equal(opened.state, 'task.skipped', '今日の行があるので 6-3');
+  assert.equal(opened.changed, false);
+  assert.equal(R.stats(opened.data, new Date(2026, 10, 6)).issued, 6);
 });
 
 test('直近 7 暦日は今日から 6 日前までで、同じ日は 1 つに数える', () => {
   const rows = ['2026-10-27', '2026-10-28', '2026-11-01', '2026-11-03'].map((dt, i) => row(dt, i + 1, I, 'done'));
   const data = { history: rows, firstOpenDate: '2026-10-27' };
-  assert.equal(R.stats(data, '2026-11-03', '2026-10-28').daysCompleted7d, 3);
-  assert.equal(R.stats(data, '2026-11-03', '2026-10-28').firstDayCompleted, true);
+  assert.equal(R.stats(data, new Date(2026, 10, 3)).daysCompleted7d, 3);
+  assert.equal(R.stats(data, new Date(2026, 10, 3)).firstDayCompleted, true);
+});
+
+test('今週は月曜始まり（ISO 8601）：月曜は 1 日目、日曜は前の月曜から 7 日目（data.md の 9、AC-37）', () => {
+  assert.equal(R.mondayOf(new Date(2026, 10, 2)), '2026-11-02', '月曜');
+  assert.equal(R.mondayOf(new Date(2026, 10, 6)), '2026-11-02', '金曜');
+  assert.equal(R.mondayOf(new Date(2026, 10, 8, 23, 59)), '2026-11-02', '日曜');
+  assert.equal(R.mondayOf(new Date(2026, 10, 9, 0, 0)), '2026-11-09', '翌週の月曜');
+  assert.equal(R.mondayOf(new Date(2027, 0, 1)), '2026-12-28', '年をまたぐ');
+  const dates = ['2026-11-01', '2026-11-02', '2026-11-04', '2026-11-04', '2026-11-08'];
+  const data = { history: dates.map((dt, i) => row(dt, i + 1, I, 'done')), firstOpenDate: '2026-11-01' };
+  assert.equal(R.daysCompletedWeek(data, new Date(2026, 10, 8)), 3, '日曜（11-01）は前の週');
+  assert.equal(R.daysCompletedWeek(data, new Date(2026, 10, 9)), 0, '翌週の月曜は 0');
+  assert.equal(R.daysCompletedWeek(data, new Date(2026, 10, 4)), 2, '今日より後の行は数えない');
+});
+
+test('2 件目以降の完了（extra-completed）：日付ごとに max(0, done の行数 − 1) の合計。先に申告した done 以外は数えない', () => {
+  const h = [
+    row('2026-11-01', 1, I, 'done'),
+    row('2026-11-02', 2, I, 'too_hard'),
+    row('2026-11-02', 3, I, 'done'),
+    row('2026-11-03', 4, I, 'done'),
+    row('2026-11-03', 5, I, 'done'),
+    row('2026-11-03', 6, I, 'done'),
+    row('2026-11-03', 7, I, 'none'),
+  ];
+  assert.equal(R.extraCompleted(h), 2);
+  assert.equal(R.extraCompleted([]), 0);
 });

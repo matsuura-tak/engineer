@@ -6,7 +6,8 @@ const LEVELS = ['beginner', 'intermediate', 'advanced'];
 const MODES = ['in_app', 'external'];
 const TASK_ID_RE = /^(backend|frontend|database|infra|testing|git)-(beginner|intermediate|advanced)-[0-9]{3}$/u;
 const TEXT_LIMITS = { title: 60, why: 200, how: 400, goal: 200 };
-const KEYS = ['id', 'area', 'level', 'mode', 'minutes', 'title', 'why', 'how', 'goal', 'tools'];
+const KEYS = ['id', 'area', 'level', 'mode', 'minutes', 'title', 'why', 'how', 'goal', 'tools', 'insight'];
+const INSIGHT_MAX = 120; // AC-38。改行とバッククォートを含めない
 
 const isObject = (v) => typeof v === 'object' && v !== null && !Array.isArray(v);
 const has = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
@@ -30,6 +31,10 @@ function checkTask(task, path, errs) {
     if (typeof v !== 'string' || len(v) < 1 || len(v) > max || !/\S/u.test(v) || /```/u.test(v)) errs.push(`${path}.${k} が決まりに合わない`);
   }
   if (has(task, 'title') && typeof task.title === 'string' && /\n/u.test(task.title)) errs.push(`${path}.title に改行がある`);
+  if (has(task, 'insight')) {
+    const v = task.insight;
+    if (typeof v !== 'string' || len(v) < 1 || len(v) > INSIGHT_MAX || !/\S/u.test(v) || /[\r\n`]/u.test(v)) errs.push(`${path}.insight が決まりに合わない`);
+  }
   if (has(task, 'tools')) {
     const tools = task.tools;
     if (!Array.isArray(tools)) errs.push(`${path}.tools が配列でない`);

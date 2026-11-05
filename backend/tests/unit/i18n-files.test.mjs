@@ -15,7 +15,8 @@ test('配る文言 ja.json と en.json が strings.schema.json に通り、キ�
   assert.equal(strings(ja), true, JSON.stringify(strings.errors?.slice(0, 3)));
   assert.equal(strings(en), true, JSON.stringify(strings.errors?.slice(0, 3)));
   assert.deepEqual(Object.keys(ja).sort(), Object.keys(en).sort());
-  assert.equal(Object.keys(ja).length, 146);
+  assert.equal(Object.keys(ja).length, 174);
+  for (const gone of ['task.done.message', 'task.skipped.message', 'task.exhausted.message', 'task.exhausted.detail']) assert.equal(gone in ja || gone in en, false, gone);
   assert.equal(typeof ja['task.dayChanged'], 'string');
   assert.equal(typeof en['task.dayChanged'], 'string');
 });
@@ -82,18 +83,34 @@ const PLACEHOLDER_KEYS = (S) => ({
   'diagnosis.progress': { n: 2, total: 3 },
   'diagnosis.q2.legend': { area: S['area.database'] },
   'task.today.label': { date: '2026-11-03' },
+  'task.today.label.nth': { nth: 2, date: '2026-11-03' },
+  'task.progress': { index: 4, total: 14 },
   'task.meta': { area: S['area.backend'], level: S['level.intermediate'], minutes: 15 },
   'task.answer.limit': { max: 2000 },
+  'task.total.value': { count: 31 },
+  'task.progress.done': { index: 5, total: 14 },
+  'task.cheer.default': { count: 12 },
   'task.done.task': { title: firstTaskTitle },
+  'task.week': { days: 3 },
+  'task.skipped.levelChanged': { level: S['level.beginner'] },
+  'task.next.note.last': { area: S['area.infra'], level: S['level.intermediate'] },
+  'task.exhausted.levelDone': { area: S['area.testing'], level: S['level.beginner'] },
+  'task.exhausted.levelDone.detail': { total: 14 },
+  'task.exhausted.next': { nextLevel: S['level.intermediate'], desc: S['level.intermediate.desc'] },
+  'task.exhausted.seenNext': { nextLevel: S['level.intermediate'] },
+  'task.exhausted.nextDone': { nextLevel: S['level.advanced'] },
+  'task.exhausted.advance': { nextLevel: S['level.advanced'] },
+  'task.exhausted.allDone': { area: S['area.frontend'] },
+  'task.exhausted.allDone.detail': { total: 7 },
   'settings.import.confirm.summary': { count: 41, date: '2026-10-30' },
   'settings.diagnosis.current': { area: S['area.git'], level: S['level.advanced'] },
   'settings.version': { version: '2026-11-03.1' },
   'settings.stats.today': { date: '2026-11-04' },
 });
 
-test('差し込みのあるキーは ja と en のどちらも strings.md の表の 10 個だけ', () => {
+test('差し込みのあるキーは ja と en のどちらも strings.md の 3 の表の 26 個だけ', () => {
   const expected = Object.keys(PLACEHOLDER_KEYS(ja)).sort();
-  assert.equal(expected.length, 10);
+  assert.equal(expected.length, 26);
   for (const [name, S] of [['ja', ja], ['en', en]]) {
     const withBrace = Object.keys(S)
       .filter((k) => /[{}]/.test(S[k]))
@@ -103,7 +120,7 @@ test('差し込みのあるキーは ja と en のどちらも strings.md の表
 });
 
 for (const [lang, S] of [['ja', ja], ['en', en]]) {
-  test(`差し込みの 10 キーを ${lang}.json の実物で format() に通すと、差し込みが全部埋まり { と } が残らない`, () => {
+  test(`差し込みの 26 キーを ${lang}.json の実物で format() に通すと、差し込みが全部埋まり { と } が残らない`, () => {
     for (const [key, values] of Object.entries(PLACEHOLDER_KEYS(S))) {
       const template = S[key];
       for (const name of Object.keys(values)) {

@@ -38,8 +38,8 @@ test('配布物は gzip 後の合計 150,000 バイト以下（contracts/budgets
   assert.ok(m.total <= TOTAL_LIMIT, `合計 ${m.total}`);
 });
 
-test('内訳の枠は budgets.md の 1（2026-11-04 の枠の見直し）：殻 32,000、文言 8,000、アイコンと manifest 4,000、課題集 106,000 で合計 150,000。アイコンの生は 4,000（6）', () => {
-  assert.deepEqual(GROUPS.map((g) => g.limit), [32_000, 8_000, 4_000, 106_000]);
+test('内訳の枠は budgets.md の 1（2026-11-05 の枠の見直し）：殻 32,000、文言 9,000、アイコンと manifest 4,000、課題集 105,000 で合計 150,000。アイコンの生は 4,000（6）', () => {
+  assert.deepEqual(GROUPS.map((g) => g.limit), [32_000, 9_000, 4_000, 105_000]);
   assert.equal(GROUPS.reduce((s, g) => s + g.limit, 0), TOTAL_LIMIT);
   assert.equal(TOTAL_LIMIT, 150_000);
   assert.equal(ICON_RAW_LIMIT, 4_000);

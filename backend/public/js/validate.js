@@ -3,7 +3,7 @@
 export const CURRENT_VERSION = 1;
 export const AREAS = ['backend', 'frontend', 'database', 'infra', 'testing', 'git'];
 export const LEVELS = ['beginner', 'intermediate', 'advanced'];
-export const YEARS = ['lt1', '1to3', '3to5', 'gte5'];
+export const YEARS = ['never', 'lt1', '1to3', '3to5', 'gte5']; // never は AC-40（data.schema.json の enum の先頭）
 export const MODES = ['in_app', 'external'];
 export const REPORTS = ['done', 'too_hard', 'too_easy', 'no_time', 'none'];
 export const HELPFUL = ['helpful', 'not_helpful', 'unanswered'];

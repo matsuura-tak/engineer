@@ -17,10 +17,15 @@ export function dayChangedNotice(t) {
 const ANSWER_HELP_ID = 'task-answer-help';
 const ANSWER_ERROR_ID = 'task-answer-error';
 
-export function todayScreen(t, { task, current, onInput, onReport }) {
+export function todayScreen(t, { task, current, nth = 1, progress, onInput, onReport }) {
   const title = h('h1', { testid: 'task.today.title', attrs: { tabindex: '-1' } }, inline(task.title));
+  const label =
+    nth > 1
+      ? h('p', { testid: 'task.today.label.nth', cls: 'small secondary', text: t('task.today.label.nth', { nth, date: current.date }) })
+      : h('p', { testid: 'task.today.label', cls: 'small secondary', text: t('task.today.label', { date: current.date }) });
   const parts = [
-    h('p', { testid: 'task.today.label', cls: 'small secondary', text: t('task.today.label', { date: current.date }) }),
+    label,
+    progress ? h('p', { testid: 'task.progress', cls: 'small secondary', text: t('task.progress', progress) }) : null,
     title,
     h('p', {
       testid: 'task.meta',
@@ -99,7 +104,15 @@ export function todayScreen(t, { task, current, onInput, onReport }) {
     {
       testid: 'task.today',
       cls: 'screen',
-      attrs: { 'data-task-id': current.taskId, 'data-task-area': current.area, 'data-task-level': current.level, 'data-task-mode': current.mode },
+      attrs: {
+        'data-task-id': current.taskId,
+        'data-task-area': current.area,
+        'data-task-level': current.level,
+        'data-task-mode': current.mode,
+        'data-task-nth-today': String(nth),
+        'data-progress-index': progress ? String(progress.index) : null,
+        'data-progress-total': progress ? String(progress.total) : null,
+      },
     },
     parts,
   );
@@ -151,43 +164,71 @@ export function rateScreen(t, { onRate, onClose }) {
   };
 }
 
-export function doneScreen(t, { title, onHistory }) {
+function nextParts(t, note, onNext, errors) {
+  const text = note?.last ? t('task.next.note.last', { area: t(`area.${note.area}`), level: t(`level.${note.level}`) }) : t('task.next.note');
+  return [h('p', { testid: 'task.next.note', cls: 'small', text }), errors.el('next'), h('div', { cls: 'actions' }, button('task.next', t('task.next'), onNext))];
+}
+
+export function doneScreen(t, { title, note, onNext, onHistory }) {
   const h1 = h('h1', { testid: 'task.done.title', attrs: { tabindex: '-1' }, text: t('task.done.title') });
+  const errors = errorSlots(t, ['next']);
   const node = h(
     'div',
     { cls: 'screen' },
     h1,
-    h('p', { testid: 'task.done.message', text: t('task.done.message') }),
     title ? h('p', { testid: 'task.done.task', cls: 'small secondary', text: t('task.done.task', { title }) }) : null,
+    nextParts(t, note, onNext, errors),
     h('p', {}, link('task.done.history', t('task.done.history'), onHistory)),
   );
-  return { node, focus: h1 };
+  return { node, focus: h1, showError: (where, onRetry) => errors.show(where, onRetry) };
 }
 
-export function skippedScreen(t, { report, onHistory }) {
+export function skippedScreen(t, { notice, note, onNext, onHistory }) {
   const h1 = h('h1', { testid: 'task.skipped.title', attrs: { tabindex: '-1' }, text: t('task.skipped.title') });
+  const errors = errorSlots(t, ['next']);
+  let hint = null;
+  if (notice?.kind === 'levelChanged') hint = h('p', { testid: 'task.skipped.levelChanged', text: t('task.skipped.levelChanged', { level: t(`level.${notice.level}`) }) });
+  else if (notice?.kind === 'levelHint') hint = h('p', { testid: 'task.skipped.levelHint', text: t('task.skipped.levelHint') });
   const node = h(
     'div',
     { cls: 'screen' },
     h1,
-    h('p', { testid: 'task.skipped.message', text: t('task.skipped.message') }),
-    report === 'too_hard' || report === 'too_easy' ? h('p', { testid: 'task.skipped.levelHint', text: t('task.skipped.levelHint') }) : null,
+    hint,
+    nextParts(t, note, onNext, errors),
     h('p', {}, link('task.skipped.history', t('task.skipped.history'), onHistory)),
   );
-  return { node, focus: h1 };
+  return { node, focus: h1, showError: (where, onRetry) => errors.show(where, onRetry) };
 }
 
-export function exhaustedScreen(t, { onRedo }) {
-  const h1 = h('h1', { testid: 'task.exhausted.message', attrs: { tabindex: '-1' }, text: t('task.exhausted.message') });
-  const errors = errorSlots(t, ['startup']);
-  const node = h(
-    'div',
-    { cls: 'screen' },
-    h1,
-    h('p', { testid: 'task.exhausted.detail', text: t('task.exhausted.detail') }),
-    errors.el('startup'),
-    h('div', { cls: 'actions' }, button('task.exhausted.redo', t('task.exhausted.redo'), onRedo, 'primary')),
-  );
+export function exhaustedScreen(t, { info, onAdvance, onRedo }) {
+  const area = t(`area.${info.area}`);
+  const level = t(`level.${info.level}`);
+  const errors = errorSlots(t, ['startup', 'advance']);
+  const parts = [];
+  let h1;
+  if (info.variant === 'allDone') {
+    h1 = h('h1', { testid: 'task.exhausted.allDone', attrs: { tabindex: '-1' }, text: t('task.exhausted.allDone', { area }) });
+    parts.push(h1, h('p', { testid: 'task.exhausted.allDone.detail', text: t('task.exhausted.allDone.detail', { total: info.total }) }), errors.el('startup'));
+    parts.push(h('div', { cls: 'actions' }, button('task.exhausted.redo', t('task.exhausted.redo'), onRedo, 'primary')));
+  } else {
+    const nextLevel = t(`level.${info.nextLevel}`);
+    h1 = h('h1', { testid: 'task.exhausted.levelDone', attrs: { tabindex: '-1' }, text: t('task.exhausted.levelDone', { area, level }) });
+    parts.push(
+      h1,
+      h('p', { testid: 'task.exhausted.levelDone.detail', text: t('task.exhausted.levelDone.detail', { total: info.total }) }),
+      h('p', { testid: 'task.exhausted.next', text: t('task.exhausted.next', { nextLevel, desc: t(`level.${info.nextLevel}.desc`) }) }),
+      info.note ? h('p', { testid: `task.exhausted.${info.note}`, cls: 'small', text: t(`task.exhausted.${info.note}`, { nextLevel }) }) : null,
+      errors.el('startup'),
+      errors.el('advance'),
+      h(
+        'div',
+        { cls: 'actions stack' },
+        button('task.exhausted.advance', t('task.exhausted.advance', { nextLevel }), onAdvance, 'primary'),
+        button('task.exhausted.redo', t('task.exhausted.redo'), onRedo),
+      ),
+    );
+  }
+  const node = h('div', { cls: 'screen' }, parts);
   return {
     node,
     focus: h1,
