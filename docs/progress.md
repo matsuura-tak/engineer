@@ -40,3 +40,4 @@
 - 2026-11-05 001-daily-learning Takuma の FB 1 回目（初級を未経験に、1 日 1 問をやめる、面白さを調べて入れる）。PRD の範囲が変わるので G0 に戻し、G0〜G3 をやり直す。PR #4 は下書きに戻す（docs/approvals/001-daily-learning-FB1.md）
 - 2026-11-05 組織の更新（/ai-org:update）は Takuma の指示で「タイミングを見て」行う。いまはキットもリポジトリも 0.2.0 で差なし。001 のマージ後、次の /feature の前に版を確かめ、新しければ更新する。未追跡の .agents/、.codex/、AGENTS.md は Takuma の片付け待ち
 - 2026-11-05 001-daily-learning G0 PASS（PRD r10。verifier r4 PASS、tech-lead r3 FAIL → r4 PASS。AC 40 件。委任により指揮役が再承認。Q14 は Takuma の返事待ち）（docs/approvals/001-daily-learning-G0.md）。次は G1（designer の調査から）
+- 2026-11-05 001-daily-learning G1 PASS（FB 1 回目の作り直し。design-reviewer r3 PASS 15/16 → Takuma の答え「控えめな演出」→ r4 PASS 15/16、tech-lead r2 PASS、reviewer（設計）r2 PASS。要修正はすべて直した。PRD r11、design r9、契約は見本 52 件で検査 OK）。G3 の前提：Takuma が使ったすべてのブラウザとホーム画面の Web アプリで「すべてのデータを削除」し、書き出しファイルに旧 *-beginner-* の行がないことを確かめる（ADR 0002）。G4 の reviewer に ID と語彙の固定テストを確かめさせる。次は課題集（pdm）と受け入れテスト（verifier）（docs/reviews/001-daily-learning-G1-*-r2〜r4.md）
