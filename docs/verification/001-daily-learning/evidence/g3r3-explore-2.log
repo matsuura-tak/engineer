@@ -1,0 +1,143 @@
+# date: 2026-11-05 21:06:12 +0900
+# commit: 32236ecd05051505c9bd26382d40e4a4a93eee0f
+# why: g3r3-explore.log の EXPLORE_R2R3R4_35件 は探索テストの側の誤り（task.next.note.last の {area} {level} を差し込んでいなかった）。直して同じテストだけをやり直す
+# cmd: npx playwright test tests/explore-g3r3.spec.mjs -g EXPLORE_R2R3R4 --retries=0 --reporter=list,json
+npm notice run npx
+npm notice run 'playwright' test tests/explore-g3r3.spec.mjs -g EXPLORE_R2R3R4 --retries=0 --reporter=list,json
+
+Running 2 tests using 2 workers
+
+  ✘  1 [chromium] › tests/explore-g3r3.spec.mjs:30:3 › EXPLORE R2+R3+R4 同じ日に初級→中級→上級→allDone まで 35 件 › EXPLORE_R2R3R4_35件 (13.0s)
+  ✘  2 [webkit] › tests/explore-g3r3.spec.mjs:30:3 › EXPLORE R2+R3+R4 同じ日に初級→中級→上級→allDone まで 35 件 › EXPLORE_R2R3R4_35件 (14.6s)
+
+
+  1) [chromium] › tests/explore-g3r3.spec.mjs:30:3 › EXPLORE R2+R3+R4 同じ日に初級→中級→上級→allDone まで 35 件 › EXPLORE_R2R3R4_35件 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByTestId('task.next.note')
+    Expected: "{area}の{level}の課題は、すべて出し終えています。次に進むと、修了の案内が出ます。"
+    Received: "バックエンド設計の上級の課題は、すべて出し終えています。次に進むと、修了の案内が出ます。"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" getByTestId('task.next.note') with timeout 5000ms
+      - waiting for getByTestId('task.next.note')
+        14 × locator resolved to <p class="small" data-testid="task.next.note">バックエンド設計の上級の課題は、すべて出し終えています。次に進むと、修了の案内が出ます。</p>
+           - unexpected value "バックエンド設計の上級の課題は、すべて出し終えています。次に進むと、修了の案内が出ます。"
+
+
+      93 |     await page.reload();
+      94 |     await app.expectState(page, 'task.done');
+    > 95 |     await expect(app.tid(page, 'task.next.note')).toHaveText(app.text(ja, 'task.next.note.last'));
+         |                                                   ^
+      96 |     await app.next(page, { to: 'task.exhausted' });
+      97 |     await expect(app.tid(page, 'task.exhausted.allDone')).toHaveCount(1);
+      98 |     // 統計
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3.spec.mjs:95:51
+
+    attachment #1: EXPLORE_S4_at7 (image/png) ──────────────────────────────────────────────────────
+    test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-chromium/attachments/EXPLORE-S4-at7-0da3aa7672c4c97a7cce484a22234bff4efd720f.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: EXPLORE_S3_nth12 (image/png) ────────────────────────────────────────────────────
+    test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-chromium/attachments/EXPLORE-S3-nth12-ed9845115429508aa57e450d5b989843fa6bb74c.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: EXPLORE_S7_levelDone_beginner (image/png) ───────────────────────────────────────
+    test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-chromium/attachments/EXPLORE-S7-levelDone-beginner-f147102e072a9abe4a4e79b6646bb7daa774e4d6.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: EXPLORE_S7_levelDone_intermediate (image/png) ───────────────────────────────────
+    test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-chromium/attachments/EXPLORE-S7-levelDone-intermediate-afc46a597e2450c0ba7e59f86359e96d9019cdb7.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #5: EXPLORE_S4_at30 (image/png) ─────────────────────────────────────────────────────
+    test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-chromium/attachments/EXPLORE-S4-at30-586c5b859c26cb5dfef609b0c0207799087f88e0.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #6: EXPLORE_S7_allDone (image/png) ──────────────────────────────────────────────────
+    test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-chromium/attachments/EXPLORE-S7-allDone-12c166f4c88b5cd106c1df85f106bbde05962f71.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #7: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-chromium/error-context.md
+
+    attachment #9: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [webkit] › tests/explore-g3r3.spec.mjs:30:3 › EXPLORE R2+R3+R4 同じ日に初級→中級→上級→allDone まで 35 件 › EXPLORE_R2R3R4_35件 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByTestId('task.next.note')
+    Expected: "{area}の{level}の課題は、すべて出し終えています。次に進むと、修了の案内が出ます。"
+    Received: "バックエンド設計の上級の課題は、すべて出し終えています。次に進むと、修了の案内が出ます。"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" getByTestId('task.next.note') with timeout 5000ms
+      - waiting for getByTestId('task.next.note')
+        14 × locator resolved to <p class="small" data-testid="task.next.note">バックエンド設計の上級の課題は、すべて出し終えています。次に進むと、修了の案内が出ます。</p>
+           - unexpected value "バックエンド設計の上級の課題は、すべて出し終えています。次に進むと、修了の案内が出ます。"
+
+
+      93 |     await page.reload();
+      94 |     await app.expectState(page, 'task.done');
+    > 95 |     await expect(app.tid(page, 'task.next.note')).toHaveText(app.text(ja, 'task.next.note.last'));
+         |                                                   ^
+      96 |     await app.next(page, { to: 'task.exhausted' });
+      97 |     await expect(app.tid(page, 'task.exhausted.allDone')).toHaveCount(1);
+      98 |     // 統計
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3.spec.mjs:95:51
+
+    attachment #1: EXPLORE_S4_at7 (image/png) ──────────────────────────────────────────────────────
+    test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-webkit/attachments/EXPLORE-S4-at7-dc385512485c8724069b229415dd913c3a358c06.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: EXPLORE_S3_nth12 (image/png) ────────────────────────────────────────────────────
+    test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-webkit/attachments/EXPLORE-S3-nth12-91d6354d5932e35877ae7b80e4ace78adfeeff09.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: EXPLORE_S7_levelDone_beginner (image/png) ───────────────────────────────────────
+    test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-webkit/attachments/EXPLORE-S7-levelDone-beginner-f0ee84d52a2e9cd2311c49fa13f3d24cfc362be3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: EXPLORE_S7_levelDone_intermediate (image/png) ───────────────────────────────────
+    test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-webkit/attachments/EXPLORE-S7-levelDone-intermediate-ec2ae521adaa714ff3543132806bddc2ae1101c0.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #5: EXPLORE_S4_at30 (image/png) ─────────────────────────────────────────────────────
+    test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-webkit/attachments/EXPLORE-S4-at30-e61daf1a7dca72640b6ff947b0164ebfd19aef90.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #6: EXPLORE_S7_allDone (image/png) ──────────────────────────────────────────────────
+    test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-webkit/attachments/EXPLORE-S7-allDone-d5c5605e55cad9c42df761cc79cd2bee71cb1021.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #7: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-webkit/error-context.md
+
+    attachment #9: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [chromium] › tests/explore-g3r3.spec.mjs:30:3 › EXPLORE R2+R3+R4 同じ日に初級→中級→上級→allDone まで 35 件 › EXPLORE_R2R3R4_35件 
+    [webkit] › tests/explore-g3r3.spec.mjs:30:3 › EXPLORE R2+R3+R4 同じ日に初級→中級→上級→allDone まで 35 件 › EXPLORE_R2R3R4_35件 
+# exit: 1

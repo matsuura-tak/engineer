@@ -1,0 +1,710 @@
+{
+  "config": {
+    "argv": [
+      "/usr/local/bin/node",
+      "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/node_modules/.bin/playwright",
+      "test",
+      "tests/explore-g3r3.spec.mjs",
+      "--retries=0",
+      "--reporter=list,json"
+    ],
+    "configFile": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/playwright.config.mjs",
+    "rootDir": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/global-setup.mjs",
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 5
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 5
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/.*\\.spec\\.mjs$/"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 5
+        },
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests",
+        "testIgnore": [
+          "/ac15-/"
+        ],
+        "testMatch": [
+          "/.*\\.spec\\.mjs$/"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 5
+        },
+        "name": "chromium",
+        "testDir": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests",
+        "snapshotDir": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests",
+        "testIgnore": [],
+        "testMatch": {},
+        "timeout": 60000,
+        "use": {
+          "locale": "ja-JP",
+          "timezoneId": "Asia/Tokyo",
+          "viewport": {
+            "width": 1024,
+            "height": 768
+          },
+          "acceptDownloads": true,
+          "screenshot": "only-on-failure",
+          "trace": "retain-on-failure",
+          "testIdAttribute": "data-testid",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Safari/537.36",
+          "screen": {
+            "width": 1920,
+            "height": 1080
+          },
+          "deviceScaleFactor": 1,
+          "isMobile": false,
+          "hasTouch": false,
+          "defaultBrowserType": "chromium"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "chromium"
+      },
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 5
+        },
+        "name": "webkit",
+        "testDir": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests",
+        "snapshotDir": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests",
+        "testIgnore": {},
+        "testMatch": {},
+        "timeout": 60000,
+        "use": {
+          "locale": "ja-JP",
+          "timezoneId": "Asia/Tokyo",
+          "viewport": {
+            "width": 1024,
+            "height": 768
+          },
+          "acceptDownloads": true,
+          "screenshot": "only-on-failure",
+          "trace": "retain-on-failure",
+          "testIdAttribute": "data-testid",
+          "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/27.2 Safari/605.1.15",
+          "screen": {
+            "width": 1792,
+            "height": 1120
+          },
+          "deviceScaleFactor": 2,
+          "isMobile": false,
+          "hasTouch": false,
+          "defaultBrowserType": "webkit"
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": "webkit"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list"
+      ],
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.1",
+    "workers": 5,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "explore-g3r3.spec.mjs",
+      "file": "explore-g3r3.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "EXPLORE_R3_U17_日付が変わった後のtask.nextと_保存の失敗からの再試行",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 2088,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T12:05:31.195Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "EXPLORE_U17_next_after_midnight",
+                      "contentType": "image/png",
+                      "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/explore-g3r3-EXPLORE-R3-U17-日付が変わった後のtask-nextと-保存の失敗からの再試行-chromium/attachments/EXPLORE-U17-next-after-midnight-cd7b913b064c6a7f7d438ad90dd284f0820fe26f.png"
+                    },
+                    {
+                      "name": "EXPLORE_U17_S6_storage_error",
+                      "contentType": "image/png",
+                      "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/explore-g3r3-EXPLORE-R3-U17-日付が変わった後のtask-nextと-保存の失敗からの再試行-chromium/attachments/EXPLORE-U17-S6-storage-error-1ab1855fb7def7dcaf3648a36ecf27105487f89e.png"
+                    },
+                    {
+                      "name": "EXPLORE_U17_next_after_midnight_with_failure",
+                      "contentType": "image/png",
+                      "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/explore-g3r3-EXPLORE-R3-U17-日付が変わった後のtask-nextと-保存の失敗からの再試行-chromium/attachments/EXPLORE-U17-next-after-midnight-with-failure-19bd5c8bc5d9a68955ac862b9ce2a8daefd38dd8.png"
+                    },
+                    {
+                      "name": "EXPLORE_U17_log",
+                      "contentType": "application/json",
+                      "body": "ewogInN0YXRlQXRFcnJvciI6ICJ0YXNrLnNraXBwZWQiLAogImFmdGVyTWlkbmlnaHRXaXRoRmFpbHVyZSI6IHsKICAic3RhdGUiOiAidGFzay50b2RheSIsCiAgInJldHJ5IjogMSwKICAiZGF5Q2hhbmdlZCI6IDAKIH0sCiAidDQiOiB7CiAgImlkIjogImJhY2tlbmQtaW50ZXJtZWRpYXRlLTAwNyIsCiAgImFyZWEiOiAiYmFja2VuZCIsCiAgImxldmVsIjogImludGVybWVkaWF0ZSIsCiAgIm1vZGUiOiAiaW5fYXBwIiwKICAibnRoVG9kYXkiOiAiMSIsCiAgInByb2dyZXNzSW5kZXgiOiAiNyIsCiAgInByb2dyZXNzVG90YWwiOiAiMTQiLAogICJ0aXRsZSI6ICJvZmZzZXQg44GoIGN1cnNvciDjga7jg5rjg7zjgrjjg7PjgrDjga7pgZXjgYTjgpLoqqzmmI7jgZnjgosiCiB9LAogImN1cnJlbnQiOiB7CiAgImRhdGUiOiAiMjAyNi0xMS0wNiIsCiAgInRhc2tJZCI6ICJiYWNrZW5kLWludGVybWVkaWF0ZS0wMDciLAogICJhcmVhIjogImJhY2tlbmQiLAogICJsZXZlbCI6ICJpbnRlcm1lZGlhdGUiLAogICJtb2RlIjogImluX2FwcCIsCiAgImFuc3dlciI6ICIiCiB9LAogImxhc3RSb3dzIjogWwogIHsKICAgImRhdGUiOiAiMjAyNi0xMS0wNCIsCiAgICJ0YXNrSWQiOiAiYmFja2VuZC1pbnRlcm1lZGlhdGUtMDA0IiwKICAgImFyZWEiOiAiYmFja2VuZCIsCiAgICJsZXZlbCI6ICJpbnRlcm1lZGlhdGUiLAogICAibW9kZSI6ICJpbl9hcHAiLAogICAiYW5zd2VyIjogIiIsCiAgICJyZXBvcnQiOiAiZG9uZSIsCiAgICJoZWxwZnVsIjogInVuYW5zd2VyZWQiCiAgfSwKICB7CiAgICJkYXRlIjogIjIwMjYtMTEtMDUiLAogICAidGFza0lkIjogImJhY2tlbmQtaW50ZXJtZWRpYXRlLTAwNSIsCiAgICJhcmVhIjogImJhY2tlbmQiLAogICAibGV2ZWwiOiAiaW50ZXJtZWRpYXRlIiwKICAgIm1vZGUiOiAiaW5fYXBwIiwKICAgImFuc3dlciI6ICIiLAogICAicmVwb3J0IjogIm5vX3RpbWUiCiAgfSwKICB7CiAgICJkYXRlIjogIjIwMjYtMTEtMDUiLAogICAidGFza0lkIjogImJhY2tlbmQtaW50ZXJtZWRpYXRlLTAwNiIsCiAgICJhcmVhIjogImJhY2tlbmQiLAogICAibGV2ZWwiOiAiaW50ZXJtZWRpYXRlIiwKICAgIm1vZGUiOiAiaW5fYXBwIiwKICAgImFuc3dlciI6ICIiLAogICAicmVwb3J0IjogImRvbmUiLAogICAiaGVscGZ1bCI6ICJ1bmFuc3dlcmVkIgogIH0KIF0sCiAiZXhwZWN0ZWROZXh0IjogImJhY2tlbmQtaW50ZXJtZWRpYXRlLTAwNyIKfQ=="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "efe49867e835f8093448-05aa70d86637e5313bb2",
+          "file": "explore-g3r3.spec.mjs",
+          "line": 124,
+          "column": 1
+        },
+        {
+          "title": "EXPLORE_R1_書き出し→削除→読み込み→next→書き出しで行とcurrentとlevelsが欠けない",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 1807,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T12:05:31.204Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "EXPLORE_R1_exports",
+                      "contentType": "application/json",
+                      "body": "ewogImUxIjogewogICJmb3JtYXRWZXJzaW9uIjogMSwKICAiYXBwIjogImt5b3Vub2l0dGUiLAogICJmaXJzdE9wZW5EYXRlIjogIjIwMjYtMTEtMDEiLAogICJkaWFnbm9zaXMiOiB7CiAgICJhcmVhIjogImJhY2tlbmQiLAogICAibGV2ZWwiOiAiaW50ZXJtZWRpYXRlIiwKICAgInllYXJzIjogIjF0bzMiLAogICAiY29tcGxldGVkT24iOiAiMjAyNi0xMS0wMSIKICB9LAogICJsZXZlbHMiOiB7CiAgICJiYWNrZW5kIjogImludGVybWVkaWF0ZSIKICB9LAogICJoaXN0b3J5IjogWwogICB7CiAgICAiZGF0ZSI6ICIyMDI2LTExLTAxIiwKICAgICJ0YXNrSWQiOiAiYmFja2VuZC1pbnRlcm1lZGlhdGUtMDAxIiwKICAgICJhcmVhIjogImJhY2tlbmQiLAogICAgImxldmVsIjogImludGVybWVkaWF0ZSIsCiAgICAibW9kZSI6ICJpbl9hcHAiLAogICAgInJlcG9ydCI6ICJkb25lIiwKICAgICJhbnN3ZXIiOiAiIiwKICAgICJoZWxwZnVsIjogImhlbHBmdWwiCiAgIH0sCiAgIHsKICAgICJkYXRlIjogIjIwMjYtMTEtMDIiLAogICAgInRhc2tJZCI6ICJiYWNrZW5kLWludGVybWVkaWF0ZS0wMDIiLAogICAgImFyZWEiOiAiYmFja2VuZCIsCiAgICAibGV2ZWwiOiAiaW50ZXJtZWRpYXRlIiwKICAgICJtb2RlIjogImluX2FwcCIsCiAgICAicmVwb3J0IjogImRvbmUiLAogICAgImFuc3dlciI6ICIiLAogICAgImhlbHBmdWwiOiAiaGVscGZ1bCIKICAgfSwKICAgewogICAgImRhdGUiOiAiMjAyNi0xMS0wMyIsCiAgICAidGFza0lkIjogImJhY2tlbmQtaW50ZXJtZWRpYXRlLTAwMyIsCiAgICAiYXJlYSI6ICJiYWNrZW5kIiwKICAgICJsZXZlbCI6ICJpbnRlcm1lZGlhdGUiLAogICAgIm1vZGUiOiAiaW5fYXBwIiwKICAgICJyZXBvcnQiOiAiZG9uZSIsCiAgICAiYW5zd2VyIjogIiIsCiAgICAiaGVscGZ1bCI6ICJub3RfaGVscGZ1bCIKICAgfQogIF0sCiAgImN1cnJlbnQiOiB7CiAgICJkYXRlIjogIjIwMjYtMTEtMDQiLAogICAidGFza0lkIjogImJhY2tlbmQtaW50ZXJtZWRpYXRlLTAwNCIsCiAgICJhcmVhIjogImJhY2tlbmQiLAogICAibGV2ZWwiOiAiaW50ZXJtZWRpYXRlIiwKICAgIm1vZGUiOiAiaW5fYXBwIiwKICAgImFuc3dlciI6ICLkuIvmm7jjgY0iCiAgfQogfSwKICJlMiI6IHsKICAiZm9ybWF0VmVyc2lvbiI6IDEsCiAgImFwcCI6ICJreW91bm9pdHRlIiwKICAiZmlyc3RPcGVuRGF0ZSI6ICIyMDI2LTExLTAxIiwKICAiZGlhZ25vc2lzIjogewogICAiYXJlYSI6ICJiYWNrZW5kIiwKICAgImxldmVsIjogImludGVybWVkaWF0ZSIsCiAgICJ5ZWFycyI6ICIxdG8zIiwKICAgImNvbXBsZXRlZE9uIjogIjIwMjYtMTEtMDEiCiAgfSwKICAibGV2ZWxzIjogewogICAiYmFja2VuZCI6ICJpbnRlcm1lZGlhdGUiCiAgfSwKICAiaGlzdG9yeSI6IFsKICAgewogICAgImRhdGUiOiAiMjAyNi0xMS0wMSIsCiAgICAidGFza0lkIjogImJhY2tlbmQtaW50ZXJtZWRpYXRlLTAwMSIsCiAgICAiYXJlYSI6ICJiYWNrZW5kIiwKICAgICJsZXZlbCI6ICJpbnRlcm1lZGlhdGUiLAogICAgIm1vZGUiOiAiaW5fYXBwIiwKICAgICJyZXBvcnQiOiAiZG9uZSIsCiAgICAiYW5zd2VyIjogIiIsCiAgICAiaGVscGZ1bCI6ICJoZWxwZnVsIgogICB9LAogICB7CiAgICAiZGF0ZSI6ICIyMDI2LTExLTAyIiwKICAgICJ0YXNrSWQiOiAiYmFja2VuZC1pbnRlcm1lZGlhdGUtMDAyIiwKICAgICJhcmVhIjogImJhY2tlbmQiLAogICAgImxldmVsIjogImludGVybWVkaWF0ZSIsCiAgICAibW9kZSI6ICJpbl9hcHAiLAogICAgInJlcG9ydCI6ICJkb25lIiwKICAgICJhbnN3ZXIiOiAiIiwKICAgICJoZWxwZnVsIjogImhlbHBmdWwiCiAgIH0sCiAgIHsKICAgICJkYXRlIjogIjIwMjYtMTEtMDMiLAogICAgInRhc2tJZCI6ICJiYWNrZW5kLWludGVybWVkaWF0ZS0wMDMiLAogICAgImFyZWEiOiAiYmFja2VuZCIsCiAgICAibGV2ZWwiOiAiaW50ZXJtZWRpYXRlIiwKICAgICJtb2RlIjogImluX2FwcCIsCiAgICAicmVwb3J0IjogImRvbmUiLAogICAgImFuc3dlciI6ICIiLAogICAgImhlbHBmdWwiOiAibm90X2hlbHBmdWwiCiAgIH0sCiAgIHsKICAgICJkYXRlIjogIjIwMjYtMTEtMDQiLAogICAgInRhc2tJZCI6ICJiYWNrZW5kLWludGVybWVkaWF0ZS0wMDQiLAogICAgImFyZWEiOiAiYmFja2VuZCIsCiAgICAibGV2ZWwiOiAiaW50ZXJtZWRpYXRlIiwKICAgICJtb2RlIjogImluX2FwcCIsCiAgICAiYW5zd2VyIjogIuS4i+abuOOBjSIsCiAgICAicmVwb3J0IjogInRvb19lYXN5IgogICB9CiAgXSwKICAiY3VycmVudCI6IHsKICAgImRhdGUiOiAiMjAyNi0xMS0wNCIsCiAgICJ0YXNrSWQiOiAiYmFja2VuZC1pbnRlcm1lZGlhdGUtMDA1IiwKICAgImFyZWEiOiAiYmFja2VuZCIsCiAgICJsZXZlbCI6ICJpbnRlcm1lZGlhdGUiLAogICAibW9kZSI6ICJpbl9hcHAiLAogICAiYW5zd2VyIjogIiIKICB9CiB9Cn0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "efe49867e835f8093448-14347f04d9483be8c15d",
+          "file": "explore-g3r3.spec.mjs",
+          "line": 195,
+          "column": 1
+        },
+        {
+          "title": "EXPLORE_R3_U17_日付が変わった後のtask.nextと_保存の失敗からの再試行",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit",
+              "projectName": "webkit",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 2050,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T12:05:34.418Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "EXPLORE_U17_next_after_midnight",
+                      "contentType": "image/png",
+                      "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/explore-g3r3-EXPLORE-R3-U17-日付が変わった後のtask-nextと-保存の失敗からの再試行-webkit/attachments/EXPLORE-U17-next-after-midnight-c3d2b56d06143b64d8cf29bf400c4c6d9f6506a4.png"
+                    },
+                    {
+                      "name": "EXPLORE_U17_S6_storage_error",
+                      "contentType": "image/png",
+                      "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/explore-g3r3-EXPLORE-R3-U17-日付が変わった後のtask-nextと-保存の失敗からの再試行-webkit/attachments/EXPLORE-U17-S6-storage-error-c6015c2564a0a50277d790fd874926325226ee0c.png"
+                    },
+                    {
+                      "name": "EXPLORE_U17_next_after_midnight_with_failure",
+                      "contentType": "image/png",
+                      "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/explore-g3r3-EXPLORE-R3-U17-日付が変わった後のtask-nextと-保存の失敗からの再試行-webkit/attachments/EXPLORE-U17-next-after-midnight-with-failure-1395b41970a1a01a52f54c4a716605a394598ec5.png"
+                    },
+                    {
+                      "name": "EXPLORE_U17_log",
+                      "contentType": "application/json",
+                      "body": "ewogInN0YXRlQXRFcnJvciI6ICJ0YXNrLnNraXBwZWQiLAogImFmdGVyTWlkbmlnaHRXaXRoRmFpbHVyZSI6IHsKICAic3RhdGUiOiAidGFzay50b2RheSIsCiAgInJldHJ5IjogMSwKICAiZGF5Q2hhbmdlZCI6IDAKIH0sCiAidDQiOiB7CiAgImlkIjogImJhY2tlbmQtaW50ZXJtZWRpYXRlLTAwNyIsCiAgImFyZWEiOiAiYmFja2VuZCIsCiAgImxldmVsIjogImludGVybWVkaWF0ZSIsCiAgIm1vZGUiOiAiaW5fYXBwIiwKICAibnRoVG9kYXkiOiAiMSIsCiAgInByb2dyZXNzSW5kZXgiOiAiNyIsCiAgInByb2dyZXNzVG90YWwiOiAiMTQiLAogICJ0aXRsZSI6ICJvZmZzZXQg44GoIGN1cnNvciDjga7jg5rjg7zjgrjjg7PjgrDjga7pgZXjgYTjgpLoqqzmmI7jgZnjgosiCiB9LAogImN1cnJlbnQiOiB7CiAgImRhdGUiOiAiMjAyNi0xMS0wNiIsCiAgInRhc2tJZCI6ICJiYWNrZW5kLWludGVybWVkaWF0ZS0wMDciLAogICJhcmVhIjogImJhY2tlbmQiLAogICJsZXZlbCI6ICJpbnRlcm1lZGlhdGUiLAogICJtb2RlIjogImluX2FwcCIsCiAgImFuc3dlciI6ICIiCiB9LAogImxhc3RSb3dzIjogWwogIHsKICAgImRhdGUiOiAiMjAyNi0xMS0wNCIsCiAgICJ0YXNrSWQiOiAiYmFja2VuZC1pbnRlcm1lZGlhdGUtMDA0IiwKICAgImFyZWEiOiAiYmFja2VuZCIsCiAgICJsZXZlbCI6ICJpbnRlcm1lZGlhdGUiLAogICAibW9kZSI6ICJpbl9hcHAiLAogICAiYW5zd2VyIjogIiIsCiAgICJyZXBvcnQiOiAiZG9uZSIsCiAgICJoZWxwZnVsIjogInVuYW5zd2VyZWQiCiAgfSwKICB7CiAgICJkYXRlIjogIjIwMjYtMTEtMDUiLAogICAidGFza0lkIjogImJhY2tlbmQtaW50ZXJtZWRpYXRlLTAwNSIsCiAgICJhcmVhIjogImJhY2tlbmQiLAogICAibGV2ZWwiOiAiaW50ZXJtZWRpYXRlIiwKICAgIm1vZGUiOiAiaW5fYXBwIiwKICAgImFuc3dlciI6ICIiLAogICAicmVwb3J0IjogIm5vX3RpbWUiCiAgfSwKICB7CiAgICJkYXRlIjogIjIwMjYtMTEtMDUiLAogICAidGFza0lkIjogImJhY2tlbmQtaW50ZXJtZWRpYXRlLTAwNiIsCiAgICJhcmVhIjogImJhY2tlbmQiLAogICAibGV2ZWwiOiAiaW50ZXJtZWRpYXRlIiwKICAgIm1vZGUiOiAiaW5fYXBwIiwKICAgImFuc3dlciI6ICIiLAogICAicmVwb3J0IjogImRvbmUiLAogICAiaGVscGZ1bCI6ICJ1bmFuc3dlcmVkIgogIH0KIF0sCiAiZXhwZWN0ZWROZXh0IjogImJhY2tlbmQtaW50ZXJtZWRpYXRlLTAwNyIKfQ=="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "efe49867e835f8093448-eaf8e502d4e6f1c407f4",
+          "file": "explore-g3r3.spec.mjs",
+          "line": 124,
+          "column": 1
+        },
+        {
+          "title": "EXPLORE_R1_書き出し→削除→読み込み→next→書き出しで行とcurrentとlevelsが欠けない",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit",
+              "projectName": "webkit",
+              "results": [
+                {
+                  "workerIndex": 6,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 1931,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T12:05:34.417Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "EXPLORE_R1_exports",
+                      "contentType": "application/json",
+                      "body": "ewogImUxIjogewogICJmb3JtYXRWZXJzaW9uIjogMSwKICAiYXBwIjogImt5b3Vub2l0dGUiLAogICJmaXJzdE9wZW5EYXRlIjogIjIwMjYtMTEtMDEiLAogICJkaWFnbm9zaXMiOiB7CiAgICJhcmVhIjogImJhY2tlbmQiLAogICAibGV2ZWwiOiAiaW50ZXJtZWRpYXRlIiwKICAgInllYXJzIjogIjF0bzMiLAogICAiY29tcGxldGVkT24iOiAiMjAyNi0xMS0wMSIKICB9LAogICJsZXZlbHMiOiB7CiAgICJiYWNrZW5kIjogImludGVybWVkaWF0ZSIKICB9LAogICJoaXN0b3J5IjogWwogICB7CiAgICAiZGF0ZSI6ICIyMDI2LTExLTAxIiwKICAgICJ0YXNrSWQiOiAiYmFja2VuZC1pbnRlcm1lZGlhdGUtMDAxIiwKICAgICJhcmVhIjogImJhY2tlbmQiLAogICAgImxldmVsIjogImludGVybWVkaWF0ZSIsCiAgICAibW9kZSI6ICJpbl9hcHAiLAogICAgInJlcG9ydCI6ICJkb25lIiwKICAgICJhbnN3ZXIiOiAiIiwKICAgICJoZWxwZnVsIjogImhlbHBmdWwiCiAgIH0sCiAgIHsKICAgICJkYXRlIjogIjIwMjYtMTEtMDIiLAogICAgInRhc2tJZCI6ICJiYWNrZW5kLWludGVybWVkaWF0ZS0wMDIiLAogICAgImFyZWEiOiAiYmFja2VuZCIsCiAgICAibGV2ZWwiOiAiaW50ZXJtZWRpYXRlIiwKICAgICJtb2RlIjogImluX2FwcCIsCiAgICAicmVwb3J0IjogImRvbmUiLAogICAgImFuc3dlciI6ICIiLAogICAgImhlbHBmdWwiOiAiaGVscGZ1bCIKICAgfSwKICAgewogICAgImRhdGUiOiAiMjAyNi0xMS0wMyIsCiAgICAidGFza0lkIjogImJhY2tlbmQtaW50ZXJtZWRpYXRlLTAwMyIsCiAgICAiYXJlYSI6ICJiYWNrZW5kIiwKICAgICJsZXZlbCI6ICJpbnRlcm1lZGlhdGUiLAogICAgIm1vZGUiOiAiaW5fYXBwIiwKICAgICJyZXBvcnQiOiAiZG9uZSIsCiAgICAiYW5zd2VyIjogIiIsCiAgICAiaGVscGZ1bCI6ICJub3RfaGVscGZ1bCIKICAgfQogIF0sCiAgImN1cnJlbnQiOiB7CiAgICJkYXRlIjogIjIwMjYtMTEtMDQiLAogICAidGFza0lkIjogImJhY2tlbmQtaW50ZXJtZWRpYXRlLTAwNCIsCiAgICJhcmVhIjogImJhY2tlbmQiLAogICAibGV2ZWwiOiAiaW50ZXJtZWRpYXRlIiwKICAgIm1vZGUiOiAiaW5fYXBwIiwKICAgImFuc3dlciI6ICLkuIvmm7jjgY0iCiAgfQogfSwKICJlMiI6IHsKICAiZm9ybWF0VmVyc2lvbiI6IDEsCiAgImFwcCI6ICJreW91bm9pdHRlIiwKICAiZmlyc3RPcGVuRGF0ZSI6ICIyMDI2LTExLTAxIiwKICAiZGlhZ25vc2lzIjogewogICAiYXJlYSI6ICJiYWNrZW5kIiwKICAgImxldmVsIjogImludGVybWVkaWF0ZSIsCiAgICJ5ZWFycyI6ICIxdG8zIiwKICAgImNvbXBsZXRlZE9uIjogIjIwMjYtMTEtMDEiCiAgfSwKICAibGV2ZWxzIjogewogICAiYmFja2VuZCI6ICJpbnRlcm1lZGlhdGUiCiAgfSwKICAiaGlzdG9yeSI6IFsKICAgewogICAgImRhdGUiOiAiMjAyNi0xMS0wMSIsCiAgICAidGFza0lkIjogImJhY2tlbmQtaW50ZXJtZWRpYXRlLTAwMSIsCiAgICAiYXJlYSI6ICJiYWNrZW5kIiwKICAgICJsZXZlbCI6ICJpbnRlcm1lZGlhdGUiLAogICAgIm1vZGUiOiAiaW5fYXBwIiwKICAgICJyZXBvcnQiOiAiZG9uZSIsCiAgICAiYW5zd2VyIjogIiIsCiAgICAiaGVscGZ1bCI6ICJoZWxwZnVsIgogICB9LAogICB7CiAgICAiZGF0ZSI6ICIyMDI2LTExLTAyIiwKICAgICJ0YXNrSWQiOiAiYmFja2VuZC1pbnRlcm1lZGlhdGUtMDAyIiwKICAgICJhcmVhIjogImJhY2tlbmQiLAogICAgImxldmVsIjogImludGVybWVkaWF0ZSIsCiAgICAibW9kZSI6ICJpbl9hcHAiLAogICAgInJlcG9ydCI6ICJkb25lIiwKICAgICJhbnN3ZXIiOiAiIiwKICAgICJoZWxwZnVsIjogImhlbHBmdWwiCiAgIH0sCiAgIHsKICAgICJkYXRlIjogIjIwMjYtMTEtMDMiLAogICAgInRhc2tJZCI6ICJiYWNrZW5kLWludGVybWVkaWF0ZS0wMDMiLAogICAgImFyZWEiOiAiYmFja2VuZCIsCiAgICAibGV2ZWwiOiAiaW50ZXJtZWRpYXRlIiwKICAgICJtb2RlIjogImluX2FwcCIsCiAgICAicmVwb3J0IjogImRvbmUiLAogICAgImFuc3dlciI6ICIiLAogICAgImhlbHBmdWwiOiAibm90X2hlbHBmdWwiCiAgIH0sCiAgIHsKICAgICJkYXRlIjogIjIwMjYtMTEtMDQiLAogICAgInRhc2tJZCI6ICJiYWNrZW5kLWludGVybWVkaWF0ZS0wMDQiLAogICAgImFyZWEiOiAiYmFja2VuZCIsCiAgICAibGV2ZWwiOiAiaW50ZXJtZWRpYXRlIiwKICAgICJtb2RlIjogImluX2FwcCIsCiAgICAiYW5zd2VyIjogIuS4i+abuOOBjSIsCiAgICAicmVwb3J0IjogInRvb19lYXN5IgogICB9CiAgXSwKICAiY3VycmVudCI6IHsKICAgImRhdGUiOiAiMjAyNi0xMS0wNCIsCiAgICJ0YXNrSWQiOiAiYmFja2VuZC1pbnRlcm1lZGlhdGUtMDA1IiwKICAgImFyZWEiOiAiYmFja2VuZCIsCiAgICJsZXZlbCI6ICJpbnRlcm1lZGlhdGUiLAogICAibW9kZSI6ICJpbl9hcHAiLAogICAiYW5zd2VyIjogIiIKICB9CiB9Cn0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "efe49867e835f8093448-d8782a0fe53697d53fc8",
+          "file": "explore-g3r3.spec.mjs",
+          "line": 195,
+          "column": 1
+        }
+      ],
+      "suites": [
+        {
+          "title": "EXPLORE R2+R3+R4 同じ日に初級→中級→上級→allDone まで 35 件",
+          "file": "explore-g3r3.spec.mjs",
+          "line": 28,
+          "column": 6,
+          "specs": [
+            {
+              "title": "EXPLORE_R2R3R4_35件",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 10699,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  getByTestId('task.next.note')\nExpected: \u001b[32m\"\u001b[7m{area}の{level}\u001b[27mの課題は、すべて出し終えています。次に進むと、修了の案内が出ます。\"\u001b[39m\nReceived: \u001b[31m\"\u001b[7mバックエンド設計の初級\u001b[27mの課題は、すべて出し終えています。次に進むと、修了の案内が出ます。\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" getByTestId('task.next.note') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('task.next.note')\u001b[22m\n\u001b[2m    14 × locator resolved to <p class=\"small\" data-testid=\"task.next.note\">バックエンド設計の初級の課題は、すべて出し終えています。次に進むと、修了の案内が出ます。</p>\u001b[22m\n\u001b[2m       - unexpected value \"バックエンド設計の初級の課題は、すべて出し終えています。次に進むと、修了の案内が出ます。\"\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  getByTestId('task.next.note')\nExpected: \u001b[32m\"\u001b[7m{area}の{level}\u001b[27mの課題は、すべて出し終えています。次に進むと、修了の案内が出ます。\"\u001b[39m\nReceived: \u001b[31m\"\u001b[7mバックエンド設計の初級\u001b[27mの課題は、すべて出し終えています。次に進むと、修了の案内が出ます。\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" getByTestId('task.next.note') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('task.next.note')\u001b[22m\n\u001b[2m    14 × locator resolved to <p class=\"small\" data-testid=\"task.next.note\">バックエンド設計の初級の課題は、すべて出し終えています。次に進むと、修了の案内が出ます。</p>\u001b[22m\n\u001b[2m       - unexpected value \"バックエンド設計の初級の課題は、すべて出し終えています。次に進むと、修了の案内が出ます。\"\u001b[22m\n\n    at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3.spec.mjs:67:53",
+                        "location": {
+                          "file": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3.spec.mjs",
+                          "column": 53,
+                          "line": 67
+                        },
+                        "snippet": "  65 |       await expect(app.tid(page, 'task.week')).toHaveAttribute('data-stat-days-completed-week', '1');\n  66 |       const unissued = tasksOf(tasks, t.area, t.level).filter((x) => !seen.some((s) => s.id === x.id)).length;\n> 67 |       await expect(app.tid(page, 'task.next.note')).toHaveText(app.text(ja, unissued === 0 ? 'task.next.note.last' : 'task.next.note'));\n     |                                                     ^\n  68 |       await app.tid(page, 'task.next').click();\n  69 |       await expect(app.root(page)).toHaveAttribute('data-state', /^task\\.(today|exhausted)$/, { timeout: app.WAIT_MS });\n  70 |       const state = await app.readState(page);"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3.spec.mjs",
+                            "column": 53,
+                            "line": 67
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  getByTestId('task.next.note')\nExpected: \u001b[32m\"\u001b[7m{area}の{level}\u001b[27mの課題は、すべて出し終えています。次に進むと、修了の案内が出ます。\"\u001b[39m\nReceived: \u001b[31m\"\u001b[7mバックエンド設計の初級\u001b[27mの課題は、すべて出し終えています。次に進むと、修了の案内が出ます。\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" getByTestId('task.next.note') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('task.next.note')\u001b[22m\n\u001b[2m    14 × locator resolved to <p class=\"small\" data-testid=\"task.next.note\">バックエンド設計の初級の課題は、すべて出し終えています。次に進むと、修了の案内が出ます。</p>\u001b[22m\n\u001b[2m       - unexpected value \"バックエンド設計の初級の課題は、すべて出し終えています。次に進むと、修了の案内が出ます。\"\u001b[22m\n\n\n  65 |       await expect(app.tid(page, 'task.week')).toHaveAttribute('data-stat-days-completed-week', '1');\n  66 |       const unissued = tasksOf(tasks, t.area, t.level).filter((x) => !seen.some((s) => s.id === x.id)).length;\n> 67 |       await expect(app.tid(page, 'task.next.note')).toHaveText(app.text(ja, unissued === 0 ? 'task.next.note.last' : 'task.next.note'));\n     |                                                     ^\n  68 |       await app.tid(page, 'task.next').click();\n  69 |       await expect(app.root(page)).toHaveAttribute('data-state', /^task\\.(today|exhausted)$/, { timeout: app.WAIT_MS });\n  70 |       const state = await app.readState(page);\n    at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3.spec.mjs:67:53"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-05T12:05:31.217Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "EXPLORE_S4_at7",
+                          "contentType": "image/png",
+                          "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-chromium/attachments/EXPLORE-S4-at7-0da3aa7672c4c97a7cce484a22234bff4efd720f.png"
+                        },
+                        {
+                          "name": "EXPLORE_S3_nth12",
+                          "contentType": "image/png",
+                          "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-chromium/attachments/EXPLORE-S3-nth12-ed9845115429508aa57e450d5b989843fa6bb74c.png"
+                        },
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-chromium/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-chromium/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3.spec.mjs",
+                        "column": 53,
+                        "line": 67
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "efe49867e835f8093448-1923f34d31972b5e544d",
+              "file": "explore-g3r3.spec.mjs",
+              "line": 30,
+              "column": 3
+            },
+            {
+              "title": "EXPLORE_R2R3R4_35件",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 240000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 4,
+                      "status": "failed",
+                      "duration": 11237,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  getByTestId('task.next.note')\nExpected: \u001b[32m\"\u001b[7m{area}の{level}\u001b[27mの課題は、すべて出し終えています。次に進むと、修了の案内が出ます。\"\u001b[39m\nReceived: \u001b[31m\"\u001b[7mバックエンド設計の初級\u001b[27mの課題は、すべて出し終えています。次に進むと、修了の案内が出ます。\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" getByTestId('task.next.note') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('task.next.note')\u001b[22m\n\u001b[2m    14 × locator resolved to <p class=\"small\" data-testid=\"task.next.note\">バックエンド設計の初級の課題は、すべて出し終えています。次に進むと、修了の案内が出ます。</p>\u001b[22m\n\u001b[2m       - unexpected value \"バックエンド設計の初級の課題は、すべて出し終えています。次に進むと、修了の案内が出ます。\"\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  getByTestId('task.next.note')\nExpected: \u001b[32m\"\u001b[7m{area}の{level}\u001b[27mの課題は、すべて出し終えています。次に進むと、修了の案内が出ます。\"\u001b[39m\nReceived: \u001b[31m\"\u001b[7mバックエンド設計の初級\u001b[27mの課題は、すべて出し終えています。次に進むと、修了の案内が出ます。\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" getByTestId('task.next.note') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('task.next.note')\u001b[22m\n\u001b[2m    14 × locator resolved to <p class=\"small\" data-testid=\"task.next.note\">バックエンド設計の初級の課題は、すべて出し終えています。次に進むと、修了の案内が出ます。</p>\u001b[22m\n\u001b[2m       - unexpected value \"バックエンド設計の初級の課題は、すべて出し終えています。次に進むと、修了の案内が出ます。\"\u001b[22m\n\n    at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3.spec.mjs:67:53",
+                        "location": {
+                          "file": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3.spec.mjs",
+                          "column": 53,
+                          "line": 67
+                        },
+                        "snippet": "  65 |       await expect(app.tid(page, 'task.week')).toHaveAttribute('data-stat-days-completed-week', '1');\n  66 |       const unissued = tasksOf(tasks, t.area, t.level).filter((x) => !seen.some((s) => s.id === x.id)).length;\n> 67 |       await expect(app.tid(page, 'task.next.note')).toHaveText(app.text(ja, unissued === 0 ? 'task.next.note.last' : 'task.next.note'));\n     |                                                     ^\n  68 |       await app.tid(page, 'task.next').click();\n  69 |       await expect(app.root(page)).toHaveAttribute('data-state', /^task\\.(today|exhausted)$/, { timeout: app.WAIT_MS });\n  70 |       const state = await app.readState(page);"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3.spec.mjs",
+                            "column": 53,
+                            "line": 67
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  getByTestId('task.next.note')\nExpected: \u001b[32m\"\u001b[7m{area}の{level}\u001b[27mの課題は、すべて出し終えています。次に進むと、修了の案内が出ます。\"\u001b[39m\nReceived: \u001b[31m\"\u001b[7mバックエンド設計の初級\u001b[27mの課題は、すべて出し終えています。次に進むと、修了の案内が出ます。\"\u001b[39m\nTimeout:  5000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveText\" getByTestId('task.next.note') with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for getByTestId('task.next.note')\u001b[22m\n\u001b[2m    14 × locator resolved to <p class=\"small\" data-testid=\"task.next.note\">バックエンド設計の初級の課題は、すべて出し終えています。次に進むと、修了の案内が出ます。</p>\u001b[22m\n\u001b[2m       - unexpected value \"バックエンド設計の初級の課題は、すべて出し終えています。次に進むと、修了の案内が出ます。\"\u001b[22m\n\n\n  65 |       await expect(app.tid(page, 'task.week')).toHaveAttribute('data-stat-days-completed-week', '1');\n  66 |       const unissued = tasksOf(tasks, t.area, t.level).filter((x) => !seen.some((s) => s.id === x.id)).length;\n> 67 |       await expect(app.tid(page, 'task.next.note')).toHaveText(app.text(ja, unissued === 0 ? 'task.next.note.last' : 'task.next.note'));\n     |                                                     ^\n  68 |       await app.tid(page, 'task.next').click();\n  69 |       await expect(app.root(page)).toHaveAttribute('data-state', /^task\\.(today|exhausted)$/, { timeout: app.WAIT_MS });\n  70 |       const state = await app.readState(page);\n    at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3.spec.mjs:67:53"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-05T12:05:31.209Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "EXPLORE_S4_at7",
+                          "contentType": "image/png",
+                          "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-webkit/attachments/EXPLORE-S4-at7-dc385512485c8724069b229415dd913c3a358c06.png"
+                        },
+                        {
+                          "name": "EXPLORE_S3_nth12",
+                          "contentType": "image/png",
+                          "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-webkit/attachments/EXPLORE-S3-nth12-91d6354d5932e35877ae7b80e4ace78adfeeff09.png"
+                        },
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-webkit/test-failed-1.png"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-webkit/error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-webkit/trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3.spec.mjs",
+                        "column": 53,
+                        "line": 67
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "efe49867e835f8093448-bafff93afc7e6a5c0b87",
+              "file": "explore-g3r3.spec.mjs",
+              "line": 30,
+              "column": 3
+            }
+          ]
+        },
+        {
+          "title": "EXPLORE 幅 320 と文字 200%（未経験の入口、節目、修了）",
+          "file": "explore-g3r3.spec.mjs",
+          "line": 234,
+          "column": 6,
+          "specs": [
+            {
+              "title": "EXPLORE_R8_320_200_診断3問_S4節目_S5_S7",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 4194,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-05T12:05:31.188Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "EXPLORE_320_200_S1",
+                          "contentType": "image/png",
+                          "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/explore-g3r3-EXPLORE-幅-320-5f93f--R8-320-200-診断3問-S4節目-S5-S7-chromium/attachments/EXPLORE-320-200-S1-dfe2760b5d2eb0d2eaa045bd5307061d799c07c6.png"
+                        },
+                        {
+                          "name": "EXPLORE_320_200_S2_q1",
+                          "contentType": "image/png",
+                          "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/explore-g3r3-EXPLORE-幅-320-5f93f--R8-320-200-診断3問-S4節目-S5-S7-chromium/attachments/EXPLORE-320-200-S2-q1-72e46a04396efbccf4f0358164136eaeb1de870d.png"
+                        },
+                        {
+                          "name": "EXPLORE_320_200_S2_q2",
+                          "contentType": "image/png",
+                          "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/explore-g3r3-EXPLORE-幅-320-5f93f--R8-320-200-診断3問-S4節目-S5-S7-chromium/attachments/EXPLORE-320-200-S2-q2-02beea4c57ae4d0f72427f958a98accca025a329.png"
+                        },
+                        {
+                          "name": "EXPLORE_320_200_S2_q3",
+                          "contentType": "image/png",
+                          "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/explore-g3r3-EXPLORE-幅-320-5f93f--R8-320-200-診断3問-S4節目-S5-S7-chromium/attachments/EXPLORE-320-200-S2-q3-d7307578e1cbc4cf0165ba68e8d24f3983af89f5.png"
+                        },
+                        {
+                          "name": "EXPLORE_320_200_S3",
+                          "contentType": "image/png",
+                          "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/explore-g3r3-EXPLORE-幅-320-5f93f--R8-320-200-診断3問-S4節目-S5-S7-chromium/attachments/EXPLORE-320-200-S3-d4c0e3e15867c0ab6d2c42b892b9c96bc6dabeb1.png"
+                        },
+                        {
+                          "name": "EXPLORE_320_200_S4_at7",
+                          "contentType": "image/png",
+                          "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/explore-g3r3-EXPLORE-幅-320-5f93f--R8-320-200-診断3問-S4節目-S5-S7-chromium/attachments/EXPLORE-320-200-S4-at7-a10540b8e9916cf66a4819dcfe1f7a3fb07193a4.png"
+                        },
+                        {
+                          "name": "EXPLORE_320_200_S5_at7",
+                          "contentType": "image/png",
+                          "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/explore-g3r3-EXPLORE-幅-320-5f93f--R8-320-200-診断3問-S4節目-S5-S7-chromium/attachments/EXPLORE-320-200-S5-at7-0f09c519af202c1353cda51daf003ced80b82143.png"
+                        },
+                        {
+                          "name": "EXPLORE_320_200_results",
+                          "contentType": "application/json",
+                          "body": "WwogewogICJuYW1lIjogIlMxIiwKICAic2Nyb2xsV2lkdGgiOiAzMjAsCiAgImNsaWVudFdpZHRoIjogMzIwLAogICJ3aWRlIjogW10KIH0sCiB7CiAgIm5hbWUiOiAiUzJfcTEiLAogICJzY3JvbGxXaWR0aCI6IDMyMCwKICAiY2xpZW50V2lkdGgiOiAzMjAsCiAgIndpZGUiOiBbXQogfSwKIHsKICAibmFtZSI6ICJTMl9xMiIsCiAgInNjcm9sbFdpZHRoIjogMzIwLAogICJjbGllbnRXaWR0aCI6IDMyMCwKICAid2lkZSI6IFtdCiB9LAogewogICJuYW1lIjogIlMyX3EzIiwKICAic2Nyb2xsV2lkdGgiOiAzMjAsCiAgImNsaWVudFdpZHRoIjogMzIwLAogICJ3aWRlIjogW10KIH0sCiB7CiAgIm5hbWUiOiAiUzMiLAogICJzY3JvbGxXaWR0aCI6IDMyMCwKICAiY2xpZW50V2lkdGgiOiAzMjAsCiAgIndpZGUiOiBbXQogfSwKIHsKICAibmFtZSI6ICJTNF9hdDciLAogICJzY3JvbGxXaWR0aCI6IDMyMCwKICAiY2xpZW50V2lkdGgiOiAzMjAsCiAgIndpZGUiOiBbXQogfSwKIHsKICAibmFtZSI6ICJTNV9hdDciLAogICJzY3JvbGxXaWR0aCI6IDMyMCwKICAiY2xpZW50V2lkdGgiOiAzMjAsCiAgIndpZGUiOiBbXQogfQpd"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "efe49867e835f8093448-9a6256fc2f92723edec2",
+              "file": "explore-g3r3.spec.mjs",
+              "line": 236,
+              "column": 3
+            },
+            {
+              "title": "EXPLORE_R8_320_200_診断3問_S4節目_S5_S7",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 2635,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-05T12:05:36.192Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "EXPLORE_320_200_S1",
+                          "contentType": "image/png",
+                          "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/explore-g3r3-EXPLORE-幅-320-5f93f--R8-320-200-診断3問-S4節目-S5-S7-webkit/attachments/EXPLORE-320-200-S1-2895bca25f84f52a3cb1dbea3006411cdaecbf6a.png"
+                        },
+                        {
+                          "name": "EXPLORE_320_200_S2_q1",
+                          "contentType": "image/png",
+                          "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/explore-g3r3-EXPLORE-幅-320-5f93f--R8-320-200-診断3問-S4節目-S5-S7-webkit/attachments/EXPLORE-320-200-S2-q1-bc48ac98039e60fa8dc1d4f2ae1d453b83356da7.png"
+                        },
+                        {
+                          "name": "EXPLORE_320_200_S2_q2",
+                          "contentType": "image/png",
+                          "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/explore-g3r3-EXPLORE-幅-320-5f93f--R8-320-200-診断3問-S4節目-S5-S7-webkit/attachments/EXPLORE-320-200-S2-q2-916dc115aa725fafba14cb7d23c6a0a653e397d9.png"
+                        },
+                        {
+                          "name": "EXPLORE_320_200_S2_q3",
+                          "contentType": "image/png",
+                          "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/explore-g3r3-EXPLORE-幅-320-5f93f--R8-320-200-診断3問-S4節目-S5-S7-webkit/attachments/EXPLORE-320-200-S2-q3-075ff0ce3612800dbcd5b1f6f5164328e81d6bd3.png"
+                        },
+                        {
+                          "name": "EXPLORE_320_200_S3",
+                          "contentType": "image/png",
+                          "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/explore-g3r3-EXPLORE-幅-320-5f93f--R8-320-200-診断3問-S4節目-S5-S7-webkit/attachments/EXPLORE-320-200-S3-3a3cc330ba7d4d7892aa743791f210c432754a46.png"
+                        },
+                        {
+                          "name": "EXPLORE_320_200_S4_at7",
+                          "contentType": "image/png",
+                          "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/explore-g3r3-EXPLORE-幅-320-5f93f--R8-320-200-診断3問-S4節目-S5-S7-webkit/attachments/EXPLORE-320-200-S4-at7-81366c1bff62f5d593a6e746203728ced3010e3f.png"
+                        },
+                        {
+                          "name": "EXPLORE_320_200_S5_at7",
+                          "contentType": "image/png",
+                          "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/explore-g3r3-EXPLORE-幅-320-5f93f--R8-320-200-診断3問-S4節目-S5-S7-webkit/attachments/EXPLORE-320-200-S5-at7-6aaa2d6995f5ee8d8d17e42aa945631bcf98c339.png"
+                        },
+                        {
+                          "name": "EXPLORE_320_200_results",
+                          "contentType": "application/json",
+                          "body": "WwogewogICJuYW1lIjogIlMxIiwKICAic2Nyb2xsV2lkdGgiOiAzMjAsCiAgImNsaWVudFdpZHRoIjogMzIwLAogICJ3aWRlIjogW10KIH0sCiB7CiAgIm5hbWUiOiAiUzJfcTEiLAogICJzY3JvbGxXaWR0aCI6IDMyMCwKICAiY2xpZW50V2lkdGgiOiAzMjAsCiAgIndpZGUiOiBbXQogfSwKIHsKICAibmFtZSI6ICJTMl9xMiIsCiAgInNjcm9sbFdpZHRoIjogMzIwLAogICJjbGllbnRXaWR0aCI6IDMyMCwKICAid2lkZSI6IFtdCiB9LAogewogICJuYW1lIjogIlMyX3EzIiwKICAic2Nyb2xsV2lkdGgiOiAzMjAsCiAgImNsaWVudFdpZHRoIjogMzIwLAogICJ3aWRlIjogW10KIH0sCiB7CiAgIm5hbWUiOiAiUzMiLAogICJzY3JvbGxXaWR0aCI6IDMyMCwKICAiY2xpZW50V2lkdGgiOiAzMjAsCiAgIndpZGUiOiBbXQogfSwKIHsKICAibmFtZSI6ICJTNF9hdDciLAogICJzY3JvbGxXaWR0aCI6IDMyMCwKICAiY2xpZW50V2lkdGgiOiAzMjAsCiAgIndpZGUiOiBbXQogfSwKIHsKICAibmFtZSI6ICJTNV9hdDciLAogICJzY3JvbGxXaWR0aCI6IDMyMCwKICAiY2xpZW50V2lkdGgiOiAzMjAsCiAgIndpZGUiOiBbXQogfQpd"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "efe49867e835f8093448-c925404a0a5f05d762df",
+              "file": "explore-g3r3.spec.mjs",
+              "line": 236,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-05T12:05:30.644Z",
+    "duration": 13839.202,
+    "expected": 6,
+    "skipped": 0,
+    "unexpected": 2,
+    "flaky": 0
+  }
+}

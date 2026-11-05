@@ -1,0 +1,17 @@
+# date: 2026-11-05 21:04:44 +0900
+# commit: 32236ecd05051505c9bd26382d40e4a4a93eee0f
+# why: g3r3-full-run.log で AC15 が 1 回落ちた（5 回の値 1098, 1078, 2249, 1091, 1102。5 workers の並列の下）。一度でも落ちたテストは 5 回くり返す（役割ファイル）。workers=1 で他のテストの負荷なし
+# cmd: cd backend/tests/acceptance && PLAYWRIGHT_JSON_OUTPUT_NAME=evidence/g3r3-repeat5-ac15.json npx playwright test tests/ac15-load-time.spec.mjs --project=chromium --repeat-each=5 --workers=1 --retries=0 --reporter=list,json
+npm notice run npx
+npm notice run 'playwright' test tests/ac15-load-time.spec.mjs --project=chromium --repeat-each=5 --workers=1 --retries=0 --reporter=list,json
+
+Running 5 tests using 1 worker
+
+  ✓  1 [chromium] › tests/ac15-load-time.spec.mjs:7:1 › AC15_遅い回線とCPU4倍の制限でキャッシュなしに開き_data-debug-load-msが5回とも2000以下 (8.2s)
+  ✓  2 [chromium] › tests/ac15-load-time.spec.mjs:7:1 › AC15_遅い回線とCPU4倍の制限でキャッシュなしに開き_data-debug-load-msが5回とも2000以下 (8.8s)
+  ✓  3 [chromium] › tests/ac15-load-time.spec.mjs:7:1 › AC15_遅い回線とCPU4倍の制限でキャッシュなしに開き_data-debug-load-msが5回とも2000以下 (8.3s)
+  ✓  4 [chromium] › tests/ac15-load-time.spec.mjs:7:1 › AC15_遅い回線とCPU4倍の制限でキャッシュなしに開き_data-debug-load-msが5回とも2000以下 (8.2s)
+  ✓  5 [chromium] › tests/ac15-load-time.spec.mjs:7:1 › AC15_遅い回線とCPU4倍の制限でキャッシュなしに開き_data-debug-load-msが5回とも2000以下 (8.3s)
+
+  5 passed (45.0s)
+# exit: 0
