@@ -94,13 +94,13 @@ function dayChanged(op) {
   decide({ focus: true, held, dayChanged: true, op });
 }
 
-function commit(next, onOk, onFail) {
+function commit(next, onOk, onFail, op = '') {
   if (save(app.storage, next)) {
     app.data = next;
     onOk();
     return;
   }
-  onFail(act(() => commit(next, onOk, onFail)));
+  onFail(act(() => commit(next, onOk, onFail, op), op));
 }
 
 function navKind() {
@@ -457,6 +457,7 @@ function issueByAction(r, view, where, onSaved = () => {}) {
       if (marked.askPersist) askPersist();
     },
     (retry) => view.showError(where, retry),
+    where === 'next' ? 'task.next' : 'task.exhausted.advance',
   );
 }
 
