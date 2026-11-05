@@ -1,7 +1,7 @@
 # 実装ノート：001-daily-learning（今日の一手）
 
-- 書いた役：backend-engineer　日付：2026-11-03（ステップ 13。前の backend-engineer の作りかけを引き継いで検査し、単体テスト、この文書、RUNBOOK を足した）。2026-11-04：design r6 と契約の更新（data.md の 2、4、11、identifiers.md の task.dayChanged、test-hooks.md の W-3、W-9）と、G3 の design-reviewer r1 の指摘 4〜6 を実装した（8 の「G3 design r6 の直し」）。2026-11-04（2 回目）：reviewer G2 r3 の要修正（やり直しの S2 で「やめる」の後に「次へ」で TypeError）と、契約 f40c61a（data.md の 11 の S8 の待つ上限と待つ間の操作、budgets.md の 1 と 6 の枠）を実装した（8 の「G2 r3 の要修正と契約 f40c61a の直し」）
-- 入力：docs/prd/001-daily-learning.md（r7）、design/001-daily-learning.md（r6）、design/tokens.md（r5）、docs/approvals/delegation.md（2026-11-03、11-04）、contracts/（data、strings、identifiers、test-hooks、service-worker、budgets、dependencies、schemas、fixtures、tools）、docs/adr/0001〜0005、docs/adr/features/001-daily-learning.md、docs/verification/001-daily-learning/test-plan.md
+- 書いた役：backend-engineer　日付：2026-11-05（実装・前半：データと規則の層。8 の「実装・前半」）。それより前：2026-11-03（ステップ 13。前の backend-engineer の作りかけを引き継いで検査し、単体テスト、この文書、RUNBOOK を足した）。2026-11-04：design r6 と契約の更新（data.md の 2、4、11、identifiers.md の task.dayChanged、test-hooks.md の W-3、W-9）と、G3 の design-reviewer r1 の指摘 4〜6 を実装した（8 の「G3 design r6 の直し」）。2026-11-04（2 回目）：reviewer G2 r3 の要修正（やり直しの S2 で「やめる」の後に「次へ」で TypeError）と、契約 f40c61a（data.md の 11 の S8 の待つ上限と待つ間の操作、budgets.md の 1 と 6 の枠）を実装した（8 の「G2 r3 の要修正と契約 f40c61a の直し」）
+- 入力：docs/prd/001-daily-learning.md（r11。2026-11-04 までは r7）、design/001-daily-learning.md（r9。2026-11-04 までは r6）、design/tokens.md（r5）、docs/approvals/delegation.md（2026-11-03、11-04）、contracts/（data、strings、identifiers、test-hooks、service-worker、budgets、dependencies、schemas、fixtures、tools）、docs/adr/0001〜0005、docs/adr/features/001-daily-learning.md、docs/verification/001-daily-learning/test-plan.md
 - 形：サーバーなしの静的な Web アプリ（ADR 0001）。HTTP の API、DB、認証、外部サービスはない。手引きの API と DB 向けの節は、当てはまらない理由を書いて「対象外」にした。
 
 ## 1. 契約との対応表
@@ -10,10 +10,10 @@ contracts/openapi.yaml はない（API がない）。代わりに、AC ごと�
 | AC | 中身 | 実装の場所 | 受け入れテスト | 単体テスト |
 |---|---|---|---|---|
 | AC-1、AC-2 | 3 問の診断と、直後の 1 件目 | js/view-start.js（startScreen、questionScreen）、js/main.js（showStart、showQuestion、onAnswer）、js/rules.js（answerInitial、finishInitial） | ac01-ac02-diagnosis | rules（診断：1 問目で firstOpenDate…） |
-| AC-3、AC-4、AC-29 | 課題集の形、件数、in_app の割合 | public/data/tasks.json（= docs/prd/001-daily-learning/tasks.v1.json）、scripts/lib/tasks-check.mjs、scripts/build.mjs | ac03-ac04-ac29-tasks-json | tasks-check |
+| AC-3、AC-4、AC-29、AC-34、AC-38、BUDGET2_ | 課題集の形、件数（210 件）、in_app の割合、初級の決まり、解説 `insight`、本文の平均と gzip の大きさ | public/data/tasks.json（= docs/prd/001-daily-learning/tasks.v2.json。2026-11-05 から。`cmp` で一致）、scripts/lib/tasks-check.mjs（`insight` 120 字、改行とバッククォートなし）、scripts/build.mjs、scripts/check-budget.mjs（課題集の枠 105,000） | ac03-ac04-ac29-tasks-json、ac34-ac38-tasks-json-r8 | tasks-check、build（枠の値） |
 | AC-5、AC-6、AC-7、AC-9 | 申告、同じ課題を出さない、役に立ったの評価、1 日 1 回 | js/view-task.js（todayScreen、rateScreen、doneScreen、skippedScreen）、js/main.js（onReport、showRate）、js/rules.js（pickTask、reportTask、rateTask、startOfDay） | ac05-ac06-ac07-ac09-report | rules（pickTask…、完了の申告は…） |
-| AC-8 | 段階の規則（2 回連続） | js/rules.js（applyLevelRule、reportTask） | ac08-level-rule | rules（AC-8 の 9 通り、契約の seed 3 件、翌日から効く） |
-| AC-10、AC-30 | 課題が尽きた、外で行う印 | js/view-task.js（exhaustedScreen、todayScreen の external の部分）、js/rules.js（startOfDay） | ac10-ac30-exhausted-external | rules（課題を出し尽くすと…） |
+| AC-8 | 段階の規則（2 回連続。段階の違う行で止める。次に出す課題から効く） | js/rules.js（applyLevelRule、reportTask、levelNotice）、js/view-task.js（skippedScreen の levelHint / levelChanged） | ac08-level-rule | rules（AC-8 の 9 通り、契約の seed 3 件、次に出す課題から効く）、next-advance（AC-8 10 通り目、levelNotice） |
+| AC-10、AC-30、design D-40 | 課題が尽きた（levelDone / allDone、補足 seenNext / nextDone、進級 advance）、外で行う印 | js/view-task.js（exhaustedScreen、todayScreen の external の部分）、js/rules.js（startOfDay、exhaustedInfo、advanceLevel、levelAbove）、js/main.js（showExhausted、onAdvance、issueByAction） | ac10-ac30-exhausted-external | rules（課題を出し尽くすと…）、next-advance（advance 2 本、S7 の補足） |
 | AC-11、AC-13 | 回答ごとの保存、保存先が使えない、壊れたデータ、persist() は 1 回だけで結果は保存しない、S8 の注意は persisted() で決める | js/store.js、js/persist.js（canRequestPersist、requestPersist、readNotPersisted、drawWhenPersistedKnown、PERSISTED_WAIT_MS）、js/rules.js（markPersist、planDay）、js/main.js（decide、route、commit、askPersist、showSettings、drawSettings、showError、retryStartupSave）、js/view-start.js（errorScreen、storageError） | ac11-ac13-storage、design-d31-persisted-wait（DESIGN_D31_ の 2 本。AC の外） | store、day-persist（persist の印…、requestPersist…、S8 の注意…、S8 の待つ上限…、S8 の待ち…） |
 | AC-12、AC-23 | 送信 0 件、オフラインの再読み込み | public/sw.js、js/main.js（scheduleServiceWorker、fetchJson は同じ origin の配布物だけ） | ac12-ac23-offline | build（FILES の一致） |
 | AC-14、AC-16 | 診断のやり直し、全部の削除 | js/main.js（startRedo、cancelRedo、openDeleteConfirm）、js/rules.js（finishRedo）、js/store.js（removeAll） | ac14-ac16-redo-delete | store（removeAll）、rules |
@@ -21,11 +21,15 @@ contracts/openapi.yaml はない（API がない）。代わりに、AC ごと�
 | AC-17、AC-18、AC-27 | 320px、200%、axe | public/app.css、js/dom.js | ac17-ac18-ac27-a11y | — |
 | AC-19、AC-20、AC-25 | 書き出し、読み込み、新しい版を拒む | js/files.js（download、readImport）、js/rules.js（exportOf、importReplacement）、js/main.js（onImportFile、replaceWith、openImportConfirm） | ac19-ac20-ac25-export-import | validate、i18n-files（読み込み）、rules（書き出しは device を除き…） |
 | AC-21、AC-22 | ホーム画面の案内、スタンドアロンの読み込みの案内 | js/main.js（isIosSafari、isStandalone、showStart）、js/view-start.js（guideSection、importer） | ac21-ac22-home-screen | — |
-| AC-24 | 統計の 9 つの値 | js/rules.js（stats）、js/view-settings.js（statsScreen）、js/main.js（showStats） | ac24-stats | rules（統計の 9 つの値、直近 7 暦日） |
-| AC-26 | 日英の文言 | public/i18n/ja.json と en.json、js/i18n.js | ac26-language | i18n-files |
+| AC-24 | 統計の 11 の値（days-completed-week、extra-completed を足した） | js/rules.js（stats、mondayOf、daysCompletedWeek、extraCompleted）、js/view-settings.js（statsScreen の STAT_ROWS）、js/main.js（showStats） | ac24-stats | rules（統計の 11 の値、直近 7 暦日、今週は月曜始まり、2 件目以降の完了） |
+| AC-26 | 日英の文言（174 キー。contracts/fixtures/strings/valid-ja.json、valid-en.json と同じ） | public/i18n/ja.json と en.json、js/i18n.js | ac26-language | i18n-files |
 | AC-28 | 新しい版に 3 回以内で切り替わる | public/sw.js（skipWaiting、clients.claim、古い kyounoitte- のキャッシュを消す）、scripts/build.mjs（版の書き込み） | ac28-update | build |
 | AC-31、AC-32 | 操作 0 回で今日の課題、書きかけの答え | js/main.js（route、showToday、saveAnswer、flushAnswer）、js/rules.js（setAnswer、startOfDay） | ac31-ac32-zero-ops-answer | rules（日付が変わると…答えも残る） |
-| design D-30、U-15（AC の外） | 画面を開いたまま日付が変わった後の最初の操作：操作をせず読み直して判定、`task.dayChanged`。「なし」「途中」の画面と S0 error は日付を確かめない | js/main.js（act、clearNotice、dayChanged、render の lead と checkDay）、js/rules.js（checksDay、carryAnswer、planDay）、js/view-task.js（dayChangedNotice） | design-d30-day-changed、ac17-ac18-ac27-a11y（AC27_task.today.dayChanged） | day-persist（日付の変わり目…、U-15…、carryAnswer…） |
+| AC-33 | 同じ日の 2 件目以降（`task.next`）、起動の 6-2 を 6-3 より先、その日の何件目 | js/rules.js（nextTask、startOfDay、nthToday、markPersist）、js/main.js（onNext、issueByAction、showToday）、js/view-task.js（todayScreen の `data-task-nth-today` と `task.today.label.nth`、doneScreen / skippedScreen の task.next） | ac33-next | next-advance（起動 2 本、task.next 3 本、issued） |
+| AC-14（r8） | やり直しの行き先：今日の current があればそのまま、なければ新しい組からその日のうちに | js/rules.js（finishRedo）、js/main.js（onAnswer の redo） | ac14-ac16-redo-delete | next-advance（やり直し 2 本） |
+| AC-35〜AC-37、design D-44 | 累計、節目、進み具合 n / N、今週、組の最後 | js/rules.js（completedCount、milestoneOf、progressOfCurrent、progressOfRow、daysCompletedWeek、nextNote）、js/view-task.js（todayScreen の `data-progress-*` と `task.progress`、nextParts の `task.next.note` / `.last`）。S4 / S5 の累計・祝い・今週・`task.progress.done`・`task.insight` の DOM は後半 | ac35-ac37-done-screen、design-d40-d44-next-note | next-advance（AC-35、AC-36、AC-37、組の最後） |
+| AC-39、AC-40 | 診断 r8（経験年数 `never`） | js/validate.js（YEARS の先頭に never）、js/view-start.js（questionScreen の 3 問目の選択肢は YEARS から作る） | ac39-ac40-diagnosis-r8 | rules（診断：…AC-40）、validate |
+| design D-30、U-15、U-17（AC の外） | 画面を開いたまま日付が変わった後の最初の操作：操作をせず読み直して判定、`task.dayChanged`。取り消した操作が `task.next` なら知らせを出さない（U-17）。「なし」「途中」の画面と S0 error は日付を確かめない | js/main.js（act の op、clearNotice、dayChanged、route の showsDayChanged、render の lead と checkDay）、js/rules.js（checksDay、carryAnswer、planDay、showsDayChanged）、js/view-task.js（dayChangedNotice） | design-d30-day-changed、ac17-ac18-ac27-a11y（AC27_task.today.dayChanged） | day-persist（日付の変わり目…、U-15…、carryAnswer…） |
 | design-reviewer G3 r1 の 4〜6 | 行の先頭のリンクと summary の左端、480 px 未満のボタンの幅、答えの保存のエラーの枠 | public/app.css（`.site-header nav`、`.screen p > .link:only-child`、`summary`、`.btn` の幅、`textarea.is-error`）、js/view-task.js（todayScreen の syncAnswerError） | ac17-ac18-ac27-a11y（押せること、切れないこと） | —（8 の Playwright の実測） |
 
 ## 2. 認可の表と交差テスト
@@ -39,7 +43,7 @@ DB のマイグレーションはない（squawk、up と down のログは対�
 ## 4. 互換性
 oasdiff は対象外（OpenAPI がない）。古い版のアプリとの関係は次のとおり。
 - 新しい版を配ると、SW が古い版のキャッシュを消して 3 回以内の読み込みで切り替わる（AC-28、受け入れテストで確認）。保存データは残る。
-- 課題の ID は消さず使い回さない（identifiers.md の 5）。tasks-check.test が tasks.json の ID の重複 0 件と 126 件を確かめる。
+- 課題の ID は消さず使い回さない（identifiers.md の 5）。tasks-check.test が tasks.json の ID の重複 0 件と 210 件を確かめる（2026-11-05 に v2 へ。公開前の課題 ID の付け替えと `never` の追加は、ADR 0002 の 2026-11-05 の改訂の (e) で formatVersion 1 のまま。ID を固定する単体テスト（ADR 0002 の 71 行目）は公開の時点で置くので、今回は置いていない）。
 - 2026-11-04 の変更で保存データの形は変えていない（`formatVersion` は 1 のまま）。前の実装が書いた `device.persistGranted` は読めるまま残し（validate.js とスキーマは許す）、新しくは書かない（data.md の 2）。前の版のアプリが新しい版の保存データを読んでも、`persistGranted` は省略できる項目なので「読めない」にならない。前の版は `persistRequested` が true なら persist() を呼ばないので、印を書いた後に古い版に戻しても求め直さない。
 
 ## 5. 失敗の扱い
@@ -176,6 +180,57 @@ docs/reviews/001-daily-learning-G2-code-reviewer-r1.md の要修正（契約と 
   | D：drawWhenPersistedKnown で isCurrent を見ない | 単体「S8 の待ち：待つ間に次の操作が始まったら描かない…」 |
   | E：決まったときに clearTimeout しない | 単体「S8 の待つ上限：上限の前に答えが決まったらタイマーを消す…」 |
 
+### 実装・前半（データと規則の層。2026-11-05、macOS、node v24.22.1、Playwright 1.64.1）
+入力：docs/prd/001-daily-learning.md（r11）、design/001-daily-learning.md（r9）、contracts/（data.md の 2、4、5、8、9、11、budgets.md の 1 と 2、identifiers.md、strings.md、fixtures）。前の backend-engineer が a21ef94 で途中まで入れ、作業の上限で止まった分を引き継いで突き合わせた。
+
+済み／途中／未（前の指示書の 1〜6）：
+| 項目 | 状態 | 確かめ |
+|---|---|---|
+| 1. 課題集 v2 を写す | 済み（a21ef94） | `cmp docs/prd/001-daily-learning/tasks.v2.json backend/public/data/tasks.json` → 差なし。210 件。tasks-check.test の「同じバイト列」 |
+| 2. 文言 174 キー | 済み（a21ef94） | ja.json、en.json とも fixtures/strings/valid-*.json と JSON で深く等しい（174 キー）。コードが `t('…')` で文字列のまま使うキーで文言ファイルにないもの 0 件 |
+| 3. 規則とデータ | 済み（a21ef94。今回は読み合わせと受け入れテストで確かめた） | 下の表 |
+| 4. check-budget の枠 | 済み（a21ef94） | 文言 9,000、課題集 105,000（budgets.md の 1 の 2026-11-05 の枠） |
+| 5. 単体テスト | 済み（a21ef94） | 145 / 145 |
+| 6. この実装ノート | 今回書いた | 1 の表（AC-3/4/29/34/38、AC-8、AC-10、AC-14、AC-24、AC-26、AC-33、AC-35〜37、AC-39/40、U-17 の行）、4 の件数、この節。RUNBOOK の 7（課題が出ないときの行、同じ日に何件も出る行、配布物の大きさ） |
+
+3 の中身と、実装の場所（js/rules.js と js/main.js）：
+| data.md | 実装 | 単体テスト（next-advance、rules、day-persist） |
+|---|---|---|
+| 8：同じ日に何行でも | 行の数に上限を置かない。6-3 は lastIndexOn（配列で最も後ろの今日の行） | 起動：今日の行が何行あっても… |
+| 4 の 6：6-2 を 6-3 より先 | startOfDay：current（今日）→ 今日の行 → 6-4 | 起動：今日の current と今日の行が両方あれば… |
+| 4「操作で出す」 | nextTask、advanceLevel、finishRedo が 6-2 と 6-3 を見ずに issueToday（6-4）。選べなければ task.next は changed=false で保存しない、advance は levels だけ、やり直しは diagnosis と levels だけ | task.next 3 本、advance 2 本、やり直し 2 本 |
+| 2：1 回の setItem、失敗で画面とメモリを変えない | main.js の issueByAction → commit（成功したときだけ app.data を置き換え、失敗は S5 / S6 / S7 の `error.storage.*`。再試行は同じ中身） | —（main.js は DOM が要るので受け入れテスト） |
+| 4「S7 を再読み込み」 | S7 は保存しないので、今日の行があれば 6-3 で S5 / S6、なければ 6-4 で S7 | task.next：組を出し終えていれば S7 で保存しない… |
+| 5：段階は次に出す課題から | reportTask が申告の保存で applyLevelRule（段階の違う行で止める）。表示中の課題は変えない | AC-8 の 9 通り、10 通り目、次に出す課題から効く |
+| 5「S7 の変種」 | exhaustedInfo：allDone / levelDone、補足 seenNext / nextDone / なし、`{total}`、`{nextLevel}` | advance 2 本、S7 の補足 |
+| 9：統計 11 値 | stats（daysCompletedWeek は mondayOf、extraCompleted）。view-settings の STAT_ROWS に 2 行 | 統計の 11 の値、今週、2 件目以降の完了 |
+| 9：画面の数 | nthToday、progressOfCurrent、progressOfRow、completedCount、milestoneOf、nextNote、levelNotice | AC-35、AC-36、AC-37、組の最後、levelNotice |
+| AC-40：never | validate.js の YEARS の先頭（design の 7 の「3 問目の先頭」、identifiers.md の 5） | 診断：…AC-40、validate |
+| 4：U-17 | act(fn, op) の op を dayChanged → decide → route に渡し、showsDayChanged(op, state) が false なら知らせを描かない | U-17 |
+| 11：印を今日の課題を作る保存に | markPersist を planDay、finishInitial、finishRedo、issueByAction（task.next、advance）が通る | task.next の 1 本目、advance の 1 本目、day-persist |
+
+実行したコマンドと出力：
+- `cd backend && npm run check:contracts` → `見本 52 件、期待と違う結果 0 件`、終了コード 0。
+- `cd backend && node --test 'tests/unit/**/*.test.mjs'` → `tests 145 / suites 1 / pass 145 / fail 0 / skipped 0`、終了コード 0。
+- `node scripts/build.mjs --out <スクラッチパッド>/dist --version 2026-11-05.1` → `20 ファイル`、終了コード 0。`node scripts/check-budget.mjs <スクラッチパッド>/dist` → 終了コード 0：
+
+| 部分 | gzip 後 / 枠 |
+|---|---|
+| 殻（HTML、CSS、JS、sw.js） | 28,184 / 32,000（うち JS は sw.js を含めて 24,063。ADR 0001 の 26,000 の線の内。CSS 2,794、HTML 865）|
+| 文言（ja.json 4,324、en.json 3,721） | 8,045 / 9,000 |
+| アイコンと manifest | 2,173 / 4,000（icon-180.png の生 2,107） |
+| 課題集 tasks.json（生 275,289） | 69,313 / 105,000 |
+| 合計 | 107,715 / 150,000 |
+
+- JS のファイル：public/js が 12 個と sw.js の 13 個（15 個まで）。
+- grep（backend/public。tasks.json の課題の本文を除く）：`innerHTML|outerHTML|insertAdjacentHTML|document\.write|eval\(|new Function|setHTMLUnsafe|toISOString|import\(` 0 件。`style=|<style|on…=`（index.html、app.css、js、sw.js）0 件、js の `.style.|cssText|setAttribute('style'|setAttribute('on` 0 件。`localStorage` は main.js:157 と store.js:1 のコメントだけ。`location.(search|hash)|URLSearchParams|__test|__acceptance|window.__|globalThis.__|testHook|webdriver|playwright` 0 件。`service_role` 0 件。
+- 依存：package-lock.json は ajv 8.20.0、fast-deep-equal 3.1.3、fast-uri 3.1.9、json-schema-traverse 1.0.0、require-from-string 2.0.2（前と同じ）。
+- 受け入れテスト：`cd backend/tests/acceptance && npx playwright test --reporter=line` → `Running 219 tests`、`186 passed / 33 failed (13.9m)`、終了コード 1。
+  - 前半で通るはずのもの：ac03-ac04-ac29-tasks-json 10 / 10、ac34-ac38-tasks-json-r8 4 / 4（AC34_、AC38_課題集の全件のinsightが…、BUDGET2_本文4要素と解説の字数の平均が480字以下、BUDGET2_課題集はgzip後105000バイト以下）、ac26-language 4 / 4、ac01-ac02-diagnosis 8 / 8（起動して課題が出る）、ac05-…-report 20 / 20、ac14-ac16 6 / 6、ac24-stats 2 / 2、ac31-ac32 14 / 14、ac33-next 4 / 4、design-d30 12 / 12、design-d31 6 / 6、AC40 2 / 2。
+  - ac08-level-rule の Chromium 8 本と AC10 の Chromium 1 本は `Test timeout of 60000ms exceeded while setting up "page"`（テストの中身に届く前の時間切れ。全体が 13.9 分かかった重さ）。`npx playwright test tests/ac08-level-rule.spec.mjs tests/ac10-ac30-exhausted-external.spec.mjs --project=chromium --reporter=line` で流し直すと `17 passed (7.6s)`。
+  - 後半（画面）の分で落ちたもの：AC35 × 8、DESIGN_D43 × 4、AC37 × 2、AC38_task.todayでは… × 2（S4 / S5 の累計、祝い、今週、insight、演出）、AC39 × 4（S2 の `area.*.desc`）、DESIGN_D44 × 2（`task.next.note.last` までは通り、S5 の `task.progress.done` がない）。
+  - AC18 × 2：`Tab を 40 回押しても data-testid="years.lt1" にフォーカスが来ない`。3 問目の先頭が `years.never` になった（design の 7 の 383 行目「3 問目の先頭」）ので、radio の組に Tab で入ると先頭の `years.never` に止まり、`years.lt1` へは矢印キーで移る。実装は design どおりで、テストの前提（`years.lt1` が先頭）が古い。受け入れテストは verifier の範囲なので直していない（9 の 9）。
+
 ## 9. 未確認のこと
 1. （解決済み。verifier が a7fc7e9 で、閉じる前にファイルを複製する形に直し、受け入れは 133 passed）AC20 の受け入れテストの不具合：tests/ac19-ac20-ac25-export-import.spec.mjs の 57 行目で `context.close()` を呼んでから、67 行目で書き出したファイル `exported.file`（`download.path()` の一時ファイル）を読み込ませている。Playwright はダウンロードを作ったコンテキストを閉じるとそのファイルを消すので、ENOENT で落ちる。Playwright 1.64.1 で確認した（閉じる前は存在、閉じた後は存在しない）。テストの写しを作業用フォルダに作り、閉じる前にファイルを別の場所へ複製する 1 行だけを足して流すと、Chromium と WebKit の 2 本とも通った（実装は AC20 を満たす）。受け入れテストは verifier の範囲なので直していない。
 2. Linux の CI で WebKit の OS のライブラリが要るか（ADR 0004）：macOS でだけ動かした。
@@ -185,9 +240,12 @@ docs/reviews/001-daily-learning-G2-code-reviewer-r1.md の要修正（契約と 
 6. 実機の Safari と Chrome での `persist()` の返事と S8 の注意の出方（G4 で Takuma が見る。data.md の 11）。
 7. act() の `app.seq += 1`（画面を移さない操作で S8 の待ちを捨てる）を、消したら落ちる自動テストがない。受け入れテストの DESIGN_D31_ は画面を移す「次へ」だけを見ており、単体テストは main.js を読み込めない（DOM が要り、依存は ajv だけ）ので同じ形の写しで確かめている。スクラッチパッドの required-r4.mjs で、消すと遅れて S8 を描くことは確かめた。受け入れテストに「待つ間に必須のエラー」の 1 本を足すかは verifier の判断。
 8. 待つ間に radio を選ぶだけ（「次へ」を押さない）の操作は act() を通らないので、S8 の待ちを捨てない（S8 を描くときに下書きは捨てる）。identifiers.md の 3 の「radio の確定」を、今の実装（`task.dayChanged` の知らせと同じ）では「次へ」などの確定のボタンと読んでいる。
+9. （2026-11-05）AC18 の受け入れテスト（ac17-ac18-ac27-a11y.spec.mjs の 156 行目 `activate('years.lt1', 'Space', …)`）は Tab だけで `years.lt1` に届く前提。3 問目の先頭が `years.never` になったので届かない。直すのは verifier（`years.never` を選ぶか、矢印キーで移る）。
+10. （2026-11-05）ADR 0002 の「公開の時点で課題 ID の一覧を固定する単体テスト」は公開の時点で置く（今は置いていない）。
+11. （2026-11-05）U-17（取り消した操作が `task.next` なら `task.dayChanged` を出さない。advance では出す）は、単体テスト（next-advance の U-17：showsDayChanged）だけで確かめている。受け入れテストのフォルダと test-plan に U-17 を名指しするテストはない（`grep -rnE "U-?17"` で 0 件）。design-d30 の 12 本は通った。画面で確かめるテストを足すかは verifier の判断。
 
 ## チェックリスト（craft-backend-engineer の 6）
-- [x] 対応表の行の数が、技術設計メモの 4 の表の operation の数と同じ。→ API の operation は 0。代わりに AC-1〜AC-32 をすべて 1 の表に並べた。
+- [x] 対応表の行の数が、技術設計メモの 4 の表の operation の数と同じ。→ API の operation は 0。代わりに AC-1〜AC-40 を 1 の表に並べた（2026-11-05 に AC-33〜AC-40 を足した）。
 - [ ] 交差テストの数が、ID を受け取るエンドポイントの数以上。→ 対象外（エンドポイントなし、利用者は 1 人）。
 - [ ] 3章のテストのうち当てはまるものが、本物の DB で通ったログがある。→ 対象外（DB なし）。当てはまる「割り当てすぎ」（知らない項目を拒む）、「上限」（答え 2,000 字、ファイル 5MB）、「削除」は単体テストと受け入れテストで通った（8）。
 - [x] schemathesis、oasdiff、squawk、advisors、gitleaks の出力がある（使わない道具は「対象外」と理由）。→ 8 の最後の行。gitleaks は未検査。
@@ -198,3 +256,4 @@ docs/reviews/001-daily-learning-G2-code-reviewer-r1.md の要修正（契約と 
 - [x] 報告の「自己点検」に API1 から API10 の10行がある。
 - 2026-11-04 の直しでも上の印は変わらない（API、DB、外部サービス、環境変数は増えていない）。
 - 2026-11-04（2 回目、G2 r3 の要修正と契約 f40c61a）の直しでも上の印は変わらない。
+- 2026-11-05（実装・前半）の直しでも上の印は変わらない（API、DB、外部サービス、環境変数は増えていない）。対応表は AC-1〜AC-40 と design の D-30、D-31、D-40、D-44、U-15、U-17 を並べた。
