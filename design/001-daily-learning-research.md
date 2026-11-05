@@ -1,8 +1,9 @@
 # デザイン調査 001-daily-learning：診断と今日の学習（今日の一手）
 
-- 対象の PRD：docs/prd/001-daily-learning.md（r10。r1 の調査は r5 を対象に書いた）
+- 対象の PRD：docs/prd/001-daily-learning.md（r10。r1 の調査は r5 を対象に書いた）。r3 は PRD r13（FB2）を対象に書いた
 - 書いた役：designer　日付：2026-10-30（R-27〜R-31 は 2026-11-03 に、G3 r1 の design-reviewer の指摘を直すために足した。仕様 r6 より先に書いた。R-1〜R-26 と 1〜7 は変えていない）
 - **r2（2026-11-05）**：Takuma の FB 1 回目（docs/approvals/001-daily-learning-FB1.md。FB-1 初級＝未経験、FB-2 同じ日に続けて進む、FB-3 面白さとワクワク）を反映した PRD r10 に合わせ、6 つの問い（1 の 10〜15）を足して調べた。R-32〜R-64 を足した（既存の R の番号と本文は変えていない）。1〜7 は「r2 の追記」の見出しで足し、r1 の本文は残した。r1 の「差をつける点 2」（S5/S6 は次の課題もストリークも見せず 1 文で終える）と仕様 r6 の D-4 は FB-2、FB-3 と食い違うので、6 の r2 の追記で置き換えた。仕様（design/001-daily-learning.md）の書き直しはこの調査の後に行う（この r2 では書いていない）。
+- **r3（2026-11-05）**：Takuma の FB 2 回目（docs/approvals/001-daily-learning-FB2.md。FB2-1 書き方と進め方、FB2-2 選択肢をタップ、FB2-3 正誤と選んだ答えに合わせた説明、FB2-4 図解と pop、FB2-5 キャラクター、FB2-6 ドット絵）を反映した PRD r13 に合わせ、5 つの問い（1 の 16〜20）を足して調べた。R-66〜R-91 を足した（既存の R の番号と本文は変えていない）。1〜7 は「r3 の追記」の見出しで足し、r1 と r2 の本文は残した。r2 の「差をつける点 2」（終えた直後の手応え）は、r3 では「選んだ直後の返し」に重心を移して 6.2 で置き換えた。仕様（design/001-daily-learning.md r10）の書き直しはこの調査の後に行う（この r3 では書いていない）。指示書の範囲は調査だけなので、見た目の最終判断（pop の度合い、キャラクターの 3 案）は 7.2 と報告の「未解決」で Takuma に委ねる。
 - この文書は仕様（design/001-daily-learning.md）より先に書く。仕様の決定は、8 の R 番号を根拠に引く。
 - 見られなかったもの、開けなかったページは「見ていない」と書く。推測で埋めない。
 - 読み替え：このアプリは iOS アプリではなく、ブラウザだけで動く Web アプリ（静的 HTML/CSS/JS、GitHub Pages、サーバーなし、ログインなし）。型の「App Store の評価」は「公開されている評価や利用者数」、「権限の求め方」は「通知や保存の許可（`navigator.storage.persist()`、Web Push）とアカウント登録の求め方」に読み替えた。原則の根拠は HIG に加えて WCAG 2.2 と WAI-ARIA APG の URL を使う（PRD の AC-27 は axe-core の WCAG 2.1 AA 監査）。HIG の2ページ（Design principles、Accessibility）は開いたが本文が取れなかったので、HIG の文言は引用しない（8 の末尾）。
@@ -25,8 +26,15 @@
   13. 未経験の人向けの入口：領域の 1 行説明（AC-39）、経験年数「まだコードを書いたことがない」（AC-40）、段階の説明、専門用語の扱い、最初の 1 件の不安を減らす見せ方
   14. ひとこと解説（`insight`）を完了の後にだけ出す見せ方。答えの写しに見えない形（AC-38）
   15. 今週の完了日（月曜始まり）の見せ方。途切れや「逃した」を感じさせない形（AC-37）
+  - r3 の追記（PRD r13。FB2-1〜FB2-6）：
+  16. 選択式の問題の画面：問題文、選択肢 3 つ、正誤の返し、選んだ答えに合わせた説明、「次の問題へ」をどう並べるか。タップの的、選んだ瞬間（300 ミリ秒以内）の動き、正解と不正解の色と形（色だけに頼らない）、選び直しをさせない見せ方（AC-41、AC-42、AC-17）
+  17. 図解：導入に添える図の 6 型（流れ、層、比較、手順、木、分岐。PRD 9）を、pop で「わくわくする」見た目にする方法。色数、線の太さ、角丸、手描き風の是非。幅 320 と文字 200% で縦に組み直す形。暗色での線のコントラスト（AC-44、AC-17）
+  18. キャラクター：案内役 1 体が出る場所、表情（待機、正解、不正解＝一緒に考える、祝い）、台詞、不正解のときの声かけ。子どもっぽく見えない、圧や罪悪感を出さない。ドット絵（32×32 か 48×48、8 色以内、整数倍の拡大）で少ない画素と色で表情を出す原則、輪郭、暗い背景での見え方（AC-45）
+  19. pop の度合い：色数 3 と 5 の差、アクセント色の増やし方と、WCAG のコントラストの保ち方（AC-27、AC-44）
+  20. 原則の確認：HIG の Feedback、Motion、Color、Accessibility、Charts、WCAG 2.2 の 1.4.1（色だけに頼らない）、1.4.11（非文字のコントラスト）、2.3.3（操作で起きる動き）、Mayer のマルチメディア学習の原則（二次資料）
 - 関係する受け入れ条件（AC 番号）：AC-1、AC-2（診断と1件目）、AC-3、AC-30（課題の4要素と外で行う印）、AC-5、AC-7、AC-9（申告と評価の流れ）、AC-10（尽きたとき）、AC-11、AC-25（エラー）、AC-13（永続化を断られたとき）、AC-16、AC-19、AC-20（設定：削除、書き出し、読み込み）、AC-17、AC-18、AC-27（アクセシビリティ）、AC-21、AC-22（ホーム画面の案内）、AC-24（統計）、AC-26（英語）、AC-31（操作0回）、AC-32（答えの欄）。r2 で足した：AC-10（修了と進級。r8 で書き直し）、AC-33（次の一手に進む）、AC-35（累計と祝い）、AC-36（n / N 件目）、AC-37（今週の完了日）、AC-38（ひとこと解説）、AC-39（領域の説明）、AC-40（経験年数の未経験）
 - 範囲の外：課題集の中身（pdm と Takuma）、保存の方式と ID（tech-lead の ADR と contracts/）、Service Worker の作り（AC-23、AC-28 は画面に出ない）。r2 でも同じ。初級 84 件の本文と全件の `insight` の中身は pdm と Takuma（AC-34、AC-38 の全件検査は verifier と指揮役）。
+- r3 で足した受け入れ条件：AC-41（返しと説明）、AC-42（まとめの正答数。点数の語を出さない）、AC-44（図の型）、AC-45（キャラクター）、AC-17（返しとまとめの状態でも 200%）、AC-27（axe-core）。AC-43（課題集の文の調子）は画面には出ないので範囲の外（pdm と verifier）。
 
 ## 2. ターゲット（仮説）
 人に聞いた調査ではなく、PRD とレビューなどから立てた仮説として書く（PRD の Q8 は回答なしのため、すべて［推測］に当たる）。
@@ -49,6 +57,13 @@
 - 起こしたい感情（足した）：終えた直後に「小さな発見があった」（`insight`。PRD 2 の気持ちの面）と「前に進んだ数が増えた」（累計、n / N）。途切れや失う恐れは起こさない（PRD の E-15、E-16。R-46 の「a missing day reads like an error you want to fix」の逆）。FB-3 の「ワクワク」は、ここでは「次に出る解説と次の段階を見たくなる」こと（白帽の達成と有能感。PRD の E-16、E-17）と読み、演出の派手さではなく「返ってくるもの」で作る（5 の r2 の性格語「手応え」）。
 - 見た目の好み（変えない）：色は少なく、密度は低く。未経験が入っても、R-13（教育水準が高いほどカラフルさの好みが下がる）の仮定は対象の主（エンジニア志望か在職）に残る。Progate の「にんじゃわんこ」「ひつじ仙人」（R-50）のようなキャラクターは PRD の S-9 で v1 では捨てた。
 - アクセシビリティで必要なこと（足した）：祝いの動きは `prefers-reduced-motion: reduce` で消す（R-33、R-38、R-40）。自動で動く要素は 5 秒を超えない（R-39）。累計の数字を大きく出すときも、文字だけで意味が分かるラベルを付ける（R-34「Make sure all feedback is accessible」）。
+
+### 2.2 r3 の追記（FB2 で分かった「退屈」と「分かりにくい」。仮説）
+- 誰が（変えない）：主は実務 1〜5 年目のエンジニアと、コードをほとんど書いたことがない人（2.1）。FB2 を書いた Takuma 自身がこの対象の代理であり、r2 の文字だけの課題を「文字だけだと退屈するし理解がむずかしい」「書き方ややり方がイマイチ」と評した（docs/approvals/001-daily-learning-FB2.md）。r1 と r2 の「色は少なく、密度は低く」（R-13）は、「飾りを置かない」の意味では残し、「図と絵を置かない」の意味では取り下げる。
+- 使う場面（足した）：1 問ごとに「選ぶ → 返しを読む → 次へ」を 1 日に 3 回（続ける日は 9 回以上）繰り返す。繰り返す操作なので、返しの動きは短く（R-67「generally avoid adding motion to UI interactions that occur frequently」）、説明は選択肢の直近に出す（R-66「near the items it describes」、R-74 の spatial contiguity）。
+- 起こしたい感情（足した）：選んだ直後に「合っていた」か「なぜ違うか」が分かり（R-75 の「正解と自分の答えを並べる」型。E-27 の「どうして間違えたかを…解説してくれるから…どんどん進んで」）、不正解でも「責められない」（E-27 の「間違えたら、リリーが笑ってくる」の逆）。図は「読む前に形が分かる」安心（R-74 の multimedia、signaling）。キャラクターは「隣にいる」感じで、「見張られている」感じにしない（R-77 の「you are disappointing Duo」は採らない型）。
+- 見た目の好み（変えた）：色は「意味色＋図の強調 1 色＋キャラクターの固有色」までを上限の候補にし（7.2 の 2 案）、密度は 1 問が幅 320 で 1 画面に収まる程度（PRD 10「選択肢を 4 つにしたくなる」の理由と同じ）。R-13 の「教育水準が高いほどカラフルさの好みが下がる」は残るので、色を増やすなら「意味を持つ色」だけにする（R-68「reserve it for elements that truly benefit from emphasis」）。
+- アクセシビリティで必要なこと（足した）：正誤は文言と印と色の 3 つで出す（R-69、R-70）。赤と緑の対で正誤を分けない（R-69「pairings such as red-green」）。図の線と枠は 3:1 以上（R-71）、文字は 4.5:1（R-69）。キャラクターの絵は `aria-hidden`、台詞は文字で読め、動きは `prefers-reduced-motion: reduce` で 0 件（R-72。AC-45）。拡大は整数倍でぼやけさせない（tech-lead r5 の 3）。
 
 ## 3. 競合
 直接の競合を4本。PRD の 3 にある候補（Enki、Mimo、Sololearn、Progate、Exercism、freeCodeCamp、roadmap.sh）から、「毎日・短時間」を掲げる2本（Enki、Mimo）と、ブラウザで完結する Web の2本（Exercism、roadmap.sh）を選んだ。価格とレビューの不満は PRD の 3 にあるので繰り返さず、見た目と操作の比較だけを足す。すべて 2026-10-30 に確認。アプリの画面そのものは App Store の画面写真が文字で取れないので見ていない。公式サイトと App Store の本文、ヘルプセンターの一覧から読めたことだけを書く。
@@ -89,6 +104,59 @@ PRD r10 の 3 の候補から、FB-3 の「面白さ」の作りを持つ 4 本�
 - 進級の型は paiza の「順に解くとレベルアップ」と Exercism の「終えると次が開く」（R-51、R-52）。どちらも段階の定義を 1 行で持つ（paiza の S〜E）。当アプリは段階の説明を診断の選択肢と修了の画面で同じ 1 行にする。
 - 未経験の入口は、Progate が「大丈夫」「ゼロから」と安心の言葉を先に置く（R-50）が、不満は用語（PRD の E-12）。安心の言葉より、用語を本文で説明すること（R-55）と、選択肢のヒント文（R-54）で受ける。
 
+### 3.2 r3 の比較 1：選択式の問題の画面（2026-11-05 に確認。画面そのものは見ていない。公式の説明文、ブログ、レビュー、第三者の記述から分かる範囲だけを書く）
+| 名前 | 問題文・選択肢・返し・説明・次への並び | タップの的 | 選んだ瞬間の動き | 正解と不正解の色と形 | 選び直し | 出典 |
+|---|---|---|---|---|---|---|
+| Swift Playgrounds（手本） | 選択式ではなく、コードを書いて実行するパズル。「identifying mistakes as you type and offering suggestions」で、書いている途中に誤りを指摘する。ヒントは「get more detailed, eventually leading to the full solution」と段階的に詳しくなる | 見ていない | 「The results of your code appear instantly as you type」。失敗したときのキャラクターの反応は記述なし | 見ていない | 何度でも実行し直せる（パズル） | R-78、R-79、R-80 |
+| Progate（アプリ） | 「スライドで知識を学んだら、実際にプログラムを書いて」。アプリ版は選択問題（E-30「選択問題なので、とてもやりやすかった」）。並びは見ていない | 見ていない | 見ていない | 見ていない | 見ていない | R-81、E-30 |
+| Duolingo | 問題 → 答える → 画面の下に帯（不正解は赤い帯に「Incorrect」と「Explain My Answer」のボタン）→ 説明は任意で開く（正解「el niño」と自分の答え「la niño」を並べ、理由と対比の例文 2 つ）→ 次へ。「Choose whether you want feedback on a mistake」 | 見ていない | 正解のとき「each character a unique animation」。不正解の動きは公式に記述なし。JP レビューは「間違えたら、リリーが笑ってくる」「間違えたときの音、表情、起こるモーションが良くない」（E-27） | 赤い帯＋「Incorrect」の文字（公式）。第三者は「green/red pop-up」と「gentle animations…not red error screens」で食い違う（R-77、R-91） | 帯が出た後は次へ進むだけ［推測。帯の説明から］ | R-75、R-76、R-77、R-91、E-27 |
+| Brilliant | 2026-11-05 のトップは AI の家庭教師「Koji」が中心。「asks guiding questions, sketches on your screen」「get you to the answer without giving it to you」。レッスンの選択問題の画面は見ていない | 見ていない | 見ていない | 見ていない | 見ていない | R-83 |
+| Mimo | 「precise feedback and hints that adapt to your progress」。画面は見ていない | 見ていない | 見ていない | 見ていない | 見ていない | R-84 |
+| Sololearn | 「in-lesson quizzes」「instant feedback」。画面は見ていない | 見ていない | 見ていない | 見ていない | 見ていない | R-84 |
+| Pythonプログラミング入門 | 章の「この章で学ぶこと」（解説）→ 3 択クイズ。レビュー「問題とは別で一から分かりやすい解説」「解説を読んだ後に問題にチャレンジして」、「間違えた時の解説が充実」（E-26）。画面は見ていない | 見ていない | 見ていない | 見ていない | 見ていない | R-82、E-26 |
+
+示唆（16 選択式の画面）：
+1. 並びは 1 列に「問題文 → 選択肢 3 つ → 返し（文言＋印）→ 選んだ選択肢の説明（不正解なら正解の説明も）→ 「次の問題へ」」。返しは選択肢の直下に出し、別の画面や帯にしない（R-66「near the items it describes」、R-74 の spatial contiguity）。Duolingo の「説明は任意で開く」（R-75）は採らず、常に出す（FB2-3。E-27「一つ一つの解説がおざなり」の逆）。
+2. 説明の中身は「正解と選んだ答えを並べ、なぜ違うかを言い、対比を 1 つ」（R-75 の型。AC-29 の 1〜120 字で収める）。
+3. タップの的は列いっぱいの `<button>`（既存トークンの主操作と同じ 44 px 以上。R-69）を縦に 3 つ。ラジオにしない（1 回で確定する操作。AC-41）。
+4. 選んだ瞬間の動きは 300 ミリ秒以内に、不透明度の変化かキャラクターの表情の切り替えまで（R-67「brief and precise」「avoid adding motion to UI interactions that occur frequently」）。`prefers-reduced-motion: reduce` で 0 件（R-72）。音は使わない（E-27「音…が良くない」）。
+5. 正誤は文言（「正解」「惜しい」。PRD 10）＋ 印（記号）＋ 色の 3 つ。赤と緑の対にしない（R-69）。不正解に color.error を使うと「エラー」と同じ色で意味が衝突する（R-68「Avoid using the same color to mean different things」）ので、不正解は色を足さず、選んだ選択肢の枠を太く（size.border.strong）して文言で示し、正解の選択肢にだけ color.success の印を付ける（決定は仕様で）。
+6. 選び直しは、答えた後に 3 つの選択肢を `aria-disabled="true"` で押せなくし（文字は読める）、「次の問題へ」を返しの直下に主操作として出す。Duolingo の「帯の後は次へ」と同じ型（当たり前）。
+
+### 3.3 r3 の比較 2：図解（2026-11-05 に確認。各社の図そのものは見ていない）
+| 名前 | 図の使い方 | 見た目（色数、線、角丸、手描き） | 幅 320 | 出典 |
+|---|---|---|---|---|
+| Progate | 「イラスト中心のスライドで直感的に」。スライドの図は見ていない（App Store とコースのページの画像は alt が空） | 見ていない | 見ていない | R-81、R-50 |
+| Brilliant | 「A visual, interactive tutor」「sketches on your screen」。レッスンの図は見ていない | 見ていない | 見ていない | R-83 |
+| Swift Playgrounds | 図ではなく「美しい3次元のステージ」と「楽しいアニメーション」（E-29） | 3D | 見ていない | R-78、E-29 |
+| Sololearn | トップの画像の alt は「illustration」だけ | 見ていない | 見ていない | R-84 |
+| Excalidraw、rough.js（道具。手描き風の参照） | 「Hand-drawn like style」。rough.js は「sketchy, hand-drawn-like」で、roughness と bowing、塗りは hachure、zigzag、dots など | 手描き風の線の揺れと斜線の塗り | 該当なし | R-90 |
+| HIG Charts（原則） | 「highlights a few key pieces of information」「Avoid relying solely on color」「use different shapes or patterns」「In a compact environment, maximize the width of the plot area」「labels…as short as possible」 | 色は意味のある所だけ | 幅を使い切る、ラベルを短く | R-73 |
+
+示唆（17 図解）：
+1. 図は 6 型を HTML と CSS かインラインの SVG で描き、色の役割は「地、線と文字、強調 1 色」の 3 役に限る（R-73「a few key pieces」、R-74 の signaling）。強調は 1 型につき 1 か所（PRD 9 の「強調する位置」）。
+2. 「pop」は、色数ではなく、太い線（2 px 以上。3:1 を満たしやすい。R-71）、角丸（size.radius）、ラベルを本文と同じ大きさで入れること、強調の 1 色で作る。手描き風の揺れ（R-90）は、本番の依存 0 件と CSP（CLAUDE.md）でライブラリが使えず、手で path を書くと 6 型 × 可変のラベルに追従できない［推測］ので採らない。
+3. 幅 320 と文字 200%：流れと手順は矢印を下向きにして縦 1 列、層はもともと縦、木は親の下に子をインデントの縦リスト、分岐は 1 の下に 2〜3 を縦。比較だけは 2 列を保ち、ラベルが 12 字以内（AC-44）でも収まらないときは「見出し → 行」の順で縦に積む（R-16 の reflow）。
+4. ラベルは文字として DOM に置き（SVG なら `<text>`）、図の要素に `role="img"` と `aria-label`（= alt）を付ける。「Describe what the chart's details represent, not what they look like」（R-73）に従い、alt は形ではなく中身を書く（課題集の `alt`。pdm）。
+5. 暗色：線と文字は color.text の dark の値、強調色は dark の値を持つトークン。線は図の地に対して 3:1（R-71）。塗り面を置くなら装飾として扱い、線と文字の 3:1 と 4.5:1 を塗りの上でも保つ（R-69、R-71）。
+6. 図は導入文の直下に 1 つだけ、同じ画面に置く（R-74 の coherence、spatial contiguity。PRD 10「図を飾りにしたくなる」）。図には動きを付けない（R-67。1 日に何度も見る）。
+
+### 3.4 r3 の比較 3：案内役のキャラクター（2026-11-05 に確認。アプリ内の表情と台詞そのものは見ていない）
+| 名前 | 出る場所 | 表情と動き | 台詞 | 失敗したとき | 子ども向けに見えるか | 出典 |
+|---|---|---|---|---|---|---|
+| Swift Playgrounds（Byte） | パズルの中。操作の対象（「move the character, Byte, and make him collect a gem」「Byteは宝石を集めるのが好きですが、一人では集めることができません」） | 3D。コードの実行に合わせて動く | 記述なし（説明はテキストのページ側） | コードの誤りを指摘し、ヒントが段階的に詳しくなる。Byte の反応は記述なし | Common Sense Media は「age 10+」「cute alien-like characters」。App Store は「8歳から108歳まで」（E-29） | R-78、R-79、R-80 |
+| Progate（にんじゃわんこ、ひつじ仙人） | 「一緒に、プログラミングを楽しく学びましょう」。出る場所は見ていない | 見ていない | 見ていない | 見ていない | 不満「余計なセンスないキャラクターやアニメも意味なし」（E-30） | R-81、E-30 |
+| Duolingo（Duo と仲間） | 問題の中で例文を「話す」。正解のとき固有のアニメ、連続正解で幕間のアニメ | 「really big endearing eyes」。同じ基本の形から作る | 例文を話す | 公式に記述なし。JP レビュー「間違えたら、リリーが笑ってくる」（E-27）。第三者は通知の「sad」「crying」「dead」Duo を「the nuclear option」と呼ぶ（R-77） | 「keeping the characters real」「different ages, ethnicities, and personalities」（E-28） | R-76、R-77、R-91、E-27、E-28 |
+| Undertale（画風の手本。4.2） | ゲームの中。会話 | 低解像度のドット。「simple, but communicative」「ability to convey emotion」 | 「consistently funny」「rather heartfelt」 | 「it is possible to clear the game without killing a single enemy」 | 評価は「mixed」。「audiences become more attached to characters drawn simply」 | R-85 |
+
+示唆（18 キャラクター）：
+1. 出る場所は PRD 9 の固定（診断の導入、各問の返し、まとめと節目、修了）。Duolingo の「正解のときだけアニメ」（R-76）は、不正解を無反応にして「一緒に考える」が成り立たないので採らない。正解と不正解で絵の大きさと位置を変えず、表情だけ変える（E-27 の「笑ってくる」の逆）。
+2. 表情は 4 つ（待機、正解、不正解＝一緒に考える、祝い）。32×32 なら目と口の 2〜4 画素で作る（R-87「like the eyes on a small sprite」）。色は 4〜8 色（R-86「a maximum of 8 or 16 colors」、R-87「If you can't make a good sprite in 4 colors, using 40 colors isn't going to help」）。
+3. 輪郭は 1 色の濃い線で閉じる。背景の色に溶かす sel-out は「specific scenarios」向け（R-87）で、地がライトとダークの 2 通りある当アプリには向かない。暗色では輪郭と肌の色を切り替える（tech-lead r5 の 3 の案 (a)（SVG の path で CSS 変数）か (b)（PNG 2 枚）。ADR で決める）。
+4. 拡大は整数倍（2 倍か 3 倍。画面上 64〜96 px）で `image-rendering: pixelated`。中間の色を出さない（tech-lead r5 の 3）。
+5. 台詞は 40 字以内、システムの書体（ドット風の Web フォントは CSP で読めない。tech-lead r5）。評価語（「すごい」）、感嘆符、催促を使わず（R-35、R-60）、事実か問いにする。「失敗」「残念」は 0 件（AC-45）。Mayer の personalization（R-74）は台詞にだけ当て、本文の調子は変えない。
+6. 子どもっぽく見せない：「really big endearing eyes」（R-76）と「cute alien-like」（R-79）は子ども向けの型。対象（実務のエンジニアと未経験の大人）には、目と口だけで表情を作り、体の描き込みを少なくした「道具か記号に近い姿」を候補にする（3 案は仕様で出し、Takuma が選ぶ。PRD 9）。固有色は 1〜2 色で、意味色（成功、注意、エラー）と重ねない（R-68）。待機のまばたきのような自動の動きは入れない（R-67。入れるなら 5 秒以内、R-39）。
+
 ## 4. 手本（別カテゴリー）
 - 名前と選んだ理由：Wordle（NYT Games。ワードゲーム）。「1日1つ」「開いたらすぐ本題」「登録なし、広告なし」で始まり、1日あたりの利用時間を短く保つことを意図して設計された。NYT のゲーム本体と NYT ヘルプのページは取得できなかった（Claude Code が nytimes.com を開けない）ので、Wikipedia と設計の解説記事から確かめた（R-6、R-7）。
 - 取り入れる考え方（R 番号）：
@@ -103,6 +171,11 @@ PRD r10 の 3 の候補から、FB-3 の「面白さ」の作りを持つ 4 本�
 - 選んだ理由：取引を終えた直後の画面を「何が終わったか」と「次に何が起きるか」で組む型が、競合の「Continue」の連鎖（R-44）の対極にある。登録も課金もない公共サービスなので、「押させる」動機がない。
 - 取り入れる考え方（R-53）：確認ページは「at the end of a transaction」に 1 つ。必ず入れるのは「details of what happens next and when」と「links to information or services that users are likely to need next」。再読み込みやブックマークで戻れること（「allow them to return to the page, whenever possible」）。当アプリの `task.done` は、終えた事実（累計、解説）→ 次に起きること（「次の一手に進む」か「明日も 1 件出る」）→ 次に要るもの（履歴）の順に置き、再読み込みしても同じ画面に戻る（PRD 11 の冒頭の規則）。
 - 取り入れないもの：参照番号、連絡先、フィードバックのリンク、PDF の保存（当アプリには取引がない）。
+
+### 4.2 r3 で足した手本：Undertale（ゲーム。ドット絵で感情を伝える画風の手本）
+- 選んだ理由：Takuma の FB2-6「アンダーテールみたいなの」。低解像度のドット絵で、評論は「simple, but communicative」「ability to convey emotion」と、少ない描き込みで感情が伝わることを認めている（R-85）。学習アプリではなくゲームなので、別カテゴリーの手本に当たる。
+- 取り入れる考え方（R-85、R-86、R-87）：作者の「audiences become more attached to characters drawn simply rather than in detail」。少ない画素と色（R-86 の 8 色、R-87 の「4 colors」）で、目と口だけで表情を作る。
+- 取り入れないもの：特定のキャラクターの姿、台詞、場面、音楽、戦闘の仕組み。評価が「mixed」（R-85）である点も含め、画風の「方法」だけを参照し、絵はこのアプリだけのものを描く（docs/approvals/001-daily-learning-FB2.md の読み取り FB2-6）。
 
 ## 5. ブランドの性格語と文言の調子
 性格語は4語。NN/g は「a set of 3–7 words that express the essence of your Brand」を選び、語ごとに意味を定めて文言、書体に当てることを勧める（R-12）。
@@ -124,6 +197,15 @@ PRD r10 の 3 の候補から、FB-3 の「面白さ」の作りを持つ 4 本�
 - 淡々 ⇔ 熱っぽい：「淡々」。「10x faster」（R-2）や「Commit to your growth」（R-5）のような煽りを使わない。例外は完了の直後の1文だけで、そこも事実を言う。
 - 英語の調子：同じ位置（plain、direct、no exclamation marks）。英語のボタンは動詞始まり（Start、Done、Export）。
 - r2 の追記（祝いと申告の後の言葉）：HIG の Writing は「exercising and reached a goal」の場面で「light and congratulatory」に調子を寄せてよいとし、同時に「just saying "Send" often works better than "Let's do it!"」「Interjections like "oops!" or "uh-oh" are typically unnecessary and can sound insincere」と言う（R-35）。当アプリの祝いは「数えられる事実を言う 1 文」（例：7 件目を終えました）にし、感嘆符、絵文字、「すごい」のような評価の語は使わない。「今日はできない」の後は、労いも励ましも置かず、事実（見送った。次はいつでも進める）だけを言う。罪悪感で動かす言い回し（confirmshaming：「No, I don't want to stay alive」。R-60）と、断っても出続ける催促（nagging。R-60）は使わない。「連続」「途切れ」「逃した」、英語の「streak」「missed」は文言ファイルに 0 件（AC-35）。
+
+- r3 の追記（FB2-4、FB2-5。性格語を 5 語から 6 語にする。NN/g の 3〜7 語の範囲。R-12）：
+
+| 性格語 | 意味すること | 意味しないこと |
+|---|---|---|
+| 一緒に（r3 で足した） | 案内役は評価者ではなく同席者。正解でも不正解でも同じ大きさで隣にいて、不正解では「一緒に考える」顔になる（PRD 9、AC-45。R-85 の「drawn simply」、E-27 の「笑ってくる」の逆）。図は読む人の理解を助ける 1 枚（R-74 の multimedia） | なれなれしい。台詞で会話を長引かせる。ペットのように世話をさせる（PRD 10）。「you are disappointing Duo」（R-77）のような情緒的な負債 |
+
+- r3 の注記：「静か」は r3 でも残す。意味は「飾りを置かない、動きは返しの 0.3 秒以内まで、色は意味を持つ所だけ」。図とキャラクターは「意味を持つ」側（図は本文の型、キャラクターは返しの一部）なので「静か」と両立する。両立しないのは、図の背景の模様、紙吹雪、効果音（E-27）。
+- 文言の調子（r3 の追記）：本文と画面の文言の位置は変えない（やや「かしこまる」、「まじめ」、「ていねい」、「淡々」）。キャラクターの台詞だけ「くだける」側に 1 段寄せる（Mayer の personalization「from a more informal, conversational voice」。R-74）。寄せ方は、です・ます調のまま、問いかけと短い相づちを許す（「ここは順番がポイントです」「もう一度、層の図を見てみましょう」）。感嘆符、絵文字、評価語は台詞でも使わない（R-35）。正誤の文言は「正解」「惜しい」（PRD 10。「不正解」「間違い」は 0 件。AC-45）。
 
 ## 6. 合わせる当たり前と、差をつける点
 - 合わせる当たり前（利用者がほかのアプリで覚えた型）と R 番号：
@@ -155,6 +237,18 @@ PRD r10 の 3 の候補から、FB-3 の「面白さ」の作りを持つ 4 本�
   - 差をつける点 1（課題そのものがホーム画面）は変えない。n / N と「次の一手」が入っても、開いた直後の `task.today` に重なる要素は 0 件のまま（AC-31）。
 - 仕様で表れる画面：`task.today`（n / N）、`task.rate` と `task.done`（手応え、次の一手）、`task.skipped`（次の一手。労いなし）、`task.exhausted`（修了と進級）、`diagnosis.question`（ヒント文）、`settings.stats`（今週の完了日）。
 
+### 6.2 r3 の追記（FB2 で変わった点）
+- 合わせる当たり前（足した）：
+  - 選択肢は縦に並べ、答えると正誤と説明がその場に出て、「次へ」で進む（R-75 の Duolingo、R-82 の Pythonプログラミング入門。E-26「間違えた時の解説が充実」）。
+  - 正誤は文言と記号と色の 3 つで示す（R-66、R-69、R-70）。
+  - 返しの動きは短く、`prefers-reduced-motion` で消える（R-67、R-72）。
+  - 案内役は正解のときに表情を変える（R-76）。
+  - 図はラベルを短く、幅を使い切り、色だけに頼らない（R-73）。
+- 差をつける点（r2 の 2 を置き換える。r1 の 1 は変えない）：
+  2. **選んだ直後の 0.3 秒に、「なぜ」が必ず出て、案内役が不正解でも同じ顔の大きさで隣にいる**。競合は説明を任意で開かせ（R-75）、正解のときだけキャラクターが動き（R-76）、不正解で笑う（E-27）か、説明が「曖昧かつ断片的」（E-26）になる。当アプリは、選んだ選択肢の説明と正解の説明を必ず並べ（AC-41）、案内役は正解と不正解で表情だけを変え、台詞は事実か問いだけ（AC-45）。r2 の「終えた直後の手応え」（解説、累計、n / N）はこの 2 の続きとして `task.rate` に残す。
+  - 図（6 型）は「差をつける点」ではなく「合わせる当たり前」側に置く。Progate と Brilliant が図を中心に据えている（R-81、R-83）ので、図があること自体は差にならない。差になるのは「課題集が型とラベルだけを持ち、アプリが描く」作りで、これは見た目ではなく実装の差（AC-44）。
+- 仕様で表れる画面：`task.today`（図、選択肢、返し、説明、案内役の表情）、`task.rate`（正答数、案内役の祝い、解説）、`diagnosis.start`（案内役の導入）、`task.exhausted`（修了の祝い）、`settings`（案内役の非表示）。
+
 ## 7. 方向性の2案
 | | 案A「一枚の紙」 | 案B「進み具合の盤」 |
 |---|---|---|
@@ -174,6 +268,20 @@ PRD r10 の 3 の候補から、FB-3 の「面白さ」の作りを持つ 4 本�
 | 選んだか、その理由 | **選ぶ**。FB-3 の「ワクワク」を「次の解説と次の段階を見たくなる」（返ってくるもの）で作り、演出に頼らない。足す要素はすべて文字で、AC-35〜AC-38 の自動テストで数えられる | 選ばない。PRD 10（連続記録、ペット、変動する報酬を採らない）と 6 の害の行 (3)（累計や節目が新しい圧になる）に反する方向。動きを入れるなら R-32、R-38、R-39 の 3 条件（短い、取り消せる、設定で消える）を全部満たす必要があり、文だけの案より確かめる手間が増える |
 
 未解決（仕様で決める前に Takuma に聞く候補）：累計の数字を「大きい文字」で出す（統計の画面と同じ例外）か、本文と同じ大きさで出すか。案A' は「大きい文字 1 行」を提案するが、r1 の「飾りは置かない」との線引きは見た目の判断なので報告の「未解決」に書く。
+
+### 7.2 r3 の方向性：pop の度合い（FB2-4。色数 3 と 5。最終の選択は Takuma。PRD 9 の図の行、AC-44）
+今のトークン（design/tokens.md r7）は、地と文字の 2 色に、主操作の青（color.action.primary）と意味色 3 つ（success、warning、error）を持つ。「色数」はここでは「意味色を除いた、見た目のためのアクセント色の数」で数える。
+
+| | 案C「3 色：地、文字、青 1 つ」 | 案D「5 色：地、文字、青、図の強調の暖色 1 つ、案内役の固有色 1 つ」 |
+|---|---|---|
+| ひとことで | アクセントは青 1 つのまま。図の強調も青、案内役の固有色は青か無彩色。pop は太い線、角丸、大きいラベル、表情で作る | 図の強調に暖色（例：橙系）を 1 つ、案内役に固有色（例：緑青か黄系）を 1 つ足す。箱に薄い塗り面を許す。各色にライト、ダーク、コントラストを上げる設定の 3 値（R-68） |
+| 性格語との合い方 | 「静か」「正直」に最も合う。「一緒に」は表情で作れる | 「一緒に」と FB2-4 の「わくわく」に合う。「静か」は「意味を持つ色だけ」の線を守れば両立する（R-68「status indicators or primary actions」。図の強調と案内役は意味を持つ） |
+| ターゲットとの合い方 | R-13（教育水準が高いほどカラフルさの好みが下がる）に合う。FB2-4 の「退屈」を線と表情だけで解けるかは確かめていない［推測］ | FB2 を書いた Takuma（対象の代理）の「pop」に直接応える。色が増える分、R-13 の仮定からは離れる。Duolingo の 7 色（R-77）までは行かない |
+| コントラストの保ち方 | 既存の値（仕様 9 の表）で済む | 新しい 2 色に、線と枠は 3:1（R-71）、文字は 4.5:1（R-69）を数字で用意する。USWDS の「magic number」（明度の段の差 50 以上で AA。R-89）のように、地との明度差で選ぶと確かめやすい。足した色を主操作と意味色に流用しない（R-68「Avoid using the same color to mean different things」） |
+| 選んだか、その理由 | 選ばない。理由：FB2-4 は「文字だけだと退屈」への直接の要望で、r2 の「色は少なく」の延長では同じ指摘を受ける可能性が高い。ただし Takuma が「静か」を優先するならこの案に戻せる | **推奨する**（選ぶ）。理由：色を「意味を持つ 2 か所」（図の強調、案内役）にだけ足すので、R-68 と「静か」を守ったまま FB2-4 に応えられる。3 値のコントラストは数字で用意できる（R-89）。見た目の判断なので Takuma の選択に委ねる（報告の「未解決」） |
+
+- どちらの案でも共通：正誤に赤と緑の対を使わない（R-69）。図の背景の模様、紙吹雪、効果音は置かない（R-67、E-27）。文字は 4.5:1、線と枠は 3:1（R-69、R-71）。色の意味は画面全体で 1 つ（R-68）。
+- 未解決（仕様の前に Takuma に聞く候補）：(1) 案C か案D か。(2) 案D のとき、暖色と固有色の色相（候補は仕様の段階で 2〜3 組を数字付きで出す）。(3) 案内役の姿の 3 案（PRD 9）は仕様で出す。
 
 ## 8. 発見の一覧
 | R | 発見（引用は「」で） | 出典 URL | 確認日 |
@@ -243,6 +351,32 @@ PRD r10 の 3 の候補から、FB-3 の「面白さ」の作りを持つ 4 本�
 | R-63 | Apple サポート「Track daily activity with Apple Watch」。Weekly Summary は「The summary includes a daily average and weekly total of the progress you've made toward closing your rings」。「You can earn awards for personal records, streaks, and major milestones」。iPhone の Fitness で「Summary → Activity rings → Calendar」で日を選ぶ。抜けた日が暦でどう見えるかは、このページには書かれておらず見ていない（R-46 の Mobbin が「Apple Fitness のリング」を抜けが見える型の例に挙げる） | https://support.apple.com/108359 | 2026-11-05 |
 | R-64 | Finch（公式トップ）。「Daily self-care is finally fun — take care of your pet by taking care of yourself!」「Your new self-care best friend.」。圧や罪悪感についての文言、抜けた日の扱い、進み具合の見せ方はトップにない（抜けた日の「fix」の見せ方は R-46 の Mobbin の記述だけ） | https://finchcare.com/ | 2026-11-05 |
 | R-65 | GOV.UK Design System「Task list」（patterns/task-list-pages は 410 で、components/task-list に移っていた）。「displays all the tasks a user needs to do」。状態は「Completed」を黒い文字（背景なし）、「Incomplete」を青いタグで示す。「Users can only move on from the task list when all tasks are shown as 'Completed'」。「n of N」の文言の例はない | https://design-system.service.gov.uk/components/task-list/ | 2026-11-05 |
+| R-66 | HIG Feedback（r3。JSON 経路。R-34 と同じページの別の文）。「Feedback helps people know what's happening, discover what they can do next, understand the results of actions, and avoid mistakes」「The most effective feedback tends to match the significance of the information to the way it's delivered」「When status feedback is available near the items it describes, people get important information without having to take action or leave their current context」。確認について「because people typically expect their action or task to succeed, they only need to know when it doesn't」 | https://developer.apple.com/tutorials/data/design/human-interface-guidelines/feedback.json （HTML は https://developer.apple.com/design/human-interface-guidelines/feedback ） | 2026-11-05 |
+| R-67 | HIG Motion（r3。JSON 経路。R-32 と同じページの別の文）。「Aim for brevity and precision in feedback animations」「When animated feedback is brief and precise, it tends to feel lightweight and unobtrusive, and it can often convey information more effectively than prominent animation」「In apps, generally avoid adding motion to UI interactions that occur frequently」「Don't add motion for the sake of adding motion」「it's essential to avoid using it as the only way to communicate important information」 | https://developer.apple.com/tutorials/data/design/human-interface-guidelines/motion.json | 2026-11-05 |
+| R-68 | HIG Color（r3。JSON 経路。本文 181,946 字のうち前半 100,000 字を読んだ）。「Avoid relying solely on color to differentiate between objects, indicate interactivity, or communicate essential information」「you can use text labels or glyph shapes to identify objects or states」「Avoid using the same color to mean different things」「if you use your brand color to indicate that a borderless button is interactive, using the same or similar color to stylize noninteractive text is confusing」「If you define a custom color, make sure to supply light and dark variants, and an increased contrast option for each variant」「reserve it for elements that truly benefit from emphasis, such as status indicators or primary actions」「Refrain from adding color to the background of multiple controls」 | https://developer.apple.com/tutorials/data/design/human-interface-guidelines/color.json | 2026-11-05 |
+| R-69 | HIG Accessibility（r3。JSON 経路。R-33 と同じページの別の節）。「Convey information with more than color alone. … people who are color blind may have particular difficulty with pairings such as red-green and blue-orange. Offer visual indicators, like distinct shapes or icons, in addition to color」。文字のコントラストの表：17 pt 以下は 4.5:1、18 pt は 3:1、太字は 3:1（「values from WCAG Level AA as guidance」）。操作部品は iOS で既定 44×44 pt、最小 28×28 pt。「about 12 points of padding around elements that include a bezel. For elements without a bezel, about 24 points」。「ensure your app or game responds by reducing automatic and repetitive animations, including zooming, scaling, and peripheral motion」 | https://developer.apple.com/tutorials/data/design/human-interface-guidelines/accessibility.json | 2026-11-05 |
+| R-70 | WCAG 2.2 Understanding SC 1.4.1 Use of Color。意図は「to ensure that all sighted users can access information that is conveyed by color differences」。色だけの例として「error is shown in red」。妥当・不当を「green for valid or red for invalid」の枠の色だけで示すのは、コントラストに関わらず別の視覚の印が要る。正誤の答えに特化した例はない | https://www.w3.org/WAI/WCAG22/Understanding/use-of-color.html | 2026-11-05 |
+| R-71 | WCAG 2.2 Understanding SC 1.4.11 Non-text Contrast（AA）。3:1 以上を求める対象は「Visual information required to identify user interface components and states, except for inactive components」と「Parts of graphics required to understand the content」。「Not every graphical object needs to contrast with its surroundings」。折れ線グラフは「The lines should have 3:1 contrast against their background」。状態が変わっても「the component must not lose contrast with the adjacent colors」。「Having a visual boundary indicating the hit area is only required when there is no other visual way」 | https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html | 2026-11-05 |
+| R-72 | WCAG 2.2 Understanding SC 2.3.3 Animation from Interactions（AAA）。「Motion animation triggered by interaction can be disabled, unless the animation is essential」。例：ページ送りの遷移が「prefers-reduced-motion CSS media query」に従う。essential の定義は「if removed, would fundamentally change the information or functionality of the content」 | https://www.w3.org/WAI/WCAG22/Understanding/animation-from-interactions.html | 2026-11-05 |
+| R-73 | HIG Charts（r3。JSON 経路）。「An effective chart highlights a few key pieces of information in a dataset」「Avoid relying solely on color to differentiate between different pieces of data or communicate essential information in a chart」「One way to supplement color is to use different shapes or patterns」「Describe what the chart's details represent, not what they look like」「In a compact environment, maximize the width of the plot area」「ensure that labels on a vertical axis are as short as possible without losing clarity」「you want the data itself to be most prominent」 | https://developer.apple.com/tutorials/data/design/human-interface-guidelines/charts.json | 2026-11-05 |
+| R-74 | Mayer のマルチメディア学習の原則（二次資料。Water Bear Learning。原著は見ていない。PRD の E-25 と同じ出典の、E-25 にない 4 原則）。signaling「humans learn best when they are shown exactly what to pay attention to on the screen」、spatial contiguity「when relevant text and visuals are physically close together」、temporal contiguity「when corresponding words and visuals are presented together, instead of in consecutive order」、redundancy「with narration and graphics, as opposed to narration, graphics, and text」。coherence「when extraneous, distracting material is not included」、segmenting「in segments」、personalization「from a more informal, conversational voice」、multimedia「uses two modalities at the same time」 | https://waterbearlearning.com/mayers-principles-multimedia-learning/ | 2026-11-05 |
+| R-75 | Duolingo 公式ブログ「Explain My Answer, now free」。不正解の後に赤い帯が出て「Incorrect」と「Explain My Answer」のボタン。開くと正解「el niño」と自分の答え「la niño」を並べ、niño が男性名詞なので el になると説明し、対比の例文「El niño y sus padres」「La niña y sus padres」を 2 つ出す。「Choose whether you want feedback on a mistake」（説明は任意）、「feel confident」。説明は学習者の母語に合わせる（英語話者には文法性がないことを踏まえる）。画面は記事のスクリーンショットの説明文から読んだ（画像そのものは見ていない） | https://blog.duolingo.com/explain-my-answer-now-free | 2026-11-05 |
+| R-76 | Duolingo 公式ブログ「Building character」（PRD の E-28 と同じ記事の、E-28 にない文）。幕間のアニメは「reward a learner for answering a number of exercises correctly in a row」。Duo の設計は「really big endearing eyes」で、新しいキャラクターは同じ基本の形から作る。キャラクターは学習者が訳す例文を「話す」。不正解のときの動き、表情の体系、ファイルの重さ、フレーム数の記述はない | https://blog.duolingo.com/building-character/ | 2026-11-05 |
+| R-77 | 第三者の Duolingo の設計ガイド（blakecrosley.com。出典のない主張が多く、AI の補助で書かれた可能性がある。数字は信じない）。「Wrong answers trigger gentle animations and encouraging feedback, not red error screens」、赤い帯と柔らかい音と「GOT IT」ボタン、「The progress bar still advances after wrong answers (just less)」。色：緑 #58cc02（成功と主 CTA）、赤 #ff4b4b（ハート、誤り）、橙 #ff9600（連続記録）、黄 #ffc800（XP）、紫 #ce82ff（リーグ）、青 #1cb0f6（情報）、桃 #ff86d0（催し）の 7 色。「Anthropomorphism creates emotional stakes (you are not disappointing an app, you are disappointing Duo)」、通知の sad、crying、「dead」Duo を「the nuclear option」と呼ぶ。「a sad owl is charming」として害は論じない。Medium の分析（開けなかった。R-91）は「red pop-up…beep」と書き、「not red error screens」と食い違う | https://blakecrosley.com/guides/design/duolingo | 2026-11-05 |
+| R-78 | Swift Playgrounds 開発者向けページ。キャラクターの名前はページに出ない。「identifying mistakes as you type and offering suggestions to help correct the errors」「The results of your code appear instantly as you type」「Interactive lessons teach key coding concepts」「use puzzles and experimentation to teach」。アニメーションと見た目の記述はない | https://developer.apple.com/swift-playgrounds/ | 2026-11-05 |
+| R-79 | Common Sense Media「Swift Playgrounds」。「Hints are available and get more detailed, eventually leading to the full solution, if needed」「move the character, Byte, and make him collect a gem」「cute alien-like characters and a 3D world」「Learning feels like play in sleek, approachable coder」。対象年齢「age 10+」。「the vocabulary ramps up as lessons progress」。失敗したときの Byte の反応は書かれていない | https://www.commonsensemedia.org/app-reviews/swift-playgrounds | 2026-11-05 |
+| R-80 | クラスメソッド「Learn to Code1編」（日本語）。「『Byte』というキャラクターを動かすためのSwiftで書かれたコマンドを使ってパズルを解きながらプログラミング学習をする」「Byteは宝石を集めるのが好きですが、一人では集めることができません。」ヒントの場所と失敗時の反応の記述はない。Apple のサポート「Swift Playgrounds ユーザガイド」（iPad）は「Help a character navigate a beautiful 3D world by writing code in Swift」「tap Start Coding at the end of the introduction」で、キャラクター名、ヒント、失敗時の挙動の記述はない | https://dev.classmethod.jp/articles/swift-playgrounds-learn-to-code 、https://support.apple.com/guide/playgrounds-ipad/itca964ba80c/ipados | 2026-11-05 |
+| R-81 | Progate App Store JP の説明文。「イラスト中心のスライドで直感的に、自分のペースで」「スライドで知識を学んだら、実際にプログラムを書いて知識を定着させましょう。」「「にんじゃわんこ」や「ひつじ仙人」と一緒に、プログラミングを楽しく学びましょう。」選択問題と正誤の見せ方の記述はなく、画面写真の alt は空。progate.com/courses/html（prog-8.com から転送）は alt が「HTML & CSS」1 件だけで、スライドの見た目の記述なし | https://apps.apple.com/jp/app/progate/id1335868128 、https://progate.com/courses/html | 2026-11-05 |
+| R-82 | Pythonプログラミング入門 App Store JP の説明文。「3択クイズに答えていくだけで、知識ゼロからでもプログラミングの基礎が身につきます」「3択クイズに答えるという手軽な学習法」「各章の「この章で学ぶこと」も必見！」。レビュー（2025-03-29、評価 5）「問題とは別で一から分かりやすい解説をしてくれるので、何も分からない私でも少しずつ理解することが出来ました。」「解説を読んだ後に問題にチャレンジして」。（2021-08-12）「実際にコードを打ち込むわけでは無いのでややこしく感じる問題もありますが」。図、キャラクター、正誤の見せ方の記述はなく、画面写真の alt は空 | https://apps.apple.com/jp/app/python%E3%83%97%E3%83%AD%E3%82%B0%E3%83%A9%E3%83%9F%E3%83%B3%E3%82%B0%E5%85%A5%E9%96%80/id1540203303 | 2026-11-05 |
+| R-83 | Brilliant 公式トップ（2026-11-05）。AI の家庭教師「Koji」が中心：「A visual, interactive tutor, not a cheating machine」「asks guiding questions, sketches on your screen, and helps you work through each step」「get you to the answer without giving it to you」「works with you on any mistakes or weak spots」。推薦文「Visual learning changed everything!」。レッスンの図と選択問題の画面は見ていない | https://brilliant.org/ | 2026-11-05 |
+| R-84 | Mimo 公式トップ：「With precise feedback and hints that adapt to your progress, Mimo helps you keep moving forward when you're stuck」「Get explanations, hints, and reviews that help you understand your code」、推薦文「Beautiful and playful interface.」「short, interactive, and visual lessons.」。マスコットの記述なし。Sololearn 公式トップ：「Assess what you've learned with in-lesson quizzes, and gradually advance your skills with practice」、JSON-LD に「learners write and run real code with instant feedback」、画像の alt は「illustration」。マスコットの記述なし | https://mimo.org/ 、https://www.sololearn.com/ | 2026-11-05 |
+| R-85 | Wikipedia「Undertale」（本文 180,193 字のうち前半 100,000 字を読んだ）。「The game's visuals received mixed reactions」。作者 Fox「there's a psychological thread that says audiences become more attached to characters drawn simply rather than in detail」。評：「simple, but communicative」（Giant Bomb）、感情を伝える力を評価（PC Gamer）、「amateur but also original」（ファミ通）。「it is possible to clear the game without killing a single enemy」。文章は「consistently funny」「rather heartfelt」。特定のキャラクターの姿は読まず、引かない | https://en.wikipedia.org/wiki/Undertale | 2026-11-05 |
+| R-86 | Wikipedia「Pixel art」。共通の特徴は「low overall color count in the image」。「highly restricted palettes (e.g. a maximum of 8 or 16 colors) were argued by some to be a defining feature of pixel art」。技法は「a single color at a time, avoiding tools such as soft edges, smudging, and blurring」、アンチエイリアスは「strong edges are softened by manually placing pixels」、ディザは「checkerboard or lines」。拡大の方法（nearest-neighbor）の記述はない | https://en.wikipedia.org/wiki/Pixel_art | 2026-11-05 |
+| R-87 | Pixeljoint「Creating Pixel Art」（cure、2010。Lospec が「selective outlining」のタグで載せる初心者向けの基本）。「If you can't make a good sprite in 4 colors, using 40 colors isn't going to help.」「Pixel art can convey a lot of information for its size」。独立した 1 画素が許される例「like the eyes on a small sprite」。「Sel-out (short for selective outlining, also known as broken outlines) is anti-aliasing an outline to a background color」「Sel-out works if it is created for specific scenarios」（背景が決まっている場合）。「Hue-shifting is used because straight ramps are usually boring」 | http://pixeljoint.com/forum/forum_posts.asp?TID=11299 （Lospec の索引：https://lospec.com/pixel-art-tutorials/creating-pixel-art ） | 2026-11-05 |
+| R-88 | Lospec のチュートリアル索引（586 件のうち 10 件が表示）：「Pixel Logic - A Guide to Pixel Art」（Michael Azzi、2018。Gumroad の有料 PDF。見ていない）、「1-Bit」（Pedro Medeiros、2017。「Tips on creating pixel art in 2 colors」）、「Palettes - A Beginner Guide」。PICO-8 パレットは 16 色。Pedro Medeiros（saint11.art）のチュートリアルは画像だけで本文が取れず、題名（Outlines、Silhouette、Portrait、Cuteness、Fundamentals、Resizing、Subpixel、characterIdle、Squash など）しか分からない（見ていない） | https://lospec.com/pixel-art-tutorials 、https://lospec.com/palette-list/pico-8 、https://saint11.art/blog/pixel-art-tutorials/ | 2026-11-05 |
+| R-89 | USWDS（米国政府のデザインシステム）の色のトークン。明度の段の差「magic number」：「A magic number of 40+ results in WCAG 2.0 AA Large Text contrast」「A magic number of 50+ results in WCAG 2.0 AA contrast or AAA Large Text contrast」「A magic number of 70+ results in WCAG 2.0 AAA contrast」「Colors of grade 50 result in Section 508 AA contrast against both pure white (grade 0) and pure black (grade 100)」。テーマの色は「will use only a few color families from the 24 color families available」 | https://designsystem.digital.gov/design-tokens/color/overview/ | 2026-11-05 |
+| R-90 | rough.js：「a small (<9kB gzipped) graphics library」で「sketchy, hand-drawn-like」の線を描き、「works with both Canvas and SVG」。roughness（例 0.5、2.8）と bowing、塗りは hachure（既定）、solid、zigzag、cross-hatch、dots、sunburst、dashed、zigzag-line。Excalidraw の README：「Hand-drawn like style.」「Export to PNG, SVG & clipboard.」。どちらも当アプリでは使えない（本番の依存 0 件、CSP。CLAUDE.md）。見た目の参照だけ | https://roughjs.com/ 、https://github.com/excalidraw/excalidraw | 2026-11-05 |
+| R-91 | Duolingo の不正解時のキャラクターの反応を公式に書いた資料は見つからなかった。Duolingo の design hub（design.duolingo.com は blog.duolingo.com/hub/design/ に転送）の 4 件（Duologues、Product Design interviews、core tabs、widget）に該当の要約なし。検索の抜粋だけ（本文は見ていない）：Medium の分析は「red pop-up…specific beep」と緑の対、Rive の講演の書き起こしは「idle state into an incorrect or correct state」、学習アプリの求人は「neutral, happy for correct, sad for wrong」の 3 状態。uxplanet.org の記事は 403、Creative Bloq は本文が切れて読めなかった | https://blog.duolingo.com/hub/design/ （開けなかった：https://uxplanet.org/analyzing-duolingo-from-product-design-perspective-after-400-days-of-non-stop-practice-c4d4809bdb37 、https://www.creativebloq.com/news/duolingos-redesigned-mascot-is-a-hoot ） | 2026-11-05 |
 
 ### 8.1 決めたいことごとの示唆（仕様に渡す。決定そのものは design/001-daily-learning.md で行う）
 | 決めたいこと（1 の番号） | 示唆 | 根拠 |
@@ -261,6 +395,11 @@ PRD r10 の 3 の候補から、FB-3 の「面白さ」の作りを持つ 4 本�
 | 13 未経験の入口（r2） | 領域の選択肢にヒント文（1 文、句点なし、リンクなし、40 字以内。`area.<ID>.desc`）。経験年数は「まだコードを書いたことがない」を先頭に置く（数直線の順。頻度順ではない）。段階の説明は PRD 9 の趣旨（初級「コードをほとんど書いたことがない」、中級「仕事や学習でコードを書いている（人に聞きながらでもよい）」、上級「設計を決め、人に教えている」）で、自己評価の問いの選択肢に同じ 1 行を付ける。`diagnosis.start` の導入文「すでにコードを書いているエンジニア向けです」（PRD の E-21）を「コードを書いたことがなくても使えます」の趣旨に変える。最初の 1 件の不安は、別の説明画面を足さず（HIG onboarding の「context-specific tips」）、課題本文の「やり方」で用語を 1 文で説明する（AC-34。中身は pdm）。画面の文言でも専門用語（「リポジトリ」「API」）を領域名と説明に使わない | R-54、R-55、R-36、R-35（plain language）、R-50（Progate の「大丈夫」より用語の説明）、R-8、AC-39、AC-40、PRD の E-12、E-21 |
 | 14 ひとこと解説（r2） | `task.rate` と `task.done` に、見出し「ひとこと解説」（「答え」「正解」の語を使わない）＋ 本文と同じ text style の 1〜2 文。折りたたまない（`<details>` は開く操作が増える）。`task.today` の DOM には置かない（AC-38 の 0 件）。`task.skipped` には出さない。位置は累計と祝いの直後、「役に立ったか」の問いの直前（解説を読んでから答える） | R-56（staged disclosure）、R-57（retrieval の後に確かめる）、R-58（折りたたみを使わない理由）、AC-38 |
 | 15 今週の完了日（r2） | 文と数字だけ：「今週（月曜から）完了した日：3 日」。曜日の並び、7 つのドット、灰色の抜けた日、先週の値は出さない。`task.done` の末尾と `settings.stats` の定義リストに同じ 1 行。英語は「Days completed this week (from Monday): 3」。月曜始まりは ISO 8601 の週で、`ja-JP` のロケールの慣習（日曜始まり）と違うので「月曜から」を省かない | R-46（灰色の抜けの逆）、R-61、R-62、R-63、R-16、AC-37 |
+| 16 選択式の画面（r3） | 1 列：問題文 → 選択肢 3 つ（列いっぱいの `<button>`、縦、44 px 以上）→ 返し（文言「正解」「惜しい」＋記号＋色。赤と緑の対にしない。不正解は色を足さず枠を太く、正解の選択肢に color.success の印）→ 選んだ選択肢の説明（不正解なら正解の説明も。正解と自分の答えを並べ「なぜ違うか」）→ 「次の問題へ」（主操作）。答えた後は選択肢を `aria-disabled` にして読めるまま残す。動きは 300 ミリ秒以内で不透明度か表情の切り替えまで、音なし、reduced motion で 0 件。説明は任意で開かせず常に出す | R-66、R-67、R-68、R-69、R-70、R-72、R-75、R-82、E-26、E-27、3.2 の示唆 |
+| 17 図解（r3） | 6 型を HTML と CSS かインラインの SVG。色の役割は地、線と文字、強調 1 色。pop は太い線（2 px 以上）、角丸、本文と同じ大きさのラベル、強調 1 色で作り、手描き風の揺れと背景の模様は置かない。幅 320 では流れ・手順・分岐・木を縦に組み、比較だけ 2 列を保ち、収まらなければ縦に積む。ラベルは DOM の文字、図は `role="img"` と `aria-label`（alt は中身を書く）。線は 3:1、文字は 4.5:1 を暗色でも保つ。図に動きは付けない | R-16、R-67、R-69、R-71、R-73、R-74、R-90、3.3 の示唆 |
+| 18 キャラクター（r3） | 出る場所は PRD 9 の固定。正解と不正解で絵の大きさと位置を変えず表情だけ変える（笑わない）。32×32、4〜8 色、目と口の 2〜4 画素で 4 表情。輪郭は 1 色の濃い線で閉じ、sel-out はしない。暗色では輪郭と肌の色を切り替える（ADR の案 (a) か (b)）。整数倍（2〜3 倍）で `image-rendering: pixelated`。台詞は 40 字以内、システムの書体、です・ます、問いか事実、評価語と感嘆符なし。姿は「目と口だけで表情、体の描き込みは少なく、道具か記号に近い」を候補に 3 案を仕様で出す。自動の動き（まばたき）は入れない。非表示の設定、`aria-hidden` の絵、reduced motion で 0 件 | R-35、R-39、R-60、R-67、R-68、R-72、R-76、R-77、R-79、R-85、R-86、R-87、tech-lead r5 の 3、3.4 の示唆 |
+| 19 pop の度合い（r3） | 案D（意味色のほかに、図の強調の暖色 1 つと案内役の固有色 1 つを足す。合計のアクセントは 3 つ）を推奨し、案C（青 1 つのまま）を代替として残す。足す色はライト、ダーク、コントラストを上げる設定の 3 値を持ち、線と枠は 3:1、文字は 4.5:1 を数字で示す。足した色を主操作と意味色に流用しない。Takuma が選ぶ | R-13、R-68、R-69、R-71、R-77、R-89、7.2 |
+| 20 原則（r3） | 正誤：R-66（直近に出す）、R-69・R-70（色だけに頼らない）。動き：R-67、R-72（頻繁な操作に動きを足さない、reduced motion）。色：R-68（意味を 1 つに、3 値）。図：R-71（線 3:1）、R-73（少なく、形で補う、中身を説明）、R-74（signaling、spatial contiguity、coherence）。キャラクター：R-74（personalization は台詞だけ） | R-66〜R-74 |
 
 見られなかったもの：
 - 競合4本のアプリ内の画面（App Store の画面写真は説明が取れず、アプリは開けない）。タップ数と空の状態は4本とも「見ていない」。
@@ -283,11 +422,22 @@ PRD r10 の 3 の候補から、FB-3 の「面白さ」の作りを持つ 4 本�
   - 第三者の批評（creativiii「two obligatory clicks feel excessive」）の本文（検索の抜粋のみ。R-44 に抜粋と明記）。
   - 累計や節目が連続記録と同じだけ続ける効き目を持つかの証拠（R-43 の +1.7% は連続記録の動きの数字。累計の数字は見つけていない。PRD 8 の反論 (b) と同じ）。
 
+- r3 で見られなかったもの：
+  - Swift Playgrounds、Progate、Duolingo、Brilliant、Mimo、Sololearn、Pythonプログラミング入門の、選択問題と返しの画面そのもの（App Store の画面写真は alt が空。アプリは開けない）。タップの的、選んだ瞬間の動き、正誤の色と形、選び直しは 7 本とも「見ていない」。Duolingo だけ公式ブログの画像の説明文（R-75）から並びを読んだ。
+  - Progate のスライドの図と、Brilliant のレッスンの図そのもの（R-81、R-83）。
+  - Swift Playgrounds の Byte の表情と、失敗したときの反応（R-78〜R-80 のどれにも記述なし）。
+  - Duolingo の不正解時のキャラクターの反応の公式資料（R-91）。uxplanet.org（403）、Creative Bloq（本文が切れた）、Medium と Rive の講演（検索の抜粋のみ）。
+  - Material Design 3 の Color roles（本文が取れず題名だけ。アクセント色の増やし方の根拠は USWDS（R-89）で代えた）。
+  - saint11.art のチュートリアルの本文（画像のみ。R-88）。「Pixel Logic」（有料 PDF）。
+  - Mayer『Multimedia Learning』の原著（二次資料 R-74 で代えた）。
+  - HIG Color の本文の後半 81,946 字と、Wikipedia「Undertale」の後半 80,193 字（前半だけ読んだ）。
+
 ## 確かめ（提出前に designer が印を付ける。design-reviewer はこれを信じずに確かめる）
-- [x] R が5つ以上あり、どれにも出典 URL と確認日がある（R-1〜R-26 は 2026-10-30、R-27〜R-31 は 2026-11-03、R-32〜R-65 は 2026-11-05）
-- [x] 競合を2つ以上と、手本を1つ調べた。不満は引用と URL 付き（r1：競合4本 Enki、Mimo、Exercism、roadmap.sh と手本 Wordle。r2：競合 7 本 Duolingo、Mimo、Sololearn、Brilliant、Progate、paiza、Exercism の見た目と操作の比較（3.1）と、手本 GOV.UK の確認ページ（4.1））
-- [x] ターゲットは「仮説」と書き、根拠に R 番号がある（r2 の追記は 2.1）
-- [x] 性格語ごとに「意味しないこと」がある（r2 で「手応え」を足した）
-- [x] 差をつける点が1から2個ある（2個。r2 で 2 を置き換えた：6.1）
-- [x] 方向性の2案と、選ばなかった理由がある（r1 の 7 と、r2 の 7.1）
+- [x] R が5つ以上あり、どれにも出典 URL と確認日がある（R-1〜R-26 は 2026-10-30、R-27〜R-31 は 2026-11-03、R-32〜R-65 は 2026-11-05、R-66〜R-91 は 2026-11-05）
+- [x] 競合を2つ以上と、手本を1つ調べた。不満は引用と URL 付き（r1：競合4本 Enki、Mimo、Exercism、roadmap.sh と手本 Wordle。r2：競合 7 本 Duolingo、Mimo、Sololearn、Brilliant、Progate、paiza、Exercism の見た目と操作の比較（3.1）と、手本 GOV.UK の確認ページ（4.1）。r3：競合 7 本の選択式の画面、図解、キャラクターの比較（3.2〜3.4）と、手本 Undertale（4.2））
+- [x] ターゲットは「仮説」と書き、根拠に R 番号がある（r2 の追記は 2.1、r3 の追記は 2.2）
+- [x] 性格語ごとに「意味しないこと」がある（r2 で「手応え」、r3 で「一緒に」を足した）
+- [x] 差をつける点が1から2個ある（2個。r2 で 2 を置き換えた：6.1。r3 で 2 を再び置き換えた：6.2）
+- [x] 方向性の2案と、選ばなかった理由がある（r1 の 7 と、r2 の 7.1、r3 の 7.2）
 - [x] r2：6 つの問い（1 の 10〜15）それぞれに R 番号と原則（HIG の URL か WCAG）の根拠があり、8.1 に示唆を書いた。見られなかったものは「見ていない」と書いた
+- [x] r3：5 つの問い（1 の 16〜20）それぞれに R 番号（R-66〜R-91。すべて 2026-11-05）と原則（HIG の JSON 経路の URL か WCAG）の根拠があり、3.2〜3.4 に競合ごとの比較表（見た目と操作）と 6 つの示唆、8.1 に示唆を書いた。手本として Undertale（4.2）を足した。見られなかったものは「見ていない」と書いた。pop の度合い（7.2）とキャラクターの姿は Takuma の判断待ち（報告の「未解決」）
