@@ -95,7 +95,7 @@
   "task.done.task": "Completed: {title}",
   "task.week": "Days completed this week (from Monday): {days}",
   "task.next.note": "Another task comes tomorrow. If you want, you can go on to the next one now.",
-  "task.next.note.last": "That was the last task at this level. If you go on, you will see the completion screen.",
+  "task.next.note.last": "You have seen every {level} task in {area}. If you go on, you will see the completion screen.",
   "task.next": "Start the next task",
   "task.done.history": "View history",
   "task.skipped.title": "Report saved",

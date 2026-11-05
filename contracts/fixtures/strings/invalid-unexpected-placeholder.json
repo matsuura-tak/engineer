@@ -95,7 +95,7 @@
   "task.done.task": "完了した課題：{title}",
   "task.week": "今週（月曜から）の完了日数：{days} 日",
   "task.next.note": "明日も課題が 1 件出ます。続けるなら、次の一手に進めます。",
-  "task.next.note.last": "この段階の課題はこれで最後です。次に進むと、修了の案内が出ます。",
+  "task.next.note.last": "{area}の{level}の課題は、すべて出し終えています。次に進むと、修了の案内が出ます。",
   "task.next": "次の一手に進む",
   "task.done.history": "履歴を見る",
   "task.skipped.title": "申告を記録しました",

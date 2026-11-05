@@ -609,8 +609,20 @@
       "$ref": "#/$defs/plain"
     },
     "task.next.note.last": {
-      "$ref": "#/$defs/plain",
-      "description": "S5、S6 の task.next.note の要素に入れる変種（task.next を押すと S7 になるとき。contracts/data.md の 9。要素の data-testid には使わない）"
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{area[,}]"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{level[,}]"
+        }
+      ],
+      "description": "差し込み：{area}、{level}（{level} は次に出す組の段階。申告で段階が動いていれば動いた先）。S5、S6 の task.next.note の要素に入れる変種（task.next を押すと S7 になるとき。contracts/data.md の 9。要素の data-testid には使わない）"
     },
     "task.next": {
       "$ref": "#/$defs/plain"

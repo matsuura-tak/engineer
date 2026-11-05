@@ -115,7 +115,7 @@
 | `data-stat-too-hard` | 整数 |
 | `data-stat-no-time` | 整数 |
 
-## 5. ID の語彙（ADR 0002。一度決めたら変えない）
+## 5. ID の語彙：最初の公開から変えない（ADR 0002）
 | 種類 | ID | 表示の文言キー |
 |---|---|---|
 | 領域（Q3） | `backend`、`frontend`、`database`、`infra`、`testing`、`git` | `area.<ID>`（バックエンド設計、フロントエンド、データベース、インフラとクラウド、テストと品質、Git とチーム開発） |

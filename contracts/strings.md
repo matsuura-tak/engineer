@@ -7,7 +7,7 @@ AC-26、AC-34、AC-35、つなぎ口 W-14。
 - 置き場所：`backend/public/i18n/ja.json` と `backend/public/i18n/en.json`（配布物の中では `./i18n/ja.json`、`./i18n/en.json`）。
 - 形：平らなキーの JSON（入れ子にしない。`settings.import` と `settings.import.note` が両方あるため）。値は空でない文字列。
 - ja と en は、どちらも strings.schema.json に通ります。スキーマは 174 個のキーをすべて必須にし、それ以外のキーを拒むので、2 つのファイルのキーの集合は必ず同じになります（AC-26 の「片方にしかないキー 0 件」）。
-- 差し込みのあるキー（25 個。3 の表）は、スキーマがその差し込みの名前を含むことを求めます。差し込みのないキー（149 個）は `{` と `}` を含めません。ja と en で、キーごとの差し込みの名前の集合は同じです（contracts/tools/check-schemas.mjs が valid-ja と valid-en で確かめる）。
+- 差し込みのあるキー（26 個。3 の表。design r9 で `task.next.note.last` に `{area}`、`{level}` が付いて 25 → 26）は、スキーマがその差し込みの名前を含むことを求めます。差し込みのないキー（148 個）は `{` と `}` を含めません。ja と en で、キーごとの差し込みの名前の集合は同じです（contracts/tools/check-schemas.mjs が valid-ja と valid-en で確かめる）。
 - キーの数は 146 → 170（design r7：28 個を足し、`task.done.message`、`task.skipped.message`、`task.exhausted.message`、`task.exhausted.detail` を消した）→ 174（design r8：`task.progress.done`、`task.next.note.last`、`task.skipped.levelChanged`、`task.exhausted.nextDone` を足した）。
 - キーを足す・消すときは、先に design/ の 7 と strings.schema.json を直します（tech-lead）。文言ファイルだけを直してもスキーマの検査で落ちます。
 
@@ -22,7 +22,7 @@ AC-26、AC-34、AC-35、つなぎ口 W-14。
 - `{name, plural, one {…} other {…}}`：`new Intl.PluralRules(言語).select(数)` の結果のカテゴリを使い、そのカテゴリがなければ `other`。中の `#` を数に置き換える。カテゴリは `one` と `other` だけ。入れ子はしない。
 - ライブラリは使いません（30 行ほどの自作。ADR 0001）。
 
-差し込みのあるキーは次の 25 個です（schemas/strings.schema.json の pattern、fixtures/strings/valid-ja.json と同じ）。「en は plural」の 5 個は、en の値が `{name, plural, …}` の形で、ja は数だけです。
+差し込みのあるキーは次の 26 個です（schemas/strings.schema.json の pattern、fixtures/strings/valid-ja.json と同じ）。「en は plural」の 5 個は、en の値が `{name, plural, …}` の形で、ja は数だけです。
 
 | キー | 差し込み | 入れる値 |
 |---|---|---|
@@ -39,6 +39,7 @@ AC-26、AC-34、AC-35、つなぎ口 W-14。
 | `task.done.task` | `{title}` | 課題の題名 |
 | `task.week` | `{days}` | `data-stat-days-completed-week` と同じ整数（0〜7） |
 | `task.skipped.levelChanged` | `{level}` | 変わった先の段階の `level.<ID>` の文言 |
+| `task.next.note.last` | `{area}`、`{level}` | 今の領域 `diagnosis.area` の `area.<ID>` の文言、次に出す組の段階 `levels[area]` の `level.<ID>` の文言（申告で段階が動いていれば動いた先。いま終えた課題の段階ではない。data.md の 9、design の D-44 (2)） |
 | `task.exhausted.levelDone` | `{area}`、`{level}` | 今の組の `area.<ID>`、`level.<ID>` の文言 |
 | `task.exhausted.levelDone.detail` | `{total}` | 今の組の課題の総数（`data-progress-total` と同じ数え方。en は plural） |
 | `task.exhausted.next` | `{nextLevel}`、`{desc}` | 次の段階の `level.<ID>` の文言、その `level.<ID>.desc` の文言（句点なし） |
@@ -52,7 +53,7 @@ AC-26、AC-34、AC-35、つなぎ口 W-14。
 | `settings.version` | `{version}` | `data-build-version` と同じ値 |
 | `settings.stats.today` | `{date}` | 今日 `YYYY-MM-DD` |
 
-- 差し込みのない変種：`task.cheer.at7`、`.at30`、`.at100`（累計が 7、30、100 のとき）と `task.next.note.last` は差し込みを持ちません（identifiers.md の 3 の例外。`data-testid` には使わない）。
+- 差し込みのない変種：`task.cheer.at7`、`.at30`、`.at100`（累計が 7、30、100 のとき）は差し込みを持ちません（identifiers.md の 3 の例外。`data-testid` には使わない）。変種の `task.next.note.last` は design r9 から `{area}`、`{level}` を持ちます（上の表。`data-testid` に使わないのは同じ）。
 
 - 日付は両言語とも ISO 8601 の `YYYY-MM-DD` です（design の U-2。Takuma の決定 D2、2026-10-30）。
 
