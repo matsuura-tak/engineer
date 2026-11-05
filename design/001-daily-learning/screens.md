@@ -1,7 +1,7 @@
 # 画面の図（文字）001-daily-learning
 
 design/001-daily-learning.md の補助。幅 320 CSS px（AC-17 の条件）での並びを文字で描く。
-`[ ]` は副操作のボタン（枠）、`[[ ]]` は主操作のボタン（塗り）、`<u>…</u>` はリンク（下線）。縦の線 `|` は本文の列の左右の線（space.4 の余白の内側）。`┌ ┐ └ ┘` は 1 px の枠（案内とダイアログ、入力欄）。色は付けない。r6（2026-11-03）：S1 の案内を枠で描き、S3 に「日付が変わった後」の図を足し、S8 と S10 の注記を直した（design-reviewer G3 r1 の 3、4、8、11）。
+`[ ]` は副操作のボタン（枠）、`[[ ]]` は主操作のボタン（塗り）、`<u>…</u>` はリンク（下線）。縦の線 `|` は本文の列の左右の線（space.4 の余白の内側）。`┌ ┐ └ ┘` は 1 px の枠（案内とダイアログ、入力欄）。色は付けない。r6（2026-11-03）：S1 の案内を枠で描き、S3 に「日付が変わった後」の図を足し、S8 と S10 の注記を直した（design-reviewer G3 r1 の 3、4、8、11）。r7（2026-11-05。仕様 r7、FB-1〜FB-3）：S2 に 1 問目（ヒント文）の図を足し、S3 に進み具合の行、S4 と S5 を累計・祝い・解説・今週・次の一手の並びに描き直し、S6 と S7（2 変種）の図を足し、S9 を 11 行にした。
 
 ## S1 diagnosis.start（iOS の Safari、非スタンドアロン、閉じた印なし）
 ```
@@ -42,18 +42,43 @@ design/001-daily-learning.md の補助。幅 320 CSS px（AC-17 の条件）で�
 ```
 保存データが形式に合わないときの error は、h1 `error.app.message`、`error.app.detail`、`[[ 再読み込み ]]`、`[ 壊れたデータをファイルに保存 ]`、`[ すべてのデータを削除 ]`（color.error）。
 
-## S2 diagnosis.question（初回の 2 問目）
+## S2 diagnosis.question（初回の 1 問目。r7：ヒント文 AC-39）
 ```
 | 今日の一手                        設定 |   header（初回の S2 と途中の再開は nav に「設定」だけ。S7 か S8 から入ったやり直しの S2 は診断後なので「履歴  設定」。design-reviewer r2 の 3）
+|                                        |
+| 質問 1 / 3                             |   diagnosis.progress（text.small、data-question-index=1）
+|                                        |
+| 伸ばしたい領域を 1 つ選んでください     |   legend（text.heading）
+| ( ) バックエンド設計                   |   radio + label（高さ 44 px 以上、間 space.2。名前とヒント文は同じ label の中で縦に積む）
+|     画面の裏側で、データを受け渡す仕組み |   area.backend.desc（text.small、secondary。1 文、句点なし。D-41）
+| ( ) フロントエンド                     |
+|     ブラウザに映る画面と、その動き      |   area.frontend.desc
+| ( ) データベース                       |
+|     データのしまい方と、取り出し方      |
+| ( ) インフラとクラウド                 |
+|     アプリを動かす土台（サーバーや設定）|
+| ( ) テストと品質                       |
+|     正しく動くかを確かめ、壊れにくくする |
+|     方法                                |
+| ( ) Git とチーム開発                   |
+|     変更の記録と、ほかの人との共同作業  |
+|                                        |
+| [[ 次へ ]]                             |   主操作
+```
+
+### S2 diagnosis.question（初回の 2 問目）
+```
+| 今日の一手                        設定 |
 |                                        |
 | 質問 2 / 3                             |   diagnosis.progress（text.small、data-question-index=2）
 |                                        |
 | バックエンド設計の今の段階に近いものを  |   legend（text.heading）
 | 選んでください                          |
 | ( ) 初級                               |   radio + label（高さ 44 px 以上、間 space.2）
-|     基本は知っているが、実務では人に…   |   level.beginner.desc（text.small、同じ label の中）
+|     コードをほとんど書いたことがない    |   level.beginner.desc（text.small、同じ label の中。r7 で PRD 9 の趣旨に）
 | (•) 中級                               |
-|     実務の大半を 1 人で進められる       |
+|     仕事や学習でコードを書いている（人に |   level.intermediate.desc
+|     聞きながらでもよい）                |
 | ( ) 上級                               |
 |     設計を決め、人に教えている          |
 |                                        |
@@ -64,12 +89,14 @@ design/001-daily-learning.md の補助。幅 320 CSS px（AC-17 の条件）で�
 | [[ 次へ ]]                             |   主操作（3 問目は「診断を終える」）
 | [ 前の質問へ ]                         |   副操作
 ```
+3 問目（r7）：legend「コードを書いてきた年数に近いものを選んでください」、radio 5 つ：`( ) まだコードを書いたことがない`（`years.never`。先頭）、`( ) 1 年未満`、`( ) 1〜3 年`、`( ) 3〜5 年`、`( ) 5 年以上`。ヒント文はない。
 
 ## S3 task.today（external の例）
 ```
 | 今日の一手                 履歴  設定 |   header（nav は flex-wrap で 2 行目に落ちてよい）
 |                                        |
-| 今日の課題 2026-10-30                  |   task.today.label（text.small、secondary）
+| 今日の課題 2026-10-30                  |   task.today.label（text.small、secondary。同じ日の 2 件目以降は task.today.label.nth「今日 2 件目の課題 2026-10-30」）
+| この段階の 4 / 14 件目                 |   task.progress（text.small、secondary。r7。AC-36。data-progress-index=4、-total=14 は article task.today の属性）
 | 自分のリポジトリの直近 10 コミットを    |   h1 task.today.title（text.title。折り返す）
 | 読み、1 つを分割し直す                 |
 | Git とチーム開発 / 中級 / 所要時間 15 分 |   task.meta（text.small。1 行の文として折り返す）
@@ -94,12 +121,13 @@ design/001-daily-learning.md の補助。幅 320 CSS px（AC-17 の条件）で�
 | └────────────────────────────────┘     |
 | 保存しました                           |   task.answer.saved（role=status、color.success、text.small）
 |                                        |
-| 申告すると、今日はもう課題が出ません。  |   task.report.note（text.small）
+| 申告すると、この課題は履歴に移ります。  |   task.report.note（text.small。r7 で差し替え）
+| 続けるかどうかは、その後に選べます。    |
 | [[ 完了 ]]                             |   主操作（列いっぱい）
 | [ 難しすぎ ]  [ 簡単すぎ ]             |   副操作 3 つ（flex-wrap。320 px では 1 列に 1 つずつ）
 | [ 今日はできない ]                     |
 ```
-初期表示（幅 320、文字 100%）に、ヘッダー、ラベル、題名、meta、「なぜ今これか」の 2 行目までが入る（差をつける点 1）。
+初期表示（幅 320、文字 100%）に、ヘッダー、ラベル、進み具合、題名、meta、「なぜ今これか」の 2 行目までが入る（差をつける点 1。r7 で進み具合の 1 行が増えた）。
 
 ### S3 task.today（画面を開いたまま日付が変わった後の最初の操作の直後。D-30）
 ```
@@ -111,30 +139,92 @@ design/001-daily-learning.md の補助。幅 320 CSS px（AC-17 の条件）で�
 | 今日の課題 2026-10-31                  |   task.today.label（以下は通常の S3 と同じ。答えの欄は空）
 | …翌日の課題の題名…                     |   h1
 ```
-出るのは「操作」で翌日の S3（か S7）に着いたときだけ（読み込みでは出ない）。次の操作（ボタン、リンク）か再読み込みで消える。textarea への入力では消えない。S7 では h1 `task.exhausted.message` の上に同じ知らせ。
+出るのは「操作」で翌日の S3（か S7）に着いたときだけ（読み込みでは出ない）。次の操作（ボタン、リンク）か再読み込みで消える。textarea への入力では消えない。S7 では h1 `task.exhausted.levelDone`（か `.allDone`）の上に同じ知らせ。
 
-## S4 task.rate
+## S4 task.rate（r7：累計、祝い、解説を足した。D-34〜D-36、D-38）
 ```
 | 今日の一手                 履歴  設定 |
 |                                        |
 | 完了しました                           |   h1（フォーカスを移す）
-| この課題は役に立ちましたか             |
+| これまでに完了した課題  7 件           |   p task.total：span task.total.label（text.small、secondary）+ span task.total.value（text.title、color.text。data-stat-completed=7）。入らなければ値が 2 行目に落ちる
+| 7 件目を終えました。最初の節目です。    |   p task.cheer（text.body。data-milestone=7。文言は task.cheer.at7。節目以外は task.cheer.default「今日も前に進みました。」。色も動きもない）
+|                                        |
+| ひとこと解説                           |   h2 task.insight（text.heading）
+| …課題集の insight（1〜120 字）…        |   p task.insight.text（text.body）
+|                                        |
+| この課題は役に立ちましたか             |   task.rate.question
 | [ 役に立った ]                         |   同格の副操作 2 つ（縦に積む）
 | [ 立たなかった ]                       |
 | 今回は答えない                         |   task.rate.close（文字のボタン、44 px の高さ）
 ```
+「次の一手に進む」はこの画面には置かない（S5 で出す。D-34）。
 
-## S5 task.done
+## S5 task.done（r7：確認ページの型。D-4、D-39）
 ```
 | 今日の一手                 履歴  設定 |
 |                                        |
-| 今日の一手は終わりです                 |   h1
-| 今日も前に進みました。次の課題は明日出  |   task.done.message
-| ます。                                  |
+| 完了を記録しました                     |   h1 task.done.title（S4 から来たらフォーカスを移す）
 | 完了した課題：…題名…                   |   task.done.task（text.small、secondary）
+| これまでに完了した課題  7 件           |   task.total（S4 と同じ）
+| 7 件目を終えました。最初の節目です。    |   task.cheer（S4 と同じ）
+|                                        |
+| ひとこと解説                           |   h2 task.insight
+| …課題集の insight…                     |   task.insight.text
+|                                        |
+| 今週（月曜から）の完了日数：3 日        |   task.week（text.body。data-stat-days-completed-week=3。曜日の並びもドットも出さない）
+|                                        |
+| 明日も課題が 1 件出ます。続けるなら、次 |   task.next.note（text.body）
+| の一手に進めます。                      |
+| [ 次の一手に進む ]                     |   task.next（副操作の形：枠。塗りにしない。列いっぱい、44 px 以上。押すと同期で S3、フォーカスは S3 の h1）
 | <u>履歴を見る</u>                      |   task.done.history（上下に space.3）
 ```
-S6 task.skipped は h1 と文が変わり、too_hard / too_easy のときだけ `task.skipped.levelHint` が 1 行増える。S7 task.exhausted は h1 `task.exhausted.message`、`task.exhausted.detail`、`[[ 診断をやり直す ]]`。
+再読み込みしても同じ画面（今日の最後の行が done）。何件目でも同じ並び。確認も催促もない。
+
+## S6 task.skipped（r7：次の一手を足した。解説、累計、祝いは出さない）
+```
+| 今日の一手                 履歴  設定 |
+|                                        |
+| 申告を記録しました                     |   h1 task.skipped.title（フォーカスを移す）
+| 同じ申告が 2 回続くと、次に出す課題から |   task.skipped.levelHint（too_hard / too_easy のときだけ。no_time では出ない）
+| 段階が変わります。                      |
+|                                        |
+| 明日も課題が 1 件出ます。続けるなら、次 |   task.next.note
+| の一手に進めます。                      |
+| [ 次の一手に進む ]                     |   task.next
+| <u>履歴を見る</u>                      |   task.skipped.history
+```
+
+## S7 task.exhausted（levelDone：初級を出し終えた。r7。D-40）
+```
+| 今日の一手                 履歴  設定 |
+|                                        |
+| バックエンド設計の初級を修了しました   |   h1 task.exhausted.levelDone（フォーカスを移す。操作で日付をまたいで着いたときは上に task.dayChanged）
+| これまでに完了した課題  14 件          |   task.total
+| この段階の 14 件をすべて出し終えました。 |   task.exhausted.levelDone.detail
+| 次の段階に進むと、その課題は今日から出  |
+| ます。                                  |
+| 次の段階は中級です。仕事や学習でコード  |   task.exhausted.next（{nextLevel} と level.intermediate.desc）
+| を書いている（人に聞きながらでもよい）  |
+| 中級の課題は、前に出したものを除いて続  |   task.exhausted.seenNext（履歴に同じ領域の中級の行があるときだけ。「難しすぎ」2 回で下がった後に初級を出し終えた場合）
+| きます。難しいときは、別の領域を選ぶこ  |
+| ともできます。                          |
+| [[ 中級に進む ]]                       |   task.exhausted.advance（主操作。塗り。同じ日に中級の課題を出して S3）
+| [ 別の領域を選ぶ ]                     |   task.exhausted.redo（副操作。→ S2。「やめる」で S7 に戻る）
+```
+
+### S7 task.exhausted（allDone：上級を出し終えた）
+```
+| 今日の一手                 履歴  設定 |
+|                                        |
+| バックエンド設計の上級を修了しました   |   h1 task.exhausted.allDone
+| これまでに完了した課題  35 件          |   task.total
+| 上級の課題 7 件をすべて出し終えました。 |   task.exhausted.allDone.detail
+| 上級の新しい課題は次の版で足します。そ  |
+| れまでは、別の領域を選べます（診断のや  |
+| り直しで、同じ領域の別の段階も選べま    |
+| す）。                                  |
+| [[ 別の領域を選ぶ ]]                   |   task.exhausted.redo（この変種では主操作。task.exhausted.advance は 0 件）
+```
 
 ## S8 settings（診断済み、persist() を断られた、iOS の Safari）
 ```
@@ -221,13 +311,17 @@ S6 task.skipped は h1 と文が変わり、too_hard / too_easy のときだけ 
 | 初めて開いた日                         |   dt（text.heading）
 | 2026-11-01                             |   dd（data-stat-first-open-date）
 | 出した課題の件数                       |
-| 5                                      |   dd（data-stat-issued）
+| 6                                      |   dd（data-stat-issued。AC-24 の seed の値：r7）
 | 完了した件数                           |
-| 3                                      |
+| 4                                      |
 | 初めて開いた日に完了したか             |
 | 完了した                               |   settings.stats.firstDayCompleted.yes
 | 直近 7 日に完了した日数                |
 | 3                                      |
+| 今週（月曜から）の完了日数             |   r7（data-stat-days-completed-week）
+| 2                                      |
+| 同じ日の 2 件目以降の完了件数          |   r7（data-stat-extra-completed）
+| 1                                      |
 | 「役に立った」の件数                   |
 | 2                                      |
 | 「役に立ったか」に答えた件数           |
