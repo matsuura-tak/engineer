@@ -7,7 +7,7 @@
 ## 概要
 - 何のアプリか：「今日の一手」。3 問の自己診断に答えると、毎日 15 分で終わる学習の課題が 1 つ出る、ブラウザだけで動く Web アプリ（サーバーなし、登録なし）。データはブラウザの中だけ。
 - 使う人：すでにコードを書いている実務 1〜5 年目のエンジニア（docs/prd/product.md）。
-- いまの段階：001-daily-learning の G3（design-reviewer r1 の直し中）。design r6 に合わせて契約を更新した（2026-11-04。日付が変わった知らせ D-30、永続化の注意 D-31、U-14 は求め直さない）。実装と受け入れテストはこれから追従する。公開先は https://matsuura-tak.github.io/engineer/（GitHub Pages）。
+- いまの段階：001-daily-learning は Takuma の FB 1 回目を受けた作り直し。G0 PASS（PRD r10、AC-1〜AC-40）、G1 の途中（design r8 に合わせて契約、ADR 0002 の改訂、設計メモを更新した。2026-11-05）。実装と受け入れテストはこれから r8 に追従する（下のコマンドの結果は 2026-11-03 の前の版のもの）。公開先は https://matsuura-tak.github.io/engineer/（GitHub Pages。2026-11-05 は未公開で 404。公開は 2026-11-30 の仮置き）。
 
 ## ビルド/テストのコマンド
 .claude/org/app.json の commands と同じものを書きます。CI は app.json の方を使います。
@@ -21,7 +21,7 @@
 - 受け入れテスト（依存は受け入れテストのフォルダの package.json だけ。ADR 0004）：
   `cd backend/tests/acceptance && npm ci && npx playwright install chromium webkit && npx playwright test`（2026-11-03 に `--list` で `Total: 133 tests in 16 files`。全件合格は上のログ）
 - 個別のコマンド（どれも backend/ で実行）：
-  - 契約の検査：`npm run check:contracts`（= `node ../contracts/tools/check-schemas.mjs`。ajv は実行したフォルダから探すので backend/package.json に ajv が要る。2026-11-03 に backend/ で確認：見本 41 件、期待と違う結果 0 件、終了コード 0）
+  - 契約の検査：`npm run check:contracts`（= `node ../contracts/tools/check-schemas.mjs`。ajv は実行したフォルダから探すので backend/package.json に ajv が要る。2026-11-05 に backend/ で確認：見本 52 件、期待と違う結果 0 件、終了コード 0）
   - 単体テスト：`node --test 'tests/unit/**/*.test.mjs'`（2026-11-03 に backend/ で確認：85 件中 85 件合格、終了コード 0。フォルダを渡す形 `tests/unit/` は終了コード 1）
   - ビルド：`npm run build -- --version <YYYY-MM-DD.N>`（= `node scripts/build.mjs --out dist --version …`。2026-11-03 に `--out` を一時フォルダにして確認：19 ファイル、終了コード 0。`--version dev` は終了コード 1）
   - 転送量の予算：`node scripts/check-budget.mjs dist`（2026-11-03 に確認：gzip 後の合計 62,960 / 150,000 バイト、終了コード 0）
@@ -55,7 +55,7 @@
 - URL はすべて相対（`./…`）。本番は `/engineer/` の下で動く。
 - CSP は contracts/budgets.md の 3 の文字列を meta で 1 つだけ。インラインのスクリプト、スタイル、`style` 属性、イベント属性を書かない。文字は textContent でだけ入れ、`innerHTML` などは使わない（ADR 0005）。
 - 保存は localStorage のキー `kyounoitte:data` だけ。他のキーに触らない。1 回の保存は 1 回の setItem。形を変えるなら `formatVersion` を上げる（ADR 0002、contracts/data.md）。
-- 領域、段階、経験年数、課題の ID は変えない。課題は消さず、ID を使い回さない（contracts/identifiers.md の 5）。
+- 領域、段階、経験年数、課題の ID は最初の公開から変えない。課題は消さず、ID を使い回さない（contracts/identifiers.md の 5、ADR 0002）。
 - テストのつなぎ口を本番に入れない。URL の引数を読まない（contracts/test-hooks.md）。
-- 転送量は gzip 後の合計 150,000 バイト以下。課題集は 1 件の本文が平均 600 字以下（contracts/budgets.md）。
+- 転送量は gzip 後の合計 150,000 バイト以下。課題集は 4 要素と解説の平均 480 字以下（contracts/budgets.md）。
 - 日付は端末の日付の `YYYY-MM-DD`（`toISOString` は使わない）。
