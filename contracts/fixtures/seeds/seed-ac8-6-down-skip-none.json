@@ -18,8 +18,23 @@
       "area": "backend",
       "level": "intermediate",
       "mode": "in_app",
-      "report": "too_hard",
-      "answer": ""
+      "answers": [
+        {
+          "choice": 1,
+          "correct": true
+        },
+        {
+          "choice": 0,
+          "correct": false
+        },
+        {
+          "choice": 0,
+          "correct": false
+        }
+      ],
+      "score": 1,
+      "report": "done",
+      "helpful": "unanswered"
     },
     {
       "date": "2026-11-02",
@@ -27,8 +42,18 @@
       "area": "backend",
       "level": "intermediate",
       "mode": "in_app",
-      "report": "none",
-      "answer": ""
+      "answers": [
+        {
+          "choice": 1,
+          "correct": true
+        },
+        {
+          "choice": 0,
+          "correct": false
+        }
+      ],
+      "score": 1,
+      "report": "none"
     }
   ]
 }

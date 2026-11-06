@@ -18,8 +18,22 @@
       "area": "backend",
       "level": "intermediate",
       "mode": "in_app",
+      "answers": [
+        {
+          "choice": 1,
+          "correct": true
+        },
+        {
+          "choice": 1,
+          "correct": true
+        },
+        {
+          "choice": 1,
+          "correct": true
+        }
+      ],
+      "score": 3,
       "report": "done",
-      "answer": "",
       "helpful": "helpful"
     },
     {
@@ -28,8 +42,14 @@
       "area": "backend",
       "level": "intermediate",
       "mode": "in_app",
-      "report": "too_hard",
-      "answer": ""
+      "answers": [
+        {
+          "choice": 1,
+          "correct": true
+        }
+      ],
+      "score": 1,
+      "report": "none"
     },
     {
       "date": "2026-11-03",
@@ -37,8 +57,22 @@
       "area": "backend",
       "level": "intermediate",
       "mode": "in_app",
+      "answers": [
+        {
+          "choice": 1,
+          "correct": true
+        },
+        {
+          "choice": 0,
+          "correct": false
+        },
+        {
+          "choice": 0,
+          "correct": false
+        }
+      ],
+      "score": 1,
       "report": "done",
-      "answer": "",
       "helpful": "helpful"
     },
     {
@@ -47,8 +81,22 @@
       "area": "backend",
       "level": "intermediate",
       "mode": "in_app",
+      "answers": [
+        {
+          "choice": 1,
+          "correct": true
+        },
+        {
+          "choice": 1,
+          "correct": true
+        },
+        {
+          "choice": 0,
+          "correct": false
+        }
+      ],
+      "score": 2,
       "report": "done",
-      "answer": "",
       "helpful": "unanswered"
     },
     {
@@ -57,8 +105,22 @@
       "area": "backend",
       "level": "intermediate",
       "mode": "in_app",
+      "answers": [
+        {
+          "choice": 1,
+          "correct": true
+        },
+        {
+          "choice": 1,
+          "correct": true
+        },
+        {
+          "choice": 1,
+          "correct": true
+        }
+      ],
+      "score": 3,
       "report": "done",
-      "answer": "",
       "helpful": "unanswered"
     },
     {
@@ -67,8 +129,9 @@
       "area": "backend",
       "level": "intermediate",
       "mode": "in_app",
-      "report": "no_time",
-      "answer": ""
+      "answers": [],
+      "score": 0,
+      "report": "no_time"
     }
   ]
 }

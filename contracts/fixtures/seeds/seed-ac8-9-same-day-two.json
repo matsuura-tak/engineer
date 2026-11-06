@@ -1,12 +1,12 @@
 {
   "formatVersion": 1,
   "app": "kyounoitte",
-  "firstOpenDate": "2026-11-02",
+  "firstOpenDate": "2026-11-01",
   "diagnosis": {
     "area": "backend",
     "level": "intermediate",
     "years": "1to3",
-    "completedOn": "2026-11-02"
+    "completedOn": "2026-11-01"
   },
   "levels": {
     "backend": "intermediate"
@@ -18,9 +18,23 @@
       "area": "backend",
       "level": "intermediate",
       "mode": "in_app",
+      "answers": [
+        {
+          "choice": 1,
+          "correct": true
+        },
+        {
+          "choice": 1,
+          "correct": true
+        },
+        {
+          "choice": 1,
+          "correct": true
+        }
+      ],
+      "score": 3,
       "report": "done",
-      "answer": "",
-      "helpful": "helpful"
+      "helpful": "unanswered"
     }
   ]
 }

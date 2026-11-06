@@ -19,7 +19,9 @@ v1 の Service Worker（以下 SW）は「配布物を先に取っておいて�
 - `caches.open(名前)` → `cache.addAll(FILES.map((u) => new Request(u, { cache: 'reload' })))` を `event.waitUntil` に渡します。1 つでも取れなければ install は失敗し、古い版のまま動きます。
 - `cache: 'reload'` は必須です。GitHub Pages は `Cache-Control: max-age=600` を返すので、これがないと新しい SW がブラウザの HTTP キャッシュから古いファイルを取ることがあります（tech-lead G1 r1 の spike 2：Chromium で 5 回とも古い版のままだった）。
 - `self.skipWaiting()` を呼びます。
-- FILES は配布物のすべてのファイルです（`./index.html`、CSS、すべての JS モジュール、`./data/tasks.json`、`./i18n/ja.json`、`./i18n/en.json`、`./manifest.webmanifest`、`./icon-180.png`（Takuma の決定 D5。budgets.md の 6））。`./sw.js` 自身は入れません。ビルドの手順は、配布物のフォルダのファイルと FILES が一致することを確かめ、違えば失敗します。
+- FILES は配布物のすべてのファイルです（2026-11-06 に改めた。ADR 0006、0007、0008）：`./index.html`、CSS、まとめた JS `./js/app.js`（ADR 0007。モジュールごとのファイルは配らない）、課題集 6 つ `./data/tasks-backend.json`、`./data/tasks-frontend.json`、`./data/tasks-database.json`、`./data/tasks-infra.json`、`./data/tasks-testing.json`、`./data/tasks-git.json`（ADR 0006。`./data/tasks.json` はなくした）、`./i18n/ja.json`、`./i18n/en.json`、ミルの絵 8 枚 `./img/miru-<mood>.png` と `./img/miru-<mood>-dark.png`（mood は idle、correct、incorrect、celebrate。ADR 0008。シート `miru-sheet-x6.png` は配らない）、`./manifest.webmanifest`、`./icon-180.png`（Takuma の決定 D5。budgets.md の 6）。`./sw.js` 自身は入れません。ビルドの手順は、配布物のフォルダのファイルと FILES が一致することを確かめ、違えば失敗します。
+- 貯め終える前（install が終わる前、SW が動いていない、`serviceWorkers: 'block'`）は、アプリの要求はふつうの通信になります。オフラインで領域のファイルが取れないとき、アプリはそれを fetch の失敗として扱い、data.md の 4「課題集のファイル」の「取れない」と同じ画面にします（S2 は `error.tasks.offline` と `task.next.retry`、S10 は `history.row.unavailable`。D-61）。SW は失敗を隠す応答（空の JSON など）を作りません（5 のとおり `fetch(request)` をそのまま返す）。
+- 読み込んだ課題集のファイルが手書きの検査「ファイル名の領域とトップの `area` が同じ」（と、すべての課題の `area` と ID の領域が同じ）に通らないときは、取れなかったときと同じに扱います（D-61：S2 は `error.tasks.offline` と `task.next.retry`、S10 は `history.row.unavailable`）。新しい文言キーは足しません（strings.md の 5 と同じ文）。
 
 ## 4. activate
 - 名前が `kyounoitte-` で始まり、今の名前でないキャッシュだけを消します。他の接頭辞のキャッシュには触りません。

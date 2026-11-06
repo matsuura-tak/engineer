@@ -181,7 +181,7 @@
 - 画面だけの値（保存しない。足すのは identifiers.md の直しだけでよい）：`data-choice-state` の 4 つ、`data-answer-result` の 2 つ、`data-explain-for` の 2 つ、`data-figure-of` の 2 つ、`data-figure-part` の 3 つ（4）。
 
 ## 6. 文言キー（194 個。3 の例外 19 個を除いて data-testid としても使う）
-- 原本は design の 7 の表（194 行）。機械で読める原本は schemas/strings.schema.json の `required` で、次の回でこの一覧に合わせる（今は 174 個のまま）。
+- 原本は design の 7 の表（194 行）。機械で読める原本は schemas/strings.schema.json の `required` で、194 個（2026-11-06 のその 3 でこの一覧に合わせた。check:contracts の strings の見本で確かめている）。
 - 経緯：r7 で 28 個を足して 4 個を消し、r8 で 4 個を足した（146 → 170 → 174）。2026-11-06（design r11〜r13）に 40 個を足し、20 個を消した（174 → 194。design の 6.1）。
 - 消した 20 個：`task.answer.label`、`task.answer.help`、`task.answer.saved`、`task.answer.limit`、`task.report.note`、`task.report.done`、`task.report.tooHard`、`task.report.tooEasy`、`task.report.noTime`、`task.why`、`task.how`、`task.goal`、`task.external.badge`、`task.external.tools.label`、`task.skipped.levelHint`、`task.skipped.levelChanged`、`settings.stats.tooHard`、`report.tooHard`、`report.tooEasy`、`history.row.answer`。
 - data-testid に使わない例外（19 個）：3 の例外の一覧。

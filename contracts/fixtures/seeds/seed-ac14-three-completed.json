@@ -18,8 +18,22 @@
       "area": "backend",
       "level": "intermediate",
       "mode": "in_app",
+      "answers": [
+        {
+          "choice": 1,
+          "correct": true
+        },
+        {
+          "choice": 1,
+          "correct": true
+        },
+        {
+          "choice": 0,
+          "correct": false
+        }
+      ],
+      "score": 2,
       "report": "done",
-      "answer": "",
       "helpful": "helpful"
     },
     {
@@ -28,8 +42,22 @@
       "area": "backend",
       "level": "intermediate",
       "mode": "in_app",
+      "answers": [
+        {
+          "choice": 1,
+          "correct": true
+        },
+        {
+          "choice": 1,
+          "correct": true
+        },
+        {
+          "choice": 0,
+          "correct": false
+        }
+      ],
+      "score": 2,
       "report": "done",
-      "answer": "",
       "helpful": "helpful"
     },
     {
@@ -38,8 +66,22 @@
       "area": "backend",
       "level": "intermediate",
       "mode": "in_app",
+      "answers": [
+        {
+          "choice": 1,
+          "correct": true
+        },
+        {
+          "choice": 1,
+          "correct": true
+        },
+        {
+          "choice": 0,
+          "correct": false
+        }
+      ],
+      "score": 2,
       "report": "done",
-      "answer": "",
       "helpful": "not_helpful"
     }
   ]

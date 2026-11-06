@@ -75,7 +75,7 @@ x-github-edge-region: japaneast
 accept-ranges: bytes
 ```
 （他のヘッダーは省いた）。同じ時刻に `curl -sI https://matsuura-tak.github.io/engineer/sw.js` も `HTTP/2 404`。`git ls-tree -r --name-only origin/main | grep -c '^backend/public/'` → `0`。
-- 新しいスキーマで古い形のデータが弾かれること：未確認（スキーマは次の回で書く。見本 `invalid-v1-before-r13` のような古い形の見本を次の回の fixtures に足し、check-schemas.mjs で落ちることを確かめる）。
+- 新しいスキーマで古い形のデータが弾かれること（2026-11-06、tech-lead）：`cd backend && npm run check:contracts` → `見本 122 件、期待と違う結果 0 件`、終了コード 0。その中で `OK  data/invalid-v1-before-r13.json 期待：落ちる → 落ちた（data/current must have required property 'answers' / data/current must NOT have additional properties / data/history/0 must have required property 'answers' / …）` と `OK  data/invalid-old-report-too-hard.json 期待：落ちる → 落ちた（… data/history/2/report must be equal to one of the allowed val…）`。新しい形の seed 14 件（fixtures/seeds/）は「期待：通る → 通った」。
 
 ## 一緒に決めたこと（design の未決）
 - U-5：S0 の error を採る。条件は data.md の 4（保存先が使えない、JSON.parse の失敗、スキーマ不一致、版が新しい）。部分だけ読むことはしない。
