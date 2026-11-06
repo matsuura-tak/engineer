@@ -17,7 +17,12 @@
     "area": "frontend",
     "level": "beginner",
     "mode": "in_app",
-    "answer": ""
+    "answers": [
+      {
+        "choice": 0,
+        "correct": true
+      }
+    ]
   },
   "history": [
     {
@@ -26,8 +31,22 @@
       "area": "frontend",
       "level": "beginner",
       "mode": "in_app",
+      "answers": [
+        {
+          "choice": 0,
+          "correct": true
+        },
+        {
+          "choice": 0,
+          "correct": true
+        },
+        {
+          "choice": 0,
+          "correct": false
+        }
+      ],
+      "score": 2,
       "report": "done",
-      "answer": "",
       "helpful": "helpful"
     },
     {
@@ -36,8 +55,9 @@
       "area": "frontend",
       "level": "beginner",
       "mode": "in_app",
-      "report": "too_easy",
-      "answer": ""
+      "answers": [],
+      "score": 0,
+      "report": "no_time"
     }
   ],
   "device": {

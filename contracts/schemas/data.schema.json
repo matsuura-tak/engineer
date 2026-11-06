@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:kyounoitte:schema:data:1",
   "title": "保存データ＝書き出しファイル＝seed（formatVersion 1）",
-  "description": "localStorage のキー kyounoitte:data に入れる JSON 文字列の形。書き出しファイルと受け入れテストの seed も同じ形（device だけは書き出しに含めない）。読み方、移し方、起動時の判定は contracts/data.md。firstOpenDate は「なし」の区分（diagnosis、levels、history が空）でだけ省ける（allOf の 3 つ目）。AC-5〜AC-11、AC-13、AC-14、AC-16、AC-19〜AC-25、AC-32、AC-33、AC-35〜AC-37、AC-40。",
+  "description": "localStorage のキー kyounoitte:data に入れる JSON 文字列の形。書き出しファイルと受け入れテストの seed も同じ形（device だけは書き出しに含めない）。読み方、移し方、起動時の判定は contracts/data.md。firstOpenDate は「なし」の区分（diagnosis、levels、history が空）でだけ省ける（allOf の 3 つ目）。2026-11-06 に PRD r13（3 問 × 3 択）の形に作り直した（formatVersion は 1 のまま。ADR 0002 の改訂 2）。AC-5〜AC-11、AC-13、AC-14、AC-16、AC-19〜AC-25、AC-32、AC-33、AC-35〜AC-37、AC-40〜AC-42、AC-45。",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -70,7 +70,7 @@
     "levels": {
       "type": "object",
       "additionalProperties": false,
-      "description": "領域ごとの現在の段階。診断を終えると目標の領域の値を回答で上書きし、申告の規則（contracts/data.md）で上下する",
+      "description": "領域ごとの現在の段階。診断を終えると目標の領域の値を回答で上書きし、段階の規則（contracts/data.md の 5。正答数）と進級で上下する",
       "properties": {
         "backend": {
           "$ref": "#/$defs/level"
@@ -95,14 +95,14 @@
     "current": {
       "type": "object",
       "additionalProperties": false,
-      "description": "出したが、まだ申告していない今日の課題（0 か 1 件）。日付が変わったら report: none の行として history に移す",
+      "description": "出したが、まだ 3 問に答えても申告してもいない今日の課題（0 か 1 件）。1 問答えるごとに answers に足す（AC-32）。3 問目に答えるか「今日はやめておく」で history の行に移し、日付が変わったら report: none の行として移す（contracts/data.md の 2 と 4）",
       "required": [
         "date",
         "taskId",
         "area",
         "level",
         "mode",
-        "answer"
+        "answers"
       ],
       "properties": {
         "date": {
@@ -123,8 +123,13 @@
             "external"
           ]
         },
-        "answer": {
-          "$ref": "#/$defs/answer"
+        "answers": {
+          "type": "array",
+          "maxItems": 2,
+          "items": {
+            "$ref": "#/$defs/choiceAnswer"
+          },
+          "description": "答えた問の答え（0〜2 件）。3 件目を書くときは current を外して done の行にする"
         }
       },
       "allOf": [
@@ -303,11 +308,15 @@
     },
     "history": {
       "type": "array",
-      "maxItems": 20000,
-      "description": "申告した課題と、申告のないまま日付が変わった課題。日付の古い順に足す。同じ日付の行は出した順に何行でも並ぶ（同じ日の「次の一手に進む」。AC-33）。書き手の決まりは contracts/data.md の 8",
+      "maxItems": 18000,
+      "description": "3 問に答えた課題、「今日はやめておく」の課題、申告のないまま日付が変わった課題。日付の古い順に足す。同じ日付の行は出した順に何行でも並ぶ（同じ日の「次の一手に進む」。AC-33）。同じ課題の ID は 1 回だけ（AC-6）なので、行の数は課題の ID の数（6 × 3 × 1,000 = 18,000）を超えない。書き手の決まりは contracts/data.md の 8",
       "items": {
         "$ref": "#/$defs/row"
       }
+    },
+    "showCharacter": {
+      "type": "boolean",
+      "description": "案内役ミルを出すか（設定 settings.character.show.input）。ないときは true と読む。保存データが「なし」でも書ける。device に入れない：読み込み（AC-20）でファイルの値を使うため（contracts/data.md の 2 と 7。AC-45）"
     },
     "device": {
       "type": "object",
@@ -452,11 +461,6 @@
       "type": "string",
       "pattern": "^(backend|frontend|database|infra|testing|git)-(beginner|intermediate|advanced)-[0-9]{3}$"
     },
-    "answer": {
-      "type": "string",
-      "maxLength": 2000,
-      "description": "答えを書く欄の中身。空なら空文字列。上限 2,000 字（textarea の maxlength と同じ）"
-    },
     "row": {
       "type": "object",
       "additionalProperties": false,
@@ -466,7 +470,8 @@
         "area",
         "level",
         "mode",
-        "answer",
+        "answers",
+        "score",
         "report"
       ],
       "properties": {
@@ -480,7 +485,8 @@
           "$ref": "#/$defs/area"
         },
         "level": {
-          "$ref": "#/$defs/level"
+          "$ref": "#/$defs/level",
+          "description": "その課題を出したときの段階（段階の規則が使う。contracts/data.md の 5）"
         },
         "mode": {
           "enum": [
@@ -488,18 +494,27 @@
             "external"
           ]
         },
-        "answer": {
-          "$ref": "#/$defs/answer"
+        "answers": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "$ref": "#/$defs/choiceAnswer"
+          },
+          "description": "答えた問の答え。done の行は 3 件、no_time と none の行は 0〜2 件（下の allOf）"
+        },
+        "score": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "description": "answers のうち correct が true の数（下の allOf で同じであることを検査する）。AC-42"
         },
         "report": {
           "enum": [
             "done",
-            "too_hard",
-            "too_easy",
             "no_time",
             "none"
           ],
-          "description": "none＝申告のないまま日付が変わった"
+          "description": "done＝3 問に答えた。no_time＝「今日はやめておく」。none＝申告のないまま日付が変わった"
         },
         "helpful": {
           "enum": [
@@ -507,7 +522,14 @@
             "not_helpful",
             "unanswered"
           ],
-          "description": "report が done の行だけに持つ"
+          "description": "report が done の行だけに持つ（必須）"
+        },
+        "levelChange": {
+          "enum": [
+            "down",
+            "up"
+          ],
+          "description": "この行を書いたときに段階の規則（contracts/data.md の 5）で levels[area] が動いた向き。動いた done の行だけに持つ（D-60 の知らせを、推し量らずに保存した事実から決める）"
         }
       },
       "allOf": [
@@ -689,35 +711,264 @@
               "report": {
                 "const": "done"
               }
+            },
+            "required": [
+              "report"
+            ]
+          },
+          "then": {
+            "type": "object",
+            "required": [
+              "helpful"
+            ],
+            "properties": {
+              "answers": {
+                "type": "array",
+                "minItems": 3
+              },
+              "helpful": {
+                "type": "string"
+              }
             }
+          },
+          "else": {
+            "type": "object",
+            "properties": {
+              "answers": {
+                "type": "array",
+                "maxItems": 2
+              }
+            },
+            "allOf": [
+              {
+                "not": {
+                  "type": "object",
+                  "properties": {
+                    "helpful": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "helpful"
+                  ]
+                }
+              },
+              {
+                "not": {
+                  "type": "object",
+                  "properties": {
+                    "levelChange": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "levelChange"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "level": {
+                "const": "beginner"
+              }
+            },
+            "required": [
+              "level"
+            ]
           },
           "then": {
             "type": "object",
             "properties": {
-              "helpful": {
-                "type": "string"
+              "levelChange": {
+                "const": "up"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "level": {
+                "const": "advanced"
               }
             },
             "required": [
-              "helpful"
+              "level"
             ]
           },
-          "else": {
+          "then": {
             "type": "object",
-            "not": {
-              "type": "object",
-              "properties": {
-                "helpful": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "helpful"
-              ]
+            "properties": {
+              "levelChange": {
+                "const": "down"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "score": {
+                "const": 0
+              }
+            },
+            "required": [
+              "score"
+            ]
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "answers": {
+                "type": "array",
+                "contains": {
+                  "type": "object",
+                  "properties": {
+                    "correct": {
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "correct"
+                  ]
+                },
+                "minContains": 0,
+                "maxContains": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "score": {
+                "const": 1
+              }
+            },
+            "required": [
+              "score"
+            ]
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "answers": {
+                "type": "array",
+                "contains": {
+                  "type": "object",
+                  "properties": {
+                    "correct": {
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "correct"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "score": {
+                "const": 2
+              }
+            },
+            "required": [
+              "score"
+            ]
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "answers": {
+                "type": "array",
+                "contains": {
+                  "type": "object",
+                  "properties": {
+                    "correct": {
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "correct"
+                  ]
+                },
+                "minContains": 2,
+                "maxContains": 2
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "score": {
+                "const": 3
+              }
+            },
+            "required": [
+              "score"
+            ]
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "answers": {
+                "type": "array",
+                "contains": {
+                  "type": "object",
+                  "properties": {
+                    "correct": {
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "correct"
+                  ]
+                },
+                "minContains": 3,
+                "maxContains": 3
+              }
             }
           }
         }
       ]
+    },
+    "choiceAnswer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "choice",
+        "correct"
+      ],
+      "description": "1 問の答え。配列の位置が問の番号（0 が問 1）。答えたときに 1 回だけ書き、選び直さない（AC-41）",
+      "properties": {
+        "choice": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2,
+          "description": "選んだ選択肢の位置（課題集の questions[i].choices の index）"
+        },
+        "correct": {
+          "type": "boolean",
+          "description": "答えたときの正誤（choice が課題集の questions[i].answer と同じか）。後で課題集が直っても書き換えない（ADR 0002 の改訂 2）"
+        }
+      }
     }
   }
 }

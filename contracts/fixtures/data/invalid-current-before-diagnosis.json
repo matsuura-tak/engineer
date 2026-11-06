@@ -16,7 +16,7 @@
     "area": "backend",
     "level": "intermediate",
     "mode": "in_app",
-    "answer": ""
+    "answers": []
   },
   "history": [
     {
@@ -25,8 +25,22 @@
       "area": "backend",
       "level": "intermediate",
       "mode": "in_app",
+      "answers": [
+        {
+          "choice": 0,
+          "correct": true
+        },
+        {
+          "choice": 1,
+          "correct": false
+        },
+        {
+          "choice": 2,
+          "correct": true
+        }
+      ],
+      "score": 2,
       "report": "done",
-      "answer": "インデックスは検索を速くするが、書き込みのたびに更新されるので、書き込みが多い表では増やしすぎない。",
       "helpful": "helpful"
     },
     {
@@ -35,8 +49,22 @@
       "area": "backend",
       "level": "intermediate",
       "mode": "in_app",
+      "answers": [
+        {
+          "choice": 0,
+          "correct": true
+        },
+        {
+          "choice": 1,
+          "correct": false
+        },
+        {
+          "choice": 2,
+          "correct": true
+        }
+      ],
+      "score": 2,
       "report": "done",
-      "answer": "",
       "helpful": "not_helpful"
     },
     {
@@ -45,8 +73,22 @@
       "area": "backend",
       "level": "intermediate",
       "mode": "in_app",
+      "answers": [
+        {
+          "choice": 0,
+          "correct": true
+        },
+        {
+          "choice": 1,
+          "correct": false
+        },
+        {
+          "choice": 2,
+          "correct": true
+        }
+      ],
+      "score": 2,
       "report": "done",
-      "answer": "",
       "helpful": "unanswered"
     }
   ]

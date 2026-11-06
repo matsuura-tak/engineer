@@ -9,16 +9,25 @@
     "completedOn": "2026-11-01"
   },
   "levels": {
-    "backend": "intermediate",
+    "backend": "beginner",
     "git": "advanced"
   },
   "current": {
     "date": "2026-11-04",
-    "taskId": "backend-intermediate-004",
+    "taskId": "backend-beginner-001",
     "area": "backend",
-    "level": "intermediate",
+    "level": "beginner",
     "mode": "in_app",
-    "answer": ""
+    "answers": [
+      {
+        "choice": 2,
+        "correct": true
+      },
+      {
+        "choice": 0,
+        "correct": false
+      }
+    ]
   },
   "history": [
     {
@@ -27,8 +36,14 @@
       "area": "git",
       "level": "advanced",
       "mode": "in_app",
-      "report": "too_easy",
-      "answer": ""
+      "answers": [
+        {
+          "choice": 1,
+          "correct": false
+        }
+      ],
+      "score": 0,
+      "report": "no_time"
     },
     {
       "date": "2026-10-31",
@@ -36,8 +51,18 @@
       "area": "git",
       "level": "advanced",
       "mode": "in_app",
-      "report": "none",
-      "answer": "書きかけ"
+      "answers": [
+        {
+          "choice": 0,
+          "correct": true
+        },
+        {
+          "choice": 2,
+          "correct": false
+        }
+      ],
+      "score": 1,
+      "report": "none"
     },
     {
       "date": "2026-11-01",
@@ -45,8 +70,22 @@
       "area": "backend",
       "level": "intermediate",
       "mode": "in_app",
+      "answers": [
+        {
+          "choice": 0,
+          "correct": true
+        },
+        {
+          "choice": 1,
+          "correct": true
+        },
+        {
+          "choice": 2,
+          "correct": true
+        }
+      ],
+      "score": 3,
       "report": "done",
-      "answer": "インデックスは検索を速くするが、書き込みのたびに更新されるので、書き込みが多い表では増やしすぎない。",
       "helpful": "helpful"
     },
     {
@@ -55,8 +94,22 @@
       "area": "backend",
       "level": "intermediate",
       "mode": "in_app",
+      "answers": [
+        {
+          "choice": 0,
+          "correct": false
+        },
+        {
+          "choice": 1,
+          "correct": true
+        },
+        {
+          "choice": 2,
+          "correct": false
+        }
+      ],
+      "score": 1,
       "report": "done",
-      "answer": "",
       "helpful": "not_helpful"
     },
     {
@@ -65,11 +118,27 @@
       "area": "backend",
       "level": "intermediate",
       "mode": "in_app",
+      "answers": [
+        {
+          "choice": 0,
+          "correct": false
+        },
+        {
+          "choice": 1,
+          "correct": false
+        },
+        {
+          "choice": 2,
+          "correct": false
+        }
+      ],
+      "score": 0,
       "report": "done",
-      "answer": "",
-      "helpful": "unanswered"
+      "helpful": "unanswered",
+      "levelChange": "down"
     }
   ],
+  "showCharacter": false,
   "device": {
     "homeGuideClosed": true,
     "persistRequested": true,
