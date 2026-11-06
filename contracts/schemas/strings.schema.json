@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:kyounoitte:schema:strings:1",
   "title": "画面の文言ファイル（backend/public/i18n/ja.json と en.json）",
-  "description": "平らなキーの JSON。ja と en はどちらもこのスキーマに通るので、キーの集合は必ず同じになる（AC-26）。キーの一覧と文の原本は design/001-daily-learning.md の 7。差し込みの書き方は contracts/strings.md。キーを足すときは、ここに足してから文言ファイルに足す。",
+  "description": "平らなキーの JSON。ja と en はどちらもこのスキーマに通るので、キーの集合は必ず同じになる（AC-26）。キーは 194 個（design/001-daily-learning.md r13 の 7、contracts/identifiers.md の 6）。差し込みの書き方は contracts/strings.md の 3。guide.* は 1〜40 字（コードポイント。AC-45、D-55）。語の検査（AC-35、AC-42、AC-45）は JSON Schema で書かず contracts/tools/check-schemas.mjs と受け入れテストで行う（contracts/strings.md の 7）。キーを足すときは、ここに足してから文言ファイルに足す。",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -71,20 +71,6 @@
     "task.today.label.nth",
     "task.progress",
     "task.meta",
-    "task.external.badge",
-    "task.external.tools.label",
-    "task.why",
-    "task.how",
-    "task.goal",
-    "task.answer.label",
-    "task.answer.help",
-    "task.answer.saved",
-    "task.answer.limit",
-    "task.report.note",
-    "task.report.done",
-    "task.report.tooHard",
-    "task.report.tooEasy",
-    "task.report.noTime",
     "task.rate.title",
     "task.rate.question",
     "task.rate.helpful",
@@ -106,8 +92,6 @@
     "task.next",
     "task.done.history",
     "task.skipped.title",
-    "task.skipped.levelHint",
-    "task.skipped.levelChanged",
     "task.skipped.history",
     "task.exhausted.levelDone",
     "task.exhausted.levelDone.detail",
@@ -164,22 +148,58 @@
     "settings.stats.extraCompleted",
     "settings.stats.helpful",
     "settings.stats.rated",
-    "settings.stats.tooHard",
     "settings.stats.noTime",
     "settings.stats.note",
     "settings.stats.back",
     "history.title",
     "history.empty",
     "history.empty.action",
-    "history.row.answer",
     "report.done",
-    "report.tooHard",
-    "report.tooEasy",
     "report.noTime",
     "report.none",
     "helpful.yes",
     "helpful.no",
-    "helpful.unanswered"
+    "helpful.unanswered",
+    "task.question.heading",
+    "task.answer.result.correct",
+    "task.answer.result.incorrect",
+    "task.question.explain.label.selected",
+    "task.question.explain.label.correct",
+    "task.choice.tag.selected",
+    "task.choice.tag.correct",
+    "task.question.next",
+    "task.summary.open",
+    "task.skip.note",
+    "task.skip",
+    "task.rate.score",
+    "task.level.adjusted.down",
+    "task.level.adjusted.up",
+    "error.tasks.offline",
+    "task.next.retry",
+    "guide.name",
+    "guide.intro",
+    "guide.correct.1",
+    "guide.correct.2",
+    "guide.correct.3",
+    "guide.incorrect.1",
+    "guide.incorrect.2",
+    "guide.incorrect.3",
+    "guide.rate.score0",
+    "guide.rate.score1",
+    "guide.rate.score2",
+    "guide.rate.score3",
+    "guide.rate.milestone",
+    "guide.exhausted.levelDone",
+    "guide.exhausted.allDone",
+    "settings.character.title",
+    "settings.character.show",
+    "settings.character.note",
+    "settings.stats.questionsAnswered",
+    "settings.stats.questionsCorrect",
+    "settings.stats.lowScoreTasks",
+    "history.row.score",
+    "history.row.answers",
+    "history.row.unavailable"
   ],
   "properties": {
     "app.name": {
@@ -387,8 +407,7 @@
       "$ref": "#/$defs/plain"
     },
     "task.dayChanged": {
-      "$ref": "#/$defs/plain",
-      "description": "S3、S7。画面を開いたまま日付が変わった後の最初の操作で着いたときだけ出す（contracts/data.md の 4。design の D-30）"
+      "$ref": "#/$defs/plain"
     },
     "task.today.label": {
       "allOf": [
@@ -454,57 +473,6 @@
       ],
       "description": "差し込み：{area}、{level}、{minutes}"
     },
-    "task.external.badge": {
-      "$ref": "#/$defs/plain"
-    },
-    "task.external.tools.label": {
-      "$ref": "#/$defs/plain"
-    },
-    "task.why": {
-      "$ref": "#/$defs/plain"
-    },
-    "task.how": {
-      "$ref": "#/$defs/plain"
-    },
-    "task.goal": {
-      "$ref": "#/$defs/plain"
-    },
-    "task.answer.label": {
-      "$ref": "#/$defs/plain"
-    },
-    "task.answer.help": {
-      "$ref": "#/$defs/plain"
-    },
-    "task.answer.saved": {
-      "$ref": "#/$defs/plain"
-    },
-    "task.answer.limit": {
-      "allOf": [
-        {
-          "$ref": "#/$defs/text"
-        },
-        {
-          "type": "string",
-          "pattern": "\\{max[,}]"
-        }
-      ],
-      "description": "差し込み：{max}"
-    },
-    "task.report.note": {
-      "$ref": "#/$defs/plain"
-    },
-    "task.report.done": {
-      "$ref": "#/$defs/plain"
-    },
-    "task.report.tooHard": {
-      "$ref": "#/$defs/plain"
-    },
-    "task.report.tooEasy": {
-      "$ref": "#/$defs/plain"
-    },
-    "task.report.noTime": {
-      "$ref": "#/$defs/plain"
-    },
     "task.rate.title": {
       "$ref": "#/$defs/plain"
     },
@@ -564,16 +532,13 @@
       "description": "差し込み：{count}。S4、S5 の task.cheer。累計が 7、30、100 以外。{count} は task.total.value と同じ整数（contracts/identifiers.md の 3。要素の data-testid には使わない）"
     },
     "task.cheer.at7": {
-      "$ref": "#/$defs/plain",
-      "description": "S4、S5 の task.cheer。累計が 7（AC-35。要素の data-testid には使わない）"
+      "$ref": "#/$defs/plain"
     },
     "task.cheer.at30": {
-      "$ref": "#/$defs/plain",
-      "description": "S4、S5 の task.cheer。累計が 30（AC-35。要素の data-testid には使わない）"
+      "$ref": "#/$defs/plain"
     },
     "task.cheer.at100": {
-      "$ref": "#/$defs/plain",
-      "description": "S4、S5 の task.cheer。累計が 100（AC-35。要素の data-testid には使わない）"
+      "$ref": "#/$defs/plain"
     },
     "task.insight": {
       "$ref": "#/$defs/plain"
@@ -632,21 +597,6 @@
     },
     "task.skipped.title": {
       "$ref": "#/$defs/plain"
-    },
-    "task.skipped.levelHint": {
-      "$ref": "#/$defs/plain"
-    },
-    "task.skipped.levelChanged": {
-      "allOf": [
-        {
-          "$ref": "#/$defs/text"
-        },
-        {
-          "type": "string",
-          "pattern": "\\{level[,}]"
-        }
-      ],
-      "description": "差し込み：{level}"
     },
     "task.skipped.history": {
       "$ref": "#/$defs/plain"
@@ -940,9 +890,6 @@
     "settings.stats.rated": {
       "$ref": "#/$defs/plain"
     },
-    "settings.stats.tooHard": {
-      "$ref": "#/$defs/plain"
-    },
     "settings.stats.noTime": {
       "$ref": "#/$defs/plain"
     },
@@ -961,16 +908,7 @@
     "history.empty.action": {
       "$ref": "#/$defs/plain"
     },
-    "history.row.answer": {
-      "$ref": "#/$defs/plain"
-    },
     "report.done": {
-      "$ref": "#/$defs/plain"
-    },
-    "report.tooHard": {
-      "$ref": "#/$defs/plain"
-    },
-    "report.tooEasy": {
       "$ref": "#/$defs/plain"
     },
     "report.noTime": {
@@ -986,6 +924,183 @@
       "$ref": "#/$defs/plain"
     },
     "helpful.unanswered": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.question.heading": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{n[,}]"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{total[,}]"
+        }
+      ],
+      "description": "差し込み：{n}、{total}。S3 の各問の h2。{n} は data-question-number と同じ整数（1〜3）、{total} は 3"
+    },
+    "task.answer.result.correct": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.answer.result.incorrect": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.question.explain.label.selected": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.question.explain.label.correct": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.choice.tag.selected": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.choice.tag.correct": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.question.next": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.summary.open": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.skip.note": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.skip": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.rate.score": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{total[,}]"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{n[,}]"
+        }
+      ],
+      "description": "差し込み：{n}、{total}。S4、S5。{n} は data-score と同じ整数（0〜3）、{total} は 3（AC-42。点数の語を使わない：contracts/strings.md の 7.1）"
+    },
+    "task.level.adjusted.down": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{level[,}]"
+        }
+      ],
+      "description": "差し込み：{level}。S3。段階が下がった後の levels[area] の level.<ID> の文言（AC-8、D-60。禁止語の対象：contracts/strings.md の 7.2）"
+    },
+    "task.level.adjusted.up": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{level[,}]"
+        }
+      ],
+      "description": "差し込み：{level}。S3。段階が上がった後の levels[area] の level.<ID> の文言（AC-8、D-60。禁止語の対象：contracts/strings.md の 7.2）"
+    },
+    "error.tasks.offline": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.next.retry": {
+      "$ref": "#/$defs/plain"
+    },
+    "guide.name": {
+      "$ref": "#/$defs/guide"
+    },
+    "guide.intro": {
+      "$ref": "#/$defs/guide"
+    },
+    "guide.correct.1": {
+      "$ref": "#/$defs/guide"
+    },
+    "guide.correct.2": {
+      "$ref": "#/$defs/guide"
+    },
+    "guide.correct.3": {
+      "$ref": "#/$defs/guide"
+    },
+    "guide.incorrect.1": {
+      "$ref": "#/$defs/guide"
+    },
+    "guide.incorrect.2": {
+      "$ref": "#/$defs/guide"
+    },
+    "guide.incorrect.3": {
+      "$ref": "#/$defs/guide"
+    },
+    "guide.rate.score0": {
+      "$ref": "#/$defs/guide"
+    },
+    "guide.rate.score1": {
+      "$ref": "#/$defs/guide"
+    },
+    "guide.rate.score2": {
+      "$ref": "#/$defs/guide"
+    },
+    "guide.rate.score3": {
+      "$ref": "#/$defs/guide"
+    },
+    "guide.rate.milestone": {
+      "$ref": "#/$defs/guide"
+    },
+    "guide.exhausted.levelDone": {
+      "$ref": "#/$defs/guide"
+    },
+    "guide.exhausted.allDone": {
+      "$ref": "#/$defs/guide"
+    },
+    "settings.character.title": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.character.show": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.character.note": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.questionsAnswered": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.questionsCorrect": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.lowScoreTasks": {
+      "$ref": "#/$defs/plain"
+    },
+    "history.row.score": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{total[,}]"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{n[,}]"
+        }
+      ],
+      "description": "差し込み：{n}、{total}。S10 の答えた問が 1 件以上の行。{n} はその行の score、{total} は 3（D-62）"
+    },
+    "history.row.answers": {
+      "$ref": "#/$defs/plain"
+    },
+    "history.row.unavailable": {
       "$ref": "#/$defs/plain"
     }
   },
@@ -1004,6 +1119,17 @@
         "pattern": "[{}]"
       },
       "description": "差し込みなし"
+    },
+    "guide": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 40,
+      "pattern": "\\S",
+      "not": {
+        "type": "string",
+        "pattern": "[{}]"
+      },
+      "description": "案内役の台詞。差し込みなし。1〜40 字（コードポイントで数える。ajv の maxLength はコードポイントで数える）。AC-45、D-55"
     }
   }
 }
