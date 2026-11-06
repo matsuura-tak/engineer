@@ -1,0 +1,14 @@
+# date: 2026-11-05 21:06:54 +0900
+# commit: 32236ecd05051505c9bd26382d40e4a4a93eee0f
+# why: g3r3-explore-2.log も探索テストの側の誤り（再読み込み後の task.next.note.last の差し込み）。直して同じテストだけをやり直す
+# cmd: npx playwright test tests/explore-g3r3.spec.mjs -g EXPLORE_R2R3R4 --retries=0 --reporter=list,json
+npm notice run npx
+npm notice run 'playwright' test tests/explore-g3r3.spec.mjs -g EXPLORE_R2R3R4 --retries=0 --reporter=list,json
+
+Running 2 tests using 2 workers
+
+  ✓  2 [chromium] › tests/explore-g3r3.spec.mjs:30:3 › EXPLORE R2+R3+R4 同じ日に初級→中級→上級→allDone まで 35 件 › EXPLORE_R2R3R4_35件 (9.8s)
+  ✓  1 [webkit] › tests/explore-g3r3.spec.mjs:30:3 › EXPLORE R2+R3+R4 同じ日に初級→中級→上級→allDone まで 35 件 › EXPLORE_R2R3R4_35件 (12.2s)
+
+  2 passed (13.9s)
+# exit: 0

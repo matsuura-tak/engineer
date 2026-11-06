@@ -1,0 +1,147 @@
+{
+  "formatVersion": 1,
+  "app": "kyounoitte",
+  "firstOpenDate": "2026-10-30",
+  "diagnosis": {
+    "area": "backend",
+    "level": "intermediate",
+    "years": "1to3",
+    "completedOn": "2026-11-01"
+  },
+  "levels": {
+    "backend": "beginner",
+    "git": "advanced"
+  },
+  "current": {
+    "date": "2026-11-04",
+    "taskId": "backend-beginner-001",
+    "area": "backend",
+    "level": "beginner",
+    "mode": "in_app",
+    "answers": [
+      {
+        "choice": 2,
+        "correct": true
+      },
+      {
+        "choice": 0,
+        "correct": false
+      }
+    ]
+  },
+  "history": [
+    {
+      "date": "2026-10-30",
+      "taskId": "git-advanced-001",
+      "area": "git",
+      "level": "advanced",
+      "mode": "in_app",
+      "answers": [
+        {
+          "choice": 1,
+          "correct": false
+        }
+      ],
+      "score": 0,
+      "report": "no_time"
+    },
+    {
+      "date": "2026-10-31",
+      "taskId": "git-advanced-002",
+      "area": "git",
+      "level": "advanced",
+      "mode": "in_app",
+      "answers": [
+        {
+          "choice": 0,
+          "correct": true
+        },
+        {
+          "choice": 2,
+          "correct": false
+        }
+      ],
+      "score": 1,
+      "report": "none"
+    },
+    {
+      "date": "2026-11-01",
+      "taskId": "backend-intermediate-001",
+      "area": "backend",
+      "level": "intermediate",
+      "mode": "in_app",
+      "answers": [
+        {
+          "choice": 0,
+          "correct": true
+        },
+        {
+          "choice": 1,
+          "correct": true
+        },
+        {
+          "choice": 2,
+          "correct": true
+        }
+      ],
+      "score": 3,
+      "report": "done",
+      "helpful": "helpful"
+    },
+    {
+      "date": "2026-11-02",
+      "taskId": "backend-intermediate-002",
+      "area": "backend",
+      "level": "intermediate",
+      "mode": "in_app",
+      "answers": [
+        {
+          "choice": 0,
+          "correct": false
+        },
+        {
+          "choice": 1,
+          "correct": true
+        },
+        {
+          "choice": 2,
+          "correct": false
+        }
+      ],
+      "score": 1,
+      "report": "done",
+      "helpful": "not_helpful"
+    },
+    {
+      "date": "2026-11-03",
+      "taskId": "backend-intermediate-003",
+      "area": "backend",
+      "level": "intermediate",
+      "mode": "in_app",
+      "answers": [
+        {
+          "choice": 0,
+          "correct": false
+        },
+        {
+          "choice": 1,
+          "correct": false
+        },
+        {
+          "choice": 2,
+          "correct": false
+        }
+      ],
+      "score": 0,
+      "report": "done",
+      "helpful": "unanswered",
+      "levelChange": "down"
+    }
+  ],
+  "showCharacter": false,
+  "device": {
+    "homeGuideClosed": true,
+    "persistRequested": true,
+    "persistGranted": false
+  }
+}

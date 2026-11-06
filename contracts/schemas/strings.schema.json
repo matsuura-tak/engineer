@@ -1,0 +1,1135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:kyounoitte:schema:strings:1",
+  "title": "画面の文言ファイル（backend/public/i18n/ja.json と en.json）",
+  "description": "平らなキーの JSON。ja と en はどちらもこのスキーマに通るので、キーの集合は必ず同じになる（AC-26）。キーは 194 個（design/001-daily-learning.md r13 の 7、contracts/identifiers.md の 6）。差し込みの書き方は contracts/strings.md の 3。guide.* は 1〜40 字（コードポイント。AC-45、D-55）。語の検査（AC-35、AC-42、AC-45）は JSON Schema で書かず contracts/tools/check-schemas.mjs と受け入れテストで行う（contracts/strings.md の 7）。キーを足すときは、ここに足してから文言ファイルに足す。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "app.name",
+    "app.loading",
+    "app.noscript",
+    "nav.history",
+    "nav.settings",
+    "error.app.message",
+    "error.app.detail",
+    "error.app.reload",
+    "error.app.exportRaw",
+    "error.app.delete",
+    "error.app.storageUnavailable.message",
+    "error.app.storageUnavailable.detail",
+    "diagnosis.start.title",
+    "diagnosis.start.lead.1",
+    "diagnosis.start.lead.2",
+    "diagnosis.start.lead.3",
+    "diagnosis.start.begin",
+    "home.standalone.import",
+    "home.standalone.importButton",
+    "home.addToHomeScreen.title",
+    "home.addToHomeScreen.why",
+    "home.addToHomeScreen.steps.1",
+    "home.addToHomeScreen.steps.2",
+    "home.addToHomeScreen.steps.3",
+    "home.addToHomeScreen.steps.4",
+    "home.addToHomeScreen.close",
+    "diagnosis.progress",
+    "diagnosis.q1.legend",
+    "diagnosis.q2.legend",
+    "diagnosis.q3.legend",
+    "area.backend",
+    "area.frontend",
+    "area.database",
+    "area.infra",
+    "area.testing",
+    "area.git",
+    "area.backend.desc",
+    "area.frontend.desc",
+    "area.database.desc",
+    "area.infra.desc",
+    "area.testing.desc",
+    "area.git.desc",
+    "level.beginner",
+    "level.beginner.desc",
+    "level.intermediate",
+    "level.intermediate.desc",
+    "level.advanced",
+    "level.advanced.desc",
+    "years.never",
+    "years.lt1",
+    "years.1to3",
+    "years.3to5",
+    "years.gte5",
+    "diagnosis.next",
+    "diagnosis.finish",
+    "diagnosis.back",
+    "diagnosis.cancel",
+    "error.diagnosis.required",
+    "error.storage.message",
+    "error.storage.retry",
+    "task.dayChanged",
+    "task.today.label",
+    "task.today.label.nth",
+    "task.progress",
+    "task.meta",
+    "task.rate.title",
+    "task.rate.question",
+    "task.rate.helpful",
+    "task.rate.notHelpful",
+    "task.rate.close",
+    "task.total.label",
+    "task.total.value",
+    "task.progress.done",
+    "task.cheer.default",
+    "task.cheer.at7",
+    "task.cheer.at30",
+    "task.cheer.at100",
+    "task.insight",
+    "task.done.title",
+    "task.done.task",
+    "task.week",
+    "task.next.note",
+    "task.next.note.last",
+    "task.next",
+    "task.done.history",
+    "task.skipped.title",
+    "task.skipped.history",
+    "task.exhausted.levelDone",
+    "task.exhausted.levelDone.detail",
+    "task.exhausted.next",
+    "task.exhausted.seenNext",
+    "task.exhausted.nextDone",
+    "task.exhausted.advance",
+    "task.exhausted.allDone",
+    "task.exhausted.allDone.detail",
+    "task.exhausted.redo",
+    "settings.title",
+    "settings.data.title",
+    "settings.data.note",
+    "settings.storage.notPersisted",
+    "settings.export",
+    "settings.export.done",
+    "settings.import.note",
+    "settings.import",
+    "error.import.message",
+    "error.import.reason.version",
+    "error.import.reason.schema",
+    "settings.import.confirm.title",
+    "settings.import.confirm.summary",
+    "settings.import.confirm.body",
+    "settings.import.confirm.ok",
+    "settings.import.confirm.cancel",
+    "settings.diagnosis.title",
+    "settings.diagnosis.current",
+    "settings.redo",
+    "settings.redo.note",
+    "settings.homeScreen.title",
+    "settings.homeScreen.open",
+    "settings.records.title",
+    "settings.stats.open",
+    "settings.history.open",
+    "settings.delete.title",
+    "settings.delete",
+    "settings.delete.confirm.title",
+    "settings.delete.confirm.body",
+    "settings.delete.confirm.ok",
+    "settings.delete.confirm.cancel",
+    "settings.version",
+    "settings.privacy",
+    "settings.stats.title",
+    "settings.stats.today",
+    "settings.stats.firstOpenDate",
+    "settings.stats.issued",
+    "settings.stats.completed",
+    "settings.stats.firstDayCompleted",
+    "settings.stats.firstDayCompleted.yes",
+    "settings.stats.firstDayCompleted.no",
+    "settings.stats.daysCompleted7d",
+    "settings.stats.daysCompletedWeek",
+    "settings.stats.extraCompleted",
+    "settings.stats.helpful",
+    "settings.stats.rated",
+    "settings.stats.noTime",
+    "settings.stats.note",
+    "settings.stats.back",
+    "history.title",
+    "history.empty",
+    "history.empty.action",
+    "report.done",
+    "report.noTime",
+    "report.none",
+    "helpful.yes",
+    "helpful.no",
+    "helpful.unanswered",
+    "task.question.heading",
+    "task.answer.result.correct",
+    "task.answer.result.incorrect",
+    "task.question.explain.label.selected",
+    "task.question.explain.label.correct",
+    "task.choice.tag.selected",
+    "task.choice.tag.correct",
+    "task.question.next",
+    "task.summary.open",
+    "task.skip.note",
+    "task.skip",
+    "task.rate.score",
+    "task.level.adjusted.down",
+    "task.level.adjusted.up",
+    "error.tasks.offline",
+    "task.next.retry",
+    "guide.name",
+    "guide.intro",
+    "guide.correct.1",
+    "guide.correct.2",
+    "guide.correct.3",
+    "guide.incorrect.1",
+    "guide.incorrect.2",
+    "guide.incorrect.3",
+    "guide.rate.score0",
+    "guide.rate.score1",
+    "guide.rate.score2",
+    "guide.rate.score3",
+    "guide.rate.milestone",
+    "guide.exhausted.levelDone",
+    "guide.exhausted.allDone",
+    "settings.character.title",
+    "settings.character.show",
+    "settings.character.note",
+    "settings.stats.questionsAnswered",
+    "settings.stats.questionsCorrect",
+    "settings.stats.lowScoreTasks",
+    "history.row.score",
+    "history.row.answers",
+    "history.row.unavailable"
+  ],
+  "properties": {
+    "app.name": {
+      "$ref": "#/$defs/plain",
+      "const": "今日の一手",
+      "description": "ja と en の両方でこの値（Takuma の決定 D3。contracts/strings.md の 6）"
+    },
+    "app.loading": {
+      "$ref": "#/$defs/plain"
+    },
+    "app.noscript": {
+      "$ref": "#/$defs/plain"
+    },
+    "nav.history": {
+      "$ref": "#/$defs/plain"
+    },
+    "nav.settings": {
+      "$ref": "#/$defs/plain"
+    },
+    "error.app.message": {
+      "$ref": "#/$defs/plain"
+    },
+    "error.app.detail": {
+      "$ref": "#/$defs/plain"
+    },
+    "error.app.reload": {
+      "$ref": "#/$defs/plain"
+    },
+    "error.app.exportRaw": {
+      "$ref": "#/$defs/plain"
+    },
+    "error.app.delete": {
+      "$ref": "#/$defs/plain"
+    },
+    "error.app.storageUnavailable.message": {
+      "$ref": "#/$defs/plain"
+    },
+    "error.app.storageUnavailable.detail": {
+      "$ref": "#/$defs/plain"
+    },
+    "diagnosis.start.title": {
+      "$ref": "#/$defs/plain"
+    },
+    "diagnosis.start.lead.1": {
+      "$ref": "#/$defs/plain"
+    },
+    "diagnosis.start.lead.2": {
+      "$ref": "#/$defs/plain"
+    },
+    "diagnosis.start.lead.3": {
+      "$ref": "#/$defs/plain"
+    },
+    "diagnosis.start.begin": {
+      "$ref": "#/$defs/plain"
+    },
+    "home.standalone.import": {
+      "$ref": "#/$defs/plain"
+    },
+    "home.standalone.importButton": {
+      "$ref": "#/$defs/plain"
+    },
+    "home.addToHomeScreen.title": {
+      "$ref": "#/$defs/plain"
+    },
+    "home.addToHomeScreen.why": {
+      "$ref": "#/$defs/plain"
+    },
+    "home.addToHomeScreen.steps.1": {
+      "$ref": "#/$defs/plain"
+    },
+    "home.addToHomeScreen.steps.2": {
+      "$ref": "#/$defs/plain"
+    },
+    "home.addToHomeScreen.steps.3": {
+      "$ref": "#/$defs/plain"
+    },
+    "home.addToHomeScreen.steps.4": {
+      "$ref": "#/$defs/plain"
+    },
+    "home.addToHomeScreen.close": {
+      "$ref": "#/$defs/plain"
+    },
+    "diagnosis.progress": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{n[,}]"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{total[,}]"
+        }
+      ],
+      "description": "差し込み：{n}、{total}"
+    },
+    "diagnosis.q1.legend": {
+      "$ref": "#/$defs/plain"
+    },
+    "diagnosis.q2.legend": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{area[,}]"
+        }
+      ],
+      "description": "差し込み：{area}"
+    },
+    "diagnosis.q3.legend": {
+      "$ref": "#/$defs/plain"
+    },
+    "area.backend": {
+      "$ref": "#/$defs/plain"
+    },
+    "area.frontend": {
+      "$ref": "#/$defs/plain"
+    },
+    "area.database": {
+      "$ref": "#/$defs/plain"
+    },
+    "area.infra": {
+      "$ref": "#/$defs/plain"
+    },
+    "area.testing": {
+      "$ref": "#/$defs/plain"
+    },
+    "area.git": {
+      "$ref": "#/$defs/plain"
+    },
+    "area.backend.desc": {
+      "$ref": "#/$defs/plain"
+    },
+    "area.frontend.desc": {
+      "$ref": "#/$defs/plain"
+    },
+    "area.database.desc": {
+      "$ref": "#/$defs/plain"
+    },
+    "area.infra.desc": {
+      "$ref": "#/$defs/plain"
+    },
+    "area.testing.desc": {
+      "$ref": "#/$defs/plain"
+    },
+    "area.git.desc": {
+      "$ref": "#/$defs/plain"
+    },
+    "level.beginner": {
+      "$ref": "#/$defs/plain"
+    },
+    "level.beginner.desc": {
+      "$ref": "#/$defs/plain"
+    },
+    "level.intermediate": {
+      "$ref": "#/$defs/plain"
+    },
+    "level.intermediate.desc": {
+      "$ref": "#/$defs/plain"
+    },
+    "level.advanced": {
+      "$ref": "#/$defs/plain"
+    },
+    "level.advanced.desc": {
+      "$ref": "#/$defs/plain"
+    },
+    "years.never": {
+      "$ref": "#/$defs/plain"
+    },
+    "years.lt1": {
+      "$ref": "#/$defs/plain"
+    },
+    "years.1to3": {
+      "$ref": "#/$defs/plain"
+    },
+    "years.3to5": {
+      "$ref": "#/$defs/plain"
+    },
+    "years.gte5": {
+      "$ref": "#/$defs/plain"
+    },
+    "diagnosis.next": {
+      "$ref": "#/$defs/plain"
+    },
+    "diagnosis.finish": {
+      "$ref": "#/$defs/plain"
+    },
+    "diagnosis.back": {
+      "$ref": "#/$defs/plain"
+    },
+    "diagnosis.cancel": {
+      "$ref": "#/$defs/plain"
+    },
+    "error.diagnosis.required": {
+      "$ref": "#/$defs/plain"
+    },
+    "error.storage.message": {
+      "$ref": "#/$defs/plain"
+    },
+    "error.storage.retry": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.dayChanged": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.today.label": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{date[,}]"
+        }
+      ],
+      "description": "差し込み：{date}"
+    },
+    "task.today.label.nth": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{nth[,}]"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{date[,}]"
+        }
+      ],
+      "description": "差し込み：{nth}、{date}"
+    },
+    "task.progress": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{index[,}]"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{total[,}]"
+        }
+      ],
+      "description": "差し込み：{index}、{total}"
+    },
+    "task.meta": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{area[,}]"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{level[,}]"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{minutes[,}]"
+        }
+      ],
+      "description": "差し込み：{area}、{level}、{minutes}"
+    },
+    "task.rate.title": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.rate.question": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.rate.helpful": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.rate.notHelpful": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.rate.close": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.total.label": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.total.value": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{count[,}]"
+        }
+      ],
+      "description": "差し込み：{count}"
+    },
+    "task.progress.done": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{index[,}]"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{total[,}]"
+        }
+      ],
+      "description": "差し込み：{index}、{total}"
+    },
+    "task.cheer.default": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{count[,}]"
+        }
+      ],
+      "description": "差し込み：{count}。S4、S5 の task.cheer。累計が 7、30、100 以外。{count} は task.total.value と同じ整数（contracts/identifiers.md の 3。要素の data-testid には使わない）"
+    },
+    "task.cheer.at7": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.cheer.at30": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.cheer.at100": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.insight": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.done.title": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.done.task": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{title[,}]"
+        }
+      ],
+      "description": "差し込み：{title}"
+    },
+    "task.week": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{days[,}]"
+        }
+      ],
+      "description": "差し込み：{days}"
+    },
+    "task.next.note": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.next.note.last": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{area[,}]"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{level[,}]"
+        }
+      ],
+      "description": "差し込み：{area}、{level}（{level} は次に出す組の段階。申告で段階が動いていれば動いた先）。S5、S6 の task.next.note の要素に入れる変種（task.next を押すと S7 になるとき。contracts/data.md の 9。要素の data-testid には使わない）"
+    },
+    "task.next": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.done.history": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.skipped.title": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.skipped.history": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.exhausted.levelDone": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{area[,}]"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{level[,}]"
+        }
+      ],
+      "description": "差し込み：{area}、{level}"
+    },
+    "task.exhausted.levelDone.detail": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{total[,}]"
+        }
+      ],
+      "description": "差し込み：{total}"
+    },
+    "task.exhausted.next": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{nextLevel[,}]"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{desc[,}]"
+        }
+      ],
+      "description": "差し込み：{nextLevel}、{desc}"
+    },
+    "task.exhausted.seenNext": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{nextLevel[,}]"
+        }
+      ],
+      "description": "差し込み：{nextLevel}"
+    },
+    "task.exhausted.nextDone": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{nextLevel[,}]"
+        }
+      ],
+      "description": "差し込み：{nextLevel}"
+    },
+    "task.exhausted.advance": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{nextLevel[,}]"
+        }
+      ],
+      "description": "差し込み：{nextLevel}"
+    },
+    "task.exhausted.allDone": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{area[,}]"
+        }
+      ],
+      "description": "差し込み：{area}"
+    },
+    "task.exhausted.allDone.detail": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{total[,}]"
+        }
+      ],
+      "description": "差し込み：{total}"
+    },
+    "task.exhausted.redo": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.title": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.data.title": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.data.note": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.storage.notPersisted": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.export": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.export.done": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.import.note": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.import": {
+      "$ref": "#/$defs/plain"
+    },
+    "error.import.message": {
+      "$ref": "#/$defs/plain"
+    },
+    "error.import.reason.version": {
+      "$ref": "#/$defs/plain"
+    },
+    "error.import.reason.schema": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.import.confirm.title": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.import.confirm.summary": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{count[,}]"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{date[,}]"
+        }
+      ],
+      "description": "差し込み：{count}、{date}"
+    },
+    "settings.import.confirm.body": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.import.confirm.ok": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.import.confirm.cancel": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.diagnosis.title": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.diagnosis.current": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{area[,}]"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{level[,}]"
+        }
+      ],
+      "description": "差し込み：{area}、{level}"
+    },
+    "settings.redo": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.redo.note": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.homeScreen.title": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.homeScreen.open": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.records.title": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.open": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.history.open": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.delete.title": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.delete": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.delete.confirm.title": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.delete.confirm.body": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.delete.confirm.ok": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.delete.confirm.cancel": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.version": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{version[,}]"
+        }
+      ],
+      "description": "差し込み：{version}"
+    },
+    "settings.privacy": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.title": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.today": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{date[,}]"
+        }
+      ],
+      "description": "差し込み：{date}"
+    },
+    "settings.stats.firstOpenDate": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.issued": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.completed": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.firstDayCompleted": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.firstDayCompleted.yes": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.firstDayCompleted.no": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.daysCompleted7d": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.daysCompletedWeek": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.extraCompleted": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.helpful": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.rated": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.noTime": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.note": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.back": {
+      "$ref": "#/$defs/plain"
+    },
+    "history.title": {
+      "$ref": "#/$defs/plain"
+    },
+    "history.empty": {
+      "$ref": "#/$defs/plain"
+    },
+    "history.empty.action": {
+      "$ref": "#/$defs/plain"
+    },
+    "report.done": {
+      "$ref": "#/$defs/plain"
+    },
+    "report.noTime": {
+      "$ref": "#/$defs/plain"
+    },
+    "report.none": {
+      "$ref": "#/$defs/plain"
+    },
+    "helpful.yes": {
+      "$ref": "#/$defs/plain"
+    },
+    "helpful.no": {
+      "$ref": "#/$defs/plain"
+    },
+    "helpful.unanswered": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.question.heading": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{n[,}]"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{total[,}]"
+        }
+      ],
+      "description": "差し込み：{n}、{total}。S3 の各問の h2。{n} は data-question-number と同じ整数（1〜3）、{total} は 3"
+    },
+    "task.answer.result.correct": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.answer.result.incorrect": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.question.explain.label.selected": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.question.explain.label.correct": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.choice.tag.selected": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.choice.tag.correct": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.question.next": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.summary.open": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.skip.note": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.skip": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.rate.score": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{total[,}]"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{n[,}]"
+        }
+      ],
+      "description": "差し込み：{n}、{total}。S4、S5。{n} は data-score と同じ整数（0〜3）、{total} は 3（AC-42。点数の語を使わない：contracts/strings.md の 7.1）"
+    },
+    "task.level.adjusted.down": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{level[,}]"
+        }
+      ],
+      "description": "差し込み：{level}。S3。段階が下がった後の levels[area] の level.<ID> の文言（AC-8、D-60。禁止語の対象：contracts/strings.md の 7.2）"
+    },
+    "task.level.adjusted.up": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{level[,}]"
+        }
+      ],
+      "description": "差し込み：{level}。S3。段階が上がった後の levels[area] の level.<ID> の文言（AC-8、D-60。禁止語の対象：contracts/strings.md の 7.2）"
+    },
+    "error.tasks.offline": {
+      "$ref": "#/$defs/plain"
+    },
+    "task.next.retry": {
+      "$ref": "#/$defs/plain"
+    },
+    "guide.name": {
+      "$ref": "#/$defs/guide"
+    },
+    "guide.intro": {
+      "$ref": "#/$defs/guide"
+    },
+    "guide.correct.1": {
+      "$ref": "#/$defs/guide"
+    },
+    "guide.correct.2": {
+      "$ref": "#/$defs/guide"
+    },
+    "guide.correct.3": {
+      "$ref": "#/$defs/guide"
+    },
+    "guide.incorrect.1": {
+      "$ref": "#/$defs/guide"
+    },
+    "guide.incorrect.2": {
+      "$ref": "#/$defs/guide"
+    },
+    "guide.incorrect.3": {
+      "$ref": "#/$defs/guide"
+    },
+    "guide.rate.score0": {
+      "$ref": "#/$defs/guide"
+    },
+    "guide.rate.score1": {
+      "$ref": "#/$defs/guide"
+    },
+    "guide.rate.score2": {
+      "$ref": "#/$defs/guide"
+    },
+    "guide.rate.score3": {
+      "$ref": "#/$defs/guide"
+    },
+    "guide.rate.milestone": {
+      "$ref": "#/$defs/guide"
+    },
+    "guide.exhausted.levelDone": {
+      "$ref": "#/$defs/guide"
+    },
+    "guide.exhausted.allDone": {
+      "$ref": "#/$defs/guide"
+    },
+    "settings.character.title": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.character.show": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.character.note": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.questionsAnswered": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.questionsCorrect": {
+      "$ref": "#/$defs/plain"
+    },
+    "settings.stats.lowScoreTasks": {
+      "$ref": "#/$defs/plain"
+    },
+    "history.row.score": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{total[,}]"
+        },
+        {
+          "type": "string",
+          "pattern": "\\{n[,}]"
+        }
+      ],
+      "description": "差し込み：{n}、{total}。S10 の答えた問が 1 件以上の行。{n} はその行の score、{total} は 3（D-62）"
+    },
+    "history.row.answers": {
+      "$ref": "#/$defs/plain"
+    },
+    "history.row.unavailable": {
+      "$ref": "#/$defs/plain"
+    }
+  },
+  "$defs": {
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "plain": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S",
+      "not": {
+        "type": "string",
+        "pattern": "[{}]"
+      },
+      "description": "差し込みなし"
+    },
+    "guide": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 40,
+      "pattern": "\\S",
+      "not": {
+        "type": "string",
+        "pattern": "[{}]"
+      },
+      "description": "案内役の台詞。差し込みなし。1〜40 字（コードポイントで数える。ajv の maxLength はコードポイントで数える）。AC-45、D-55"
+    }
+  }
+}

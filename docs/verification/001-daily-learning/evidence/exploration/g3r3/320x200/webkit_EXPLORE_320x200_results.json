@@ -1,0 +1,972 @@
+[
+ {
+  "scene": "S10_history",
+  "browser": "webkit",
+  "viewport": "320x568",
+  "state": "history",
+  "scrollWidth": 320,
+  "clientWidth": 320,
+  "scrollHeight": 1545,
+  "wide": [],
+  "ellipsis": [],
+  "clipped": [],
+  "rootFontSize": "32px",
+  "operations": [
+   {
+    "id": "history.row.answer",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "答えを見る",
+    "box": {
+     "x": 16,
+     "y": 379,
+     "w": 180,
+     "h": 99
+    },
+    "initiallyInView": false,
+    "inViewAfterScroll": true,
+    "size44": true
+   },
+   {
+    "id": "nav.history",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "履歴",
+    "box": {
+     "x": 16,
+     "y": 99,
+     "w": 91,
+     "h": 99
+    },
+    "initiallyInView": false,
+    "inViewAfterScroll": true,
+    "size44": true
+   },
+   {
+    "id": "nav.settings",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "設定",
+    "box": {
+     "x": 123,
+     "y": 99,
+     "w": 91,
+     "h": 99
+    },
+    "initiallyInView": true,
+    "inViewAfterScroll": true,
+    "size44": true
+   }
+  ],
+  "dialog": null,
+  "historyRows": 3
+ },
+ {
+  "scene": "S10_history_answerOpen",
+  "browser": "webkit",
+  "viewport": "320x568",
+  "state": "history",
+  "scrollWidth": 320,
+  "clientWidth": 320,
+  "scrollHeight": 1911,
+  "wide": [],
+  "ellipsis": [],
+  "clipped": [],
+  "rootFontSize": "32px",
+  "operations": [
+   {
+    "id": "history.row.answer",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "答えを見る",
+    "box": {
+     "x": 16,
+     "y": 379,
+     "w": 180,
+     "h": 99
+    },
+    "initiallyInView": true,
+    "inViewAfterScroll": true,
+    "size44": true
+   },
+   {
+    "id": "nav.history",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "履歴",
+    "box": {
+     "x": 16,
+     "y": 99,
+     "w": 91,
+     "h": 99
+    },
+    "initiallyInView": false,
+    "inViewAfterScroll": true,
+    "size44": true
+   },
+   {
+    "id": "nav.settings",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "設定",
+    "box": {
+     "x": 123,
+     "y": 99,
+     "w": 91,
+     "h": 99
+    },
+    "initiallyInView": true,
+    "inViewAfterScroll": true,
+    "size44": true
+   }
+  ],
+  "dialog": null
+ },
+ {
+  "scene": "S6_levelChanged_note.last",
+  "browser": "webkit",
+  "viewport": "320x568",
+  "state": "task.skipped",
+  "scrollWidth": 320,
+  "clientWidth": 320,
+  "scrollHeight": 1302,
+  "wide": [],
+  "ellipsis": [],
+  "clipped": [],
+  "rootFontSize": "32px",
+  "operations": [
+   {
+    "id": "task.next",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "次の一手に進む",
+    "box": {
+     "x": 32,
+     "y": 207,
+     "w": 256,
+     "h": 152
+    },
+    "initiallyInView": false,
+    "inViewAfterScroll": true,
+    "size44": true
+   },
+   {
+    "id": "task.skipped.history",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "履歴を見る",
+    "box": {
+     "x": 16,
+     "y": 392,
+     "w": 180,
+     "h": 99
+    },
+    "initiallyInView": true,
+    "inViewAfterScroll": true,
+    "size44": true
+   },
+   {
+    "id": "nav.history",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "履歴",
+    "box": {
+     "x": 16,
+     "y": 99,
+     "w": 91,
+     "h": 99
+    },
+    "initiallyInView": false,
+    "inViewAfterScroll": true,
+    "size44": true
+   },
+   {
+    "id": "nav.settings",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "設定",
+    "box": {
+     "x": 123,
+     "y": 99,
+     "w": 91,
+     "h": 99
+    },
+    "initiallyInView": true,
+    "inViewAfterScroll": true,
+    "size44": true
+   }
+  ],
+  "dialog": null
+ },
+ {
+  "scene": "S6_too_hard",
+  "browser": "webkit",
+  "viewport": "320x568",
+  "state": "task.skipped",
+  "scrollWidth": 320,
+  "clientWidth": 320,
+  "scrollHeight": 1257,
+  "wide": [],
+  "ellipsis": [],
+  "clipped": [],
+  "rootFontSize": "32px",
+  "operations": [
+   {
+    "id": "task.next",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "次の一手に進む",
+    "box": {
+     "x": 32,
+     "y": 208,
+     "w": 256,
+     "h": 152
+    },
+    "initiallyInView": false,
+    "inViewAfterScroll": true,
+    "size44": true
+   },
+   {
+    "id": "task.skipped.history",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "履歴を見る",
+    "box": {
+     "x": 16,
+     "y": 392,
+     "w": 180,
+     "h": 99
+    },
+    "initiallyInView": true,
+    "inViewAfterScroll": true,
+    "size44": true
+   },
+   {
+    "id": "nav.history",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "履歴",
+    "box": {
+     "x": 16,
+     "y": 99,
+     "w": 91,
+     "h": 99
+    },
+    "initiallyInView": false,
+    "inViewAfterScroll": true,
+    "size44": true
+   },
+   {
+    "id": "nav.settings",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "設定",
+    "box": {
+     "x": 123,
+     "y": 99,
+     "w": 91,
+     "h": 99
+    },
+    "initiallyInView": true,
+    "inViewAfterScroll": true,
+    "size44": true
+   }
+  ],
+  "dialog": null
+ },
+ {
+  "scene": "S7_allDone",
+  "browser": "webkit",
+  "viewport": "320x568",
+  "state": "task.exhausted",
+  "scrollWidth": 320,
+  "clientWidth": 320,
+  "scrollHeight": 1507,
+  "wide": [],
+  "ellipsis": [],
+  "clipped": [],
+  "rootFontSize": "32px",
+  "operations": [
+   {
+    "id": "task.exhausted.advance",
+    "count": 0,
+    "required": false
+   },
+   {
+    "id": "task.exhausted.redo",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "別の領域を選ぶ",
+    "box": {
+     "x": 32,
+     "y": 319,
+     "w": 256,
+     "h": 152
+    },
+    "initiallyInView": false,
+    "inViewAfterScroll": true,
+    "size44": true
+   },
+   {
+    "id": "nav.history",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "履歴",
+    "box": {
+     "x": 16,
+     "y": 99,
+     "w": 91,
+     "h": 99
+    },
+    "initiallyInView": false,
+    "inViewAfterScroll": true,
+    "size44": true
+   },
+   {
+    "id": "nav.settings",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "設定",
+    "box": {
+     "x": 123,
+     "y": 99,
+     "w": 91,
+     "h": 99
+    },
+    "initiallyInView": true,
+    "inViewAfterScroll": true,
+    "size44": true
+   }
+  ],
+  "dialog": null
+ },
+ {
+  "scene": "S7_levelDone",
+  "browser": "webkit",
+  "viewport": "320x568",
+  "state": "task.exhausted",
+  "scrollWidth": 320,
+  "clientWidth": 320,
+  "scrollHeight": 1613,
+  "wide": [],
+  "ellipsis": [],
+  "clipped": [],
+  "rootFontSize": "32px",
+  "operations": [
+   {
+    "id": "task.exhausted.advance",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "上級に進む",
+    "box": {
+     "x": 32,
+     "y": 233,
+     "w": 256,
+     "h": 101
+    },
+    "initiallyInView": false,
+    "inViewAfterScroll": true,
+    "size44": true
+   },
+   {
+    "id": "task.exhausted.redo",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "別の領域を選ぶ",
+    "box": {
+     "x": 32,
+     "y": 358,
+     "w": 256,
+     "h": 152
+    },
+    "initiallyInView": true,
+    "inViewAfterScroll": true,
+    "size44": true
+   },
+   {
+    "id": "nav.history",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "履歴",
+    "box": {
+     "x": 16,
+     "y": 99,
+     "w": 91,
+     "h": 99
+    },
+    "initiallyInView": false,
+    "inViewAfterScroll": true,
+    "size44": true
+   },
+   {
+    "id": "nav.settings",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "設定",
+    "box": {
+     "x": 123,
+     "y": 99,
+     "w": 91,
+     "h": 99
+    },
+    "initiallyInView": true,
+    "inViewAfterScroll": true,
+    "size44": true
+   }
+  ],
+  "dialog": null
+ },
+ {
+  "scene": "S7_nextDone",
+  "browser": "webkit",
+  "viewport": "320x568",
+  "state": "task.exhausted",
+  "scrollWidth": 320,
+  "clientWidth": 320,
+  "scrollHeight": 1971,
+  "wide": [],
+  "ellipsis": [],
+  "clipped": [],
+  "rootFontSize": "32px",
+  "operations": [
+   {
+    "id": "task.exhausted.advance",
+    "count": 1,
+    "required": false,
+    "visible": true,
+    "text": "中級に進む",
+    "box": {
+     "x": 32,
+     "y": 234,
+     "w": 256,
+     "h": 101
+    },
+    "initiallyInView": false,
+    "inViewAfterScroll": true,
+    "size44": true
+   },
+   {
+    "id": "task.exhausted.redo",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "別の領域を選ぶ",
+    "box": {
+     "x": 32,
+     "y": 359,
+     "w": 256,
+     "h": 152
+    },
+    "initiallyInView": true,
+    "inViewAfterScroll": true,
+    "size44": true
+   },
+   {
+    "id": "nav.history",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "履歴",
+    "box": {
+     "x": 16,
+     "y": 99,
+     "w": 91,
+     "h": 99
+    },
+    "initiallyInView": false,
+    "inViewAfterScroll": true,
+    "size44": true
+   },
+   {
+    "id": "nav.settings",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "設定",
+    "box": {
+     "x": 123,
+     "y": 99,
+     "w": 91,
+     "h": 99
+    },
+    "initiallyInView": true,
+    "inViewAfterScroll": true,
+    "size44": true
+   }
+  ],
+  "dialog": null
+ },
+ {
+  "scene": "S7_seenNext",
+  "browser": "webkit",
+  "viewport": "320x568",
+  "state": "task.exhausted",
+  "scrollWidth": 320,
+  "clientWidth": 320,
+  "scrollHeight": 1971,
+  "wide": [],
+  "ellipsis": [],
+  "clipped": [],
+  "rootFontSize": "32px",
+  "operations": [
+   {
+    "id": "task.exhausted.advance",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "中級に進む",
+    "box": {
+     "x": 32,
+     "y": 234,
+     "w": 256,
+     "h": 101
+    },
+    "initiallyInView": false,
+    "inViewAfterScroll": true,
+    "size44": true
+   },
+   {
+    "id": "task.exhausted.redo",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "別の領域を選ぶ",
+    "box": {
+     "x": 32,
+     "y": 359,
+     "w": 256,
+     "h": 152
+    },
+    "initiallyInView": true,
+    "inViewAfterScroll": true,
+    "size44": true
+   },
+   {
+    "id": "nav.history",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "履歴",
+    "box": {
+     "x": 16,
+     "y": 99,
+     "w": 91,
+     "h": 99
+    },
+    "initiallyInView": false,
+    "inViewAfterScroll": true,
+    "size44": true
+   },
+   {
+    "id": "nav.settings",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "設定",
+    "box": {
+     "x": 123,
+     "y": 99,
+     "w": 91,
+     "h": 99
+    },
+    "initiallyInView": true,
+    "inViewAfterScroll": true,
+    "size44": true
+   }
+  ],
+  "dialog": null
+ },
+ {
+  "scene": "S8_settings",
+  "browser": "webkit",
+  "viewport": "320x568",
+  "state": "settings",
+  "scrollWidth": 320,
+  "clientWidth": 320,
+  "scrollHeight": 4046,
+  "wide": [],
+  "ellipsis": [],
+  "clipped": [],
+  "rootFontSize": "32px",
+  "operations": [
+   {
+    "id": "settings.export",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "ファイルに書き出す",
+    "box": {
+     "x": 32,
+     "y": 207,
+     "w": 256,
+     "h": 152
+    },
+    "initiallyInView": false,
+    "inViewAfterScroll": true,
+    "size44": true
+   },
+   {
+    "id": "settings.import",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "ファイルを読み込む",
+    "box": {
+     "x": 32,
+     "y": 207,
+     "w": 256,
+     "h": 152
+    },
+    "initiallyInView": false,
+    "inViewAfterScroll": true,
+    "size44": true
+   },
+   {
+    "id": "settings.redo",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "診断をやり直す",
+    "box": {
+     "x": 32,
+     "y": 208,
+     "w": 256,
+     "h": 152
+    },
+    "initiallyInView": false,
+    "inViewAfterScroll": true,
+    "size44": true
+   },
+   {
+    "id": "settings.homeScreen.open",
+    "count": 0,
+    "required": false
+   },
+   {
+    "id": "settings.stats.open",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "統計を見る",
+    "box": {
+     "x": 16,
+     "y": 234,
+     "w": 180,
+     "h": 99
+    },
+    "initiallyInView": false,
+    "inViewAfterScroll": true,
+    "size44": true
+   },
+   {
+    "id": "settings.history.open",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "履歴を見る",
+    "box": {
+     "x": 16,
+     "y": 365,
+     "w": 180,
+     "h": 99
+    },
+    "initiallyInView": true,
+    "inViewAfterScroll": true,
+    "size44": true
+   },
+   {
+    "id": "settings.delete",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "すべてのデータを削除",
+    "box": {
+     "x": 32,
+     "y": 243,
+     "w": 256,
+     "h": 152
+    },
+    "initiallyInView": false,
+    "inViewAfterScroll": true,
+    "size44": true
+   },
+   {
+    "id": "nav.history",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "履歴",
+    "box": {
+     "x": 16,
+     "y": 99,
+     "w": 91,
+     "h": 99
+    },
+    "initiallyInView": false,
+    "inViewAfterScroll": true,
+    "size44": true
+   },
+   {
+    "id": "nav.settings",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "設定",
+    "box": {
+     "x": 123,
+     "y": 99,
+     "w": 91,
+     "h": 99
+    },
+    "initiallyInView": true,
+    "inViewAfterScroll": true,
+    "size44": true
+   }
+  ],
+  "dialog": null
+ },
+ {
+  "scene": "S9_stats",
+  "browser": "webkit",
+  "viewport": "320x568",
+  "state": "settings.stats",
+  "scrollWidth": 320,
+  "clientWidth": 320,
+  "scrollHeight": 2833,
+  "wide": [],
+  "ellipsis": [],
+  "clipped": [],
+  "rootFontSize": "32px",
+  "operations": [
+   {
+    "id": "settings.stats.back",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "設定に戻る",
+    "box": {
+     "x": 16,
+     "y": 372,
+     "w": 180,
+     "h": 99
+    },
+    "initiallyInView": false,
+    "inViewAfterScroll": true,
+    "size44": true
+   },
+   {
+    "id": "nav.history",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "履歴",
+    "box": {
+     "x": 16,
+     "y": 99,
+     "w": 91,
+     "h": 99
+    },
+    "initiallyInView": false,
+    "inViewAfterScroll": true,
+    "size44": true
+   },
+   {
+    "id": "nav.settings",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "設定",
+    "box": {
+     "x": 123,
+     "y": 99,
+     "w": 91,
+     "h": 99
+    },
+    "initiallyInView": true,
+    "inViewAfterScroll": true,
+    "size44": true
+   }
+  ],
+  "dialog": null,
+  "statValues": [
+   "settings.stats.firstOpenDate.value=2026-11-01",
+   "settings.stats.issued.value=6",
+   "settings.stats.completed.value=4",
+   "settings.stats.firstDayCompleted.value=完了した",
+   "settings.stats.daysCompleted7d.value=3",
+   "settings.stats.daysCompletedWeek.value=2",
+   "settings.stats.extraCompleted.value=1",
+   "settings.stats.helpful.value=2",
+   "settings.stats.rated.value=2",
+   "settings.stats.tooHard.value=1",
+   "settings.stats.noTime.value=1"
+  ]
+ },
+ {
+  "scene": "dialog_delete",
+  "browser": "webkit",
+  "viewport": "320x568",
+  "state": "settings",
+  "scrollWidth": 320,
+  "clientWidth": 320,
+  "scrollHeight": 4046,
+  "wide": [],
+  "ellipsis": [],
+  "clipped": [],
+  "rootFontSize": "32px",
+  "operations": [
+   {
+    "id": "settings.delete.confirm.ok",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "削除する",
+    "box": {
+     "x": 81,
+     "y": 175,
+     "w": 158,
+     "h": 152
+    },
+    "initiallyInView": true,
+    "inViewAfterScroll": true,
+    "size44": true
+   },
+   {
+    "id": "settings.delete.confirm.cancel",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "やめる",
+    "box": {
+     "x": 81,
+     "y": 351,
+     "w": 158,
+     "h": 101
+    },
+    "initiallyInView": true,
+    "inViewAfterScroll": true,
+    "size44": true
+   }
+  ],
+  "dialog": {
+   "dialogRect": {
+    "x": 32,
+    "y": 35,
+    "w": 256,
+    "h": 498,
+    "inView": true
+   },
+   "initialFocus": "settings.delete.confirm.cancel",
+   "cancelRect": {
+    "x": 81,
+    "y": 351,
+    "w": 158,
+    "h": 101,
+    "inView": true
+   },
+   "keys": 3,
+   "reached": "settings.delete.confirm.ok",
+   "okRect": {
+    "x": 81,
+    "y": 175,
+    "w": 158,
+    "h": 152,
+    "inView": true
+   }
+  }
+ },
+ {
+  "scene": "dialog_import",
+  "browser": "webkit",
+  "viewport": "320x568",
+  "state": "settings",
+  "scrollWidth": 320,
+  "clientWidth": 320,
+  "scrollHeight": 4046,
+  "wide": [],
+  "ellipsis": [],
+  "clipped": [],
+  "rootFontSize": "32px",
+  "operations": [
+   {
+    "id": "settings.import.confirm.ok",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "置き換える",
+    "box": {
+     "x": 81,
+     "y": 174,
+     "w": 158,
+     "h": 152
+    },
+    "initiallyInView": true,
+    "inViewAfterScroll": true,
+    "size44": true
+   },
+   {
+    "id": "settings.import.confirm.cancel",
+    "count": 1,
+    "required": true,
+    "visible": true,
+    "text": "やめる",
+    "box": {
+     "x": 81,
+     "y": 351,
+     "w": 158,
+     "h": 101
+    },
+    "initiallyInView": true,
+    "inViewAfterScroll": true,
+    "size44": true
+   }
+  ],
+  "dialog": {
+   "dialogRect": {
+    "x": 32,
+    "y": 35,
+    "w": 256,
+    "h": 498,
+    "inView": true
+   },
+   "initialFocus": "settings.import.confirm.cancel",
+   "cancelRect": {
+    "x": 81,
+    "y": 351,
+    "w": 158,
+    "h": 101,
+    "inView": true
+   },
+   "keys": 3,
+   "reached": "settings.import.confirm.ok",
+   "okRect": {
+    "x": 81,
+    "y": 174,
+    "w": 158,
+    "h": 152,
+    "inView": true
+   }
+  }
+ }
+]

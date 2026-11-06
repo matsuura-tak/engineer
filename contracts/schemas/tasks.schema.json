@@ -1,0 +1,821 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:kyounoitte:schema:tasks:2",
+  "title": "課題集の 1 ファイル（backend/public/data/tasks-<領域>.json。ADR 0006）",
+  "description": "1 ファイルは 1 領域の課題だけを持つ（ADR 0006）。型は「選んで学ぶ」（PRD r13 の 9、AC-3、AC-29、AC-38、AC-44）。字数はすべてコードポイントで数える（ajv の minLength と maxLength はコードポイントで数える）。JSON Schema で書けない決まり（ID の重複、highlight が labels の数より小さい、選択肢の text と explain が問の中で互いに異なる、文の調子 AC-43、初級 AC-34、正解の位置の偏り AC-29、件数 AC-4、ファイル名と area の一致）は contracts/strings.md の 5 と 7 にあり、contracts/tools/check-schemas.mjs と受け入れテストが確かめる。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "formatVersion",
+    "area",
+    "tasks"
+  ],
+  "properties": {
+    "formatVersion": {
+      "const": 2,
+      "description": "課題集の形式の版。2 は「選んで学ぶ」型（2026-11-06。1 は r10 の why / how / goal / tools の型で、もう読まない）。アプリと一緒に配るので、古いアプリが新しい課題集を読むことはない"
+    },
+    "area": {
+      "$ref": "#/$defs/area",
+      "description": "このファイルの領域。ファイル名 tasks-<area>.json の <area> と同じ（JSON Schema では書けないので、build.mjs と読み込みの手書きの検査が確かめる：contracts/strings.md の 5）。tasks のすべての area と ID の <領域> はこの値と同じ"
+    },
+    "tasks": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 200,
+      "items": {
+        "$ref": "#/$defs/task"
+      },
+      "description": "v1 は 1 ファイル 21 件（3 段階 × 7）。上限 200 は形の上の歯止めで、量の予算は contracts/budgets.md"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "type": "object",
+        "required": [
+          "area"
+        ],
+        "properties": {
+          "area": {
+            "const": "backend"
+          }
+        }
+      },
+      "then": {
+        "type": "object",
+        "properties": {
+          "tasks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "area": {
+                  "const": "backend"
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^backend-"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "type": "object",
+        "required": [
+          "area"
+        ],
+        "properties": {
+          "area": {
+            "const": "frontend"
+          }
+        }
+      },
+      "then": {
+        "type": "object",
+        "properties": {
+          "tasks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "area": {
+                  "const": "frontend"
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^frontend-"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "type": "object",
+        "required": [
+          "area"
+        ],
+        "properties": {
+          "area": {
+            "const": "database"
+          }
+        }
+      },
+      "then": {
+        "type": "object",
+        "properties": {
+          "tasks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "area": {
+                  "const": "database"
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^database-"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "type": "object",
+        "required": [
+          "area"
+        ],
+        "properties": {
+          "area": {
+            "const": "infra"
+          }
+        }
+      },
+      "then": {
+        "type": "object",
+        "properties": {
+          "tasks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "area": {
+                  "const": "infra"
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^infra-"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "type": "object",
+        "required": [
+          "area"
+        ],
+        "properties": {
+          "area": {
+            "const": "testing"
+          }
+        }
+      },
+      "then": {
+        "type": "object",
+        "properties": {
+          "tasks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "area": {
+                  "const": "testing"
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^testing-"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "type": "object",
+        "required": [
+          "area"
+        ],
+        "properties": {
+          "area": {
+            "const": "git"
+          }
+        }
+      },
+      "then": {
+        "type": "object",
+        "properties": {
+          "tasks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "area": {
+                  "const": "git"
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^git-"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "area": {
+      "enum": [
+        "backend",
+        "frontend",
+        "database",
+        "infra",
+        "testing",
+        "git"
+      ],
+      "description": "領域の ID。変えない（ADR 0002、contracts/identifiers.md の 5）"
+    },
+    "level": {
+      "enum": [
+        "beginner",
+        "intermediate",
+        "advanced"
+      ],
+      "description": "段階の ID。変えない（ADR 0002）"
+    },
+    "taskId": {
+      "type": "string",
+      "pattern": "^(backend|frontend|database|infra|testing|git)-(beginner|intermediate|advanced)-[0-9]{3}$",
+      "description": "<area>-<level>-<3 桁>。一度配った ID は消さず、使い回さず、別の課題に付け替えない（ADR 0002、contracts/identifiers.md の 5）"
+    },
+    "noNewline": {
+      "type": "string",
+      "not": {
+        "type": "string",
+        "pattern": "[\\r\\n]"
+      },
+      "description": "改行を含めない（どの項目も <p> か <span> か属性 1 つに入る）"
+    },
+    "noCodeFence": {
+      "type": "string",
+      "not": {
+        "type": "string",
+        "pattern": "```"
+      },
+      "description": "コードブロック（連続する 3 つのバッククォート）を含めない（AC-29）"
+    },
+    "noUrl": {
+      "type": "string",
+      "not": {
+        "type": "string",
+        "pattern": "https?://"
+      },
+      "description": "URL を含めない（AC-29。P-1）"
+    },
+    "noBacktick": {
+      "type": "string",
+      "not": {
+        "type": "string",
+        "pattern": "`"
+      },
+      "description": "バッククォートを含めない（行内のコードにしない項目）"
+    },
+    "figure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "labels",
+        "alt"
+      ],
+      "description": "図の指定（AC-44、design r13 の D-50、D-51）。描くのはアプリ（HTML と CSS と inline SVG）",
+      "properties": {
+        "type": {
+          "enum": [
+            "flow",
+            "layers",
+            "compare",
+            "sequence",
+            "tree",
+            "split"
+          ],
+          "description": "図の型の ID（contracts/identifiers.md の 5）。data-figure-type に写す"
+        },
+        "labels": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 8,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 12,
+            "pattern": "\\S",
+            "allOf": [
+              {
+                "$ref": "#/$defs/noNewline"
+              },
+              {
+                "$ref": "#/$defs/noCodeFence"
+              },
+              {
+                "$ref": "#/$defs/noUrl"
+              },
+              {
+                "$ref": "#/$defs/noBacktick"
+              }
+            ],
+            "description": "ラベル。1〜12 字。行内のコードにしない（画面の文字が labels の文字列と等しい：AC-44）"
+          },
+          "description": "型ごとの数は下の allOf。並びの意味は D-51（compare は labels[0..1] が見出し、以下 labels[2i]、labels[2i+1] の対）"
+        },
+        "highlight": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 7,
+          "description": "強調するラベルの index（任意。ないときは強調なし）。labels の数より小さい（手書きの検査）。data-figure-highlight に写す"
+        },
+        "alt": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "pattern": "\\S",
+          "allOf": [
+            {
+              "$ref": "#/$defs/noNewline"
+            },
+            {
+              "$ref": "#/$defs/noCodeFence"
+            },
+            {
+              "$ref": "#/$defs/noUrl"
+            },
+            {
+              "$ref": "#/$defs/noBacktick"
+            }
+          ],
+          "description": "代替文。1〜80 字。aria-label に入れる（AC-44）"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "type": "object",
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "const": "flow"
+              }
+            }
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "labels": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 5
+              },
+              "highlight": {
+                "type": "integer",
+                "maximum": 4
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "const": "layers"
+              }
+            }
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "labels": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 5
+              },
+              "highlight": {
+                "type": "integer",
+                "maximum": 4
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "const": "compare"
+              }
+            }
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "labels": {
+                "type": "array",
+                "minItems": 4,
+                "maxItems": 8,
+                "oneOf": [
+                  {
+                    "type": "array",
+                    "minItems": 4,
+                    "maxItems": 4
+                  },
+                  {
+                    "type": "array",
+                    "minItems": 6,
+                    "maxItems": 6
+                  },
+                  {
+                    "type": "array",
+                    "minItems": 8,
+                    "maxItems": 8
+                  }
+                ],
+                "description": "見出し 2 と、2 つずつの行 1〜3（4、6、8 の偶数）"
+              },
+              "highlight": {
+                "type": "integer",
+                "maximum": 7
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "const": "sequence"
+              }
+            }
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "labels": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 5
+              },
+              "highlight": {
+                "type": "integer",
+                "maximum": 4
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "const": "tree"
+              }
+            }
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "labels": {
+                "type": "array",
+                "minItems": 3,
+                "maxItems": 5
+              },
+              "highlight": {
+                "type": "integer",
+                "maximum": 4
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "const": "split"
+              }
+            }
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "labels": {
+                "type": "array",
+                "minItems": 3,
+                "maxItems": 4
+              },
+              "highlight": {
+                "type": "integer",
+                "maximum": 3
+              }
+            }
+          }
+        }
+      ]
+    },
+    "choice": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "text",
+        "explain"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40,
+          "pattern": "\\S",
+          "allOf": [
+            {
+              "$ref": "#/$defs/noNewline"
+            },
+            {
+              "$ref": "#/$defs/noCodeFence"
+            },
+            {
+              "$ref": "#/$defs/noUrl"
+            }
+          ],
+          "description": "選択肢の文。1〜40 字。同じ問の 3 つで互いに異なる（手書きの検査）。行内のコードを使える（contracts/strings.md の 5）"
+        },
+        "explain": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120,
+          "pattern": "\\S",
+          "allOf": [
+            {
+              "$ref": "#/$defs/noNewline"
+            },
+            {
+              "$ref": "#/$defs/noCodeFence"
+            },
+            {
+              "$ref": "#/$defs/noUrl"
+            }
+          ],
+          "description": "その選択肢を選んだときの説明。1〜120 字。同じ問の 3 つで互いに異なる（手書きの検査）。AC-41、AC-43"
+        }
+      }
+    },
+    "question": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "text",
+        "choices",
+        "answer"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
+          "pattern": "\\S",
+          "allOf": [
+            {
+              "$ref": "#/$defs/noNewline"
+            },
+            {
+              "$ref": "#/$defs/noCodeFence"
+            },
+            {
+              "$ref": "#/$defs/noUrl"
+            }
+          ],
+          "description": "問題文。1〜100 字。AC-43 の です・ます を 1 回以上"
+        },
+        "figure": {
+          "$ref": "#/$defs/figure",
+          "description": "問の図（任意）。data-figure-of=\"question\""
+        },
+        "choices": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "$ref": "#/$defs/choice"
+          }
+        },
+        "answer": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2,
+          "description": "正解の choices の index"
+        }
+      }
+    },
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "area",
+        "level",
+        "mode",
+        "minutes",
+        "title",
+        "intro",
+        "figure",
+        "questions",
+        "insight"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/taskId"
+        },
+        "area": {
+          "$ref": "#/$defs/area"
+        },
+        "level": {
+          "$ref": "#/$defs/level"
+        },
+        "mode": {
+          "enum": [
+            "in_app"
+          ],
+          "description": "v1 は in_app だけ（PRD r13 の P-1、AC-29）。external は identifiers.md の 5 の語彙に残すが、課題集では受け付けない（足すときはこの enum に足し、formatVersion を上げる）"
+        },
+        "minutes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 15,
+          "description": "所要時間（分）。AC-3。初級は 10 以下（AC-34。手書きの検査）"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60,
+          "pattern": "\\S",
+          "allOf": [
+            {
+              "$ref": "#/$defs/noNewline"
+            },
+            {
+              "$ref": "#/$defs/noCodeFence"
+            },
+            {
+              "$ref": "#/$defs/noUrl"
+            },
+            {
+              "$ref": "#/$defs/noBacktick"
+            }
+          ],
+          "description": "題名。1〜60 字。改行とバッククォートなし"
+        },
+        "intro": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300,
+          "pattern": "\\S",
+          "allOf": [
+            {
+              "$ref": "#/$defs/noNewline"
+            },
+            {
+              "$ref": "#/$defs/noCodeFence"
+            },
+            {
+              "$ref": "#/$defs/noUrl"
+            }
+          ],
+          "description": "導入（なぜ今これかを含む）。1〜300 字。<p> 1 つ（改行なし）。行内のコードを使える"
+        },
+        "figure": {
+          "$ref": "#/$defs/figure",
+          "description": "導入の図（必須）。data-figure-of=\"intro\""
+        },
+        "questions": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "$ref": "#/$defs/question"
+          }
+        },
+        "insight": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120,
+          "pattern": "\\S",
+          "allOf": [
+            {
+              "$ref": "#/$defs/noNewline"
+            },
+            {
+              "$ref": "#/$defs/noCodeFence"
+            },
+            {
+              "$ref": "#/$defs/noUrl"
+            },
+            {
+              "$ref": "#/$defs/noBacktick"
+            }
+          ],
+          "description": "ひとこと解説（AC-38）。1〜120 字。改行とバッククォートを含めない（<p> 1 つに textContent でそのまま入れる）。task.rate と task.done でだけ出す"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "type": "object",
+            "required": [
+              "level"
+            ],
+            "properties": {
+              "level": {
+                "const": "beginner"
+              }
+            }
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "-beginner-[0-9]{3}$"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "required": [
+              "level"
+            ],
+            "properties": {
+              "level": {
+                "const": "intermediate"
+              }
+            }
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "-intermediate-[0-9]{3}$"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "required": [
+              "level"
+            ],
+            "properties": {
+              "level": {
+                "const": "advanced"
+              }
+            }
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "-advanced-[0-9]{3}$"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,44 @@
+npm notice run check:seeds
+npm notice run node helpers/check-seeds.mjs && node helpers/check-seed-builders.mjs
+課題集：/var/folders/q8/pb4r57zj60s00b7lv68l9d600000gn/T/kyounoitte-check-seeds-cgYvGh/dist/data/tasks.json（126 件）
+OK  seeds/seed-ac8-advanced-one-too-easy.json
+OK  seeds/seed-ac8-beginner-one-too-hard.json
+OK  seeds/seed-ac8-intermediate-one-too-easy.json
+OK  seeds/seed-ac8-intermediate-too-hard-done.json
+OK  seeds/seed-ac8-intermediate-too-hard-no-time.json
+OK  seeds/seed-ac8-intermediate-two-done.json
+OK  seeds/seed-diagnosed-2026-10.json
+OK  seeds/seed-one-done.json
+OK  seeds/seed-three-done-one-answer.json
+OK  seeds/seed-two-done.json
+OK  contracts/fixtures/seeds/seed-ac14-three-completed.json
+OK  contracts/fixtures/seeds/seed-ac24-stats.json
+OK  contracts/fixtures/seeds/seed-ac35-six-completed.json
+OK  contracts/fixtures/seeds/seed-ac36-three-issued.json
+OK  contracts/fixtures/seeds/seed-ac8-intermediate-after-advanced-two-too-hard.json
+OK  contracts/fixtures/seeds/seed-ac8-intermediate-one-too-hard.json
+OK  contracts/fixtures/seeds/seed-ac8-intermediate-same-day.json
+OK  contracts/fixtures/seeds/seed-ac8-intermediate-too-hard-then-none.json
+seed 18 件、期待と違う結果 0 件
+OK  合成の課題集は 210 件（初級・中級 14、上級 7）
+OK  completedSeed n=10：data.schema と data.md 8
+OK  completedSeed n=10：完了の行 10
+OK  completedSeed n=10：levels.backend は intermediate（目標の段階のまま）
+OK  completedSeed n=10：data.md 5 で次に出る ID は backend-intermediate-011、nextId は backend-intermediate-011（期待 backend-intermediate-011）、levels={"backend":"intermediate"}、開く日 2026-01-11
+OK  completedSeed n=29：data.schema と data.md 8
+OK  completedSeed n=29：完了の行 29
+OK  completedSeed n=29：levels.backend は intermediate（目標の段階のまま）
+OK  completedSeed n=29：data.md 5 で次に出る ID は backend-intermediate-014、nextId は backend-intermediate-014（期待 backend-intermediate-014）、levels={"backend":"intermediate"}、開く日 2026-01-30
+OK  completedSeed n=99：data.schema と data.md 8
+OK  completedSeed n=99：完了の行 99
+OK  completedSeed n=99：levels.backend は intermediate（目標の段階のまま）
+OK  completedSeed n=99：data.md 5 で次に出る ID は backend-intermediate-014、nextId は backend-intermediate-014（期待 backend-intermediate-014）、levels={"backend":"intermediate","frontend":"advanced","database":"advanced"}、開く日 2026-04-10
+OK  completedSeed n=99：3 領域にまたがる（W-7「3 領域以上」）
+OK  seenNextSeed：data.schema と data.md 8
+OK  seenNextSeed：次に出る ID は null（S7）、levels.backend=beginner、中級の行 2、中級の未出 12（seenNext）
+OK  nextDoneSeed：data.schema と data.md 8
+OK  nextDoneSeed：次に出る ID は null（S7）、levels.backend=beginner、中級の未出 0（nextDone）、行 28
+OK  beginnerDoneAtIntermediateSeed：data.schema と data.md 8
+OK  beginnerDoneAtIntermediateSeed：次に出る ID は backend-intermediate-001（期待 backend-intermediate-001）、行 14
+OK  課題集 v2 の下書き 126 件の ID はすべて合成の ID の付け方に合う
+自己検査 21 件、期待と違う結果 0 件

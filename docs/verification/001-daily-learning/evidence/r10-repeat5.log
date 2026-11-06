@@ -1,0 +1,31 @@
+HEAD: 53155c8d851befbd61ea9d2b2e8c91db51a09ae5
+command: cd backend/tests/acceptance && npx playwright test --reporter=line --repeat-each 5 -g 'AC18_|DESIGN_D43_reduceで完了'
+date: 2026-11-05 20:30:03 +0900
+retries: 0
+npm notice run npx
+npm notice run 'playwright' test --reporter=line --repeat-each 5 -g AC18_|DESIGN_D43_reduceで完了
+
+Running 20 tests using 5 workers
+
+[1/20] [chromium] › tests/ac35-ac37-done-screen.spec.mjs:121:3 › DESIGN_D43 完了の演出（prefers-reduced-motion: reduce） › DESIGN_D43_reduceで完了するとtask.rateのgetAnimationsが0件でtask.total.prevが0件_task.rate.markはあり累計は最終の値
+[2/20] [chromium] › tests/ac35-ac37-done-screen.spec.mjs:121:3 › DESIGN_D43 完了の演出（prefers-reduced-motion: reduce） › DESIGN_D43_reduceで完了するとtask.rateのgetAnimationsが0件でtask.total.prevが0件_task.rate.markはあり累計は最終の値
+[3/20] [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:118:1 › AC18_移動キー(Tab系)とEnter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上
+[4/20] [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:118:1 › AC18_移動キー(Tab系)とEnter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上
+[5/20] [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:118:1 › AC18_移動キー(Tab系)とEnter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上
+[6/20] [chromium] › tests/ac35-ac37-done-screen.spec.mjs:121:3 › DESIGN_D43 完了の演出（prefers-reduced-motion: reduce） › DESIGN_D43_reduceで完了するとtask.rateのgetAnimationsが0件でtask.total.prevが0件_task.rate.markはあり累計は最終の値
+[7/20] [chromium] › tests/ac35-ac37-done-screen.spec.mjs:121:3 › DESIGN_D43 完了の演出（prefers-reduced-motion: reduce） › DESIGN_D43_reduceで完了するとtask.rateのgetAnimationsが0件でtask.total.prevが0件_task.rate.markはあり累計は最終の値
+[8/20] [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:118:1 › AC18_移動キー(Tab系)とEnter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上
+[9/20] [chromium] › tests/ac35-ac37-done-screen.spec.mjs:121:3 › DESIGN_D43 完了の演出（prefers-reduced-motion: reduce） › DESIGN_D43_reduceで完了するとtask.rateのgetAnimationsが0件でtask.total.prevが0件_task.rate.markはあり累計は最終の値
+[10/20] [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:118:1 › AC18_移動キー(Tab系)とEnter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上
+[11/20] [webkit] › tests/ac35-ac37-done-screen.spec.mjs:121:3 › DESIGN_D43 完了の演出（prefers-reduced-motion: reduce） › DESIGN_D43_reduceで完了するとtask.rateのgetAnimationsが0件でtask.total.prevが0件_task.rate.markはあり累計は最終の値
+[12/20] [webkit] › tests/ac35-ac37-done-screen.spec.mjs:121:3 › DESIGN_D43 完了の演出（prefers-reduced-motion: reduce） › DESIGN_D43_reduceで完了するとtask.rateのgetAnimationsが0件でtask.total.prevが0件_task.rate.markはあり累計は最終の値
+[13/20] [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:118:1 › AC18_移動キー(Tab系)とEnter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上
+[14/20] [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:118:1 › AC18_移動キー(Tab系)とEnter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上
+[15/20] [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:118:1 › AC18_移動キー(Tab系)とEnter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上
+[16/20] [webkit] › tests/ac35-ac37-done-screen.spec.mjs:121:3 › DESIGN_D43 完了の演出（prefers-reduced-motion: reduce） › DESIGN_D43_reduceで完了するとtask.rateのgetAnimationsが0件でtask.total.prevが0件_task.rate.markはあり累計は最終の値
+[17/20] [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:118:1 › AC18_移動キー(Tab系)とEnter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上
+[18/20] [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:118:1 › AC18_移動キー(Tab系)とEnter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上
+[19/20] [webkit] › tests/ac35-ac37-done-screen.spec.mjs:121:3 › DESIGN_D43 完了の演出（prefers-reduced-motion: reduce） › DESIGN_D43_reduceで完了するとtask.rateのgetAnimationsが0件でtask.total.prevが0件_task.rate.markはあり累計は最終の値
+[20/20] [webkit] › tests/ac35-ac37-done-screen.spec.mjs:121:3 › DESIGN_D43 完了の演出（prefers-reduced-motion: reduce） › DESIGN_D43_reduceで完了するとtask.rateのgetAnimationsが0件でtask.total.prevが0件_task.rate.markはあり累計は最終の値
+  20 passed (11.8s)
+exit code: 0

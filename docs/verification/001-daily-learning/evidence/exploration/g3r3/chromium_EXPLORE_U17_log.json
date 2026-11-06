@@ -1,0 +1,58 @@
+{
+ "stateAtError": "task.skipped",
+ "afterMidnightWithFailure": {
+  "state": "task.today",
+  "retry": 1,
+  "dayChanged": 0
+ },
+ "t4": {
+  "id": "backend-intermediate-007",
+  "area": "backend",
+  "level": "intermediate",
+  "mode": "in_app",
+  "nthToday": "1",
+  "progressIndex": "7",
+  "progressTotal": "14",
+  "title": "offset と cursor のページングの違いを説明する"
+ },
+ "current": {
+  "date": "2026-11-06",
+  "taskId": "backend-intermediate-007",
+  "area": "backend",
+  "level": "intermediate",
+  "mode": "in_app",
+  "answer": ""
+ },
+ "lastRows": [
+  {
+   "date": "2026-11-04",
+   "taskId": "backend-intermediate-004",
+   "area": "backend",
+   "level": "intermediate",
+   "mode": "in_app",
+   "answer": "",
+   "report": "done",
+   "helpful": "unanswered"
+  },
+  {
+   "date": "2026-11-05",
+   "taskId": "backend-intermediate-005",
+   "area": "backend",
+   "level": "intermediate",
+   "mode": "in_app",
+   "answer": "",
+   "report": "no_time"
+  },
+  {
+   "date": "2026-11-05",
+   "taskId": "backend-intermediate-006",
+   "area": "backend",
+   "level": "intermediate",
+   "mode": "in_app",
+   "answer": "",
+   "report": "done",
+   "helpful": "unanswered"
+  }
+ ],
+ "expectedNext": "backend-intermediate-007"
+}

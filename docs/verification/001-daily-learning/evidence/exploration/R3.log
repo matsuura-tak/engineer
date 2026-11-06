@@ -1,0 +1,24 @@
+# セッション R3（chromium、2026-11-03T14:29:13.691Z、配布物 2026-11-30.1）
+1. 23:55 に task.today（backend-intermediate-004）。答えを書きかけ
+  data-state=task.today
+2. 0:05（翌日）に日付を進め、再読み込みせずに「完了」を押す
+  state=task.today label=「今日の課題 2026-11-05」
+  history 末尾=[{"date":"2026-11-03","taskId":"backend-intermediate-003","report":"done","answer":""},{"date":"2026-11-04","taskId":"backend-intermediate-004","report":"none","answer":"23 時 55 分に書きかけ"}] current={"date":"2026-11-05","taskId":"backend-intermediate-005","area":"backend","level":"intermediate","mode":"in_app","answer":"23 時 55 分に書きかけ"}
+  R3_02_done_after_midnight.png
+  data-state=task.today
+3. 再読み込み（0:05）→ 翌日の課題か
+  state=task.today task=backend-intermediate-005 history=4 末尾=[["2026-11-03","backend-intermediate-003","done",""],["2026-11-04","backend-intermediate-004","none","23 時 55 分に書きかけ"]] current={"date":"2026-11-05","taskId":"backend-intermediate-005","area":"backend","level":"intermediate","mode":"in_app","answer":""}
+  data-state=task.today
+4. （別のコンテキスト）11-05 23:59 に完了 → task.rate のまま 11-06 0:01 に「役に立った」
+  state=task.today 末尾=[["2026-11-05","backend-intermediate-004","done","unanswered"]]（課題 backend-intermediate-004）
+  !! 疑問/不具合候補：日付が変わった後の「役に立った」が記録されない
+  再読み込み（11-06）→ state=task.today task=backend-intermediate-005
+  data-state=task.today
+5. （別のコンテキスト）settings のまま日付が変わり app.name で戻る
+  state=task.today task=backend-intermediate-005（0 時前 backend-intermediate-004）label=「今日の課題 2026-11-05」 history=4 current={"date":"2026-11-05","taskId":"backend-intermediate-005","area":"backend","level":"intermediate","mode":"in_app","answer":""}
+  data-state=task.today
+6. （別のコンテキスト）やり直しの S2 の途中で日付が変わり、終える
+!! 例外で中断：locator.check: Timeout 30000ms exceeded. / Call log: /   - waiting for getByTestId('years.lt1')
+  R3_06_exception.png
+# 操作 6 件、37 秒、疑問/不具合候補 1 件
+- 日付が変わった後の「役に立った」が記録されない

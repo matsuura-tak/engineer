@@ -1,0 +1,35 @@
+{
+  "formatVersion": 1,
+  "app": "kyounoitte",
+  "firstOpenDate": "2026-11-01",
+  "diagnosis": {
+    "area": "backend",
+    "level": "advanced",
+    "years": "gte5",
+    "completedOn": "2026-11-01"
+  },
+  "levels": {
+    "backend": "advanced"
+  },
+  "history": [
+    {
+      "date": "2026-11-01",
+      "taskId": "backend-advanced-001",
+      "area": "backend",
+      "level": "advanced",
+      "mode": "in_app",
+      "report": "done",
+      "answer": "",
+      "helpful": "helpful"
+    },
+    {
+      "date": "2026-11-02",
+      "taskId": "backend-advanced-002",
+      "area": "backend",
+      "level": "advanced",
+      "mode": "in_app",
+      "report": "too_easy",
+      "answer": ""
+    }
+  ]
+}

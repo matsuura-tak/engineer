@@ -1,0 +1,36 @@
+{
+  "url": "http://127.0.0.1:58596/engineer/",
+  "state": "settings",
+  "violations": [],
+  "incomplete": [
+    {
+      "id": "color-contrast",
+      "impact": "serious",
+      "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "nodes": [
+        {
+          "target": [
+            "p[data-testid=\"settings.import.confirm.body\"]"
+          ],
+          "html": "<p data-testid=\"settings.import.confirm.body\">このブラウザの診断の回答、履歴、答えは、ファイルの内容に置き換わります（結合はしません）。この操作は元に戻せません。</p>",
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined because it partially overlaps other elements",
+          "reasons": [
+            {
+              "id": "color-contrast",
+              "message": "Element's background color could not be determined because it partially overlaps other elements",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "12.0pt (16px)",
+                "fontWeight": "normal",
+                "messageKey": "elmPartiallyObscuring",
+                "expectedContrastRatio": "4.5:1"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "passes": 12
+}

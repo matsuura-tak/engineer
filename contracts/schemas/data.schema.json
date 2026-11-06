@@ -1,0 +1,974 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:kyounoitte:schema:data:1",
+  "title": "保存データ＝書き出しファイル＝seed（formatVersion 1）",
+  "description": "localStorage のキー kyounoitte:data に入れる JSON 文字列の形。書き出しファイルと受け入れテストの seed も同じ形（device だけは書き出しに含めない）。読み方、移し方、起動時の判定は contracts/data.md。firstOpenDate は「なし」の区分（diagnosis、levels、history が空）でだけ省ける（allOf の 3 つ目）。2026-11-06 に PRD r13（3 問 × 3 択）の形に作り直した（formatVersion は 1 のまま。ADR 0002 の改訂 2）。AC-5〜AC-11、AC-13、AC-14、AC-16、AC-19〜AC-25、AC-32、AC-33、AC-35〜AC-37、AC-40〜AC-42、AC-45。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "formatVersion",
+    "app",
+    "diagnosis",
+    "levels",
+    "history"
+  ],
+  "properties": {
+    "formatVersion": {
+      "const": 1,
+      "description": "形式の版。読み手が知らない項目か値を書く変更は、必ずこの値を上げる（ADR 0002）"
+    },
+    "app": {
+      "const": "kyounoitte",
+      "description": "このアプリのファイルであることの印"
+    },
+    "firstOpenDate": {
+      "$ref": "#/$defs/date",
+      "description": "統計の「初めて開いた日」（端末の日付）。保存データが「なし」の状態で初回の診断の 1 問目を確定する保存のときに書き、以後変えない。device だけの保存（案内を閉じた印など）では書かない（contracts/data.md の 2）。AC-19、AC-20、AC-24"
+    },
+    "diagnosis": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "最後に確定した診断の回答。初回の診断では質問ごとに保存するので、途中の状態（completedOn がない）もある",
+      "properties": {
+        "area": {
+          "$ref": "#/$defs/area",
+          "description": "1 問目：目標の領域"
+        },
+        "level": {
+          "$ref": "#/$defs/level",
+          "description": "2 問目：目標の領域の自己評価"
+        },
+        "years": {
+          "enum": [
+            "never",
+            "lt1",
+            "1to3",
+            "3to5",
+            "gte5"
+          ],
+          "description": "3 問目：経験年数。never は「まだコードを書いたことがない」（AC-40）。段階の規則には使わない。never は最初の公開の前に足したので formatVersion は 1 のまま（ADR 0002）"
+        },
+        "completedOn": {
+          "$ref": "#/$defs/date",
+          "description": "診断を終えた日。あれば診断済み"
+        }
+      },
+      "dependentRequired": {
+        "level": [
+          "area"
+        ],
+        "years": [
+          "level"
+        ],
+        "completedOn": [
+          "area",
+          "level",
+          "years"
+        ]
+      }
+    },
+    "levels": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "領域ごとの現在の段階。診断を終えると目標の領域の値を回答で上書きし、段階の規則（contracts/data.md の 5。正答数）と進級で上下する",
+      "properties": {
+        "backend": {
+          "$ref": "#/$defs/level"
+        },
+        "frontend": {
+          "$ref": "#/$defs/level"
+        },
+        "database": {
+          "$ref": "#/$defs/level"
+        },
+        "infra": {
+          "$ref": "#/$defs/level"
+        },
+        "testing": {
+          "$ref": "#/$defs/level"
+        },
+        "git": {
+          "$ref": "#/$defs/level"
+        }
+      }
+    },
+    "current": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "出したが、まだ 3 問に答えても申告してもいない今日の課題（0 か 1 件）。1 問答えるごとに answers に足す（AC-32）。3 問目に答えるか「今日はやめておく」で history の行に移し、日付が変わったら report: none の行として移す（contracts/data.md の 2 と 4）",
+      "required": [
+        "date",
+        "taskId",
+        "area",
+        "level",
+        "mode",
+        "answers"
+      ],
+      "properties": {
+        "date": {
+          "$ref": "#/$defs/date"
+        },
+        "taskId": {
+          "$ref": "#/$defs/taskId"
+        },
+        "area": {
+          "$ref": "#/$defs/area"
+        },
+        "level": {
+          "$ref": "#/$defs/level"
+        },
+        "mode": {
+          "enum": [
+            "in_app",
+            "external"
+          ]
+        },
+        "answers": {
+          "type": "array",
+          "maxItems": 2,
+          "items": {
+            "$ref": "#/$defs/choiceAnswer"
+          },
+          "description": "答えた問の答え（0〜2 件）。3 件目を書くときは current を外して done の行にする"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "area": {
+                "const": "backend"
+              }
+            }
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string",
+                "pattern": "^backend-"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "area": {
+                "const": "frontend"
+              }
+            }
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string",
+                "pattern": "^frontend-"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "area": {
+                "const": "database"
+              }
+            }
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string",
+                "pattern": "^database-"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "area": {
+                "const": "infra"
+              }
+            }
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string",
+                "pattern": "^infra-"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "area": {
+                "const": "testing"
+              }
+            }
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string",
+                "pattern": "^testing-"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "area": {
+                "const": "git"
+              }
+            }
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string",
+                "pattern": "^git-"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "level": {
+                "const": "beginner"
+              }
+            }
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string",
+                "pattern": "-beginner-[0-9]{3}$"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "level": {
+                "const": "intermediate"
+              }
+            }
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string",
+                "pattern": "-intermediate-[0-9]{3}$"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "level": {
+                "const": "advanced"
+              }
+            }
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string",
+                "pattern": "-advanced-[0-9]{3}$"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "history": {
+      "type": "array",
+      "maxItems": 18000,
+      "description": "3 問に答えた課題、「今日はやめておく」の課題、申告のないまま日付が変わった課題。日付の古い順に足す。同じ日付の行は出した順に何行でも並ぶ（同じ日の「次の一手に進む」。AC-33）。同じ課題の ID は 1 回だけ（AC-6）なので、行の数は課題の ID の数（6 × 3 × 1,000 = 18,000）を超えない。書き手の決まりは contracts/data.md の 8",
+      "items": {
+        "$ref": "#/$defs/row"
+      }
+    },
+    "showCharacter": {
+      "type": "boolean",
+      "description": "案内役ミルを出すか（設定 settings.character.show.input）。ないときは true と読む。保存データが「なし」でも書ける。device に入れない：読み込み（AC-20）でファイルの値を使うため（contracts/data.md の 2 と 7。AC-45）"
+    },
+    "device": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "このブラウザだけの印。書き出しに含めない。読み込みではファイルの値を使わず、今のブラウザの値を残す",
+      "properties": {
+        "homeGuideClosed": {
+          "type": "boolean",
+          "description": "home.addToHomeScreen を閉じた（AC-21）"
+        },
+        "persistRequested": {
+          "type": "boolean",
+          "description": "navigator.storage.persist() を求めた印。印がないときに今日の課題（current）を作る保存に true を含め、その S3 を描いた後に persist() を 1 回呼ぶ。true なら求め直さない（PRD 11 の冒頭。contracts/data.md の 2 と 11。AC-13）"
+        },
+        "persistGranted": {
+          "type": "boolean",
+          "description": "前の実装が書いた persist() の結果。読めるように残す。アプリは書かず、設定の注意にも使わない（注意は S8 を描くたびに navigator.storage.persisted() で決める：contracts/data.md の 11。AC-13）"
+        }
+      },
+      "dependentRequired": {
+        "persistGranted": [
+          "persistRequested"
+        ]
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "type": "object",
+        "properties": {
+          "current": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "current"
+        ]
+      },
+      "then": {
+        "type": "object",
+        "properties": {
+          "diagnosis": {
+            "type": "object",
+            "properties": {
+              "completedOn": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "completedOn"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "type": "object",
+        "properties": {
+          "diagnosis": {
+            "type": "object",
+            "properties": {
+              "completedOn": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "completedOn"
+            ]
+          }
+        }
+      },
+      "then": {
+        "type": "object",
+        "properties": {
+          "levels": {
+            "type": "object",
+            "minProperties": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "type": "object",
+        "not": {
+          "type": "object",
+          "properties": {
+            "firstOpenDate": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "firstOpenDate"
+          ]
+        }
+      },
+      "then": {
+        "type": "object",
+        "properties": {
+          "diagnosis": {
+            "type": "object",
+            "maxProperties": 0
+          },
+          "levels": {
+            "type": "object",
+            "maxProperties": 0
+          },
+          "history": {
+            "type": "array",
+            "maxItems": 0
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "date": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$",
+      "description": "端末の日付 YYYY-MM-DD（getFullYear、getMonth、getDate から作る。toISOString は UTC なので使わない）"
+    },
+    "area": {
+      "enum": [
+        "backend",
+        "frontend",
+        "database",
+        "infra",
+        "testing",
+        "git"
+      ]
+    },
+    "level": {
+      "enum": [
+        "beginner",
+        "intermediate",
+        "advanced"
+      ]
+    },
+    "taskId": {
+      "type": "string",
+      "pattern": "^(backend|frontend|database|infra|testing|git)-(beginner|intermediate|advanced)-[0-9]{3}$"
+    },
+    "row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "date",
+        "taskId",
+        "area",
+        "level",
+        "mode",
+        "answers",
+        "score",
+        "report"
+      ],
+      "properties": {
+        "date": {
+          "$ref": "#/$defs/date"
+        },
+        "taskId": {
+          "$ref": "#/$defs/taskId"
+        },
+        "area": {
+          "$ref": "#/$defs/area"
+        },
+        "level": {
+          "$ref": "#/$defs/level",
+          "description": "その課題を出したときの段階（段階の規則が使う。contracts/data.md の 5）"
+        },
+        "mode": {
+          "enum": [
+            "in_app",
+            "external"
+          ]
+        },
+        "answers": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "$ref": "#/$defs/choiceAnswer"
+          },
+          "description": "答えた問の答え。done の行は 3 件、no_time と none の行は 0〜2 件（下の allOf）"
+        },
+        "score": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "description": "answers のうち correct が true の数（下の allOf で同じであることを検査する）。AC-42"
+        },
+        "report": {
+          "enum": [
+            "done",
+            "no_time",
+            "none"
+          ],
+          "description": "done＝3 問に答えた。no_time＝「今日はやめておく」。none＝申告のないまま日付が変わった"
+        },
+        "helpful": {
+          "enum": [
+            "helpful",
+            "not_helpful",
+            "unanswered"
+          ],
+          "description": "report が done の行だけに持つ（必須）"
+        },
+        "levelChange": {
+          "enum": [
+            "down",
+            "up"
+          ],
+          "description": "この行を書いたときに段階の規則（contracts/data.md の 5）で levels[area] が動いた向き。動いた done の行だけに持つ（D-60 の知らせを、推し量らずに保存した事実から決める）"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "area": {
+                "const": "backend"
+              }
+            }
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string",
+                "pattern": "^backend-"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "area": {
+                "const": "frontend"
+              }
+            }
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string",
+                "pattern": "^frontend-"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "area": {
+                "const": "database"
+              }
+            }
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string",
+                "pattern": "^database-"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "area": {
+                "const": "infra"
+              }
+            }
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string",
+                "pattern": "^infra-"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "area": {
+                "const": "testing"
+              }
+            }
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string",
+                "pattern": "^testing-"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "area": {
+                "const": "git"
+              }
+            }
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string",
+                "pattern": "^git-"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "level": {
+                "const": "beginner"
+              }
+            }
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string",
+                "pattern": "-beginner-[0-9]{3}$"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "level": {
+                "const": "intermediate"
+              }
+            }
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string",
+                "pattern": "-intermediate-[0-9]{3}$"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "level": {
+                "const": "advanced"
+              }
+            }
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "taskId": {
+                "type": "string",
+                "pattern": "-advanced-[0-9]{3}$"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "report": {
+                "const": "done"
+              }
+            },
+            "required": [
+              "report"
+            ]
+          },
+          "then": {
+            "type": "object",
+            "required": [
+              "helpful"
+            ],
+            "properties": {
+              "answers": {
+                "type": "array",
+                "minItems": 3
+              },
+              "helpful": {
+                "type": "string"
+              }
+            }
+          },
+          "else": {
+            "type": "object",
+            "properties": {
+              "answers": {
+                "type": "array",
+                "maxItems": 2
+              }
+            },
+            "allOf": [
+              {
+                "not": {
+                  "type": "object",
+                  "properties": {
+                    "helpful": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "helpful"
+                  ]
+                }
+              },
+              {
+                "not": {
+                  "type": "object",
+                  "properties": {
+                    "levelChange": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "levelChange"
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "level": {
+                "const": "beginner"
+              }
+            },
+            "required": [
+              "level"
+            ]
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "levelChange": {
+                "const": "up"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "level": {
+                "const": "advanced"
+              }
+            },
+            "required": [
+              "level"
+            ]
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "levelChange": {
+                "const": "down"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "score": {
+                "const": 0
+              }
+            },
+            "required": [
+              "score"
+            ]
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "answers": {
+                "type": "array",
+                "contains": {
+                  "type": "object",
+                  "properties": {
+                    "correct": {
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "correct"
+                  ]
+                },
+                "minContains": 0,
+                "maxContains": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "score": {
+                "const": 1
+              }
+            },
+            "required": [
+              "score"
+            ]
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "answers": {
+                "type": "array",
+                "contains": {
+                  "type": "object",
+                  "properties": {
+                    "correct": {
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "correct"
+                  ]
+                },
+                "minContains": 1,
+                "maxContains": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "score": {
+                "const": 2
+              }
+            },
+            "required": [
+              "score"
+            ]
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "answers": {
+                "type": "array",
+                "contains": {
+                  "type": "object",
+                  "properties": {
+                    "correct": {
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "correct"
+                  ]
+                },
+                "minContains": 2,
+                "maxContains": 2
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "score": {
+                "const": 3
+              }
+            },
+            "required": [
+              "score"
+            ]
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "answers": {
+                "type": "array",
+                "contains": {
+                  "type": "object",
+                  "properties": {
+                    "correct": {
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "correct"
+                  ]
+                },
+                "minContains": 3,
+                "maxContains": 3
+              }
+            }
+          }
+        }
+      ]
+    },
+    "choiceAnswer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "choice",
+        "correct"
+      ],
+      "description": "1 問の答え。配列の位置が問の番号（0 が問 1）。答えたときに 1 回だけ書き、選び直さない（AC-41）",
+      "properties": {
+        "choice": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2,
+          "description": "選んだ選択肢の位置（課題集の questions[i].choices の index）"
+        },
+        "correct": {
+          "type": "boolean",
+          "description": "答えたときの正誤（choice が課題集の questions[i].answer と同じか）。後で課題集が直っても書き換えない（ADR 0002 の改訂 2）"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "formatVersion": 1,
+  "app": "kyounoitte",
+  "firstOpenDate": "2026-11-05",
+  "diagnosis": {
+    "area": "frontend",
+    "level": "beginner",
+    "years": "never",
+    "completedOn": "2026-11-05"
+  },
+  "levels": {
+    "frontend": "beginner"
+  },
+  "current": {
+    "date": "2026-11-05",
+    "taskId": "frontend-beginner-003",
+    "area": "frontend",
+    "level": "beginner",
+    "mode": "in_app",
+    "answers": [
+      {
+        "choice": 0,
+        "correct": true
+      }
+    ]
+  },
+  "history": [
+    {
+      "date": "2026-11-05",
+      "taskId": "frontend-beginner-001",
+      "area": "frontend",
+      "level": "beginner",
+      "mode": "in_app",
+      "answers": [
+        {
+          "choice": 0,
+          "correct": true
+        },
+        {
+          "choice": 0,
+          "correct": true
+        },
+        {
+          "choice": 0,
+          "correct": false
+        }
+      ],
+      "score": 2,
+      "report": "done",
+      "helpful": "helpful"
+    },
+    {
+      "date": "2026-11-05",
+      "taskId": "frontend-beginner-002",
+      "area": "frontend",
+      "level": "beginner",
+      "mode": "in_app",
+      "answers": [],
+      "score": 0,
+      "report": "no_time"
+    }
+  ],
+  "device": {
+    "persistRequested": true
+  }
+}

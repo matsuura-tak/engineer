@@ -1,0 +1,232 @@
+// G3 r3 の探索の追加（verifier。使い捨て。design r10 5.1 の前書き：幅 320 × 文字 200% は「それ以外の画面とダイアログは探索のセッションで見る」）。
+// 前半の R8 は S1〜S5 だけだったので、S6、S7、S8、S9、S10、ダイアログ 2 つを幅 320 × ルートの文字サイズ 200% で開き、
+//   (1) scrollWidth = clientWidth（横スクロール 0）、(2) 表示域の幅からはみ出す要素 0、(3) 文字が切れる要素（text-overflow: ellipsis、overflow で隠れた文字）0、
+//   (4) 主な操作（contracts/identifiers.md の data-testid）が 1 件あり、見え、44 × 44 以上で、スクロールすれば表示域の中に収まる
+// を確かめる。ダイアログは、開いたときのフォーカスが「やめる」で表示域の中、移動キーで「削除する／置き換える」に届き表示域の中（design 9、design-reviewer G3 r1 の 2）。
+// 終わったら tests/ から消し、写しを docs/verification/001-daily-learning/evidence/exploration/g3r3/ に .txt で残す。
+// 場面の作り方（seed と日付）は tools/screenshots.mjs の同じ名前の場面と同じ。期待する値は PRD AC-17 / AC-39 の確かめ方、design 9、identifiers.md から。実装は見ていない。
+import { test, expect } from '../helpers/fixtures.mjs';
+import * as app from '../helpers/app.mjs';
+import {
+  injectSeed, loadSeed, loadContractFixture, contractFixturePath, exhaustedSeed, seenNextSeed, nextDoneSeed, beginnerDoneAtIntermediateSeed,
+} from '../helpers/seed.mjs';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const here = path.dirname(fileURLToPath(import.meta.url));
+const OUT = path.resolve(here, '../../../../docs/verification/001-daily-learning/evidence/exploration/g3r3/320x200');
+const VIEW = { width: 320, height: 568 };
+const AC14 = () => loadContractFixture('seeds/seed-ac14-three-completed.json');
+const AC24 = () => loadContractFixture('seeds/seed-ac24-stats.json');
+
+test.use({ viewport: VIEW });
+
+/** 横スクロール、はみ出す要素、切れる文字（PRD AC-17 の幅 320 の確かめ方と同じ数え方）。 */
+async function overflow(page) {
+  return page.evaluate(() => {
+    const d = document.documentElement;
+    // 見た目だけ隠したファイルの input（contracts/identifiers.md の 2「例外は、見た目だけ隠したファイルの input（home.standalone.importFile、settings.import.file）」）は
+    // 1 px に切り詰めてあるのが仕様なので、切れる文字の数え方から除く（1 回目の実行で S8 とダイアログ 2 つがこれで落ちた：探索テストの側の誤り）。
+    const all = [...document.querySelectorAll('body *')].filter((el) => !(el.tagName === 'INPUT' && el.type === 'file'));
+    const label = (el) => `${el.tagName.toLowerCase()}[data-testid=${el.getAttribute('data-testid')}]`;
+    const wide = all.filter((el) => {
+      const r = el.getBoundingClientRect();
+      return r.width > 0 && (r.right > d.clientWidth + 1 || r.left < -1);
+    }).map((el) => `${label(el)} left=${Math.round(el.getBoundingClientRect().left)} right=${Math.round(el.getBoundingClientRect().right)}`);
+    const ellipsis = all.filter((el) => getComputedStyle(el).textOverflow === 'ellipsis' && ['hidden', 'clip'].includes(getComputedStyle(el).overflowX)).map(label);
+    const clipped = all.filter((el) => {
+      const cs = getComputedStyle(el);
+      return ['hidden', 'clip'].includes(cs.overflowX) && el.scrollWidth > el.clientWidth + 1 && el.tagName !== 'DIALOG';
+    }).map((el) => `${label(el)} scrollWidth=${el.scrollWidth} clientWidth=${el.clientWidth}`);
+    return { scrollWidth: d.scrollWidth, clientWidth: d.clientWidth, scrollHeight: d.scrollHeight, wide, ellipsis, clipped,
+      rootFontSize: getComputedStyle(d).fontSize };
+  });
+}
+async function font200(page) {
+  await page.evaluate(() => { document.documentElement.style.fontSize = '200%'; });
+  await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+}
+/** 主な操作：件数、見えるか、大きさ、初期表示に入るか、スクロールすれば表示域の中に全部入るか。 */
+async function ops(page, ids, { required = ids } = {}) {
+  const out = [];
+  for (const id of ids) {
+    const loc = app.tid(page, id).first();
+    const count = await app.tid(page, id).count();
+    if (count === 0) { out.push({ id, count, required: required.includes(id) }); continue; }
+    const before = await loc.boundingBox();
+    const initiallyInView = !!before && before.y >= 0 && before.y + before.height <= VIEW.height && before.x >= 0 && before.x + before.width <= VIEW.width;
+    await loc.scrollIntoViewIfNeeded();
+    const b = await loc.boundingBox();
+    const inViewAfterScroll = !!b && b.y >= -0.5 && b.y + b.height <= VIEW.height + 0.5 && b.x >= -0.5 && b.x + b.width <= VIEW.width + 0.5;
+    const visible = await loc.isVisible();
+    const text = (await loc.textContent())?.trim().replace(/\s+/g, ' ').slice(0, 40) ?? '';
+    out.push({ id, count, required: required.includes(id), visible, text, box: b && { x: Math.round(b.x), y: Math.round(b.y), w: Math.round(b.width), h: Math.round(b.height) },
+      initiallyInView, inViewAfterScroll, size44: !!b && b.width >= 44 && b.height >= 44 });
+  }
+  await page.evaluate(() => window.scrollTo(0, 0));
+  return out;
+}
+async function record(page, testInfo, scene, { opIds, required, dialog, viewportOnly = false, extra = {} }) {
+  const browser = testInfo.project.name;
+  const o = await overflow(page);
+  const operations = await ops(page, opIds, { required });
+  const result = { scene, browser, viewport: `${VIEW.width}x${VIEW.height}`, state: await app.readState(page), ...o, operations, dialog: null, ...extra };
+  if (dialog) {
+    // design 9 と tools/screenshots.mjs の dialog の記録と同じ：初期フォーカスは「やめる」、移動キーで ok に届く。WebKit は Alt+Tab（test-hooks.md「キーボードの移動キー」）。
+    const next = browser === 'webkit' ? 'Alt+Tab' : 'Tab';
+    const activeId = () => page.evaluate(() => document.activeElement?.getAttribute('data-testid') ?? document.activeElement?.tagName);
+    const rectOf = (id) => page.evaluate((i) => { const el = document.querySelector(`[data-testid="${i}"]`); if (!el) return null; const r = el.getBoundingClientRect();
+      return { x: Math.round(r.x), y: Math.round(r.y), w: Math.round(r.width), h: Math.round(r.height), inView: r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight }; }, id);
+    const dialogRect = await rectOf(dialog.id);
+    const initial = await activeId();
+    const cancelRect = await rectOf(dialog.cancel);
+    let okId = initial; let pressed = 0;
+    for (; pressed < 6 && okId !== dialog.ok; pressed++) { await page.keyboard.press(next); okId = await activeId(); }
+    const okRect = await rectOf(dialog.ok);
+    result.dialog = { dialogRect, initialFocus: initial, cancelRect, keys: pressed, reached: okId, okRect };
+  }
+  mkdirSync(OUT, { recursive: true });
+  await page.evaluate(() => window.scrollTo(0, 0));
+  const png = path.join(OUT, `${browser}_${scene}.png`);
+  await page.screenshot({ path: png, fullPage: !viewportOnly });
+  writeFileSync(path.join(OUT, `${browser}_${scene}.json`), JSON.stringify(result, null, 1));
+  await testInfo.attach(`EXPLORE_320x200_${scene}`, { body: JSON.stringify(result, null, 1), contentType: 'application/json' });
+  // 判定
+  expect(result.rootFontSize, 'ルートの文字サイズ 200%').toBe('32px');
+  expect(result.scrollWidth, `${scene} の横スクロール（はみ出す要素 ${JSON.stringify(o.wide)}）`).toBe(result.clientWidth);
+  expect(o.wide, `${scene} の表示域からはみ出す要素`).toEqual([]);
+  expect(o.ellipsis, `${scene} の text-overflow: ellipsis`).toEqual([]);
+  expect(o.clipped, `${scene} の overflow で切れた文字`).toEqual([]);
+  for (const op of operations.filter((x) => x.required)) {
+    expect(op.count, `${scene} の主な操作 ${op.id} の件数`).toBe(1);
+    expect(op.visible, `${scene} の主な操作 ${op.id} が見える`).toBe(true);
+    expect(op.inViewAfterScroll, `${scene} の主な操作 ${op.id} がスクロールで表示域に収まる ${JSON.stringify(op.box)}`).toBe(true);
+    expect(op.size44, `${scene} の主な操作 ${op.id} が 44×44 以上 ${JSON.stringify(op.box)}`).toBe(true);
+  }
+  if (dialog) {
+    expect(result.dialog.initialFocus, `${scene} の初期フォーカス`).toBe(dialog.cancel);
+    expect(result.dialog.cancelRect?.inView, `${scene} の「やめる」が表示域の中 ${JSON.stringify(result.dialog.cancelRect)}`).toBe(true);
+    expect(result.dialog.reached, `${scene} の移動キーで ok に届く（${result.dialog.keys} 回）`).toBe(dialog.ok);
+    expect(result.dialog.okRect?.inView, `${scene} の ok が表示域の中 ${JSON.stringify(result.dialog.okRect)}`).toBe(true);
+  }
+  return result;
+}
+async function openAt(page, baseURL, ymd) {
+  await app.fixDate(page, ymd);
+  await app.open(page, baseURL);
+}
+const S6_OPS = ['task.next', 'task.skipped.history', 'nav.history', 'nav.settings'];
+const S7_OPS = ['task.exhausted.advance', 'task.exhausted.redo', 'nav.history', 'nav.settings'];
+
+test('EXPLORE_320x200_S6_too_hard（levelHint）', async ({ context, page, baseURL }, testInfo) => {
+  await injectSeed(context, AC14()); await openAt(page, baseURL, '2026-11-04'); await app.expectState(page, 'task.today');
+  await app.tid(page, 'task.report.tooHard').click(); await app.expectState(page, 'task.skipped');
+  await expect(app.tid(page, 'task.skipped.levelHint')).toBeVisible();
+  await font200(page);
+  await record(page, testInfo, 'S6_too_hard', { opIds: S6_OPS });
+});
+
+test('EXPLORE_320x200_S6_levelChanged_note.last', async ({ context, page, baseURL, request }, testInfo) => {
+  const tasks = await app.loadTasks(request);
+  const { seed, nextDate } = beginnerDoneAtIntermediateSeed(tasks, { area: 'backend', firstOpenDate: '2026-06-01' });
+  await injectSeed(context, seed); await openAt(page, baseURL, nextDate); await app.expectState(page, 'task.today');
+  await app.tid(page, 'task.report.tooHard').click(); await app.expectState(page, 'task.skipped');
+  await app.tid(page, 'task.next').click(); await app.expectState(page, 'task.today');
+  await app.tid(page, 'task.report.tooHard').click(); await app.expectState(page, 'task.skipped');
+  await expect(app.tid(page, 'task.skipped.levelChanged')).toBeVisible();
+  await expect(app.tid(page, 'task.next.note')).toContainText('すべて出し終えています');
+  await font200(page);
+  await record(page, testInfo, 'S6_levelChanged_note.last', { opIds: S6_OPS });
+});
+
+test('EXPLORE_320x200_S7_levelDone', async ({ context, page, baseURL, request }, testInfo) => {
+  const tasks = await app.loadTasks(request);
+  const { seed, nextDate } = exhaustedSeed(tasks, { area: 'backend', level: 'intermediate', firstOpenDate: '2026-09-01' });
+  await injectSeed(context, seed); await openAt(page, baseURL, nextDate); await app.expectState(page, 'task.exhausted');
+  await expect(app.tid(page, 'task.exhausted.levelDone')).toBeVisible();
+  await font200(page);
+  await record(page, testInfo, 'S7_levelDone', { opIds: S7_OPS });
+});
+
+test('EXPLORE_320x200_S7_allDone', async ({ context, page, baseURL, request }, testInfo) => {
+  const tasks = await app.loadTasks(request);
+  const { seed, nextDate } = exhaustedSeed(tasks, { area: 'backend', level: 'advanced', firstOpenDate: '2026-09-01' });
+  await injectSeed(context, seed); await openAt(page, baseURL, nextDate); await app.expectState(page, 'task.exhausted');
+  await expect(app.tid(page, 'task.exhausted.allDone')).toBeVisible();
+  await expect(app.tid(page, 'task.exhausted.advance')).toHaveCount(0);
+  await font200(page);
+  await record(page, testInfo, 'S7_allDone', { opIds: S7_OPS, required: ['task.exhausted.redo', 'nav.history', 'nav.settings'] });
+});
+
+test('EXPLORE_320x200_S7_seenNext', async ({ context, page, baseURL, request }, testInfo) => {
+  const tasks = await app.loadTasks(request);
+  const { seed, nextDate } = seenNextSeed(tasks, { area: 'backend', firstOpenDate: '2026-06-01' });
+  await injectSeed(context, seed); await openAt(page, baseURL, nextDate); await app.expectState(page, 'task.exhausted');
+  await expect(app.tid(page, 'task.exhausted.seenNext')).toBeVisible();
+  await font200(page);
+  await record(page, testInfo, 'S7_seenNext', { opIds: S7_OPS });
+});
+
+test('EXPLORE_320x200_S7_nextDone', async ({ context, page, baseURL, request }, testInfo) => {
+  const tasks = await app.loadTasks(request);
+  const { seed, nextDate } = nextDoneSeed(tasks, { area: 'backend', firstOpenDate: '2026-06-01' });
+  await injectSeed(context, seed); await openAt(page, baseURL, nextDate); await app.expectState(page, 'task.exhausted');
+  await expect(app.tid(page, 'task.exhausted.nextDone')).toBeVisible();
+  await font200(page);
+  // nextDone（次の段階も出し終えている）で advance があるかは design D-40 の範囲なので、件数を記録するだけで必須にしない
+  await record(page, testInfo, 'S7_nextDone', { opIds: S7_OPS, required: ['task.exhausted.redo', 'nav.history', 'nav.settings'] });
+});
+
+const S8_OPS = ['settings.export', 'settings.import', 'settings.redo', 'settings.homeScreen.open', 'settings.stats.open', 'settings.history.open', 'settings.delete', 'nav.history', 'nav.settings'];
+test('EXPLORE_320x200_S8_settings', async ({ context, page, baseURL }, testInfo) => {
+  await injectSeed(context, AC14()); await openAt(page, baseURL, '2026-11-04'); await app.expectState(page, 'task.today');
+  await app.goSettings(page);
+  await font200(page);
+  // settings.homeScreen.open は iOS の Safari で非スタンドアロンのときだけ出す（design 5 の S8 の行）。UA を偽装しないこの場面では 0 件が仕様なので、件数の記録だけで必須にしない
+  // （2 回目の実行で S8 がこれで落ちた：探索テストの側の誤り）。
+  await record(page, testInfo, 'S8_settings', { opIds: S8_OPS, required: S8_OPS.filter((id) => id !== 'settings.homeScreen.open') });
+});
+
+test('EXPLORE_320x200_S9_stats', async ({ context, page, baseURL }, testInfo) => {
+  await injectSeed(context, AC24()); await openAt(page, baseURL, '2026-11-06');
+  await expect(app.root(page)).toHaveAttribute('data-state', /^task\./, { timeout: app.WAIT_MS });
+  await app.goSettings(page);
+  await app.tid(page, 'settings.stats.open').click(); await app.expectState(page, 'settings.stats');
+  await font200(page);
+  const values = await page.evaluate(() => [...document.querySelectorAll('dd[data-testid^="settings.stats."]')].map((el) => `${el.getAttribute('data-testid')}=${el.textContent.trim()}`));
+  await record(page, testInfo, 'S9_stats', { opIds: ['settings.stats.back', 'nav.history', 'nav.settings'], extra: { statValues: values } });
+});
+
+test('EXPLORE_320x200_S10_history', async ({ context, page, baseURL }, testInfo) => {
+  await injectSeed(context, loadSeed('seed-three-done-one-answer.json')); await openAt(page, baseURL, '2026-11-03');
+  await expect(app.root(page)).toHaveAttribute('data-state', /^task\./, { timeout: app.WAIT_MS });
+  await app.goHistory(page);
+  await font200(page);
+  const rows = await app.tid(page, 'history.row').count();
+  await record(page, testInfo, 'S10_history', { opIds: ['history.row.answer', 'nav.history', 'nav.settings'], extra: { historyRows: rows } });
+  // 答えを開いた行でもはみ出さないか
+  await app.tid(page, 'history.row.answer').first().click();
+  await expect(app.tid(page, 'history.row.answerText').first()).toBeVisible();
+  await record(page, testInfo, 'S10_history_answerOpen', { opIds: ['history.row.answer', 'nav.history', 'nav.settings'] });
+});
+
+test('EXPLORE_320x200_dialog_delete', async ({ context, page, baseURL }, testInfo) => {
+  await injectSeed(context, AC14()); await openAt(page, baseURL, '2026-11-04'); await app.expectState(page, 'task.today');
+  await app.goSettings(page);
+  await font200(page); // 利用者が見るとおり、大きい文字のままダイアログを開く
+  await app.tid(page, 'settings.delete').click();
+  await expect(app.tid(page, 'settings.delete.confirm')).toBeVisible();
+  await record(page, testInfo, 'dialog_delete', { opIds: ['settings.delete.confirm.ok', 'settings.delete.confirm.cancel'], viewportOnly: true,
+    dialog: { id: 'settings.delete.confirm', ok: 'settings.delete.confirm.ok', cancel: 'settings.delete.confirm.cancel' } });
+});
+
+test('EXPLORE_320x200_dialog_import', async ({ context, page, baseURL }, testInfo) => {
+  await injectSeed(context, AC14()); await openAt(page, baseURL, '2026-11-04'); await app.expectState(page, 'task.today');
+  await app.goSettings(page);
+  await font200(page);
+  await app.tid(page, 'settings.import.file').setInputFiles(contractFixturePath('data/v1/valid-export-three-completed.json'));
+  await expect(app.tid(page, 'settings.import.confirm')).toBeVisible();
+  await record(page, testInfo, 'dialog_import', { opIds: ['settings.import.confirm.ok', 'settings.import.confirm.cancel'], viewportOnly: true,
+    dialog: { id: 'settings.import.confirm', ok: 'settings.import.confirm.ok', cancel: 'settings.import.confirm.cancel' } });
+});

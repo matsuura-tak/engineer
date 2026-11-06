@@ -1,0 +1,8 @@
+# date: 2026-11-05 21:10:24 +0900
+# commit: 32236ecd05051505c9bd26382d40e4a4a93eee0f
+# why: g3r3-screenshots-axe.log で chromium の S4_task.rate_at100 が「1 秒後も task.total.prev が残っている」で撮れなかった（177 枚中 1）。原因の切り分けのため、その場面だけを単独でもう一度（結果は両方とも報告する）
+# cmd: node tools/screenshots.mjs --out docs/verification/001-daily-learning/evidence/screenshots --browser chromium --only '^S4_task.rate_at100$'
+ok             chromium light S4_task.rate_at100 
+
+撮った：1 枚（問題 0）。axe：1 画面、違反のある画面 0、incomplete のノード 0
+# exit: 0

@@ -1,0 +1,10 @@
+# チャーター：S8 が persisted() を待つ上限 1,000 ms と、待つ間の操作（data.md 11）。返らない約束、待つ間の申告、待つ間の入力、S9 との往復、日付またぎとの重なり
+1. persisted() が永遠に返らない → nav.settings から S8 まで 1094 ms（上限 1,000 の後）、notPersisted=0 件、export=1 件
+2. S9 → 戻る（S8 を描き直す）→ 1046 ms（描くたびに待つ：上限の後）、notPersisted=0 件
+3. S3 で nav.settings の直後に「簡単すぎ」→ data-state=task.skipped（答えが返った後も S6 のまま。遅れて S8 を描かない）、settled=1、保存の最後の行=too_easy
+4. S3 で nav.settings の直後に答えの欄へ入力 → data-state=settings（入力は操作でないので S8 は描かれる）、notPersisted=1 件、保存の current.answer="待つ間の入力"
+5. app.name → S3、欄="待つ間の入力"（待つ間の入力は残るか）
+6. nav.settings の待つ間に日付が変わる → data-state=settings、保存：history=3[2026-11-01:bi-001:done/helpful, 2026-11-02:bi-002:done/helpful, 2026-11-03:bi-003:done/not_helpful] current=2026-11-04:backend-intermediate-004/ans="" diag=backend/intermediate levels={"backend":"intermediate"}（まだ移していない）
+7. S8 で履歴を見る → data-state=history、保存：history=3[2026-11-01:bi-001:done/helpful, 2026-11-02:bi-002:done/helpful, 2026-11-03:bi-003:done/not_helpful] current=2026-11-04:backend-intermediate-004/ans="" diag=backend/intermediate levels={"backend":"intermediate"}（S8 を描いた日が 11-05 なので操作はそのまま実行され、移していない）
+8. S10 → S8 → S9 → data-state=settings.stats、issued=4、保存：history=3[2026-11-01:bi-001:done/helpful, 2026-11-02:bi-002:done/helpful, 2026-11-03:bi-003:done/not_helpful] current=2026-11-04:backend-intermediate-004/ans="" diag=backend/intermediate levels={"backend":"intermediate"}（まだ移していない）
+9. app.name → S3、task.dayChanged=0 件、保存：history=4[2026-11-01:bi-001:done/helpful, 2026-11-02:bi-002:done/helpful, 2026-11-03:bi-003:done/not_helpful, 2026-11-04:bi-004:none] current=2026-11-05:backend-intermediate-005/ans="" diag=backend/intermediate levels={"backend":"intermediate"}（app.name の判定で移した）

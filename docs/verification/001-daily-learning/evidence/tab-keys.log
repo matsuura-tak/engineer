@@ -1,0 +1,14 @@
+# tab-keys.log：キーボードの移動キーの確認（AC-18。contracts/test-hooks.md「キーボードの移動キー」）
+# 日付：2026-10-31　node v24.22.1　Playwright 1.64.1（chromium-1248、webkit-2370）　macOS（Darwin 27.2.0）
+# 何を：スクラッチパッドの stub（リンク nav.settings、radio area.backend、ボタン diagnosis.start.begin、textarea task.answer の順に置いた HTML）を
+#       backend/tests/acceptance/server/static-server.mjs で配り、`Tab` と `Alt+Tab` をそれぞれ 6 回押したときの document.activeElement の順を出した。
+# スクリプト：スクラッチパッドの spike/tab-keys.mjs（使い捨て。リポジトリに入れない）。
+# 結果：WebKit の `Tab` は textarea と BODY だけを回り、ボタンにもリンクにも止まらない。`Alt+Tab` はリンク > radio > ボタン > textarea の順にすべて回る。
+#       Chromium は `Tab` でも `Alt+Tab` でも同じ順ですべて回る。→ tabTo の移動キーは WebKit で Alt+Tab / Alt+Shift+Tab、それ以外で Tab / Shift+Tab（helpers/app.mjs の navKeys）。
+# 未確認：Linux の WebKit（CI）。最初の CI の実行で同じ出力を残す（契約の「未確認」）。
+#
+# ブラウザ   キー     フォーカスの順（6 回）                                                               | ボタンに届くか / リンクに届くか
+chromium Tab      nav.settings > area.backend > diagnosis.start.begin > task.answer > BODY > nav.settings  | button=true link=true
+chromium Alt+Tab  nav.settings > area.backend > diagnosis.start.begin > task.answer > BODY > nav.settings  | button=true link=true
+webkit   Tab      task.answer > BODY > task.answer > BODY > task.answer > BODY  | button=false link=false
+webkit   Alt+Tab  nav.settings > area.backend > diagnosis.start.begin > task.answer > BODY > nav.settings  | button=true link=true

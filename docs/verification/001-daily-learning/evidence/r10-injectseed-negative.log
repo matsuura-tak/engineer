@@ -1,0 +1,5 @@
+例外: 理由あり・testInfo なし -> allowIdsNotInTasks を使うときは testInfo も渡す（理由を注釈に書くため。W-7「そのテストは注釈にそう書く」）
+通った: 理由あり・ID なし・area/level 一致 [{"type":"W-7 の例外（課題集にない ID）","description":"わざと"}]
+例外: 理由あり・ID なし・level 不一致 -> seed が contracts/schemas/data.schema.json に通らない：data/history/0/taskId must match pattern "-advanced-[0-9]{3}$"
+例外: 理由なし・ID なし -> seed が W-7 の ID の決まりに合わない（seed の誤り）：
+通った: 既定・正しい seed ok

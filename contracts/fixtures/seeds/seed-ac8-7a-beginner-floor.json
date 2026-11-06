@@ -1,0 +1,40 @@
+{
+  "formatVersion": 1,
+  "app": "kyounoitte",
+  "firstOpenDate": "2026-11-01",
+  "diagnosis": {
+    "area": "backend",
+    "level": "beginner",
+    "years": "1to3",
+    "completedOn": "2026-11-01"
+  },
+  "levels": {
+    "backend": "beginner"
+  },
+  "history": [
+    {
+      "date": "2026-11-01",
+      "taskId": "backend-beginner-001",
+      "area": "backend",
+      "level": "beginner",
+      "mode": "in_app",
+      "answers": [
+        {
+          "choice": 0,
+          "correct": false
+        },
+        {
+          "choice": 0,
+          "correct": false
+        },
+        {
+          "choice": 0,
+          "correct": false
+        }
+      ],
+      "score": 0,
+      "report": "done",
+      "helpful": "unanswered"
+    }
+  ]
+}
