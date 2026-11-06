@@ -1,6 +1,6 @@
 # ADR 0001：Web の土台は、まとめずに ES modules のまま配り、実行時の依存を 0 にする
 
-- 状態：提案（G1 で reviewer が判定する）
+- 状態：提案（G1 で reviewer が判定する）。2026-11-06：「まとめずに配る」「JS 15 ファイルまで」「見直しの線 27,000」は ADR 0007 が置き換えを提案中（見直しの記録の (iii) に当たった）。本番の依存 0、動的な `import()` なし、Safari 17.0 の機能の決まりは残る
 - 書いた役：tech-lead　日付：2026-10-30
 - 関係する PRD、設計メモ、契約：docs/prd/001-daily-learning.md（12）、docs/adr/features/001-daily-learning.md、contracts/budgets.md、contracts/service-worker.md
 - 元に戻す手間：中（まとめる道具を後から足すのは 1〜2 日。配布物の URL と SW のファイル一覧が変わる）

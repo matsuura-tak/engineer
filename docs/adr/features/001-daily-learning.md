@@ -1,9 +1,21 @@
 # 技術設計メモ 001-daily-learning：診断と今日の学習（今日の一手）
 
-- 書いた役：tech-lead　日付：2026-10-30（2026-11-05 に PRD r10 と design r8 に合わせて書き直した。Takuma の FB 1 回目の作り直し。同じ日に PRD r11 と design r9 に追従）
+- 書いた役：tech-lead　日付：2026-10-30（2026-11-06 に冒頭の 0 を足した：FB 2 回目の改訂の範囲。2026-11-05 に PRD r10 と design r8 に合わせて書き直した。Takuma の FB 1 回目の作り直し。同じ日に PRD r11 と design r9 に追従）
 - PRD：docs/prd/001-daily-learning.md（r11、AC-1〜AC-40）　デザイン：design/001-daily-learning.md（r9、文言 174 キー、差し込みのあるキー 26）　契約：contracts/（HTTP の API はないので OpenAPI はない。一覧は contracts/README.md）
 - 読み替え：型の「operationId」は「契約のファイルと項目」、「iOS」は「ブラウザ（Safari 17 以上、Chrome の最新 2 版）」に読み替える。spectral と oasdiff は使えないので、JSON Schema の検査と見本のテストで代える（指揮役の裁定 E2）。
 - Takuma の決定 D1〜D10（2026-10-30。docs/approvals/001-daily-learning-G0.md の末尾）と、FB 1 回目（docs/approvals/001-daily-learning-FB1.md）、指揮役の決定（docs/approvals/delegation.md の 2026-11-05：Q12〜Q19、S7 の再読み込み、予算の割り直し）を反映した。一覧は 10。
+
+## 0. FB 2 回目の改訂の範囲（2026-11-06、tech-lead。PRD r13、design r13）
+この節より下（1〜10）は r10 の形（FB 1 回目の作り直し）のままです。FB 2 回目に合わせた全面の書き直しは、契約を書き直した後に行います。食い違うところは、この節と下の ADR が優先します。
+- 何が変わるか（PRD r13：3 問 × 3 択で選んで学ぶ型、正誤の返し、正誤による段階、図の 6 型、案内役ミル。AC-41〜AC-45 が増え、AC-8、AC-23、AC-31、AC-32 などが変わった）：
+  - 保存の形：`formatVersion` 1 のまま作り直す。行の `answer` を外し、`answers`（`{ choice, correct }`）、`score`、`levelChange` を足す。`current.answers`、トップレベルの `showCharacter` を足す。申告は `done`、`no_time`、`none` の 3 つ（ADR 0002 の改訂 2）。
+  - 課題集：6 領域のファイル `./data/tasks-<領域>.json` に分ける。診断の 1 問目の確定で先に取り、「診断を終える」で待ち、失敗したら取り直す。オフラインの失敗の状態は S2 と S10 だけ（ADR 0006、design の D-61）。
+  - JS：esbuild（devDependency 0.28.2）で 1 つの `js/app.js` にまとめる。sw.js は別。本番の依存 0 は変えない。ADR 0001 の 15 ファイルと見直しの線 27,000 をなくす（ADR 0007）。
+  - ミルの絵：48×48 の索引色 PNG の 8 枚を `./img/miru-<mood>[-dark].png` に置き、`<picture>` で切り替える。SW の FILES に足す（ADR 0008）。
+  - 依存：contracts/dependencies.md に esbuild と `@esbuild/*` の 26 件を足した（2026-11-06）。
+  - 変わらないもの：ブラウザだけ、サーバーなし、localStorage のキー 1 つ、CSP の文字列と Trusted Types（ADR 0005）、SW の更新の仕方（ADR 0003）、受け入れテストの置き場所（ADR 0004）、領域・段階・経験年数の ID。脅威モデルは「新しい境界なし」（PNG と課題集は同じ origin で `img-src 'self'` と `connect-src 'self'` の範囲。G1 tech-lead r3 の 6）。
+- 契約は次の回から書く（今回は書いていない）：data.md と data.schema.json（上の保存の形、2 の保存の表、5 の段階の規則を score に、9 の統計）、identifiers.md（testid、属性、図の型 6、`data-mood` 4、申告 3、文言のキー）、strings.md と strings.schema.json（文言 194 キー）、tasks.schema.json（新しい型）、test-hooks.md（選択肢から返しの 300 ms、W-4 の差し替えを領域のファイルに、AC-23 の 3 通り目、W-12 でミルを除く、seed の作り直し）、budgets.md（初回に読む分と SW が貯める分の 2 つの枠、文言の枠 10,000、5 の使う機能の一覧）、service-worker.md（FILES）、fixtures/。
+- 設計メモの 2（AC の対応表）、4（契約の検査の出力）、5、6、9、10 と「確かめ」は、契約の後に書き直す。それまでは印を付け直さない。
 
 ## 1. 範囲、目標、非目標
 - 範囲：ブラウザだけで動く静的な Web アプリ（HTML、CSS、ES modules、Service Worker）と同梱の課題集（v1 は 210 件、2026-12-14 の版で 252 件）。保存は localStorage のキー 1 つ。配布は GitHub Pages の `/engineer/`。受け入れテストは Playwright（Chromium と WebKit）。
