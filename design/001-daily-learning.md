@@ -2,7 +2,7 @@
 
 - 対象の PRD：docs/prd/001-daily-learning.md（r13。G0 の判定は verifier r5 と tech-lead r5 がどちらも PASS。AC-1〜AC-45、AC-30 は欠番。FB 2 回目 docs/approvals/001-daily-learning-FB2.md）
 - 調査：design/001-daily-learning-research.md（この仕様より先に書いた。r1 はコミット 854cf47、r2 は 3d9c9e6、r3 は 74e68d2）。方向性は案A「一枚の紙」＋ r2 の案A'「手応えを足す」＋ r3 の案D「5 色」（調査 7.2。Takuma が選んだ：FB2 の Q28）
-- 書いた役：designer　日付：2026-11-06（**r13**。G1 design-reviewer r6（PASS 14 / 16）の要修正 2 と提案 2 を直した：AC-23 の 3 通り目と #47、#56 の手順を「先読みを待たずに（contracts/test-hooks.md の手順）」にし、D-61 に取り直しの 1 文、`guide.correct.3` の en、S10 の読み込み中とオフラインの列、記載の数字、表のセルの中の `|`。一覧は 11。r12。G1 design-reviewer r5（FAIL 12 / 16）と tech-lead r3（PASS、要修正 3）の指摘を直した：U-24（再読み込みで復元した返しにもミルを出す：D-53）、正誤の `role="status"` の入れ物を描いた時点から置く（D-48）、3 問目に答えたら `task.skip` を外す（D-3）、U-28（`guide.incorrect`）、`{total}`、状態の表の「なし」に理由、課題集を 6 領域に分ける前提（S2 と S10 のオフライン：D-61）、ミルの台詞を正誤 3 本ずつ（D-55、U-30）、図の横並びの条件（D-51）、ほか。一覧は 11。文言は 194 キー。r11：PRD r13（FB2：選んで学ぶ型、正誤の返し、図の 6 型、案内役のキャラクター）と調査 r3（3.2〜3.4、4.2、6.2、7.2、8.1 の 16〜20）に合わせて書き直した。Takuma が選んだもの：案内役はミル（カメレオン。design/001-daily-learning/characters/README.md の 7、`miru-*`）、配色は案D「5 色」（図の強調は橙 color.figure.accent、案内役の色 color.guide）。課題の画面 S3 を「導入と図 → 問 1〜3（3 択、選ぶと 300 ms 以内に正誤と説明）→ まとめ」に変え、答えを書く欄、難しすぎ／簡単すぎ、「完了」ボタンを消した。D-3、D-5、D-6、D-13、D-15、D-18、D-19、D-20、D-26、D-34、D-36、D-43、D-44 を書き直し、D-46〜D-65 を足した。文言は 20 キーを消し 35 キーを足して 189 キー。tokens.md に色 2 つと寸法 3 つ（r8）。直した箇所の一覧は 11。r10 までの経緯は 11 の「r10 以前」）
+- 書いた役：designer　日付：2026-11-08（**r14**。G1 reviewer（設計）r3 の重大 1 と、tech-lead の契約の直し（コミット a8e900c）に合わせた：AC-23 の 3 通り目と #56 の入口を S7 の `task.exhausted.redo` に、S0 error の 3 つ目（起動で要る課題集のファイルが取れない）と #76 を足した。新しい文言キーはない。一覧は 11。r13。G1 design-reviewer r6（PASS 14 / 16）の要修正 2 と提案 2 を直した：AC-23 の 3 通り目と #47、#56 の手順を「先読みを待たずに（contracts/test-hooks.md の手順）」にし、D-61 に取り直しの 1 文、`guide.correct.3` の en、S10 の読み込み中とオフラインの列、記載の数字、表のセルの中の `|`。一覧は 11。r12。G1 design-reviewer r5（FAIL 12 / 16）と tech-lead r3（PASS、要修正 3）の指摘を直した：U-24（再読み込みで復元した返しにもミルを出す：D-53）、正誤の `role="status"` の入れ物を描いた時点から置く（D-48）、3 問目に答えたら `task.skip` を外す（D-3）、U-28（`guide.incorrect`）、`{total}`、状態の表の「なし」に理由、課題集を 6 領域に分ける前提（S2 と S10 のオフライン：D-61）、ミルの台詞を正誤 3 本ずつ（D-55、U-30）、図の横並びの条件（D-51）、ほか。一覧は 11。文言は 194 キー。r11：PRD r13（FB2：選んで学ぶ型、正誤の返し、図の 6 型、案内役のキャラクター）と調査 r3（3.2〜3.4、4.2、6.2、7.2、8.1 の 16〜20）に合わせて書き直した。Takuma が選んだもの：案内役はミル（カメレオン。design/001-daily-learning/characters/README.md の 7、`miru-*`）、配色は案D「5 色」（図の強調は橙 color.figure.accent、案内役の色 color.guide）。課題の画面 S3 を「導入と図 → 問 1〜3（3 択、選ぶと 300 ms 以内に正誤と説明）→ まとめ」に変え、答えを書く欄、難しすぎ／簡単すぎ、「完了」ボタンを消した。D-3、D-5、D-6、D-13、D-15、D-18、D-19、D-20、D-26、D-34、D-36、D-43、D-44 を書き直し、D-46〜D-65 を足した。文言は 20 キーを消し 35 キーを足して 189 キー。tokens.md に色 2 つと寸法 3 つ（r8）。直した箇所の一覧は 11。r10 までの経緯は 11 の「r10 以前」）
 - 図：design/001-daily-learning/screens.md（文字で描いた画面の図。r11 で S3、S4、S5、S6、S7、S8、S9、S10 を描き直した）。案内役の絵：design/001-daily-learning/characters/（ミルの PNG 8 枚、画素の原本 miru.txt、コントラスト contrast.md）
 - トークン：design/tokens.md（色、文字、余白、図の寸法。この仕様はトークンの名前だけを使う）
 - 原則の番号 B-1〜B-6 は .claude/skills/craft-designer/SKILL.md にある。
@@ -15,7 +15,7 @@
 
 ```
 [URL を開く] → S0 loading（JS が動くまで）
-   判定順（契約 data.md の 4）：枠の中 → loading のまま／保存先が使えない → S0 error (2)／読めない → S0 error (1)／診断の途中 → S2／なし → S1／あり → 今日の状態（S3 / S5 / S6 / S7）
+   判定順（契約 data.md の 4）：枠の中 → loading のまま／保存先が使えない → S0 error (2)／読めない → S0 error (1)／診断の途中 → S2／なし → S1／あり → 要る課題集のファイルを読み終えてから今日の状態（S3 / S5 / S6 / S7）。取れない → S0 error (3)（r14）
    ├ 保存データなし → S1 diagnosis.start（ミル idle と台詞 guide.intro。AC-45）
    │     ├ スタンドアロン表示 → S1 に案内 home.standalone.import
    │     ├ iOS の Safari でスタンドアロンでない、かつ閉じた印がない → S1 に案内 home.addToHomeScreen
@@ -26,7 +26,7 @@
    ├ 保存データあり、今日の最後の課題が完了（report done。まとめの回答の有無を問わない） → S5 task.done
    ├ 保存データあり、今日の最後の課題が「今日はやめておく」（no_time） → S6 task.skipped
    ├ 保存データあり、今日の課題の途中（current がある。答えた問が 0〜2） → S3（答えた問の返しを復元し、次の問を出す：AC-32）
-   └ 読めない／保存先が使えない → S0 error
+   └ 読めない／保存先が使えない → S0 error (1)(2)。起動で要る課題集のファイルが取れない → S0 error (3)：error.tasks.offline + task.next.retry（押すと起動の判定をやり直す。保存しない。r14）
 
 S3 task.today（D-46。data-task-question-index は 0 → 1 → 2 → 3）
    題名、導入の本文、導入の図（AC-44）、問 1（問題文、任意の図、選択肢 3 つ）、「今日はやめておく」
@@ -44,7 +44,7 @@ S5 task.done / S6 task.skipped
    └ 「履歴を見る」→ S10
 S7 task.exhausted（levelDone / allDone。ミル celebrate と台詞 guide.exhausted.*）
    ├ levelDone：「{次の段階}に進む」→ S3（次の段階の 1 件目。同じ領域のファイルの中なので取り直しは無い：D-61）
-   ├ 「別の領域を選ぶ」→ S2（「やめる」で S7 に戻る。終えるときに別の領域のファイルが SW に無くオフライン → S2 のまま error.tasks.offline + task.next.retry：AC-23 の 3 通り目、D-61）
+   ├ 「別の領域を選ぶ」→ S2（「やめる」で S7 に戻る。終えるときに別の領域のファイルが SW に無くオフライン → S2 のまま error.tasks.offline + task.next.retry：AC-23 の 3 通り目の入口はここ（今日の課題がない S7 から。r14）、D-61）
    └ 再読み込みの扱いは r10 と同じ（今日の行がある日に操作で着いた S7 は S5 / S6 に戻る）
 ヘッダーの nav、S8 settings（読み込み、書き出し、やり直し、削除、統計、履歴、ホーム画面。r11 で節「案内役」settings.character.show を足した：D-56）、S9、S10、翌日の扱い、日付が変わった知らせ（D-30）は r10 と同じ。やり直しの診断は「次に出す課題」から効く（S3 の途中にやり直しても表示中の課題は変わらない）。
 ```
@@ -76,7 +76,7 @@ verifier はこの表から受け入れテストを書く。識別子の詳し�
 | AC-20 | S1 → S8、または S1 の案内 | r10 と同じ |
 | AC-21 | S1、S8 | r10 と同じ |
 | AC-22 | S1 | r10 と同じ |
-| AC-23（r12） | S0 → S3 / S5。3 通り目：S8 → S2 | 1・2 通り目：オフラインで再読み込み → 3 秒以内に同じ `data-state`、`data-task-id`、`data-task-question-index`=1、`task.figure` の `data-figure-type` が同じ、`guide.character` の件数と `data-mood` が再読み込み前と同じ（返しの直後も復元後も 1 件。`data-mood` は `answers[0].correct` から correct か incorrect：D-53。U-24 の決定 2026-11-06）。復元では問 1 の `task.question.next` が 0 件、問 2 の `task.choice` ×3 が押せる。3 通り目（課題集は 6 領域に分けるので `task.next` と `task.exhausted.advance` ではファイルを取り直さない：D-61。「やり直しの診断で別の領域へ移る `diagnosis.finish`」と読み替える）：`serviceWorkers: 'block'` で開き、S8 の `settings.redo` → S2 で別の領域を選び、3 問目を選び、先読みを待たずに（contracts/test-hooks.md の手順） setOffline → `diagnosis.finish` → S2 のまま（`data-question-index`=3、radio の `checked` は保たれる）`error.tasks.offline` 1 件と `task.next.retry` 1 件、`data-stat-issued` は増えず、保存データは変わらない → オンラインで `task.next.retry` → `task.today`（新しい領域の 1 件目） |
+| AC-23（r12、r14） | S0 → S3 / S5。3 通り目：S7 → S2 | 1・2 通り目：オフラインで再読み込み → 3 秒以内に同じ `data-state`、`data-task-id`、`data-task-question-index`=1、`task.figure` の `data-figure-type` が同じ、`guide.character` の件数と `data-mood` が再読み込み前と同じ（返しの直後も復元後も 1 件。`data-mood` は `answers[0].correct` から correct か incorrect：D-53。U-24 の決定 2026-11-06）。復元では問 1 の `task.question.next` が 0 件、問 2 の `task.choice` ×3 が押せる。3 通り目（課題集は 6 領域に分けるので `task.next` と `task.exhausted.advance` ではファイルを取り直さない：D-61。「やり直しの診断で別の領域へ移る `diagnosis.finish`」と読み替える）：`serviceWorkers: 'block'` で、本番の課題集から作った「出し終えた」seed（今日の課題なし）で開き、S7 の `task.exhausted.redo` → S2 で別の領域を選び、先読みを待たずに（contracts/test-hooks.md の W-17。1 問目の確定の前） setOffline → 2 問目、3 問目を選び → `diagnosis.finish` → S2 のまま（`data-question-index`=3、radio の `checked` は保たれる）`error.tasks.offline` 1 件と `task.next.retry` 1 件、`data-stat-issued` は増えず、保存データは変わらない → オンラインで `task.next.retry` → `task.today`（新しい領域の 1 件目） |
 | AC-24（r11） | S9 | `settings.stats.open` → `<dd>` 13 個：`data-stat-first-open-date`、`-issued`、`-completed`、`-first-day-completed`、`-days-completed-7d`、`-days-completed-week`、`-extra-completed`、`-helpful`、`-rated`、`-questions-answered`、`-questions-correct`、`-low-score-tasks`、`-no-time`。`data-stat-too-hard` は 0 件（6 に定義しない） |
 | AC-25 | S8（エラー） | r10 と同じ |
 | AC-26（r11） | S1（全画面） | locale en-US で S1 の文言が en と一致。キーの差 0 件（7 の表が日英の原本。`guide.*` を含む） |
@@ -106,7 +106,7 @@ verifier はこの表から受け入れテストを書く。識別子の詳し�
 
 | 画面 | 仕事（1文） | 主操作 | 使う標準部品 | 標準から外れる所（本来の部品、理由、対応） |
 |---|---|---|---|---|
-| S0 殻（loading / error） | JS が動くまでの地を出し、保存データが読めないときに次の一手を出す | `error.app.reload` | `<main>`、`<h1>`、`<p>`、`<noscript>`、`<button>` | なし |
+| S0 殻（loading / error） | JS が動くまでの地を出し、保存データか起動で要る課題集のファイルが読めないときに次の一手を出す | `error.app.reload`（r14：error (3) では `task.next.retry`） | `<main>`、`<h1>`、`<p>`、`<noscript>`、`<button>`、r14：`<p role="alert">`（error (3)） | なし |
 | S1 diagnosis.start | 何が起きるかを 10 行以内で伝え、案内役を 1 回だけ紹介し、診断を始めさせる | `diagnosis.start.begin` | `<main>`、`<h1>`、`<p>`、`<aside>`（ミル：`guide.character`。絵は `<img>` か `<svg>`、台詞は `<p>`）、`<button>`、案内は `<section aria-labelledby>`、`<ol>`、隠した `<input type="file">` | ファイルの読み込み（r10 と同じ：D-27）。案内役の絵：本来は文字だけ（D-20）。理由：FB2-5（Takuma の要望）と PRD 9 の S-13。対応：絵は `aria-hidden`、台詞は文字で DOM にあり、設定で消せる（D-53、D-56） |
 | S2 diagnosis.question | 1 問だけ見せて答えさせ、確定ごとに保存する | `diagnosis.next`（3 問目は `diagnosis.finish`） | `<form>`、`<fieldset>`、`<legend>`、`<input type="radio">`、`<label>`、`<button>`、`<p role="alert">`（未選択、保存の失敗、r12：領域のファイルが無くオフライン `error.tasks.offline`：D-61） | なし（r10 と同じ） |
 | S3 task.today | 今日の課題 1 件を、題名と導入と図と問 1 が開いた瞬間に読める形で出し、問ごとに 1 回だけ選ばせて、その場で正誤と理由を返す | 表示中の問の `task.choice` ×3（同格。答えた後は `task.question.next`、問 3 の後は `task.summary.open`）。「今日はやめておく」`task.skip` は副操作 | `<article>`、`<h1>`、`<p>`、`<figure>`（図：`role="img"`）、`<section>`（問ごと）＋`<h2>`、`<div role="group" aria-labelledby>`（選択肢の入れ物）、`<button>`（選択肢。`aria-disabled` で確定後も読める）、`<div role="status" aria-live="polite">`（正誤の入れ物。描いた時点から空で置く：D-48）、`<aside>`（ミル）、`<p>`（説明）、`<button>`（次へ／まとめへ／やめておく） | 選択肢：本来は `<input type="radio">`＋確定ボタン（S2 の型）。理由：PRD 9「1 問につき 1 回、タップで選ぶと 300 ms 以内に返す」（FB2-2）で、選んだ瞬間に確定する操作は radio の「選択で文脈を変えない」（SC 3.2.2）と合わない。対応：列いっぱいの `<button>` を縦に 3 つ（44 px 以上、R-69）、答えた後は 3 つとも `aria-disabled="true"`（文字は読める。フォーカスできるが押せない）、正誤は描いた時点から置いた `role="status"` の入れ物に文字を入れて読み上げる（D-47、D-48）。図：本来は `<img>` と `alt`。理由：課題集は型とラベルだけを持ち画像ファイルを持たない（AC-44）。対応：`<figure role="img" aria-label>` の中に HTML と CSS で描き、ラベルは DOM の文字、子は role=img の中で presentational（D-50） |
@@ -184,7 +184,7 @@ verifier はこの表から受け入れテストを書く。識別子の詳し�
 | D-58（r11。案D、Q28）tokens.md 1 に color.figure.accent（橙：ライト #B45309、ダーク #F2A33A、上げる #7A3400 / #FFC877。地との比 5.02 / 8.99 / 9.06 / 13.78。線 3:1 と文字 4.5:1 をどの設定でも満たす）と color.guide（ミルの紫：ライト #7E55C2（体の陰の色）、ダーク #B48CE0（体の色）、上げる #5B2FA8 / #DCCBF5。地との比 5.30 / 6.93 / 8.69 / 13.90。名前の 14 px の文字と 2 px の線に使う）を足す。橙は color.warning と色相が近い（比 1.49 / 1.26）ので、同じ部品の中に並べない：color.warning は文（`task.dayChanged`、`settings.storage.notPersisted`、案内の h2）だけ、color.figure.accent は図の中（3 px の枠と 700 の文字）だけに限る。S3 で `task.dayChanged`（画面の先頭の文）と図（本文の中の枠）が同じ画面に出ることはあるが、場所と形が違う。見た目で混ざると Takuma が判断したら第 2 候補の紫系（characters/README.md 3）に替える（10 の U-23） | R-68、R-69、R-71、R-89、R-13、調査 7.2、characters/README.md 3 と 7.4 | https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html 、https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html 、B-5 |
 | D-59（r11。AC-42）正答数は `task.rate.score`「3 問中 {n} 問に正解しました」（{n} は 0〜3、{total} は 3。text.body、color.text。要素 `task.rate` と `task.done` の `data-score`）。0 問のときも同じ形（「3 問中 0 問に正解しました」）で、責める語も慰める語も足さない（ミルの `guide.rate.score0` が一緒に考える 1 文を言う）。S5 でも同じ 1 行を h1 の直後に出す。「点」「得点」「満点」「スコア」「ランク」の語は全キーで使わない | R-35（avoid blame）、R-53（事実を先に）、E-27（点数で責められる不満）、PRD 10（点数と XP） | https://developer.apple.com/design/human-interface-guidelines/writing 、B-1 |
 | D-60（r11。AC-8）段階が変わった直後の課題の S3 に、`task.progress` の直後（h1 の前）に `<p data-testid="task.level.adjusted.down">`「直近の課題の正答数に合わせて、段階を{level}にしました。」または `.up`「直近の 3 件が全問正解だったので、段階を{level}に上げました。」（text.body、color.text。色を付けない：注意でもエラーでもない）。その課題の S3 にだけ出し、再読み込みでも出る（表示中の課題が「段階が変わった後の最初の課題」である間）。次の課題からは出ない。{level} は変わった先の `level.*`。禁止語の対象（AC-45） | R-27（システムの状態を見せる）、R-35（blame しない）、R-51（paiza：段階の変化を 1 行で）、R-10（注意をエラーに見せない） | https://www.nngroup.com/articles/ten-usability-heuristics/ 、B-1 |
-| D-61（r12 で書き直し。AC-23 の 3 通り目。PRD 11「組のファイルを貯め終える前のオフライン」。課題集は 6 領域に分ける：指揮役の仮の決定 2026-11-06。G1 の ADR で確定）領域のファイルは 1 領域 1 ファイルで全段階を含むので、`task.next`（S5 / S6）と `task.exhausted.advance`（S7）ではファイルを取り直さず、オフラインの例外は無い。ファイルが要るのは (1) S2 の `diagnosis.finish`（初回は 1 問目の確定で裏で取り始め、終えるときに待つ。やり直しで別の領域へ移るときも同じ）と (2) S10 の、履歴にある別の領域の行（題名と選んだ選択肢の文）だけ。(1) SW が貯め終える前にオフラインで取れないときは、S2 を 3 / 3 のまま変えず、radio の回答を保ち、保存せず、`diagnosis.finish` の直上に `<p role="alert" data-testid="error.tasks.offline">`「課題のファイルをまだ取り込めていません。ネットにつないでから、もう一度進めてください。」と `task.next.retry`「もう一度進む」（副操作の形。`diagnosis.finish` と同じ処理を呼ぶ）を出す。先読みが失敗していたら、`diagnosis.finish` と `task.next.retry` で取り直す（r13）。統計の出した件数は増えない。(2) S10 では行を消さず、`history.row.taskTitle` に題名の代わりに課題の ID（`data-task-id` と同じ文字）を出し、題名の直下に `history.row.unavailable`（text.small、color.text.secondary。エラーの色にしない：その場で直す操作が無い）を 1 行出し、`history.row.answers` は出さない（選択肢の文が無い）。`history.row.score` と申告は保存データにあるので出す。行に `data-title-unavailable="true"` | R-10（問題の近く、何が起きたか、どう直すか、責めない）、R-9（次の一手のボタン）、R-27（1 状態の可視化）、tech-lead r3 の要修正 2 と 7 | https://www.nngroup.com/articles/error-messages-scoring-rubric/ 、B-1 |
+| D-61（r12 で書き直し。AC-23 の 3 通り目。PRD 11「組のファイルを貯め終える前のオフライン」。課題集は 6 領域に分ける：指揮役の仮の決定 2026-11-06。G1 の ADR で確定）領域のファイルは 1 領域 1 ファイルで全段階を含むので、`task.next`（S5 / S6）と `task.exhausted.advance`（S7）ではファイルを取り直さず、オフラインの例外は無い。ファイルが要るのは (1) S2 の `diagnosis.finish`（初回は 1 問目の確定で裏で取り始め、終えるときに待つ。やり直しで別の領域へ移るときも同じ）と (2) S10 の、履歴にある別の領域の行（題名と選んだ選択肢の文）と、r14：(3) 起動（保存データありで今日の状態を決めるとき。取れなければ S0 error (3)：5 の S0 の行）だけ。(1) SW が貯め終える前にオフラインで取れないときは、S2 を 3 / 3 のまま変えず、radio の回答を保ち、保存せず、`diagnosis.finish` の直上に `<p role="alert" data-testid="error.tasks.offline">`「課題のファイルをまだ取り込めていません。ネットにつないでから、もう一度進めてください。」と `task.next.retry`「もう一度進む」（副操作の形。`diagnosis.finish` と同じ処理を呼ぶ）を出す。先読みが失敗していたら、`diagnosis.finish` と `task.next.retry` で取り直す（r13）。統計の出した件数は増えない。(2) S10 では行を消さず、`history.row.taskTitle` に題名の代わりに課題の ID（`data-task-id` と同じ文字）を出し、題名の直下に `history.row.unavailable`（text.small、color.text.secondary。エラーの色にしない：その場で直す操作が無い）を 1 行出し、`history.row.answers` は出さない（選択肢の文が無い）。`history.row.score` と申告は保存データにあるので出す。行に `data-title-unavailable="true"` | R-10（問題の近く、何が起きたか、どう直すか、責めない）、R-9（次の一手のボタン）、R-27（1 状態の可視化）、tech-lead r3 の要修正 2 と 7 | https://www.nngroup.com/articles/error-messages-scoring-rubric/ 、B-1 |
 | D-62（r11。AC-7、AC-42）S10 の行：日付、題名、`report.done` / `.noTime` / `.none`、正答数 `history.row.score`「3 問中 {n} 問」（答えた問が 0 件の行は出さない）、done のときだけ `helpful.*`、答えた問があれば `<details>` `history.row.answers`「選んだ答えを見る」の中に `<ol>` で問ごとに「{選んだ選択肢の text}」＋ 文字「正解」/「惜しい」（`task.answer.result.*` と同じ文言。`history.row.answer.item`、`data-correct`）。答えを書く欄が無くなったので `history.row.answer` / `.answerText` は消す。行の `data-score`。r12：領域のファイルを読めない行は D-61 (2) | R-16、R-22、R-58（畳む操作は読み返すものだけ） | https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/details 、B-1 |
 | D-63（r11。AC-24）S9 は 13 行：r10 の 11 行から `settings.stats.tooHard` を消し、`settings.stats.questionsAnswered`（答えた問題数）、`.questionsCorrect`（正解した問題数）、`.lowScoreTasks`（正答 1 以下で完了した課題数）を `.rated` の直後に足す。形は D-11 のまま | R-16、PRD 13 の指標 | B-1、B-5 |
 | D-64（r11。AC-18）キーボード：選択肢は `<button>` なので Tab で順に止まり、Enter / Space で確定する。確定後は次に現れた `task.question.next` へフォーカスを移さず、DOM の順で Tab すれば届く（結果の文は `role="status"` で読まれる。フォーカスを勝手に動かさない：SC 3.2.2）。「次の問題へ」を押したら次の問の h2（`tabindex="-1"`）へフォーカスを移す（新しく現れた内容の先頭）。「まとめへ」で S4 の h1 へ。r12：再読み込みで復元した S3 ではフォーカスを動かさない（読み込みで着いた画面は文書の先頭から読む：他の画面の読み込みと同じ。問 n+1 の h2 へ移すのは `task.question.next` の経路だけ） | R-21、R-28（`tabindex="-1"` でフォーカスを移す）、R-19 | https://www.w3.org/WAI/WCAG22/Understanding/on-input.html 、https://www.w3.org/WAI/WCAG22/Understanding/focus-order.html |
@@ -195,7 +195,7 @@ verifier はこの表から受け入れテストを書く。識別子の詳し�
 
 | 画面 | 通常 | 空 | 読み込み中 | エラー | オフライン | 権限を断られたとき | 一部だけ読めたとき |
 |---|---|---|---|---|---|---|---|
-| S0 殻 | r10 と同じ（`data-state="loading"`。1 秒後に `app.loading`。`<noscript>`） | なし（殻は内容を持たない） | 上の loading そのもの（R-9） | r10 と同じ：(1) 読めない → `error.app.*`（reload、exportRaw、delete）。(2) 保存先が使えない → `error.app.storageUnavailable.*` + reload | 通常と同じ | なし（この画面で求める権限はない） | エラー (1) と同じ扱い |
+| S0 殻 | r10 と同じ（`data-state="loading"`。1 秒後に `app.loading`。`<noscript>`） | なし（殻は内容を持たない） | 上の loading そのもの（R-9） | r10 と同じ：(1) 読めない → `error.app.*`（reload、exportRaw、delete）。(2) 保存先が使えない → `error.app.storageUnavailable.*` + reload。r14：(3) 起動で要る課題集のファイルが取れない → `error.tasks.offline`（`<p role="alert">`）+ `task.next.retry`（唯一の操作なので主操作の塗り。押すと起動の判定をやり直す。保存しない。`error.app.*` は置かない。h1 は置かない：新しい文言キーを足さない。contracts/data.md の 4「課題集のファイル」） | 通常と同じ（r14：SW が貯め終える前のオフラインはエラー (3)） | なし（この画面で求める権限はない） | エラー (1) と同じ扱い |
 | S1 diagnosis.start | ヘッダー（アプリ名、`nav.settings`）。h1 `diagnosis.start.title`、`diagnosis.start.lead.1`〜`.3`、ミル `guide.character`（idle。`guide.sprite`、`guide.name`、`guide.say`=`guide.intro`。lead の直後、主操作の前：D-53）、主操作 `diagnosis.start.begin`。案内（スタンドアロン、iOS の Safari）は r10 と同じ。`showCharacter` が false ならミルは 0 件 | なし（この画面が「保存データなし」の表示そのもの） | なし（同期で出る） | 読み込み（案内から）の失敗 → r10 と同じ `error.import.*` | 通常と同じ | なし（冒頭の理由） | なし（冒頭の理由） |
 | S2 diagnosis.question | r10 と同じ（進み具合、legend、radio、ヒント文、次へ／終える／前へ／やめる）。ミルは出ない。r12：1 問目の確定で領域のファイルを裏で取り始める（画面は変えない） | なし（選択肢は固定） | なし（画面は同期で描く。領域のファイルの取得は裏で始め、`diagnosis.finish` だけがその完了を待つ：待つ間は 3 / 3 のまま `diagnosis.finish` に `aria-busy="true"` を付けて 2 度押しを無視し、1 秒を超えたら直上に `app.loading` の文を出す：R-9） | r10 と同じ（未選択、保存の失敗） | 通常と同じ。例外（r12）：`diagnosis.finish` で領域のファイルが SW に無くオフライン → S2 の 3 / 3 のまま、radio の回答を保ち、保存せず、`diagnosis.finish` の直上に `error.tasks.offline` + `task.next.retry`。オンラインで `task.next.retry` → S3（初回と、やり直しで別の領域へ移るとき：D-61、AC-23 の 3 通り目） | なし（冒頭の理由） | なし（冒頭の理由） |
 | S3 task.today（問 0 / 3：開いた直後） | `task.today.label`（か `.nth`）、`task.progress`、（段階が変わった直後の課題なら `task.level.adjusted.down` / `.up`：D-60）、h1 `task.today.title`、`task.meta`、`task.intro.text`、導入の図 `task.figure`（`data-figure-of="intro"`）、問 1 の `task.question`（`task.question.heading`、`task.question.text`、任意の図、`task.choice` ×3。`data-answer-result` なし）、`task.skip.note` と `task.skip`。`guide.character` は 0 件（AC-31）。`task.insight.text` は DOM にない（AC-38）。日付が変わった知らせ `task.dayChanged`（D-30）は r10 と同じ | なし（出せる課題がないときは S7） | なし（AC-15 は殻の loading の時間） | 選択肢を押した後の保存の失敗（`current.answers`）→ 押した問の選択肢の直下に `error.storage.message` + `error.storage.retry`（`role="alert"`）。返しは描かず、`data-answer-result` は付けず、選択肢は押せるまま。`error.storage.retry` で保存に成功すれば返しを描く。r12：別の選択肢を押せばその選択肢で保存を試み、成功した答えで返しを描く（エラーは成功するまで残る）。`error.storage.retry` は最後に押した選択肢を再び試す（D-47） | 通常と同じ | 初めて S3 を出した直後の `persist()` が断られても S3 は変わらない（知らせは S8） | なし（冒頭の理由） |
@@ -265,7 +265,7 @@ verifier はこの表から受け入れテストを書く。識別子の詳し�
 | 53 | S7 | levelDone（`task.exhausted.seenNext`） | r10 の #33 と同じ | |
 | 54 | S7 | levelDone（`task.exhausted.nextDone`） | r10 の #53 と同じ | |
 | 55 | S7 | allDone（上級。ミル celebrate） | 上級を出し終えた seed | r11（ミル） |
-| 56 | S2 | やり直しの診断で別の領域へ移るときのオフライン（AC-23 の 3 通り目） | S8 の `settings.redo` → 別の領域を選び、先読みを待たずに（contracts/test-hooks.md の手順） setOffline → `diagnosis.finish` | r12（r11 の S7 の行を置き換えた）。r13：手順 |
+| 56 | S2 | やり直しの診断で別の領域へ移るときのオフライン（AC-23 の 3 通り目。今日の課題がない S7 から） | 本番の課題集から作った「出し終えた」seed で S7 → `task.exhausted.redo` → 別の領域を選び、先読みを待たずに（contracts/test-hooks.md の W-17）setOffline → `diagnosis.finish` | r12（r11 の S7 の行を置き換えた）。r13：手順。r14：入口を S7 に（今日の課題があると、やり直しの後も前の領域の S3 に戻るため。G1 reviewer r3 の重大 1） |
 | 57 | S7 | 日付が変わった知らせ | 開いたまま日付を進めて操作 | |
 | 58 | S7 | `task.exhausted.advance` の保存の失敗 | 注入 | |
 | 59 | S8 | 診断済み（通常。節「案内役」あり） | nav の「設定」 | r11 |
@@ -285,8 +285,9 @@ verifier はこの表から受け入れテストを書く。識別子の詳し�
 | 73 | S10 | 空 | 診断直後 | |
 | 74 | S10 | 領域のファイルを読めない行（題名の代わりに ID、`history.row.unavailable`、「選んだ答えを見る」なし） | 2 領域の履歴の seed を `serviceWorkers: 'block'` で開き、setOffline → `nav.history` | r12（D-61 (2)） |
 | 75 | S3 | 返しの読み上げ（VoiceOver） | G3 で Safari の VoiceOver を使い、選択肢を押した後に「正解」/「惜しい」が読まれることを手で確かめる（スクリーンショットではなく記録を残す） | r12（D-48） |
+| 76 | S0 | error（起動で要る課題集のファイルが取れない。`error.tasks.offline` + `task.next.retry`、`error.app.*` なし） | 診断済みの seed（`current` なし）で `serviceWorkers: 'block'` にし、`page.route` で `tasks-<領域>.json` を abort して開く（contracts/test-hooks.md の W-17） | r14 |
 
-状態の数：画面の通常と変種を合わせて 75 行（#17〜22 は 6 型 × 2 配色で 12 枚）。r10 の 54 行から、答えの欄と自己申告に関わる 7 行（r10 の #15、#17〜#20、#30、#52、#54 のうち残したものを除く）を消し、r11 で 26 行を足した。r12：#47 と #56 を S2 の行に置き換え（6 領域では S5 と S7 のオフラインは起きない）、#74（S10）と #75（S3 の読み上げ）を足して 75 行。番号は撮る順ではなく通し番号。
+状態の数：画面の通常と変種を合わせて 76 行（r14：#76 を足した。#17〜22 は 6 型 × 2 配色で 12 枚）。r10 の 54 行から、答えの欄と自己申告に関わる 7 行（r10 の #15、#17〜#20、#30、#52、#54 のうち残したものを除く）を消し、r11 で 26 行を足した。r12：#47 と #56 を S2 の行に置き換え（6 領域では S5 と S7 のオフラインは起きない）、#74（S10）と #75（S3 の読み上げ）を足して 75 行。番号は撮る順ではなく通し番号。
 
 ## 6. 要素と識別子
 受け入れテストが使う。`data-testid` は 7 の文言キーと同じ名前（文字を持たない要素はここで決める）。ルート要素は `data-state`、`data-build-version`、`data-debug-load-ms` を持つ。r10 から変えていない行は要点だけ（詳細は r10）。r11 で消した識別子：`task.answer`、`task.answer.label`、`.help`、`.saved`、`.limit`、`task.report.note`、`task.report.done`、`.tooHard`、`.tooEasy`、`.noTime`、`task.why`、`.how`、`.goal`（と `.text` ×3）、`task.external.badge`、`task.external.tools`（と `.label`、`.item`）、`task.skipped.levelHint`、`.levelChanged`、`settings.stats.tooHard`（と `.value`、`data-stat-too-hard`）、`report.tooHard`、`.tooEasy`、`history.row.answer`、`.answerText`。
@@ -295,7 +296,7 @@ verifier はこの表から受け入れテストを書く。識別子の詳し�
 |---|---|---|---|
 | 共通 | ルート、ヘッダー、nav | r10 と同じ（`data-state`、`data-build-version`、`data-debug-load-ms`、`app.name`、`nav.history`、`nav.settings`） | — |
 | 共通（S1、S3、S4、S7） | 案内役 | `<aside>` `guide.character`（`data-mood`：idle / correct / incorrect / celebrate。`aria-label` は `guide.name` の文字）。中：絵 `guide.sprite`（`aria-hidden="true"`。`<img alt="">` か `<svg>`。表示の幅と高さ 96 CSS px）、名前 `guide.name`（`<p>`）、台詞 `guide.say`（`<p>`。中身は `guide.*` の 1 つ。台詞のキーは `data-testid` にしない：`task.cheer.*` と同じ型） | 「ミル」+ 台詞（絵は読まれない） |
-| S0、S1、S2 | r10 と同じ | `app.loading`、`app.noscript`、`error.app.*`、`diagnosis.*`、`home.*`、`area.*`、`level.*`、`years.*`、`error.diagnosis.required`、`error.storage.*`、r12：S2 の `error.tasks.offline` + `task.next.retry`（`diagnosis.finish` の直上：D-61） | 文言のとおり |
+| S0、S1、S2 | r10 と同じ | `app.loading`、`app.noscript`、`error.app.*`、`diagnosis.*`、`home.*`、`area.*`、`level.*`、`years.*`、`error.diagnosis.required`、`error.storage.*`、r12：S2 の `error.tasks.offline` + `task.next.retry`（`diagnosis.finish` の直上：D-61）。r14：S0 error (3) の `error.tasks.offline` + `task.next.retry`（`error.app.*` は 0 件） | 文言のとおり |
 | S3 | 日付が変わった知らせ、段階の知らせ | `task.dayChanged`（r10 と同じ）、`task.level.adjusted.down` / `.up`（`<p>`。段階が変わった直後の課題だけ。D-60） | 文言のとおり |
 | S3 | 課題の入れ物 | `<article>` `task.today`（`data-task-id`、`data-task-area`、`data-task-level`、`data-task-mode`、`data-task-nth-today`、`data-progress-index`、`data-progress-total`、r11：`data-task-question-index`（答えた問の数 0〜3）、`data-task-question-total`（3）） | — |
 | S3 | 進み具合、日付、題名、meta | `task.progress`、`task.today.label`（か `.nth`）、`task.today.title`（h1）、`task.meta`（r10 と同じ） | 文言のとおり |
@@ -532,8 +533,8 @@ ID の語彙（identifiers.md 5）：図の型の ID は上の 6 つ。申告の
 | task.rate.score | {total} 問中 {n} 問に正解しました | You got {n} of {total} questions right | S4、S5（h1 の直後。text.body。{n} は `data-score`、{total} は 3。r11。AC-42。D-59。「点」「score」を使わない） |
 | task.level.adjusted.down | 直近の課題の正答数に合わせて、段階を{level}にしました。 | Based on your recent answers, the level is now {level}. | S3（段階が下がった直後の課題。`task.progress` の直後。text.body、color.text。r11。AC-8。D-60。禁止語の対象） |
 | task.level.adjusted.up | 直近の 3 件が全問正解だったので、段階を{level}に上げました。 | You answered every question right in the last 3 tasks, so the level is now {level}. | S3（段階が上がった直後の課題。r11。AC-8。D-60） |
-| error.tasks.offline | 課題のファイルをまだ取り込めていません。ネットにつないでから、もう一度進めてください。 | The task file has not been downloaded yet. Connect to the internet, then try again. | S2（`role="alert"`。`diagnosis.finish` の直上。r12：6 領域に分けるので S5、S6、S7 では出ない。AC-23。D-61） |
-| task.next.retry | もう一度進む | Try again | S2（副操作。`error.tasks.offline` の直下。`diagnosis.finish` と同じ処理を呼ぶ。r12。D-61） |
+| error.tasks.offline | 課題のファイルをまだ取り込めていません。ネットにつないでから、もう一度進めてください。 | The task file has not been downloaded yet. Connect to the internet, then try again. | S2（`role="alert"`。`diagnosis.finish` の直上。r12：6 領域に分けるので S5、S6、S7 では出ない。AC-23。D-61）。r14：S0 error (3)（起動で要る課題集のファイルが取れない。`role="alert"`） |
+| task.next.retry | もう一度進む | Try again | S2（副操作。`error.tasks.offline` の直下。`diagnosis.finish` と同じ処理を呼ぶ。r12。D-61）。r14：S0 error (3)（唯一の操作で主操作の塗り。`error.tasks.offline` の直下。起動の判定をやり直す。保存しない） |
 | guide.name | ミル | Miru | 案内役の名前（`guide.character` の `aria-label` と、台詞の上の小さな文字。text.small、color.guide。r11。D-53） |
 | guide.intro | 3 問に答えてください。今日の一手を決めます。 | Three questions, then today's move. | S1（idle。r11。D-55） |
 | guide.correct.1 | そのとおりです。理由も読んでおきましょう。 | That is it. Read the why, too. | S3 の問 1 の正解の返し（correct。r12：問の番号で選ぶ。D-55） |
@@ -569,7 +570,7 @@ ID の語彙（identifiers.md 5）：図の型の ID は上の 6 つ。申告の
 - 性格語が表れている場所（調査 5。r3 で 6 語）：
   - ひとつ：S3 に未回答の問は常に 1 つだけ（D-46）。申告の操作は `task.skip` の 1 つ（D-3）。図は導入に 1 つ（問の図は任意）。案内役は 1 体で、1 画面に 1 か所（D-53）。
   - 静か：地が 1 色で、カード、影、グラデーション、吹き出し、背景の模様がない（tokens 1、D-50、D-54）。動きは不透明度 150 ms と S4 の演出だけ（D-13、D-57）。色が付く所は次の一覧がすべて：
-    - color.action.primary：主操作の塗り（`diagnosis.start.begin`、`diagnosis.next` / `.finish`、`task.question.next`、`task.summary.open`、`task.exhausted.advance`（levelDone）、`task.exhausted.redo`（allDone）、`settings.export`、保存データなしの S8 の `settings.import`、`history.empty.action`、`error.app.reload`）、リンクの文字、radio と checkbox の `accent-color`。color.focus（同じ値）はフォーカスの枠。
+    - color.action.primary：主操作の塗り（`diagnosis.start.begin`、`diagnosis.next` / `.finish`、`task.question.next`、`task.summary.open`、`task.exhausted.advance`（levelDone）、`task.exhausted.redo`（allDone）、`settings.export`、保存データなしの S8 の `settings.import`、`history.empty.action`、`error.app.reload`、r14：S0 error (3) の `task.next.retry`）、リンクの文字、radio と checkbox の `accent-color`。color.focus（同じ値）はフォーカスの枠。
     - color.success：`task.answer.result.correct` の文字と印、正解の選択肢の印と `task.choice.tag.correct`、`settings.export.done`、S4 の完了の印、節目の `task.cheer`（D-43、D-36、D-48）。
     - color.warning：`settings.storage.notPersisted`、`home.addToHomeScreen.title`、`task.dayChanged`（D-30）。
     - color.error：エラーの文（`error.*`。`error.tasks.offline` を含む）、取り消せない操作のボタン。
@@ -642,6 +643,16 @@ U-5〜U-22 の記録（決まったことを含む）は r10 と同じで、git 
 - U-30（Takuma、G3 で見てもらう）：ミルの返しの台詞を正誤 3 本ずつにし、問の番号で選ぶ（D-55。design-reviewer r5 の 7：毎回同じ 1 文だと飾りに寄る）。6 本の文（7 の `guide.correct.1`〜`.3`、`guide.incorrect.1`〜`.3`）と `guide.rate.score1` の言い換えを G3 の画面で見て、口調が合わなければ文だけ替える（戻せる。40 字と禁止語の検査は AC-45 のまま）。
 
 ## 11. 変更の記録
+### G1 r13 → r14（G1 reviewer（設計）r3 の重大 1 と、tech-lead の契約の直し（コミット a8e900c。contracts/test-hooks.md の W-17、contracts/data.md の 4「課題集のファイル」）。指揮役の指示書 2026-11-08）
+- 前書き：r14 の要約。
+- 1：判定順に「あり → 要る課題集のファイルを読み終えてから。取れない → S0 error (3)」、S0 error の行に (3) と `task.next.retry`、S7 の「別の領域を選ぶ」に AC-23 の 3 通り目の入口であること。
+- 2：AC-23 の 3 通り目を S8 → S2 から S7 → S2 に（「出し終えた」seed、`task.exhausted.redo`、1 問目の確定の前に setOffline）。今日の課題がある S3 から `settings.redo` で入ると、やり直しの後も前の領域の S3 に戻り、期待とぶつかるため（重大 1）。
+- 3：S0 の仕事、主操作（error (3) では `task.next.retry`）、`<p role="alert">`。
+- 4：D-61 にファイルが要る場面 (3) 起動を足した。
+- 5：S0 のエラーの欄に (3)、オフラインの欄に注記。5.1：#56 の入口を S7 に、#76（S0 error (3)）を足して 76 行。
+- 6、7：S0 の行と `error.tasks.offline`、`task.next.retry` の使う場所に S0 error (3)。新しい文言キーはない（194 キーのまま）。
+- 8：color.action.primary の塗りに S0 error (3) の `task.next.retry`。
+- 実行したコマンド（2026-11-08）：`python3 -I scratchpad/edit_r14.py`（置換がそれぞれ 1 回だけ一致）と `python3 -I scratchpad/check_tables_r14.py`（表の列数）。
 ### G1 r12 → r13（design-reviewer r6（PASS 14 / 16）の要修正 2 と提案 2。指揮役の決定 2026-11-06：要修正 1 は (b)。指揮役の指示書 2026-11-06）
 - 前書き：r13 の要約。
 - 2：AC-23 の 3 通り目の手順を「3 問目を選び、先読みを待たずに（contracts/test-hooks.md の手順）setOffline」にした（要修正 1 の (b)。先読みを止める手順そのものは tech-lead が contracts/test-hooks.md に書く）。
