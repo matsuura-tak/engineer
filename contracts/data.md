@@ -1,6 +1,6 @@
 # 保存データの決まり（001-daily-learning）
 
-形は schemas/data.schema.json（formatVersion 1。2026-11-06 に PRD r13 の 3 問 × 3 択の形に作り直した：ADR 0002 の改訂 2）です。ここには、スキーマで書けない読み書きの決まりを書きます。
+形は schemas/data.schema.json（formatVersion 1。2026-11-06 に PRD r13 の 3 問 × 3 択の形に作り直した：ADR 0002 の改訂 2。2026-11-08 に同じ改訂 2 の中で、段階の規則の数え始め `levelStart` を足した：5）です。ここには、スキーマで書けない読み書きの決まりを書きます。
 判断の理由は docs/adr/0002-storage-localstorage-single-key.md にあります。
 
 ## 1. 置き場所
@@ -21,14 +21,14 @@
 | 案内役の表示を切り替える（S8 の `settings.character.show.input`。D-56） | トップレベルの `showCharacter` に切り替えた後の値（true も書く）。保存データが「なし」でキーがなければ、`{ formatVersion: 1, app, diagnosis: {}, levels: {}, history: [], showCharacter }` を書く。`firstOpenDate` は書かず、3 の区分は変わらない（見本：fixtures/data/v1/valid-show-character-only.json） | はい |
 | 初回の診断で 1 問目、2 問目を確定する | `diagnosis.area`、`diagnosis.level`。「なし」の状態で 1 問目を確定する保存では、`firstOpenDate` に今日も書く | はい |
 | 初回の診断で 3 問目を確定する（診断を終える） | `diagnosis.years`、`diagnosis.completedOn`、`levels[area]`、今日の課題（`current`。`answers` は空の配列）、印がなければ `device.persistRequested: true`（11）。領域のファイルを読み終えてから保存する（4 の「課題集のファイル」） | はい（まとめて 1 回） |
-| やり直しの診断を終える | `diagnosis` を新しい回答で置き換え、`levels[area]`。保存データに今日の `current` がなければ、4 の「操作で出す」で新しい組から選んだ課題を `current` に（そのとき印がなければ `device.persistRequested: true` も。11）。選べなければ `current` は書かない（S7） | はい（まとめて 1 回） |
+| やり直しの診断を終える | `diagnosis` を新しい回答で置き換え、`levels[area]`。`levels[area]` の値が変わったとき（前になかったときを含む）は、`levelStart[area]` にその時点の `history` の行数も（5 の段階の規則の数え直し。同じ段階を選び直したときは書かない）。保存データに今日の `current` がなければ、4 の「操作で出す」で新しい組から選んだ課題を `current` に（そのとき印がなければ `device.persistRequested: true` も。11）。選べなければ `current` は書かない（S7） | はい（まとめて 1 回） |
 | 起動時に日付が変わった課題を移す、今日の課題を出す | `history` に 6-1 の `none` の行を足す、`current`。`current` を作るとき印がなければ `device.persistRequested: true`（11） | はい（まとめて 1 回） |
 | 選択肢を押す（問 1、問 2。`task.choice`） | `current.answers` の末尾に `{ choice, correct }` を足す。`choice` は押した選択肢の `data-choice-index`、`correct` は課題集のその問の `answer` と `choice` が同じか | はい |
 | 選択肢を押す（問 3） | `current` を外し、`history` の末尾に `done` の行を足す：`current` の `date`、`taskId`、`area`、`level`、`mode`、`answers`（3 件）、`score`、`helpful: "unanswered"`。5 の段階の規則で `levels[a]` が動けば、`levels[a]` と、その行の `levelChange` も | はい（まとめて 1 回） |
 | 「今日はやめておく」`task.skip` | `current` を外し、`history` の末尾に `no_time` の行（`answers` は答えた分の 0〜2 件のまま、`score`）。段階の規則は当てない（規則は `done` の行だけを見る） | はい |
 | 「役に立ったか」に答える（S4） | その行の `helpful` | はい |
 | 「次の一手に進む」`task.next`（S5、S6） | 4 の「操作で出す」で選んだ課題を `current` に。印がなければ `device.persistRequested: true` も（11）。選べなければ保存しない（S7 を描くだけ。変える値がない） | はい |
-| 「次の段階に進む」`task.exhausted.advance`（S7 の levelDone） | `levels[a]` を 1 段上げ（`beginner` → `intermediate` → `advanced`）、4 の「操作で出す」で新しい組から選んだ課題を `current` に（印がなければ `device.persistRequested: true` も。11）。選べなければ上げた `levels[a]` だけを保存し、新しい段階の S7 を描く（中級なら levelDone、上級なら allDone。design の D-40） | はい（まとめて 1 回） |
+| 「次の段階に進む」`task.exhausted.advance`（S7 の levelDone） | `levels[a]` を 1 段上げ（`beginner` → `intermediate` → `advanced`）、`levelStart[a]` にその時点の `history` の行数（5）、4 の「操作で出す」で新しい組から選んだ課題を `current` に（印がなければ `device.persistRequested: true` も。11）。選べなければ上げた `levels[a]` と `levelStart[a]` だけを保存し、新しい段階の S7 を描く（中級なら levelDone、上級なら allDone。design の D-40） | はい（まとめて 1 回） |
 | 読み込みで置き換える | ファイルの中身（`showCharacter` もファイルの値。ファイルになければ書かない＝true と読む。`device` はこのブラウザの値を残す） | はい |
 | すべて削除 | `localStorage.removeItem('kyounoitte:data')`（setItem ではない）。`showCharacter` も消え、既定の表示に戻る | — |
 
@@ -100,8 +100,12 @@
   - `task.next.retry` を押すと、4 の判定を 2 からやり直します（`getItem` を読み直し、取れなかったファイルを取り直す）。読めたら 6 の行き先を描きます。
   - 起きるのは、SW がこのページを制御していない起動（初めての訪問の install が終わる前に、HTTP の cache から開いた）か、サーバーが 2xx を返さないときだけです。SW の install は FILES を `cache.addAll` でまとめて貯め、1 つでも取れなければ失敗する（service-worker.md の 3）ので、SW が制御している起動では、殻と 6 ファイルは同じ cache にそろっています。
   - 選ばなかった案：(a) 課題の中身なしで S3 / S5 を描く（題名、問、選択肢がなく、答えられない画面になる）。(b) 6-1 の移しだけ先に保存する（取り直しの後にもう一度 6 を通るので、「あり」の起動で最大 1 回の保存（2）が 2 回になる）。
-  - design の 5.1 にこの状態の行がまだありません（未解決。designer に 5.1 の行と、スクリーンショットの手順を足してもらう）。
+  - design r13 の 5.1 と S0 の行にこの状態がまだありません。行の文案は 2026-11-08 に tech-lead が指揮役に渡しました（G1 reviewer r3 の要修正 6。designer が足す）。作り方は test-hooks.md の W-17 の「S0 error の 3 つ目」です。
 - 初回とやり直しの診断（S2）：1 問目を確定した時点でその領域のファイルを取り始め、`diagnosis.finish` で待ちます。取れなければ S2 を 3 / 3 のまま変えず、radio の回答を保ち、保存せず、`diagnosis.finish` の直上に `error.tasks.offline` と `task.next.retry` を出します（`task.next.retry` は `diagnosis.finish` と同じ処理。D-61 の (1)）。
+  - 今日の `current` があるやり直し（終えた後は `current` のまま S3。2 の「終えた後の行き先」）でも、`diagnosis.finish` は新しい領域のファイルを待ちます（2026-11-08 に決めた。G1 reviewer r3 の提案「課題を選ぶときだけ待つ」は採らない。ADR 0006 の「中身」）。
+    - 理由：待たないと、その日の `task.next`（S5 / S6）が新しい領域のファイルを初めて要る操作になり、下の「`task.next` と advance はファイルを取り直さない」が崩れて、失敗の場所が 4 つ目（S5 / S6 の `task.next`）に増えます。S2 で止まれば、回答を保ったまま `task.next.retry` で取り直せます。
+    - 悪い結果：SW が貯め終える前のオフラインで、今日の課題が残っているのに、やり直しを終えられないことがあります（今日の課題には影響しません。`diagnosis.cancel` で元の診断のまま戻れます）。
+    - 見直す条件：公開後に、この場面の `error.tasks.offline` の報告が 1 件でも来る（ADR 0006 の見直す条件と同じ線）。
 - 履歴（S10）：行の領域のファイルを取ります。取れない領域の行は D-61 の (2)（題名の代わりに ID、`history.row.unavailable`、`data-title-unavailable="true"`、`history.row.answers` を出さない）。S10 は保存しません。
 - `task.next` と `task.exhausted.advance` はファイルを取り直しません（同じ領域のファイルに全段階がある）。
 
@@ -116,8 +120,8 @@
 ### 操作で出すとき（`task.next`、`task.exhausted.advance`、やり直しの診断を終えて今日の `current` がないとき）
 - 6 の 2 と 3（今日の `current`、今日の行）を見ずに、6 の 4 へ進みます。選べたら `current` に入れて保存し（2 の表。1 回）、S3。選べなければ S7 です。
   - `task.next` で選べないとき：保存しません（変わる値がない）。
-  - advance で選べないとき：上げた `levels[a]` だけを保存し、新しい段階の S7 です。
-  - やり直しで選べないとき：新しい `diagnosis` と `levels[area]` だけを保存し、S7 です。
+  - advance で選べないとき：上げた `levels[a]` と `levelStart[a]` だけを保存し、新しい段階の S7 です。
+  - やり直しで選べないとき：新しい `diagnosis` と `levels[area]`（変わったときは `levelStart[area]` も）だけを保存し、S7 です。
 - 選ぶ組は、そのときの `diagnosis.area` と `levels[a]` です（5）。3 問目の保存で段階が動いた直後の `task.next` は、新しい段階から選びます（AC-8 の 9 通り目）。
 - 押す前に日付が変わっていたら、操作はせず、下の「画面を開いたまま日付が変わったとき」に進みます。
 - 出せる数に上限はなく、確認も出しません（PRD Q15 は A。AC-33）。
@@ -152,16 +156,20 @@
 - 候補：課題集のうち `area = a` かつ `level = L` で、ID が `history` のどの行にも `current` にもないもの。
 - 選ぶ：候補のうち ID が最も小さいもの（文字列の比較。3 桁の 0 埋めなので番号の順と同じ）。`mode` で順番を変えない（PRD 11）。
 - 段階の規則（3 問目に答えた `done` の行を保存するときに、その 1 回の保存の中で行う。AC-8。PRD 11 の冒頭の「段階の規則」。2026-11-06 に正答数に置き換えた）：
-  1. 新しい行の領域を `a`、今の段階を `L = levels[a]` とします（`diagnosis.area` ではなく行の領域。S3 のまま診断をやり直した課題でも同じ）。
-  2. 新しい行を含む `history` のうち、`area` が `a` の行を新しい順（配列の後ろから）に見て、次のどちらかに当たるまでの行を取ります。当たった行は取りません。
+  1. 新しい行の領域を `a`、今の段階を `L = levels[a]`、数え始めを `S = levelStart[a]`（なければ 0）とします（`diagnosis.area` ではなく行の領域。S3 のまま診断をやり直した課題でも同じ）。
+  2. 新しい行を含む `history` のうち、`area` が `a` の行を新しい順（配列の後ろから）に見て、次のどれかに当たるまでの行を取ります。当たった行は取りません。
      - `level` が `L` と違う行（段階が変わる前の行。進級、やり直しの診断、規則で段階が動いた後は、新しい段階の行から数え直す。D10）。
      - `levelChange` を持つ行（規則で段階が動いた行。そこから先は動く前の流れ。下がった先の組を出し終えてすぐ進級したときなど、間に新しい段階の行がなくても数え直すため）。
+     - 行の番号（`history` の配列の位置。0 から）が `S` より小さい行（やり直しの診断か進級で `levels[a]` が変わる前の行。2026-11-08 に足した：G1 reviewer r3 の要修正 2、委任の決定 (a)）。間に別の段階の行がなくても数え直すためです。例：中で done（score 1）→ やり直しで同じ領域の初を選ぶ（初の組は出し終えていて S7。行は増えない）→ S7 の advance で中に戻す → 中で done（score 0）。1 つ目と 2 つ目の止まる行は間にないが、advance の保存で `S` が中の行の次の番号になるので、取る行は新しい 1 行だけで、下げない（PRD 11 の「段階が変わった後は新しい段階の行から数え直す」「進級は数え直しの起点」）。
   3. 取った行のうち `report` が `done` の行だけを、新しい順のまま並べます（`no_time` と `none` の行は数えず、流れも切らない）。
   4. 下げる：並びの先頭 2 行がどちらも `score` 1 以下 → `L` が `beginner` でなければ 1 段下げる。上げる：先頭 3 行がどれも `score` 3 → `L` が `advanced` でなければ 1 段上げる。新しい行は先頭にあるので、両方に当たることはありません。
   5. 動いたら、`levels[a]` を動いた先にし、新しい行に `levelChange`（`down` か `up`）を書きます。`beginner` で下げる、`advanced` で上げるに当たったときは動かず、`levelChange` も書きません。
   6. 変わった段階は次に出す課題から効きます（同じ日の `task.next` でも、翌日の 6-4 でも）。表示中の返しと S4 は変えません（`current` はもうない）。
-- 進級（`task.exhausted.advance`。PRD 11 の冒頭の「修了と進級」）：`levels[a]` を 1 段上げます。規則とは別の操作で、`levelChange` は書きません。段階が変わるので、上の 2 により「連続」はそこから数え直しです。上級では advance を出しません（allDone）。
-- 規則の外に残る場合：やり直しの診断で段階を変え、その段階の行を 1 つも作らないうちに元の段階に戻したときは、2 の止まる行がないので、前の行から数え続けます（変えた事実を保存しないため。起きるのは、やり直しを 2 回続けたときだけ）。
+- 進級（`task.exhausted.advance`。PRD 11 の冒頭の「修了と進級」）：`levels[a]` を 1 段上げ、`levelStart[a]` にその時点の `history` の行数を書きます。規則とは別の操作で、`levelChange` は書きません。上の 2 の 3 つ目により「連続」はそこから数え直しです。上級では advance を出しません（allDone）。
+- やり直しの診断：`levels[area]` の値が変わったときだけ `levelStart[area]` を書きます（2 の表）。同じ段階を選び直したときは段階が変わらないので数え直しません（PRD 11 の「段階が変わった後は」）。
+- `levelStart` を書くのは、この 2 つの操作だけです。規則で段階が動いたとき（5）は書きません（その行の `levelChange` が 2 の 2 つ目で同じ役をする）。日付が変わった移し（4 の 6-1）、`task.skip`、`task.next` は `levels` を変えないので書きません。
+- 規則の外に残る場合：ありません。段階が変わる操作は、規則（`levelChange`）、進級とやり直し（`levelStart`）の 3 つだけで、どれも止まる行か数え始めを保存します。前は「やり直しを 2 回続けたとき」と書きましたが、それだけでなく上の例の経路（やり直しで出し終えた段階を選んで advance で戻す）でも起きていました（G1 reviewer r3 の要修正 2）。どちらも `levelStart` で数え直します。
+  - 確かめ：スクラッチパッドの模型（この 5 の 1〜5 と 2 の表の保存を書いたもの）で、AC-8 の seed 11 件（下の表の 10 通り）、上の例の経路、やり直し 2 回、同じ段階のやり直し、下がった直後の advance、上げる側の数え直しがどれも期待どおり（設計メモの 4）。
 - 段階が変わった知らせ（D-60。`task.level.adjusted.down` / `.up`）：S3 を描くとき、`history` の最後の行 `r` が `levelChange` を持ち、`current` の `area` が `r.area` と同じで、`current.level` が `r.level` から `r.levelChange` の向きに 1 段動いた段階なら、その向きの 1 文を置きます（`{level}` は `level.<current.level>` の文言）。それ以外は置きません。保存した事実だけで決めるので、再読み込みしても同じで、次の課題（`r` が最後の行でなくなる）からは出ません（G1 tech-lead r3 の提案 6）。
 - AC-8 の 9 通りは、この規則で次のとおりになります（seed の各行の `level` は、その課題が出たときの段階。目標の領域は `backend`）。
 
@@ -176,8 +184,9 @@
 | 7 | 初。初 done 0 ／ 上。上 done 3、上 done 3 | 0 ／ 3 | 初 ／ 上 | 5 の端では動かない |
 | 8 | 中（`levels`）。上 done 1、上 done 1（`levelChange: down`） | 0 | 中 | 2 で上の行（段階が違う）に当たって止まる。取った行は新しい 1 行だけ |
 | 9 | 中。前日 中 done 3。画面で 2 件 | 1、1（同じ日） | 初（`task.level.adjusted.down` が見える） | 4 の下げる。2 件目の行に `levelChange: down` |
+| 10（PRD の AC-8 の 9 通りの外。PRD 11 の数え直しの確かめ） | 中（`levels`）、`levelStart.backend` 8。初 done 2 を 7 行、中 done 1（番号 7）。今日の `current` は中 | 0 | 中 | 2 の 3 つ目で番号 7 の行に当たって止まる（中で done 1 → やり直しで初（S7）→ advance で中、の後の形）。`levelStart` を読まないと初に下がる |
 
-  - 見本の seed は fixtures/seeds/ の `seed-ac8-<通り>-*.json`（10 件。7 通り目は 7a 初級と 7b 上級の 2 件）。2026-11-06 に answers と score の形で作り直し、check:contracts で形を、この表の規則を当てる手書きの計算で「次の段階」を確かめた（設計メモの 4）。使い方は test-hooks.md の W-7。
+  - 見本の seed は fixtures/seeds/ の `seed-ac8-<通り>-*.json`（11 件。7 通り目は 7a 初級と 7b 上級の 2 件。10 通り目は 2026-11-08 に足した `seed-ac8-10-restart-after-redo-advance.json`）。2026-11-06 に answers と score の形で作り直し、check:contracts で形を、この表の規則を当てる手書きの計算で「次の段階」を確かめた（設計メモの 4）。使い方は test-hooks.md の W-7。
 
 ### S7 の変種と補足の 1 文（design の D-40。AC-10）
 S7 を描くときの組を `a = diagnosis.area`、`L = levels[a]` とします。
@@ -226,6 +235,7 @@ S7 を描くときの組を `a = diagnosis.area`、`L = levels[a]` とします�
 - `levelChange` は 5 の規則で `levels[area]` を動かした `done` の行にだけ書く（進級とやり直しの診断では書かない）。スキーマは、`done` 以外の行の `levelChange`、`beginner` の行の `down`、`advanced` の行の `up` を拒む。
 - `answers` の順は問の順。`done` の行は 3 件、`no_time` と `none` の行と `current` は 0〜2 件（スキーマで検査する）。
 - 診断済みなら `levels[diagnosis.area]` がある。
+- `levelStart[a]` は `history` の行数以下で、`levels[a]` がある領域にだけ書く（5。check-schemas.mjs が見本で確かめる）。行を消さないので、書いた後も番号はずれません。
 
 ## 9. 統計と画面の数の数え方（AC-24、AC-33、AC-35〜AC-37、AC-41、AC-42。identifiers.md の 4）
 統計（S9 の `data-stat-*`。13 個。2026-11-06 に `too-hard` を外し、正誤の 3 つを足した。design の D-63）：

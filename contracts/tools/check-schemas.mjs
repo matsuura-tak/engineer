@@ -51,6 +51,11 @@ function semantic(doc) {
   const ids = [...h.map((r) => r.taskId), ...(doc.current ? [doc.current.taskId] : [])];
   if (new Set(ids).size !== ids.length) errs.push('同じ taskId が 2 回出ている');
   if (doc.diagnosis.completedOn && !doc.levels[doc.diagnosis.area]) errs.push('診断済みなのに levels に目標の領域がない');
+  // 段階の規則の数え始め（data.md の 5 と 8。2026-11-08）：history の行数以下で、levels にある領域だけ
+  for (const [a, i] of Object.entries(doc.levelStart ?? {})) {
+    if (i > h.length) errs.push(`levelStart.${a}（${i}）が history の行数（${h.length}）より大きい`);
+    if (!doc.levels[a]) errs.push(`levelStart.${a} があるのに levels.${a} がない`);
+  }
   return errs;
 }
 

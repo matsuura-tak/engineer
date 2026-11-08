@@ -1,7 +1,7 @@
 # ADR 0002：保存は localStorage のキー 1 つ。形は版番号つきで書き出しと同じにし、ID は最初の公開から変えない
 
 - 状態：提案（G1 で reviewer が判定する。2026-11-06 の改訂 2 に反論を出してもらう）
-- 書いた役：tech-lead　日付：2026-10-30（2026-11-06 に改訂 2：FB 2 回目で保存の形を作り直し、formatVersion 1 のままにすると決めた。下の「改訂 2」。PRD r13、design r13。2026-11-05 に改訂：ID を凍結する時点を「最初の公開から」にし、公開前の課題 ID の付け替えと経験年数 `never` の追加を formatVersion 1 のまま行うと決めた。PRD r10、design r8）
+- 書いた役：tech-lead　日付：2026-10-30（2026-11-06 に改訂 2：FB 2 回目で保存の形を作り直し、formatVersion 1 のままにすると決めた。2026-11-08 に改訂 2 の中で `levelStart` を足した。下の「改訂 2」。PRD r13、design r13。2026-11-05 に改訂：ID を凍結する時点を「最初の公開から」にし、公開前の課題 ID の付け替えと経験年数 `never` の追加を formatVersion 1 のまま行うと決めた。PRD r10、design r8）
 - 関係する PRD、設計メモ、契約：docs/prd/001-daily-learning.md（r13。改訂 2 は AC-8、AC-19、AC-20、AC-23、AC-31、AC-32、AC-42、AC-45 も。r10 の時点では 9 の課題集の行、10 のはまりやすい所、11、12、AC-4、AC-40）、docs/adr/features/001-daily-learning.md、contracts/data.md、contracts/schemas/data.schema.json、contracts/identifiers.md の 5
 - 元に戻す手間：大（利用者のブラウザにある保存データと、書き出したファイルを読み続ける必要がある）
 
@@ -37,6 +37,15 @@
   - `current`：`answers`（0〜2 件。1 問答えるごとに 1 回の setItem。AC-32）を必須にする。3 問目に答えたら `current` を外し、`done` の行（`answers`、`score`、あれば `levelChange`）と `levels` を 1 回の setItem で書く。
   - トップレベルに任意の真偽値 `showCharacter` を足す（ないときは true と読む）。`device` に入れない：読み込み（AC-20）は `device` だけこのブラウザの値を残すので、`device` に入れると読み込んだファイルの「非表示」が効かない（G0 tech-lead r5 の表、G1 tech-lead r3 の 3 の U-25）。
   - 正誤は答えたときに行へ書く。公開の後に課題の中身が直っても、統計（S9）と段階の規則の結果が変わらないようにするため（G0 tech-lead r5 の 2 の (2)）。
+  - トップレベルに任意の `levelStart`（領域ごとの 0 以上の整数）を足す（2026-11-08 に足した。この改訂 2 の中で行い、3 度目の作り直しにしない：G1 reviewer r3 の要修正 2、docs/approvals/delegation.md の 2026-11-08 の決定 (a)）。
+    - 意味：段階の規則（data.md の 5）の「数え始め」。`history` の行の番号で、これより前の行はその領域の規則で数えない。やり直しの診断を終える保存で `levels[領域]` の値が変わったときと、`task.exhausted.advance` の保存で、その時点の `history` の行数を書く。ない領域は 0 と読む。
+    - 理由：やり直しと進級では行が増えないことがある（やり直しで出し終えた段階を選ぶと S7 になり、そこで advance すると元の段階に戻る）。行だけを見る規則では、段階が変わった事実が残らず、前の段階の行から数え続けて下げてしまう（reviewer の模型で「中 done 1 → やり直し 初 → advance 中 → 中 done 0」が初に下がった）。PRD 11 の「段階が変わった後は新しい段階の行から数え直す」「進級は数え直しの起点」をそのまま満たすには、変わった事実を保存するしかない。
+    - 案（levelStart の形）：
+      - (L1) 領域ごとの行の番号（採用）：行は消さない（data.md の 8）ので番号はずれない。1 回の setItem の中で書け、読み込みと書き出しでもそのまま運ばれる。検査は「行数以下」と「levels にある領域だけ」の 2 つ（check-schemas.mjs）。悪い点：配列の位置に意味を持たせるので、将来に行を消す・並べ替える機能を作るなら一緒に直す必要がある。
+      - (L2) 次に出す課題（`current`）に印を付け、行に移すときに運ぶ：advance や やり直しで選べず S7 になったときは `current` がないので、印を置く場所がなく、別の「保留の印」が要る。
+      - (L3) 段階が変わった日付を持つ：同じ日に何行でも並ぶ（AC-33）ので、日付では行の境目を決められない。
+      - (L4) 規則の外として許す（reviewer の (b)）：PRD 11 と食い違ったまま公開することになり、委任の決定で退けた。
+    - いちばん強い反論：版 1 を公開前に 3 回変えたのと同じではないか。答え：2026-11-06 の改訂 2 は G1 が PASS する前の作り直しで、今回はその改訂の中身を足す変更（任意の項目を 1 つ足すだけで、2026-11-06 の後に作った正しいデータはすべてそのまま通る）。2026-11-08 12:16 JST に `curl -sI https://matsuura-tak.github.io/engineer/` は `HTTP/2 404`、`git ls-tree -r --name-only origin/main | grep -c '^backend/public/'` は `0` で、まだ公開していない。
 - 手元に残っている古い形の版 1 のデータ（2026-11-06 より前のアプリで作った、`history` か `current` を持つもの）は、新しいスキーマで弾かれて S0 error になる（`answer` は知らない項目、`answers` と `score` がない、`too_hard` と `too_easy` は知らない値）。S0 error の「そのまま書き出す」と「削除」で片付ける（data.md の 4）。黙って読み替えない（(d) を選ばなかった理由と同じ側）。
 - `diagnosis`、`levels`、`device`、`firstOpenDate` だけのデータ（`history` が 0 行で `current` がない）は、形も意味も同じなので新しい形でも通る。
 - 2,000 字の `answer.max`（下の「一緒に決めたこと」の U-6）と、答えの欄の `task.answer`（U-11）はこの改訂でなくなる。上限の見積もり（data.md の 10）は、1 行が数百字に縮むので次の回の data.md で書き直す（課題集の件数（v1 は 126 件、2026-12-21 の版で 168 件）の行でも WebKit の上限の 1 割未満の見込み［推測］）。
@@ -61,6 +70,7 @@
 - G1 が終わる前に公開した（`curl -sI https://matsuura-tak.github.io/engineer/` が 404 でない）なら、この改訂は formatVersion 2 に上げる形で書き直す。
 - 公開（2026-12-07 の仮置き）の後に保存の形を変えるときは、必ず版を上げる。公開前にもう一度形を変えるなら、(i) を 3 度目に使わず、(iii) を選ぶ（例外を足してでも決まりを守る）。
 - Takuma の手元で、削除の後も古い形のデータが残っていた（書き出しファイルに `"answer"` がある）。
+- `levelStart`：行を消す、並べ替える、まとめる機能を作る（番号の意味が崩れる）。または、段階を変える操作を規則、進級、やり直しの 3 つのほかに足す（その操作でも `levelStart` を書くかを決め直す）。
 
 ### 確かめたこと（改訂 2）
 - 未公開であること（2026-11-06 23:08:36 JST、tech-lead）：`curl -sI https://matsuura-tak.github.io/engineer/` →
@@ -147,6 +157,7 @@ content-length: 9115
 - 付け替えと `never` の後の契約の検査（2026-11-05、tech-lead）：`cd backend && npm run -s check:contracts` → `見本 52 件、期待と違う結果 0 件`、終了コード 0。`never` を持つ見本 data/v1/valid-same-day-rows-never.json は通り、知らない years の data/invalid-unknown-years.json は `data/diagnosis/years must be equal to one of the allowed values` で落ちた。
 - `node contracts/tools/check-schemas.mjs`（ajv 8.20.0、Ajv2020 の strict）：data.schema.json はメタスキーマに通り、data の見本 22 件（valid 5、seed 3、invalid 14）がすべて期待どおり（2026-10-30、firstOpenDate の見本 4 件を足した後。足す前は 18 件）。出力は設計メモの 4。
 - `firstOpenDate` の条件（2026-10-30、スクラッチパッドの ajv 8.20.0）：`device` だけ → true、`device` だけ＋persist の印 → true、`device` だけ＋1 問目で `firstOpenDate` なし → false（`/diagnosis must NOT have more than 0 properties`）、同じく `firstOpenDate` あり → true。072d0e3 の形で通った・落ちた data と seed の見本 18 件は、今の形でも合否が 18 件とも同じ（緩めただけ）。
+- `levelStart` の確かめ（2026-11-08、tech-lead）：スクラッチパッドの模型（data.md の 5 の 1〜5 と 2 の表の保存をそのまま書いたもの。`…/scratchpad/tl/rule2.mjs`）を fixtures/seeds に当てた。AC-8 の seed 11 件がすべて表のとおり、10 通り目の seed は `levelStart` を読まないと `beginner`（改める前の規則）で、読むと `intermediate`。reviewer の経路、やり直し 2 回、同じ段階のやり直し（数え直さない）、下がった直後の advance、上げる側も期待どおりで `NG 0 件`。`cd backend && npm run check:contracts` は `見本 127 件、期待と違う結果 0 件`（新しい見本 5 件：valid 1、seed 1、invalid 3）。
 - tech-lead G0 r1 の spike 4（setItem の失敗の注入）と G1 r1 の spike 2（版を差し替えても履歴 3 件が残った）。
 - localStorage の上限の数字（2026-11-03、Playwright 1.64.1 で 1 つのキーに入る値の長さを測った）：Chromium 156 は 5,242,865 字、WebKit 27.2 は Latin-1 の字だけなら 5,242,865 字、日本語を含むと 2,621,432 字。超えると setItem が QuotaExceededError を投げ、前の値は残る。数字と前提は data.md の 10。ブラウザの公式な数字、本物の Safari 17 の値、この origin を共有する他のページが使う分は未確認（実機の G4 でも測らない。見直す条件で監視する）。
 

@@ -1,6 +1,6 @@
 # ADR 0007：JS は esbuild（devDependency、版を固定）で 1 ファイルにまとめて配る。sw.js は別のまま
 
-- 状態：提案（G1 で reviewer が反論を出す。指揮役の仮の決定 2026-11-06 を受けて書いた）。承認されたら ADR 0001 の「まとめずに配る」「JS 15 ファイルまで」と見直しの線 27,000 を置き換える
+- 状態：承認（2026-11-08、委任。指揮役の委任指示書による。G1 reviewer r3 の指摘を直した後、reviewer r4 で確かめる前提。2026-11-06 は提案）。ADR 0001 の「まとめずに配る」「JS 15 ファイルまで」と見直しの線 27,000 を置き換える
 - 書いた役：tech-lead　日付：2026-11-06
 - 関係する PRD、設計メモ、契約：docs/prd/001-daily-learning.md（r13。12、AC-15、AC-28）、docs/adr/0001（見直しの記録の (iii)）、docs/adr/0003、docs/adr/0005、contracts/budgets.md の 1 と 3、contracts/service-worker.md の 3、contracts/dependencies.md、docs/adr/features/001-daily-learning.md
 - 元に戻す手間：小〜中（build.mjs のまとめる処理を外し、modulepreload と FILES を戻す。1 日。ソースの ES modules はそのまま残すので、コードの書き直しは要らない）
@@ -64,10 +64,14 @@
   - esbuild の版を上げるときは、dependencies.md の表と推移的な依存の表を直し、受け入れテストを 2 つのエンジンで流す。
   - Linux の CI（`npm ci` で入る `@esbuild/linux-x64`）で動くかは未確認。CI は Takuma が持つ（.github/）。
   - npm 12 の `install-scripts` の警告は毎回出る。approve はしない（下の dependencies.md の決まり）。
+  - 受け入れテストを単独で動かす前に `cd backend && npm ci` が要る（2026-11-08 に足した。G1 reviewer r3 の要修正 5）。受け入れテストの global-setup は backend/scripts/build.mjs を動かし、build.mjs が backend/node_modules の esbuild を読むため。今の build.mjs は node: の組み込みだけを読むので、この ADR の前は要らなかった。
+    - ADR 0004 は案 A を「受け入れテストのフォルダの外の依存に頼る」として退けた。ここで生まれる向き（受け入れテスト → build.mjs → backend の devDependency）は、それとは別の向きとして受け入れる。理由：受け入れテストが確かめるのは、配る物を作る build.mjs の出力そのもので、ビルドの道具を受け入れテストのフォルダにもう 1 つ入れると、テストと本番で違う版の esbuild でまとめることがあり得る。テストの道具（@playwright/test、@axe-core/playwright、ajv）は今までどおり受け入れテストのフォルダだけに置く。
+    - 分かる文で止める：global-setup（verifier が書く）は、build.mjs の import か esbuild の読み込みに失敗したら、`cd backend && npm ci` を先に実行するよう書いた文を出し、終了コード 1 で止める（contracts/test-hooks.md の実行の環境）。CI の `cd backend && npm ci && npm test` は先に入れるので、この文には当たらない。
+    - CLAUDE.md と test-hooks.md の受け入れテストのコマンドは、`cd backend && npm ci` から始める形に直した。
 - 元に戻すときの手順と手間：build.mjs のまとめる処理を外し、`public/js/` を写す形と全モジュールの modulepreload に戻し、ADR 0001 の 15 ファイルの検査を戻す。ソースは ES modules のままなので書き直しは要らない。esbuild を devDependencies から外す。1 日。ただし枠を超える問題は戻る。
 
 ## 見直す条件
-- まとめた `app.js` と `sw.js` の gzip 後の合計が 28,000 バイトを超える、または殻が枠の 95% を超える（次の回の budgets.md の 1 の数字で）。
+- まとめた `app.js` と `sw.js` の gzip 後の合計が 28,000 バイトを超える、または殻が枠の 95% を超える（contracts/budgets.md の 1 の殻の枠 32,000 の 95% は 30,400）。
 - AC-15 の 5 回の最大値が 1,600 ms を超える。
 - esbuild の新しい版が 12 か月出ない、セキュリティの勧告が出る、または install script を許さないと動かない版になる。
 - まとめた物にだけ出る不具合（ソースを直接開くと出ない）が G3 か公開後に 2 件を超える。

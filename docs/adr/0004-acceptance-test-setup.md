@@ -11,7 +11,7 @@
 - HTTP の API がないので、spectral と oasdiff は使えない（指揮役の裁定 E2：JSON Schema の検査と見本のテストで代える）。
 
 ## 決定
-- `@playwright/test` 1.64.1 で、projects は chromium と webkit。設定は `backend/tests/acceptance/playwright.config.mjs`。コマンドは `cd backend/tests/acceptance && npm ci && npx playwright install chromium webkit && npx playwright test`（2026-10-31 に直した。前の形 `cd backend && npx playwright test -c tests/acceptance` は、backend/ に @playwright/test がないと動かない）。
+- `@playwright/test` 1.64.1 で、projects は chromium と webkit。設定は `backend/tests/acceptance/playwright.config.mjs`。コマンドは `cd backend/tests/acceptance && npm ci && npx playwright install chromium webkit && npx playwright test`（2026-10-31 に直した。前の形 `cd backend && npx playwright test -c tests/acceptance` は、backend/ に @playwright/test がないと動かない）。2026-11-08 に足した：ADR 0007 の後は global-setup が動かす build.mjs が backend/ の esbuild を読むので、単独で動かす前に `cd backend && npm ci` が要る（ADR 0007 の「結果」。テストの道具の置き場所 B は変えない）。
 - 依存の置き場所（2026-10-31、tech-lead G2 r1 の未解決 (1) で B に決めた）：@playwright/test、@axe-core/playwright、ajv は backend/tests/acceptance/package.json と package-lock.json に置き、verifier が持つ。backend/package.json には ajv だけを入れる（check:contracts と単体テストのため。ADR 0001）。@playwright/test を 2 つの package.json に入れない。表は contracts/dependencies.md の「入る package.json」の列。
 - テスト用の静的サーバーは、verifier が node の組み込みだけで書き、GitHub Pages と同じパス（/engineer/）とヘッダーを返す（test-hooks.md）。
 - 監査は `@axe-core/playwright` 4.14.0。課題集、書き出し、seed、文言ファイルの検査は `ajv` 8.20.0（テストと単体テストの中だけ）。

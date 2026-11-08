@@ -7,7 +7,7 @@
 ## 概要
 - 何のアプリか：「今日の一手」。3 問の自己診断に答えると、毎日 15 分で終わる学習の課題が 1 つ出る、ブラウザだけで動く Web アプリ（サーバーなし、登録なし）。データはブラウザの中だけ。
 - 使う人：すでにコードを書いている実務 1〜5 年目のエンジニア（docs/prd/product.md）。
-- いまの段階：001-daily-learning は Takuma の FB 2 回目の作り直しで G1（PRD r13、design r13。G1 のデザインの判定は design-reviewer r6、tech-lead r3 とも PASS）。2026-11-06 に ADR 0002 の改訂 2 と 0006〜0008 を提案した（reviewer の反論待ち）。契約（contracts/）はまだ r10 の形で、次の回から r13 に書き直す。実装と受け入れテストはその後に追従する。公開先は https://matsuura-tak.github.io/engineer/（GitHub Pages。2026-11-06 は未公開で 404。公開は 2026-12-07 の仮置き）。
+- いまの段階：001-daily-learning は Takuma の FB 2 回目の作り直しで G1（PRD r13、design r13。G1 のデザインの判定は design-reviewer r6、tech-lead r3 とも PASS）。契約（contracts/）は r13 の形に書き直した（2026-11-06〜08。G1 reviewer（設計）r3 の FAIL の指摘を 2026-11-08 に直し、r4 の判定待ち）。ADR 0002 の改訂 2（2026-11-08 に `levelStart` を足した）、0006、0008 は提案、0007 は承認（2026-11-08、委任）。実装と受け入れテストはこれから追従する（backend/ と backend/tests/acceptance/ はまだ r10 の形）。公開先は https://matsuura-tak.github.io/engineer/（GitHub Pages。2026-11-06 は未公開で 404。公開は 2026-12-07 の仮置き）。
 
 ## ビルド/テストのコマンド
 .claude/org/app.json の commands と同じものを書きます。CI は app.json の方を使います。
@@ -19,14 +19,14 @@
   `cd backend && npm ci && npm test`
   - `npm test` の中身（ADR 0001 の scripts）：契約の検査 → 単体テスト → 受け入れテスト（`test:acceptance` が受け入れテストのフォルダで npm ci とブラウザの入れ方までする）。結果（2026-11-05）：見本 52 件 OK、単体 158/158、受け入れ 219 passed
   - Linux の CI で WebKit の OS のライブラリ（`npx playwright install-deps`）が要るかは未確認（ADR 0004）
-- 受け入れテスト（依存は受け入れテストのフォルダの package.json だけ。ADR 0004）：
-  `cd backend/tests/acceptance && npm ci && npx playwright install chromium webkit && npx playwright test`（2026-11-05 に `--list` で `Total: 219 tests in 23 files`。AC-15 の Chromium の 5 回は 1136, 1087, 1087, 1081, 1080 ms）
+- 受け入れテスト（テストの道具は受け入れテストのフォルダの package.json だけ。ADR 0004。ADR 0007 の後は、global-setup が動かす build.mjs が backend/ の esbuild を読むので、単独で動かす前に `cd backend && npm ci` が要る。この形は未確認：esbuild がまだ backend/package.json にない）：
+  `cd backend && npm ci && cd tests/acceptance && npm ci && npx playwright install chromium webkit && npx playwright test`（下の結果は `cd backend/tests/acceptance` から始める前の形で動かしたもの）（2026-11-05 に `--list` で `Total: 219 tests in 23 files`。AC-15 の Chromium の 5 回は 1136, 1087, 1087, 1081, 1080 ms）
 - 個別のコマンド（どれも backend/ で実行）：
   - 契約の検査：`npm run check:contracts`（= `node ../contracts/tools/check-schemas.mjs`。ajv は実行したフォルダから探すので backend/package.json に ajv が要る。2026-11-05 に backend/ で確認：見本 52 件、期待と違う結果 0 件、終了コード 0）
   - 単体テスト：`node --test 'tests/unit/**/*.test.mjs'`（2026-11-05 に backend/ で確認：158 件中 158 件合格、終了コード 0。フォルダを渡す形 `tests/unit/` は終了コード 1）
   - ビルド：`npm run build -- --version <YYYY-MM-DD.N>`（= `node scripts/build.mjs --out dist --version …`。2026-11-05 に `--out` を一時フォルダにして確認：20 ファイル、終了コード 0。`--version dev` は終了コード 1）
   - 転送量の予算：`node scripts/check-budget.mjs dist`（2026-11-05 に確認：gzip 後の合計 109,554 / 150,000 バイト、殻 30,023 / 32,000（JS 25,829。見直しの線 27,000 は ADR 0001）、終了コード 0）
-- 依存：backend/package.json の devDependencies は今 ajv 8.20.0 だけ。ADR 0007 が承認されたら esbuild 0.28.2 を足す（lockfile に `@esbuild/*` の optional 26 件。npm 12 が止める install script は止めたまま）。lockfile には ajv が持ち込む 4 件もある。推移的な依存の決まりと確かめ方は contracts/dependencies.md。入れるのは `npm ci` だけ。
+- 依存：backend/package.json の devDependencies は今 ajv 8.20.0 だけ。ADR 0007 の承認（2026-11-08、委任）で esbuild 0.28.2 を足す（backend-engineer。lockfile に `@esbuild/*` の optional 26 件。npm 12 が止める install script は止めたまま）。lockfile には ajv が持ち込む 4 件もある。推移的な依存の決まりと確かめ方は contracts/dependencies.md。入れるのは `npm ci` だけ。
 - Node は 24（.tool-versions）。
 
 ## 構成
@@ -52,12 +52,12 @@
 
 ## このアプリだけの決まり
 - 対応ブラウザ：Safari 17 以上（iOS、iPadOS、macOS）と Chrome の最新 2 版。Safari 17.0 にない機能は使わない（contracts/budgets.md の 5）。自動テストは Playwright の Chromium と WebKit。
-- 本番の依存ライブラリは 0 件（ADR 0001）。JS のソースは ES modules で書き、配るときは esbuild（devDependency）で 1 つの `js/app.js` にまとめる。sw.js はまとめない。動的な `import()` は使わない。JS のファイルの数の上限と見直しの線 27,000 はなくし、殻の枠で見る（ADR 0007。提案中で、承認までは ADR 0001 のまま）。
+- 本番の依存ライブラリは 0 件（ADR 0001）。JS のソースは ES modules で書き、配るときは esbuild（devDependency）で 1 つの `js/app.js` にまとめる。sw.js はまとめない。動的な `import()` は使わない。JS のファイルの数の上限と見直しの線 27,000 はなくし、殻の枠 32,000 で見る（ADR 0007。2026-11-08 に承認（委任）。backend-engineer が build.mjs に入れるまで、今の実装は ADR 0001 の形）。
 - URL はすべて相対（`./…`）。本番は `/engineer/` の下で動く。
 - CSP は contracts/budgets.md の 3 の文字列を meta で 1 つだけ。インラインのスクリプト、スタイル、`style` 属性、イベント属性を書かない。文字は textContent でだけ入れ、`innerHTML` などは使わない（ADR 0005）。
-- 保存は localStorage のキー `kyounoitte:data` だけ。他のキーに触らない。1 回の保存は 1 回の setItem。公開の後に形を変えるなら `formatVersion` を上げる。FB 2 回目の作り直し（公開前）は版 1 のまま（ADR 0002 の改訂 2、contracts/data.md）。
+- 保存は localStorage のキー `kyounoitte:data` だけ。他のキーに触らない。1 回の保存は 1 回の setItem。公開の後に形を変えるなら `formatVersion` を上げる。FB 2 回目の作り直し（公開前。2026-11-08 の `levelStart` を含む）は版 1 のまま（ADR 0002 の改訂 2、contracts/data.md）。
 - 領域、段階、経験年数、課題の ID は最初の公開から変えない。課題は消さず、ID を使い回さない（contracts/identifiers.md の 5、ADR 0002）。
 - テストのつなぎ口を本番に入れない。URL の引数を読まない（contracts/test-hooks.md）。
-- 転送量は初回に読む分が gzip 後 150,000 バイト以下。課題集は 6 領域のファイルに分け、診断の 1 問目の確定で先に取る（ADR 0006）。SW が貯める分の枠と課題集の 1 件の上限は、次の回の contracts/budgets.md で決め直す。
+- 転送量は初回に読む分（A）が gzip 後 150,000 バイト以下、SW が貯める分（B）が 400,000 バイト以下。課題集は 6 領域のファイルに分け、1 ファイルは gzip 後 50,000 バイト以下、1 件の本文の平均は 1,200 字以下。診断の 1 問目の確定で先に取る（ADR 0006、contracts/budgets.md の 1 と 2）。
 - 案内役ミルの絵は PNG を `<picture>` で切り替える。data: の画像と `style` 属性は使わない（ADR 0008）。
 - 日付は端末の日付の `YYYY-MM-DD`（`toISOString` は使わない）。

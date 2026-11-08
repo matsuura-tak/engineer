@@ -6,7 +6,9 @@ verifier G0 r3 の W-1〜W-16 を、名前と値まで決めたものです。�
 ## 実行の環境（W-11）
 - 置き場所：`backend/tests/acceptance/`。設定は `backend/tests/acceptance/playwright.config.mjs` だけで動きます。
 - 依存の置き場所（ADR 0004 の「依存の置き場所」。B）：@playwright/test、@axe-core/playwright、ajv は `backend/tests/acceptance/package.json` と、その package-lock.json に置きます。backend/package.json には @playwright/test と @axe-core/playwright を入れません（2 つのコピーを作らないため）。
-- 実行のコマンド：`cd backend/tests/acceptance && npm ci && npx playwright install chromium webkit && npx playwright test`。backend の `npm test` からは `npm run test:acceptance` が同じことをします（ADR 0001 の scripts）。`cd backend && npx playwright test -c tests/acceptance` の形は使いません（backend/ に @playwright/test がないので動かない）。
+- 先に入れるもの（2026-11-08。ADR 0007 の「結果」。G1 reviewer r3 の要修正 5）：受け入れテストの global-setup は `backend/scripts/build.mjs` を動かし、build.mjs は backend/ の devDependency の esbuild を読みます。そのため、受け入れテストを単独で動かす前に `cd backend && npm ci` が要ります（新しく clone した所で、受け入れテストのフォルダの `npm ci` だけでは esbuild がない）。backend の `npm test` は先に `npm ci` を済ませているので要りません。
+  - global-setup（verifier が書く）は、build.mjs の import か esbuild の読み込みに失敗したら、`backend/node_modules に esbuild がありません。先に cd backend && npm ci を実行してください` と分かる文を出して、終了コード 1 で止めます（Playwright の既定の stack trace だけにしない）。
+- 実行のコマンド：`cd backend && npm ci && cd tests/acceptance && npm ci && npx playwright install chromium webkit && npx playwright test`。backend の `npm test` からは `npm run test:acceptance` が同じことをします（ADR 0001 の scripts）。`cd backend && npx playwright test -c tests/acceptance` の形は使いません（backend/ に @playwright/test がないので動かない）。
 - projects は `chromium` と `webkit` の 2 つ。`retries: 0`。
 - テスト用の静的サーバー（`backend/tests/acceptance/server/` に verifier が node の組み込みだけで書く）：
   - 配布物は `backend/scripts/build.mjs`（ADR 0001。backend-engineer）でビルドしたフォルダを使う。`backend/public/` をそのまま配らない（版の刻印と SW のファイル一覧が入らないため）。
@@ -22,7 +24,7 @@ verifier G0 r3 の W-1〜W-16 を、名前と値まで決めたものです。�
 - identifiers.md のとおり。ルート `<html>` の `data-state` と、要素の `data-testid`。
 
 ## W-3 時刻
-- `page.clock.setFixedTime(…)`（Date と new Date だけを固定し、タイマーは動く）と、コンテキストの `timezoneId: 'Asia/Tokyo'`。`page.clock.install()` は使わない（答えの保存の 300 ms のタイマーが止まるため）。
+- `page.clock.setFixedTime(…)`（Date と new Date だけを固定し、タイマーは動く）と、コンテキストの `timezoneId: 'Asia/Tokyo'`。`page.clock.install()` は使わない（setTimeout と requestAnimationFrame も止まり、1 秒後の `app.loading` や返しのフェードなど、タイマーで進む処理が動かなくなるため。setFixedTime は Date だけを固定する）。
 - 日付を進めるときは `setFixedTime` を新しい日時で呼び直してから読み込む。
 - 画面を開いたまま日付を進めるとき（data.md の 4 の「画面を開いたまま日付が変わったとき」、identifiers.md の 3 の `task.dayChanged`）は、`setFixedTime` を呼び直し、読み込まずに操作する。アプリは操作のたびに `new Date()` を読むので、これで足りる（探索 R3 の 2 で確かめた）。
 - AC-15 では時刻を固定しない（performance を上書きしないため）。
@@ -44,11 +46,10 @@ verifier G0 r3 の W-1〜W-16 を、名前と値まで決めたものです。�
 ## W-6 課題集のスキーマと検査
 - スキーマ：contracts/schemas/tasks.schema.json。ajv（`ajv/dist/2020`、strict）で本番の 6 ファイルをそれぞれ検査する（AC-3、AC-29 の大半）。
 - スキーマの外なので、テストのコードで数えるもの（2026-11-05 に直した。Takuma の決定 Q17、指揮役の決定「予算の割り直し」：docs/approvals/delegation.md）：
-  - 件数：v1 は 210 以上。上級を足す 252 件版（12-14 の予定）は 252 以上。
-  - 18 の組ごとの件数：v1 は初級 14 以上、中級 14 以上、上級 7 以上。252 件版はどの組も 14 以上。
-  - ID の重複 0（AC-4）、組ごとの external の割合 20% 以下（AC-29）、初級の決まり（AC-34。語の検査は strings.md の 7）。
+  - 件数（PRD r13 の AC-4。2026-11-08 に直した）：v1 は全体 126 以上で、18 の組すべてで 7 以上。公開後 14 日（2026-12-21）までに足す 168 件版は、全体 168 以上で、初級の 6 組で 14 以上、他の 12 組で 7 以上。
+  - ID の重複 0（AC-4）、全件の `mode` が `in_app` で `tools` がないか空の配列（AC-29。external は置かない）、正解の位置の偏り（AC-29：6 ファイルを合わせて、位置ごとに全体の 20% 以上 50% 以下）、初級の決まり（AC-34。語の検査は strings.md の 7）。
   - 予算（budgets.md の 2）：1 件の本文（2 の「数える項目」）の字数の平均が 1,200 以下、6 ファイルのどれも gzip 後 50,000 バイト以下（budgets.md の 1 の「課題集の 1 ファイル」）。
-- budgets.md の 2 の予算のテストは、名前を `BUDGET2_` で始めます（例 `BUDGET2_本文と解説の平均は480字以下`、`BUDGET2_課題集はgzip後105000バイト以下`）。`AC<番号>_` の名前を付けず、G3 の AC の表に混ぜません。検証レポートでは AC の表とは別の「予算」の行に、合否と値を書きます。
+- budgets.md の 2 の予算のテストは、名前を `BUDGET2_` で始めます（例 `BUDGET2_本文の平均は1200字以下`、`BUDGET2_課題集の各ファイルはgzip後50000バイト以下`）。`AC<番号>_` の名前を付けず、G3 の AC の表に混ぜません。検証レポートでは AC の表とは別の「予算」の行に、合否と値を書きます。
 - design の「AC にない状態」（design/001-daily-learning.md の 2 の表の下と 10 の決定。例：D-30 の知らせ `task.dayChanged`、U-15）だけを確かめるテストは、名前を `DESIGN_<design の番号>_` で始めます（例 `DESIGN_D30_…`、`DESIGN_U15_…`）。`AC<番号>_` の名前を付けず、AC のループ（例：AC-27 の「6 つの画面」）にも足さず、G3 の AC の表に混ぜません。検証レポートでは AC の表とは別の「design の状態」の行に合否を書きます（`BUDGET2_` と同じ扱い。G2 tech-lead r3 の提案 4）。
 
 ## W-7 データの投入（seed）
@@ -62,7 +63,7 @@ verifier G0 r3 の W-1〜W-16 を、名前と値まで決めたものです。�
 - 課題 ID の参照（2026-11-05 の付け替えの後。旧初級 → `<領域>-intermediate-001`〜`007`、旧中級 → `<領域>-intermediate-008`〜`014`、新しい初級（未経験向け）→ `<領域>-beginner-001`〜`014`、上級は変えない。ADR 0002 への記録は G1 tech-lead r2 の (m) で別に行う）：
   - seed の行と `current` の `taskId` は、本番の課題集（6 ファイル）にある ID だけにする。テストは seed を入れる前に、各 `taskId` が課題集にあり、行の `area` と `level` が ID の `<領域>-<段階>` と同じことを確かめ、違えば seed の誤りとして落とす。例外は、課題集にない ID をわざと入れるテスト（data.md の 5「課題集に ID がない行」）だけで、そのテストは注釈にそう書く。
   - ID は組の中の番号として使う。課題の中身（題名、本文、型、道具）を ID で決め打ちしない。付け替えで同じ ID の中身が変わったため（例：`backend-intermediate-001` の中身は旧初級の 1 件目）。中身が要るときは、テストの中で課題集から ID で引く。
-  - 次に出る ID の期待値は、data.md の 5 の選び方（組の ID のうち `history` にも `current` にもない最も小さいもの）を本番の課題集に当てて求める。fixtures/seeds/ の見本は、どれも `backend-intermediate-` の 001 から古い順に使い、中級は 14 件あるので、付け替えの後もそのまま使える。
+  - 次に出る ID の期待値は、data.md の 5 の選び方（組の ID のうち `history` にも `current` にもない最も小さいもの）を本番の課題集に当てて求める。fixtures/seeds/ の見本は、どれも `backend-intermediate-` の 001 から古い順に使い、組の 7 件（v1 の 1 組の件数。PRD AC-4、AC-36 の Given）の中に収まる（最も多く使う seed-ac35-six-completed.json で 001〜006、開くと 007）。
   - 付け替えの前に作った seed のうち `*-beginner-*` を使うものは、中身が新しい初級に変わった。段階の規則だけを見る seed はそのまま使えるが、中身や件数（旧初級は 7 件）に頼る seed は作り直す。
 - 行の形（2026-11-06。PRD r13、ADR 0002 の改訂 2）：どの行も `answers`（`{ choice, correct }` の配列）と `score`（`correct` が true の数）を持つ。`done` は answers 3 件と `helpful`、`no_time` と `none` は 0〜2 件で `helpful` を持たない。`correct` は保存した事実なので、本番の課題集の `answer` と合わせなくてよい（見本は正解を `choice: 1`、不正解を `choice: 0` にした）。段階の規則（data.md の 5）を動かしたくない seed は、`done` の行の `score` を 2 にする（2 は「1 以下」にも「3」にも当たらないので、何件続いても段階は動かない）。規則で段階が動いた形を作る seed だけ、動いた行に `levelChange` を書く。
 - AC-24 の seed（PRD r13）：fixtures/seeds/seed-ac24-stats.json。初めて開いた日 2026-11-01、`current` なし、6 行：11-01 done score 3・役に立った、11-02 none（answers 1 件で正解、score 1）、11-03 done score 1・役に立った、11-04 done score 2・未回答、11-04 done score 3・未回答、11-06 no_time（answers 0 件）。答えた問 13、正解 10（3 + 1 + 1 + 2 + 3。PRD の式の並びと同じ値）、低い正答数の完了 1。時刻を 2026-11-06 に固定して開くと、今日の行があるので `task.skipped`（data.md の 4 の 6-3）で、`issued` は 6 のまま。今日の行を入れないと、開いたときにアプリがその日の課題を出し、`issued` が 1 増える（4 の 6-4）。期待値は PRD の AC-24 の Then（数え方は data.md の 9）。AC-37 もこの seed から始める。
@@ -70,23 +71,24 @@ verifier G0 r3 の W-1〜W-16 を、名前と値まで決めたものです。�
   - 6 件：fixtures/seeds/seed-ac35-six-completed.json（2026-11-01〜11-06 に `backend-intermediate-001`〜`006` を 1 日 1 件、どれも score 2 で完了。`device.persistRequested` は true）。時刻を 2026-11-07 に固定して開くと S3 で `backend-intermediate-007` が出る。画面で何問正解しても段階は動かない（上の「行の形」）。
   - 10、29、99 件：固定の見本は置かず、verifier が同じ形で作る。決まり：
     - 完了の行（`report: "done"`、answers 3 件、score 2）を n 行。1 つの ID は 1 回だけ（data.md の 8）。score を 2 にそろえ、画面で完了する 1 件で段階が動かないようにする。
-    - 目標の組（`backend`、`intermediate`）には未出を 1 件以上残す（開いたときに今日の課題を出すため）。目標の組からは 13 件まで使い、残りは他の組の ID を使う（99 件は 1 領域の 35 件を超えるので、3 領域以上にまたがる）。他の組の行を古い方に、目標の組の行を新しい方に置く。他の領域の行を入れるときは、その領域の `levels` に最後の行の段階を入れる（data.md の 8 は `levels[diagnosis.area]` だけを求めるが、アプリが書く形に寄せる）。
+    - 目標の組（`backend`、`intermediate`）には未出を 1 件以上残す（開いたときに今日の課題を出すため）。目標の組からは 6 件まで使い（1 組 7 件）、残りは他の組の ID を使う（v1 は 1 領域 21 件なので、29 件は 2 領域以上、99 件は 5 領域以上にまたがる）。他の組の行を古い方に、目標の組の行を新しい方に置く。他の領域の行を入れるときは、その領域の `levels` に最後の行の段階を入れる（data.md の 8 は `levels[diagnosis.area]` だけを求めるが、アプリが書く形に寄せる）。
     - 目標の領域の `levels` は目標の段階のまま（同じ領域の別の段階の行では書き換えない）。作った seed に data.md の 5 を当てて、次に出る ID が目標の組の最小の未出であることを確かめる（2026-11-05 に足した。G2 tech-lead r5 の提案）。
     - 日付は古い順で、同じ日に何行並べてもよい（data.md の 8）。どの行も `firstOpenDate` 以上。時刻は最後の行の翌日に固定する（最後の行の日に開くと 4 の 6-3 で `task.done` になる）。
     - ajv に通し、統計の `data-stat-completed` が n であることを完了の前に確かめる。
 - AC-36 の seed：fixtures/seeds/seed-ac36-three-issued.json（目標の組 `backend` / `intermediate` の 001〜003 の 3 行：11-01 done score 2、11-02 no_time（answers 1 件）、11-03 none（answers 0 件））。時刻を 2026-11-04 に固定して開くと S3 で、`data-task-id` は `backend-intermediate-004`、`data-progress-index` は 4、`data-progress-total` は課題集のその組の件数（PRD の Given は 7 件の組。data.md の 9）。
-- AC-8 の seed（9 通り。data.md の 5 の表）：見本は fixtures/seeds/ の `seed-ac8-<通り>-*.json` の 10 件（7 通り目は `7a-beginner-floor` と `7b-advanced-ceiling`）。各行の `level` はその課題が出たときの段階。時刻は最後の行の翌日に固定して開き、S3 で問 3 つを、表の「画面で答える score」になるように答える（正解は本番の課題集の `answer` を引く）。まとめへ進んだ後、`task.next` を押して出た S3 の `data-task-level` を表の値と比べ、書き出しで `levels.backend` と最後の行の `levelChange` を確かめる。8 通り目の seed だけ、`levels` が `intermediate` で古い 2 行の `level` が `advanced`（2 行目に `levelChange: "down"`）。
+- AC-8 の seed（9 通り + 10 通り目。data.md の 5 の表）：見本は fixtures/seeds/ の `seed-ac8-<通り>-*.json` の 11 件（7 通り目は `7a-beginner-floor` と `7b-advanced-ceiling`）。各行の `level` はその課題が出たときの段階。時刻は最後の行の翌日に固定して開き、S3 で問 3 つを、表の「画面で答える score」になるように答える（正解は本番の課題集の `answer` を引く）。まとめへ進んだ後、`task.next` を押して出た S3 の `data-task-level` を表の値と比べ、書き出しで `levels.backend` と最後の行の `levelChange` を確かめる。8 通り目の seed だけ、`levels` が `intermediate` で古い 2 行の `level` が `advanced`（2 行目に `levelChange: "down"`）。
+  - 10 通り目（2026-11-08 に足した。PRD 11 の「段階が変わった後は新しい段階の行から数え直す」「進級は数え直しの起点」。data.md の 5 の 2 の 3 つ目）：seed-ac8-10-restart-after-redo-advance.json（初 done score 2 を 2026-11-01〜07 に 7 行、11-08 に中 done score 1、`levels.backend` は `intermediate`、`levelStart.backend` は 8、今日 11-08 の `current` は `backend-intermediate-002`）。中で done 1 → やり直しで初（出し終えて S7）→ advance で中、と進んだ後の形です。時刻を 2026-11-08 に固定して開くと S3（4 の 6-2）。score 0 で答え → まとめ → `task.next` の S3 の `data-task-level` が `intermediate`、書き出しの最後の行に `levelChange` がない。名前は `AC8_` で始めてよい（AC-8 の Then「段階が変わった後は数え直す」の確かめ）。本番の課題集で初級の組が 7 件より多くても、この seed の形は変わらない（初の行は規則の止まる行にならない位置にある）。
   - 9 通り目：seed-ac8-9-same-day-two.json（段階は中、前日 2026-11-02 の done score 3 の 1 行だけ）。時刻を 2026-11-03 に固定したまま、画面で score 1 → まとめ → `task.next` → score 1 → まとめ → `task.next` と進め、最後の S3 の `data-task-level` が `beginner` で、`task.level.adjusted.down` が 1 つ見える（data.md の 5 の「段階が変わった知らせ」）。時刻は動かさない。
 - design の 5.1 #33（S7 levelDone で `task.exhausted.seenNext` がある状態。design/001-daily-learning.md の 5.1）：固定の見本は置かない（課題集の中身に依存するため。AC-10 と同じ）。作り方：
   - `diagnosis` は `backend` / `intermediate`、`levels.backend` は `beginner`、`current` なし。
   - `history` の古い順に、`backend-intermediate-001` と `002` を `level: "intermediate"` の done score 1 で 2 日（2 行目に `levelChange: "down"`。この 2 行で初級に下がった形。data.md の 5）。続けて本番の課題集の `backend-beginner-*` をすべて `level: "beginner"` の done score 2 で入れる（score 3 を 3 行続けると段階の規則で中級に上がる形になり、`levels` と食い違う）。
-  - 時刻は最後の行の翌日に固定して開く。目標の組（`backend`、`beginner`）の未出が 0 件なので S7（data.md の 4 の 6-4）、`levels` が `beginner` なので levelDone。次の段階の組（`backend`、`intermediate`）に未出が 12 件あり、`history` に中級の行があるので `task.exhausted.seenNext` が 1 つ（data.md の 5「S7 の変種と補足の 1 文」）。
-  - 対の確かめ（任意）：中級の 2 行を外すと補足なし、中級の 14 件をすべて `history` に入れると `task.exhausted.nextDone`。
+  - 時刻は最後の行の翌日に固定して開く。目標の組（`backend`、`beginner`）の未出が 0 件なので S7（data.md の 4 の 6-4）、`levels` が `beginner` なので levelDone。次の段階の組（`backend`、`intermediate`）に未出が 5 件（1 組 7 件のうち 001 と 002 を使った残り）あり、`history` に中級の行があるので `task.exhausted.seenNext` が 1 つ（data.md の 5「S7 の変種と補足の 1 文」）。
+  - 対の確かめ（任意）：中級の 2 行を外すと補足なし、中級の 7 件をすべて `history` に入れると `task.exhausted.nextDone`（件数は本番の課題集で数える）。
 - AC-14 の seed は 2 通り（PRD r11 の AC-14 の確かめ方。Q11 は A。2 通り目は PRD r8 で「翌日」から「同じ日に次へ進む」に変わった）。
   - 1 通り目（`task.exhausted` からやり直す）：出し終えた履歴（完了 3 件を含む）。AC-10 と同じく本番の課題集から作る（今の組の課題をすべて `history` に入れ、そのうち直近 3 日の 3 件を `done` にする）。PRD の Given「今日の課題はまだ出していない」は、data.md の 4 の 6-4 の下では、目標の組を出し終えた日（`task.exhausted`）にしか作れないため。固定の seed は置かない（課題集の中身に依存するため）。
   - 2 通り目（`task.today` からやり直す）：fixtures/seeds/seed-ac14-three-completed.json の形（完了 3 件、最後の行は 2026-11-03、`current` なし）で開き、`task.today` とその `data-task-id` を確かめてからやり直す。時刻は最後の行より後の日（例 2026-11-04）に固定する（2026-11-03 に開くと 4 の 6-3 で `task.done` になる。6-2 と 6-3 の順は 2026-11-05 に入れ替えた）。やり直しで選ぶ領域は seed の `backend` 以外にする。
     - やり直しの直後：data.md の 2 の表（今日の課題を出した後のやり直しは `current` を書かない）と、終えた後の行き先（同じ 2）により、今日の `current` が残るので 4 の 6-2 で `task.today` のまま。確かめること：S3 のまま、`data-task-id` がやり直しの前と同じ、`data-task-area` は `backend` のまま。S10 の完了（`data-report="done"`）は 3 行のまま。
-    - 続けて同じ日のうちに（時刻は動かさない）、その課題を完了（`task.report.done`）→ S4（`task.rate`。`task.rate.helpful` などで答えるか閉じる）→ S5（`task.done`）→ `task.next` を押す（design の 2 の AC-14 の行と同じ流れ）：4 の「操作で出すとき」で新しい `diagnosis.area` と `levels` の組から選び、S3 です。確かめること：`data-task-area` が新しく選んだ領域、`data-task-nth-today` が `2`（今日の完了の行 1 + 1。data.md の 9）、`data-task-id` がやり直しの前の課題と違う。完了した課題はこのとき 4 件（PRD の Then の「3 件のまま」は、完了を押す前のやり直しの直後に確かめる）。
+    - 続けて同じ日のうちに（時刻は動かさない）、その課題の 3 問に答えて完了（`task.choice` を 3 回。問 1、2 の後は `task.question.next`、問 3 の後は `task.summary.open`）→ S4（`task.rate`。`task.rate.helpful` などで答えるか閉じる）→ S5（`task.done`）→ `task.next` を押す（design の 2 の AC-14 の行と同じ流れ）：4 の「操作で出すとき」で新しい `diagnosis.area` と `levels` の組から選び、S3 です。確かめること：`data-task-area` が新しく選んだ領域、`data-task-nth-today` が `2`（今日の完了の行 1 + 1。data.md の 9）、`data-task-id` がやり直しの前の課題と違う。完了した課題はこのとき 4 件（PRD の Then の「3 件のまま」は、完了を押す前のやり直しの直後に確かめる）。
   - seed-ac14-three-completed.json は 1 通り目の Given を満たさない（開くと今日の課題が出る）。完了 3 件の履歴の見本として、AC-14 の 2 通り目のほか AC-5、AC-16 などにも使う。
 
 ## W-8 履歴の読み出し
@@ -173,19 +175,21 @@ G2 tech-lead r2 の要修正への決定です。今の `expect(...).toHaveAttri
 
 ## W-12 通信の数え方（AC-12、AC-23、AC-44）
 - 「送信」＝ `page.on('response')` のうち `response.fromServiceWorker()` が false のもの + `page.on('requestfailed')` の件数。数えた 1 件ごとに `{ url, resourceType: request.resourceType(), fromServiceWorker, failed }` を記録し、annotation に残す（0 件でなかったときに、何が出たかを G3 の証拠で読めるようにする）。
-- AC-44 の「図の画像の要求が 0」：S3 を描いてから図を確かめ終えるまでの `page.on('request')` のうち、`request.resourceType() === 'image'` で、URL のパスが `/engineer/img/miru-` で始まらないものが 0 件（図は HTML と CSS と inline SVG だけ：design の D-50。ミルの絵は ADR 0008 で数えない）。ここでは SW が返した要求も数える（図が画像を持たないことを確かめたいので、通信の有無は問わない）。数える区間は「オフラインにした直後から、Then を確かめ終えるまで」。
+- AC-44 の「図の画像の要求が 0」：S3 を描いてから図を確かめ終えるまでの `page.on('request')` のうち、`request.resourceType() === 'image'` で、URL のパスが `/engineer/img/miru-` で始まらないものが 0 件（図は HTML と CSS と inline SVG だけ：design の D-50。ミルの絵は ADR 0008 で数えない）。ここでは SW が返した要求も数える（図が画像を持たないことを確かめたいので、通信の有無は問わない）。数える区間は「`page.goto` の前（`page.on('request')` を付けてから goto する）から、Then を確かめ終えるまで」（AC-44 の手順にはオフラインにする段がないため。2026-11-08 に直した：G1 reviewer r3 の要修正 3）。区間の中で S3 を描いたこと（`task.today` が見えた）を確かめてから 0 件を数える（何も描かずに 0 件で通さないため）。
 - `page.on('request')` をそのまま数えない（SW が返した要求も request として出る：tech-lead G0 r2 の spike で 9 件）。
 - Q1 は A（外に送らない）なので、除く送信先はない。
 - オフラインは `context.setOffline(true)`。
 
-## W-17 SW が貯め終える前のオフライン（AC-23 の 3 通り目、design の 5.1 #47 と #56。2026-11-06）
+## W-17 SW が貯め終える前のオフライン（AC-23 の 3 通り目、design の 5.1 #47 と #56、S0 error の 3 つ目。2026-11-06、2026-11-08 に #56 と S0 を直した）
 目当ての領域のファイルを、先読みを待たずにオフラインで取らせる手順です。SW が動くと install で 6 ファイルを貯めてしまい、この状態を作れないので、SW を止めて開きます。
 1. コンテキスト：`browser.newContext({ serviceWorkers: 'block', timezoneId: 'Asia/Tokyo', locale })`。SW は登録されず、領域のファイルはふつうの通信でだけ取れる（service-worker.md の 3「貯め終える前」）。
 2. #47（初回の診断）：保存データなしで開き、`diagnosis.start.begin` → 1 問目で目当ての領域の radio を選ぶ → `context.setOffline(true)` → `diagnosis.next`（1 問目の確定。ここでアプリが領域のファイルの先読みを始め、オフラインなので失敗する）→ 2 問目、3 問目を選ぶ → `diagnosis.finish`。
-   #56（やり直しで別の領域へ）：診断済みの seed（目標の領域 `backend`）で開き、`task.today` を待つ（`tasks-backend.json` はこの時点で読み終えている）→ S8 の `settings.redo` → 1 問目で `backend` 以外の領域を選ぶ → `context.setOffline(true)` → `diagnosis.next` → 2 問目、3 問目 → `diagnosis.finish`。
+   #56（S7 からやり直しで別の領域へ。PRD AC-23 の 3 通り目の Given「`task.exhausted` にいる」。2026-11-08 に直した：G1 reviewer r3 の重大 1）：AC-10 と同じく本番の課題集から作った「出し終えた」seed（目標の組 `backend` / `intermediate` の課題をすべて `history` に入れ、`current` なし、今日の行なし。時刻は最後の行の翌日）で開き、`task.exhausted` を待つ（`tasks-backend.json` はこの時点で読み終えている。今日の `current` がないので、やり直しの後は新しい組から選ぶ：data.md の 2 の「終えた後の行き先」の 2 つ目）→ `task.exhausted.redo` → 1 問目で `backend` 以外の領域（`history` にその領域の行がない領域。例 `git`）を選ぶ → `context.setOffline(true)` → `diagnosis.next` → 2 問目で段階（例 `beginner`）、3 問目 → `diagnosis.finish`。
+   - 診断済みの seed で S3（今日の `current` がある）から `settings.redo` で入る形は使わない。今日の `current` があると、やり直しの後も前の領域の課題のまま S3 になる（data.md の 2、AC-14 の 2 通り目）ので、手順 4 の期待とぶつかる。
    setOffline は、目当ての領域のファイルの要求が出る前（1 問目の確定の前）に呼ぶ。確定の後に呼ぶと先読みが間に合って、この状態にならないことがある。
 3. 確かめること：`data-state` が `diagnosis.question` のまま、`data-question-index` が 3、選んだ 3 つの radio が checked のまま、`error.tasks.offline` と `task.next.retry` が 1 つずつ、`diagnosis.finish` を押す前と後で `localStorage.getItem('kyounoitte:data')` が同じ（保存しない。読むのは getItem だけ：W-9）、`pageerror` が 0 件。目当ての領域のファイルの `requestfailed` が 1 件以上（W-12 の記録に出る）。
-4. `context.setOffline(false)` → `task.next.retry` → `data-state` が `task.today` で、`data-task-area` が選んだ領域。
+4. `context.setOffline(false)` → `task.next.retry` → `data-state` が `task.today`。#47 は `data-task-area` が選んだ領域。#56 は data.md の 2 の「終えた後の行き先」の 2 つ目（今日の `current` がない → 新しい組から選んで S3）のとおり、`data-task-area` が選んだ領域、`data-task-level` が 2 問目で選んだ段階、`data-task-id` がその組の ID の最も小さいもの（例 `git-beginner-001`。data.md の 5 の選び方を本番の課題集に当てて求める）。#56 では、統計の `data-stat-issued` が seed の行数 + 1（やり直しの前は seed の行数。オフラインの間は増えない：PRD AC-23 の Then「出した件数は増えず」）。
+   - S0 error の 3 つ目（起動で要る課題集のファイルが取れない。data.md の 4「課題集のファイル」。design の 5.1 に designer が足す行）：手順 1 のコンテキストで、`page.route('**/data/tasks-backend.json', (r) => r.abort())` を付けてから、診断済みの seed（目標の領域 `backend`、`current` なし、時刻は最後の行の翌日）で開く（setOffline で開くと HTML も取れないので、route で 1 ファイルだけ落とす。SW は止めているので route を通る：W-4）。確かめること：`data-state` が `error`、`error.tasks.offline` と `task.next.retry` が 1 つずつ、`error.app.reload` などの `error.app.*` が 0 件、`localStorage.getItem('kyounoitte:data')` が seed と同じ（保存しない）。続けて `page.unroute` → `task.next.retry` → `data-state` が `task.today`。
 5. 未確認：`serviceWorkers: 'block'` と `setOffline(true)` の組で、WebKit の fetch が失敗として返ること（Chromium と WebKit の両方で、G2 の最初の実行の出力を evidence に残す）。
 
 ## W-13 SW の準備（AC-12、AC-23、AC-28）

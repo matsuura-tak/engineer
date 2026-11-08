@@ -25,7 +25,7 @@ operationId は全行「なし（端末のみ）」。代わりに「データ�
 | AC-5 | S3 → S4 → S5 | なし（端末のみ） | data.md の 2（3 問目で current を done の行に）、4（6-3）。identifiers.md の `task.done` | 受け入れ 2：再読み込みと翌日まで |
 | AC-6 | S3（翌日） | なし（端末のみ） | data.md の 5（history と current にない最小の ID）、8（ID は 1 回だけ） | 受け入れ 2：seed と時刻の固定 |
 | AC-7 | S3 → S6 | なし（端末のみ） | data.md の 2（no_time の行と answers、score）、4（6-3） | 受け入れ 2 |
-| AC-8 | S3 → S5 → S3 | なし（端末のみ） | data.md の 5（段階の規則と 9 通りの表）、data.schema.json の `score`、`levelChange`。seed は fixtures/seeds/seed-ac8-*（10 件）と test-hooks.md の W-7 | 受け入れ 2：9 通り。単体（規則の関数） |
+| AC-8 | S3 → S5 → S3 | なし（端末のみ） | data.md の 5（段階の規則と 9 通り + 10 通り目の表。止まる行は段階の違う行、`levelChange` の行、`levelStart` より前の行）、data.schema.json の `score`、`levelChange`、`levelStart`。seed は fixtures/seeds/seed-ac8-*（11 件）と test-hooks.md の W-7 | 受け入れ 2：9 通りと 10 通り目（やり直しと advance の後の数え直し）。単体（規則の関数） |
 | AC-9 | S4 | なし（端末のみ） | data.md の 2（helpful は done の行だけ）、data.schema.json の allOf | 受け入れ 2 |
 | AC-10 | S7 | なし（端末のみ） | data.md の 4（6-4）、5（S7 の変種と補足）、identifiers.md の `task.exhausted.*` | 受け入れ 2：本番の課題集から作る seed |
 | AC-11 | S2、S3、S4 | なし（端末のみ） | data.md の 2（setItem 1 回）、test-hooks.md の W-9（失敗の注入） | 受け入れ 2 |
@@ -40,7 +40,7 @@ operationId は全行「なし（端末のみ）」。代わりに「データ�
 | AC-20 | S8 / S1 | なし（端末のみ） | data.md の 6、7（読み込み、showCharacter はファイルの値） | 受け入れ 2 |
 | AC-21 | S1 | なし（端末のみ） | data.md の 2（device.homeGuideClosed）、test-hooks.md の W-16 | 受け入れ 2：UA の偽装 |
 | AC-22 | S1 | なし（端末のみ） | test-hooks.md の W-16（スタンドアロン） | 受け入れ 2 |
-| AC-23 | S0 → S3 / S5。3 通り目は S8 → S2 | なし（端末のみ） | service-worker.md の 3（貯め終える前は fetch の失敗）、data.md の 4「課題集のファイル」、test-hooks.md の「時間の計り方」と W-12、W-13、W-17 | 受け入れ 2：3 通り |
+| AC-23 | S0 → S3 / S5。3 通り目は S7 → S2 → S3（今日の `current` がない日に `task.exhausted.redo` から。2026-11-08 に S8 → S2 から直した） | なし（端末のみ） | service-worker.md の 3（貯め終える前は fetch の失敗）、data.md の 4「課題集のファイル」、test-hooks.md の「時間の計り方」と W-12、W-13、W-17 | 受け入れ 2：3 通り |
 | AC-24 | S9 | なし（端末のみ） | data.md の 9（13 の指標）、identifiers.md の 4 の `data-stat-*`。seed は seed-ac24-stats.json | 受け入れ 2：seed と時刻の固定 |
 | AC-25 | S8 | なし（端末のみ） | data.md の 6（formatVersion が新しいものは拒む）。見本 fixtures/data/invalid-newer-version.json | 受け入れ 2 |
 | AC-26 | 全画面 | なし（端末のみ） | strings.md の 2、3、schemas/strings.schema.json（194 キー）、test-hooks.md の W-14 | 受け入れ 2：en-US |
@@ -78,13 +78,14 @@ operationId は全行「なし（端末のみ）」。代わりに「データ�
 
 ## 4. 契約の変更と互換性
 - 書き直した契約：data.md と schemas/data.schema.json（answers、score、levelChange、current.answers、showCharacter。申告は done、no_time、none）、identifiers.md、strings.md と schemas/strings.schema.json（194 キー）、schemas/tasks.schema.json（新しい型）、test-hooks.md（選択肢 → 返し 300 ms、W-4 の 6 ファイル、W-7 の seed の形、W-8、W-12 の resourceType とミルを除く数え方、W-17 の SW が貯め終える前のオフライン、図とミルと読み上げの確かめ方）、budgets.md（1 を A 150,000 と B 400,000 の 2 つの枠に、2 を新しい型の長さに、4 の preload、5 の使う機能）、service-worker.md（FILES に 6 ファイル、PNG 8 枚、app.js。貯め終える前は fetch の失敗）。
+- 2026-11-08（G1 reviewer r3 の直し）：data.schema.json にトップレベルの任意の `levelStart` を足した（ADR 0002 の改訂 2 の中）。見本を 5 件足した（`data/v1/valid-level-start-after-redo-advance.json`、`seeds/seed-ac8-10-restart-after-redo-advance.json`、`data/invalid-level-start-negative.json`、`-beyond-history.json`、`-without-levels.json`）。check-schemas.mjs に `levelStart` の 2 つの決まり（行数以下、levels にある領域だけ）を足した。`cd backend && npm run check:contracts` → `見本 127 件、期待と違う結果 0 件`、終了コード 0。段階の規則の模型（スクラッチパッドの tl/rule2.mjs）→ AC-8 の seed 11 件と、やり直しと advance の 5 つの経路で `NG 0 件`（10 通り目の seed は `levelStart` を読まないと beginner に下がる）。
 - 互換性：spectral と oasdiff は未検査（OpenAPI がない。指揮役の裁定 E2）。代わりに `cd backend && npm run check:contracts`（2026-11-06、tech-lead）：`ajv 8.20.0（Ajv2020、strict）`、`見本 122 件、期待と違う結果 0 件`、終了コード 0。古い形の見本 `data/invalid-v1-before-r13.json` と `data/invalid-old-report-too-hard.json` は「期待：落ちる → 落ちた」。formatVersion は 1 のまま（未公開。ADR 0002 の改訂 2）。
 - seed の規則の確かめ：AC-8 の 10 件、AC-14、AC-35、AC-36 の seed に data.md の 5 の規則を当てる手書きの計算（スクラッチパッドの p4/rule.py。リポジトリの外）で、15 通りとも「次の段階」が data.md の 5 の表と test-hooks.md の W-7 のとおり（OK 15、終了コード 0）。
 - 予算の見積もりのうち、合成の文で 1 ファイルの大きさを測る試しは、元の文が短く縮みすぎたので使わなかった（budgets.md の 2）。
 
 ## 5. データモデルと移行
 - 保存データ：localStorage のキー 1 つ（端末の中だけ。個人情報は持たない：診断の回答、課題の ID、選んだ選択肢の位置と正誤、日付）。保存期間は利用者が消すまで。消し方は S8 の削除（removeItem）。形は data.schema.json。
-- 移行：公開前なので formatVersion 1 のまま作り直し、移す手順はない（ADR 0002 の改訂 2。見直す条件：G1 が終わる前に公開したら版を上げる）。
+- 移行：公開前なので formatVersion 1 のまま作り直し、移す手順はない（ADR 0002 の改訂 2。見直す条件：G1 が終わる前に公開したら版を上げる）。2026-11-08 に同じ改訂 2 の中で、段階の規則の数え始め `levelStart`（任意。ない領域は 0）を足した（2026-11-06 の後に作った正しいデータはそのまま通る）。
 - 課題集：配布物の 6 ファイル（formatVersion は tasks.schema.json）。課題は消さず、ID を使い回さない（identifiers.md の 5）。
 
 ## 6. 非機能の目標
@@ -109,8 +110,8 @@ PRD 15 のイベントはどれも外に送らない（Q1 は A）。値は端�
 - esbuild 0.28.2（devDependency。ビルドの時だけ。本番の依存は 0 のまま）と、lockfile の `@esbuild/*` の optional 依存 26 件（contracts/dependencies.md、ADR 0007）。解決とビルドの出力は ADR 0007 の「確かめたこと」（G1 tech-lead r3 の spike）。backend/package.json に入れるのは backend-engineer。
 
 ## 10. ADR と未確認
-- ADR：0001（土台。0007 で一部を置き換え）、0002（保存。改訂 2）、0003（SW）、0004（受け入れテスト）、0005（CSP）、0006（6 領域）、0007（esbuild）、0008（ミル）。
-- 作り手に頼むこと（契約の外）：check-budget.mjs を A と B の 2 つの枠に（backend-engineer）、build.mjs の `--tasks-dir` と `tasksDir`、6 ファイルの検査、app.js へのまとめ（backend-engineer）、backend/tests/unit/rules.test.mjs が参照する古い seed の名前（`seed-ac8-intermediate-*`）を新しい名前に（backend-engineer）、課題集 v3 を budgets.md の 2 の長さで（pdm）。
+- ADR：0001（土台。0007 で一部を置き換え）、0002（保存。改訂 2。2026-11-08 に levelStart）、0003（SW）、0004（受け入れテスト）、0005（CSP）、0006（6 領域。失敗の場所は 3 か所）、0007（esbuild。2026-11-08 に承認（委任）。受け入れテストの前に `cd backend && npm ci`）、0008（ミル）。
+- 作り手に頼むこと（契約の外）：check-budget.mjs を A と B の 2 つの枠に（backend-engineer）、build.mjs の `--tasks-dir` と `tasksDir`、6 ファイルの検査、app.js へのまとめ（backend-engineer）、backend/tests/unit/rules.test.mjs が参照する古い seed の名前（`seed-ac8-intermediate-*`）を新しい名前に（backend-engineer）、課題集 v3 を budgets.md の 2 の長さで（pdm）、check-budget.mjs の A のミルを 3 枚に（backend-engineer。budgets.md の 1）、段階の規則の関数に `levelStart` の止まる行と、やり直しと advance の保存に `levelStart` を（backend-engineer。data.md の 2 と 5）、global-setup の「`cd backend && npm ci` を先に」の文と、W-17 の #56 の作り直しと S0 error の 3 つ目、W-7 の 10 通り目（verifier。test-hooks.md）、design の 5.1 #56 の文と S0 error の 3 つ目の行（designer）。
 - 未確認：`serviceWorkers: 'block'` と setOffline の組での WebKit の fetch の失敗（test-hooks.md の W-17）、`page.emulateMedia({ contrast: 'more' })`（「線の対比」）、Safari 17 の実機での `<picture>` と `pixelated`（G4）、Linux の CI での WebKit の OS のライブラリ（ADR 0004）、課題集 v3 の実物の大きさ（budgets.md の 2 の 1,200 字は［推測］）。
 
 ## 確かめ（A）
@@ -125,6 +126,8 @@ PRD 15 のイベントはどれも外に送らない（Q1 は A）。値は端�
 - [x] 新しい依存に、解決とビルドの出力があり、dependencies.md の全列が埋まっている（esbuild。ADR 0007 と dependencies.md。2026-11-06 のその 1）
 
 ## 変更の記録
+G1 reviewer（設計）r3 の直し（2026-11-08、tech-lead。FB 2 回目）：重大 1（W-17 #56 を S7 からに）、要修正 2（`levelStart`。委任の決定 (a)）、3（W-12 の AC-44 の区間）、4（budgets.md の 2 の比）、5（受け入れテストの前の `cd backend && npm ci`）、6（ADR 0006 を失敗の場所 3 か所に）、7（CLAUDE.md）と提案（test-hooks.md の古い行、A のミル 3 枚、ADR 0007 の状態、「課題を選ぶときだけ待つ」は採らない）。この 2 の AC-8、AC-23 の行と 4、5、10 を直した。
+
 FB 2 回目の書き直し（2026-11-06、tech-lead。その 4）：1〜10 と確かめを PRD r13、design r13 の形にした。2 の表は 44 行。前の形は git の履歴（コミット 94bcc6a）。
 
 G1 reviewer（設計）r1 の要修正と提案、pdm の G1 の確認（firstOpenDate）を反映した（2026-10-30、tech-lead）。1 行に 1 つの変更。
