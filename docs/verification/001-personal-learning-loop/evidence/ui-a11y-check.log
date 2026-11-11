@@ -1,0 +1,592 @@
+[1] Server startup + first GET /: status=200, startup_ms=104.9ms (target <=500ms), first_GET_ms=32.2ms
+[2] Subsequent GET latencies: /?lang=ja 0.7ms, /?lang=en 0.7ms, /?api_base_url=... 0.7ms (target <=100ms)
+[3] GET /: missing_required_10=[], total_data_testids_in_html_and_js=24 -> ['app-root', 'category-select', 'challenge-card', 'challenge-submit-form', 'empty-state-cta-btn', 'empty-state-guide', 'grade-btn-1', 'grade-btn-2', 'grade-btn-3', 'grade-btn-4', 'learning-form', 'memo-input', 'model-points-list', 'offline-error-banner', 'retry-submit-btn', 'review-card-panel', 'session-header', 'skills-summary-panel', 'submit-learning-btn', 'title-input', 'today-session-panel', 'url-input', 'validation-error-banner', 'xp-badge']
+[3] GET /?lang=ja: missing_required_10=[], total_data_testids_in_html_and_js=24 -> ['app-root', 'category-select', 'challenge-card', 'challenge-submit-form', 'empty-state-cta-btn', 'empty-state-guide', 'grade-btn-1', 'grade-btn-2', 'grade-btn-3', 'grade-btn-4', 'learning-form', 'memo-input', 'model-points-list', 'offline-error-banner', 'retry-submit-btn', 'review-card-panel', 'session-header', 'skills-summary-panel', 'submit-learning-btn', 'title-input', 'today-session-panel', 'url-input', 'validation-error-banner', 'xp-badge']
+[3] GET /?lang=en: missing_required_10=[], total_data_testids_in_html_and_js=24 -> ['app-root', 'category-select', 'challenge-card', 'challenge-submit-form', 'empty-state-cta-btn', 'empty-state-guide', 'grade-btn-1', 'grade-btn-2', 'grade-btn-3', 'grade-btn-4', 'learning-form', 'memo-input', 'model-points-list', 'offline-error-banner', 'retry-submit-btn', 'review-card-panel', 'session-header', 'skills-summary-panel', 'submit-learning-btn', 'title-input', 'today-session-panel', 'url-input', 'validation-error-banner', 'xp-badge']
+[3] GET /?api_base_url=...: missing_required_10=[], total_data_testids_in_html_and_js=24 -> ['app-root', 'category-select', 'challenge-card', 'challenge-submit-form', 'empty-state-cta-btn', 'empty-state-guide', 'grade-btn-1', 'grade-btn-2', 'grade-btn-3', 'grade-btn-4', 'learning-form', 'memo-input', 'model-points-list', 'offline-error-banner', 'retry-submit-btn', 'review-card-panel', 'session-header', 'skills-summary-panel', 'submit-learning-btn', 'title-input', 'today-session-panel', 'url-input', 'validation-error-banner', 'xp-badge']
+[4] DOM A11y (ja (GET /)): html_lang='ja', controls=16, with_aria_label=16, unlabeled=0
+    aria-label: tag=button id/testid=lang-toggle-btn -> 'English に切り替え'
+    aria-label: tag=button id/testid=theme-toggle-btn -> '表示テーマを切り替え'
+    aria-label: tag=button id/testid=retry-submit-btn -> '再試行'
+    aria-label: tag=button id/testid=empty-state-cta-btn -> '新しい学びを追加する'
+    aria-label: tag=textarea id/testid=challenge-answer-input -> 'あなたの設計・トレードオフ回答（10〜2,000文字）'
+    aria-label: tag=button id/testid=submit-challenge-btn -> '回答を記録して XP を獲得する'
+    aria-label: tag=button id/testid=reveal-answer-btn -> '要点・答えを確認する'
+    aria-label: tag=button id/testid=grade-btn-1 -> '1: 忘れた（1日後）'
+    aria-label: tag=button id/testid=grade-btn-2 -> '2: 曖昧（間隔×1.2）'
+    aria-label: tag=button id/testid=grade-btn-3 -> '3: 思い出せた（標準）'
+    aria-label: tag=button id/testid=grade-btn-4 -> '4: 即答できた（×1.3）'
+    aria-label: tag=input id/testid=title-input -> 'タイトル（任意・最大200文字）'
+    aria-label: tag=input id/testid=url-input -> '公開記事 URL（任意・http/https）'
+    aria-label: tag=select id/testid=category-select -> 'スキル領域（未指定ならキーワードから自動判定）'
+    aria-label: tag=textarea id/testid=memo-input -> '学習メモ本文（必須・10〜2,000文字）'
+    aria-label: tag=button id/testid=submit-learning-btn -> '3秒で問題＆復習カードに変換する（+15 XP）'
+    alerts/live-regions: [('div', 'offline-error-banner', 'alert', None), ('div', 'validation-error-banner', 'alert', None)]
+[4] DOM A11y (en (GET /?lang=en)): html_lang='en', controls=16, with_aria_label=16, unlabeled=0
+    aria-label: tag=button id/testid=lang-toggle-btn -> 'Switch to Japanese'
+    aria-label: tag=button id/testid=theme-toggle-btn -> 'Toggle color theme'
+    aria-label: tag=button id/testid=retry-submit-btn -> 'Retry'
+    aria-label: tag=button id/testid=empty-state-cta-btn -> 'Add New Learning'
+    aria-label: tag=textarea id/testid=challenge-answer-input -> 'Your Architecture & Trade-off Answer (10–2,000 chars)'
+    aria-label: tag=button id/testid=submit-challenge-btn -> 'Submit Answer & Claim XP'
+    aria-label: tag=button id/testid=reveal-answer-btn -> 'Reveal Key Summary'
+    aria-label: tag=button id/testid=grade-btn-1 -> '1: Forgot (1d)'
+    aria-label: tag=button id/testid=grade-btn-2 -> '2: Hard (×1.2)'
+    aria-label: tag=button id/testid=grade-btn-3 -> '3: Good (SM-2)'
+    aria-label: tag=button id/testid=grade-btn-4 -> '4: Easy (×1.3)'
+    aria-label: tag=input id/testid=title-input -> 'Title (optional, max 200 chars)'
+    aria-label: tag=input id/testid=url-input -> 'Public Article URL (optional, http/https)'
+    aria-label: tag=select id/testid=category-select -> 'Skill Category (auto-detected if omitted)'
+    aria-label: tag=textarea id/testid=memo-input -> 'Learning Memo (required, 10–2,000 chars)'
+    aria-label: tag=button id/testid=submit-learning-btn -> 'Convert to Challenge & Card (+15 XP)'
+    alerts/live-regions: [('div', 'offline-error-banner', 'alert', None), ('div', 'validation-error-banner', 'alert', None)]
+[5] CSS checks: min-height:44px count=3, min-width:44px count=1, focus_rules=1, prefers-color-scheme:dark=True, prefers-contrast:more=False, wrap_rules=['overflow-wrap: anywhere']
+[6] CSS color variables found in <style>:
+    [('--bg', '#F8FAFC'), ('--surface', '#FFFFFF'), ('--surface-muted', '#F1F5F9'), ('--border', '#CBD5E1'), ('--text', '#0F172A'), ('--text-secondary', '#334155'), ('--primary', '#1D4ED8'), ('--primary-hover', '#1E40AF'), ('--primary-contrast', '#FFFFFF'), ('--accent-xp-bg', '#EEF2FF'), ('--accent-xp-text', '#312E81'), ('--success-bg', '#ECFDF5'), ('--success-border', '#059669'), ('--success-text', '#065F46'), ('--danger-bg', '#FEF2F2'), ('--danger-border', '#DC2626'), ('--danger-text', '#991B1B'), ('--warning-bg', '#FFFBEB'), ('--warning-border', '#D97706'), ('--warning-text', '#92400E'), ('--focus-ring', '#2563EB'), ('--bg', '#0B1120'), ('--surface', '#111827'), ('--surface-muted', '#1E293B'), ('--border', '#334155'), ('--text', '#F8FAFC'), ('--text-secondary', '#CBD5E1'), ('--primary', '#60A5FA'), ('--primary-hover', '#93C5FD'), ('--primary-contrast', '#0B1120'), ('--accent-xp-bg', '#1E1B4B'), ('--accent-xp-text', '#E0E7FF'), ('--success-bg', '#064E3B'), ('--success-border', '#34D399'), ('--success-text', '#ECFDF5'), ('--danger-bg', '#7F1D1D'), ('--danger-border', '#F87171'), ('--danger-text', '#FEF2F2'), ('--warning-bg', '#78350F'), ('--warning-border', '#FBBF24'), ('--warning-text', '#FEF3C7'), ('--focus-ring', '#93C5FD'), ('--bg', '#0B1120'), ('--surface', '#111827'), ('--surface-muted', '#1E293B'), ('--border', '#334155'), ('--text', '#F8FAFC'), ('--text-secondary', '#CBD5E1'), ('--primary', '#60A5FA'), ('--primary-hover', '#93C5FD'), ('--primary-contrast', '#0B1120'), ('--accent-xp-bg', '#1E1B4B'), ('--accent-xp-text', '#E0E7FF'), ('--success-bg', '#064E3B'), ('--success-border', '#34D399'), ('--success-text', '#ECFDF5'), ('--danger-bg', '#7F1D1D'), ('--danger-border', '#F87171'), ('--danger-text', '#FEF2F2'), ('--warning-bg', '#78350F'), ('--warning-border', '#FBBF24'), ('--warning-text', '#FEF3C7'), ('--focus-ring', '#93C5FD')]
+[7] Style sheet excerpt:
+    --bg: #F8FAFC;
+    --surface: #FFFFFF;
+    --surface-muted: #F1F5F9;
+    --border: #CBD5E1;
+    --text: #0F172A;
+    --text-secondary: #334155;
+    --primary: #1D4ED8;
+    --primary-hover: #1E40AF;
+    --primary-contrast: #FFFFFF;
+    --accent-xp-bg: #EEF2FF;
+    --accent-xp-text: #312E81;
+    --success-bg: #ECFDF5;
+    --success-border: #059669;
+    --success-text: #065F46;
+    --danger-bg: #FEF2F2;
+    --danger-border: #DC2626;
+    --danger-text: #991B1B;
+    --warning-bg: #FFFBEB;
+    --warning-border: #D97706;
+    --warning-text: #92400E;
+    --focus-ring: #2563EB;
+    --shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+    @media (prefers-color-scheme: dark) {
+    --bg: #0B1120;
+    --surface: #111827;
+    --surface-muted: #1E293B;
+    --border: #334155;
+    --text: #F8FAFC;
+    --text-secondary: #CBD5E1;
+    --primary: #60A5FA;
+    --primary-hover: #93C5FD;
+    --primary-contrast: #0B1120;
+    --accent-xp-bg: #1E1B4B;
+    --accent-xp-text: #E0E7FF;
+    --success-bg: #064E3B;
+    --success-border: #34D399;
+    --success-text: #ECFDF5;
+    --danger-bg: #7F1D1D;
+    --danger-border: #F87171;
+    --danger-text: #FEF2F2;
+    --warning-bg: #78350F;
+    --warning-border: #FBBF24;
+    --warning-text: #FEF3C7;
+    --focus-ring: #93C5FD;
+    --shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+    --bg: #0B1120;
+    --surface: #111827;
+    --surface-muted: #1E293B;
+    --border: #334155;
+    --text: #F8FAFC;
+    --text-secondary: #CBD5E1;
+    --primary: #60A5FA;
+    --primary-hover: #93C5FD;
+    --primary-contrast: #0B1120;
+    --accent-xp-bg: #1E1B4B;
+    --accent-xp-text: #E0E7FF;
+    --success-bg: #064E3B;
+    --success-border: #34D399;
+    --success-text: #ECFDF5;
+    --danger-bg: #7F1D1D;
+    --danger-border: #F87171;
+    --danger-text: #FEF2F2;
+    --warning-bg: #78350F;
+    --warning-border: #FBBF24;
+    --warning-text: #FEF3C7;
+    --focus-ring: #93C5FD;
+    --shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+    background-color: var(--bg);
+    color: var(--text);
+    overflow-wrap: anywhere;
+    :focus-visible {
+    outline: 3px solid var(--focus-ring);
+    border-bottom: 1px solid var(--border);
+    font-size: 1.5rem;
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+    color: inherit;
+    min-height: 44px;
+    min-width: 44px;
+    transition: background-color 0.12s ease, border-color 0.12s ease;
+    background-color: var(--primary);
+    color: var(--primary-contrast);
+    background-color: var(--primary-hover);
+    background-color: var(--surface-muted);
+    color: var(--text);
+    border-color: var(--border);
+    border-color: var(--primary);
+    background-color: var(--danger-text);
+    color: #FFFFFF;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    font-size: 1.375rem;
+    background-color: var(--danger-bg);
+    border-color: var(--danger-border);
+    color: var(--danger-text);
+    background-color: var(--warning-bg);
+    border-color: var(--warning-border);
+    color: var(--warning-text);
+    background-color: var(--success-bg);
+    border-color: var(--success-border);
+    color: var(--success-text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    font-size: 1.25rem;
+    font-size: 0.875rem;
+    background-color: var(--accent-xp-bg);
+    color: var(--accent-xp-text);
+    background: var(--surface);
+    border: 2px dashed var(--border);
+    font-size: 1.0625rem;
+    font-size: 0.9375rem;
+    min-height: 44px;
+    border: 1px solid var(--border);
+    background-color: var(--bg);
+    color: var(--text);
+    min-height: 7rem;
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    background-color: var(--surface-muted);
+    border: 1px solid var(--border);
+    min-height: 44px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    min-width: 22px;
+    min-height: 22px;
+    background-color: var(--surface-muted);
+    border: 1px solid var(--border);
+    color: var(--primary);
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    background-color: var(--primary);
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+[8] Query param XSS check: raw_script_injected=False
+[9] Skills summary ja/en labels: [('architecture', '設計・アーキテクチャ', 'Architecture & Design'), ('backend', 'バックエンド・API', 'Backend & API'), ('data', 'データ・DB', 'Data & Database'), ('reliability', 'インフラ・信頼性', 'Infrastructure & Reliability'), ('security', 'セキュリティ', 'Security'), ('trend', '技術トレンド', 'Tech Trends')]
+[10] Empty state copy in GET / (ja): True
+[11] Offline banner copy in GET / (ja): True
+[12] English UI check in GET /?lang=en: has 'Connection failed' or English strings -> (True, True)
+
+[13] Full <style> from HTTP GET /:
+
+    :root {
+      --bg: #F8FAFC;
+      --surface: #FFFFFF;
+      --surface-muted: #F1F5F9;
+      --border: #CBD5E1;
+      --text: #0F172A;
+      --text-secondary: #334155;
+      --primary: #1D4ED8;
+      --primary-hover: #1E40AF;
+      --primary-contrast: #FFFFFF;
+      --accent-xp-bg: #EEF2FF;
+      --accent-xp-text: #312E81;
+      --success-bg: #ECFDF5;
+      --success-border: #059669;
+      --success-text: #065F46;
+      --danger-bg: #FEF2F2;
+      --danger-border: #DC2626;
+      --danger-text: #991B1B;
+      --warning-bg: #FFFBEB;
+      --warning-border: #D97706;
+      --warning-text: #92400E;
+      --focus-ring: #2563EB;
+      --shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #0B1120;
+        --surface: #111827;
+        --surface-muted: #1E293B;
+        --border: #334155;
+        --text: #F8FAFC;
+        --text-secondary: #CBD5E1;
+        --primary: #60A5FA;
+        --primary-hover: #93C5FD;
+        --primary-contrast: #0B1120;
+        --accent-xp-bg: #1E1B4B;
+        --accent-xp-text: #E0E7FF;
+        --success-bg: #064E3B;
+        --success-border: #34D399;
+        --success-text: #ECFDF5;
+        --danger-bg: #7F1D1D;
+        --danger-border: #F87171;
+        --danger-text: #FEF2F2;
+        --warning-bg: #78350F;
+        --warning-border: #FBBF24;
+        --warning-text: #FEF3C7;
+        --focus-ring: #93C5FD;
+        --shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+      }
+    }
+    :root[data-theme="dark"] {
+      --bg: #0B1120;
+      --surface: #111827;
+      --surface-muted: #1E293B;
+      --border: #334155;
+      --text: #F8FAFC;
+      --text-secondary: #CBD5E1;
+      --primary: #60A5FA;
+      --primary-hover: #93C5FD;
+      --primary-contrast: #0B1120;
+      --accent-xp-bg: #1E1B4B;
+      --accent-xp-text: #E0E7FF;
+      --success-bg: #064E3B;
+      --success-border: #34D399;
+      --success-text: #ECFDF5;
+      --danger-bg: #7F1D1D;
+      --danger-border: #F87171;
+      --danger-text: #FEF2F2;
+      --warning-bg: #78350F;
+      --warning-border: #FBBF24;
+      --warning-text: #FEF3C7;
+      --focus-ring: #93C5FD;
+      --shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+    }
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans JP", sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+    }
+    [hidden] {
+      display: none !important;
+    }
+    :focus-visible {
+      outline: 3px solid var(--focus-ring);
+      outline-offset: 2px;
+    }
+    .container {
+      max-width: 72rem;
+      margin: 0 auto;
+      padding: 1.25rem 1rem 3rem;
+    }
+    .topbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.25rem;
+    }
+    .brand-title {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .brand-sub {
+      margin: 0.25rem 0 0;
+      font-size: 0.9375rem;
+      color: var(--text-secondary);
+    }
+    .topbar-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    button, input, select, textarea {
+      font: inherit;
+      color: inherit;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      min-width: 44px;
+      padding: 0.625rem 1.125rem;
+      border-radius: 0.625rem;
+      border: 1px solid transparent;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color 0.12s ease, border-color 0.12s ease;
+      text-align: center;
+    }
+    .btn-primary {
+      background-color: var(--primary);
+      color: var(--primary-contrast);
+    }
+    .btn-primary:hover:not(:disabled) {
+      background-color: var(--primary-hover);
+    }
+    .btn-secondary {
+      background-color: var(--surface-muted);
+      color: var(--text);
+      border-color: var(--border);
+    }
+    .btn-secondary:hover:not(:disabled) {
+      border-color: var(--primary);
+    }
+    .btn-danger {
+      background-color: var(--danger-text);
+      color: #FFFFFF;
+    }
+    .btn:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+    .stats-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+    .stat-pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 0.875rem 1rem;
+      box-shadow: var(--shadow);
+    }
+    .stat-label {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    .stat-value {
+      font-size: 1.375rem;
+      font-weight: 800;
+      margin-top: 0.125rem;
+    }
+    .banner {
+      border-radius: 0.75rem;
+      padding: 0.875rem 1rem;
+      margin-bottom: 1rem;
+      border: 2px solid;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      font-weight: 600;
+    }
+    .banner-error {
+      background-color: var(--danger-bg);
+      border-color: var(--danger-border);
+      color: var(--danger-text);
+    }
+    .banner-warning {
+      background-color: var(--warning-bg);
+      border-color: var(--warning-border);
+      color: var(--warning-text);
+    }
+    .banner-success {
+      background-color: var(--success-bg);
+      border-color: var(--success-border);
+      color: var(--success-text);
+    }
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+      box-shadow: var(--shadow);
+    }
+    .panel-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .panel-title {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 800;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.875rem;
+      font-weight: 700;
+      background-color: var(--accent-xp-bg);
+      color: var(--accent-xp-text);
+    }
+    .empty-guide {
+      text-align: left;
+      background: var(--surface);
+      border: 2px dashed var(--border);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .empty-guide p {
+      margin: 0 0 1rem;
+      font-size: 1.0625rem;
+      font-weight: 600;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+      margin-bottom: 1rem;
+    }
+    .field label {
+      font-weight: 700;
+      font-size: 0.9375rem;
+    }
+    .input, .select, .textarea {
+      width: 100%;
+      min-height: 44px;
+      padding: 0.625rem 0.75rem;
+      border-radius: 0.625rem;
+      border: 1px solid var(--border);
+      background-color: var(--bg);
+      color: var(--text);
+    }
+    .textarea {
+      min-height: 7rem;
+      resize: vertical;
+    }
+    .field-meta {
+      display: flex;
+      justify-content: flex-end;
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+    }
+    .subcard {
+      background-color: var(--surface-muted);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 1rem;
+      margin-top: 0.875rem;
+    }
+    .rubric-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin: 0.75rem 0 1rem;
+    }
+    .rubric-check {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.625rem;
+      min-height: 44px;
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.625rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      cursor: pointer;
+    }
+    .rubric-check input[type="checkbox"] {
+      min-width: 22px;
+      min-height: 22px;
+      margin-top: 0.2rem;
+    }
+    .grade-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+      gap: 0.625rem;
+      margin-top: 0.75rem;
+    }
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+      gap: 0.875rem;
+    }
+    .skill-card {
+      background-color: var(--surface-muted);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 1rem;
+    }
+    .skill-card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .skill-name {
+      font-weight: 800;
+    }
+    .skill-level {
+      font-weight: 800;
+      color: var(--primary);
+    }
+    .progress-track {
+      width: 100%;
+      height: 0.625rem;
+      background-color: var(--surface);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      margin-bottom: 0.5rem;
+    }
+    .progress-fill {
+      height: 100%;
+      background-color: var(--primary);
+      border-radius: 999px;
+      transition: width 0.2s ease;
+    }
+    .skill-foot {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+    .model-points {
+      margin: 0.5rem 0 0;
+      padding-left: 1.25rem;
+    }
+    .model-points li {
+      margin-bottom: 0.375rem;
+    }
+  
+
+[14] WCAG 2.1 Contrast Ratios (AA minimum 4.5:1):
+  body text on bg                 : Light #0F172A/#F8FAFC = 17.06:1 | Dark #F8FAFC/#0B1120 = 18.00:1
+  body text on surface            : Light #0F172A/#FFFFFF = 17.85:1 | Dark #F8FAFC/#111827 = 16.96:1
+  body text on surface-muted      : Light #0F172A/#F1F5F9 = 16.30:1 | Dark #F8FAFC/#1E293B = 13.98:1
+  secondary text on bg            : Light #334155/#F8FAFC =  9.90:1 | Dark #CBD5E1/#0B1120 = 12.68:1
+  secondary text on surface       : Light #334155/#FFFFFF = 10.35:1 | Dark #CBD5E1/#111827 = 11.95:1
+  secondary text on surface-muted : Light #334155/#F1F5F9 =  9.45:1 | Dark #CBD5E1/#1E293B =  9.85:1
+  primary button                  : Light #FFFFFF/#1D4ED8 =  6.70:1 | Dark #0B1120/#60A5FA =  7.41:1
+  xp badge                        : Light #312E81/#EEF2FF = 10.22:1 | Dark #E0E7FF/#1E1B4B = 12.98:1
+  success banner                  : Light #065F46/#ECFDF5 =  7.29:1 | Dark #ECFDF5/#064E3B =  9.23:1
+  danger banner                   : Light #991B1B/#FEF2F2 =  7.60:1 | Dark #FEF2F2/#7F1D1D =  9.16:1
+  warning banner                  : Light #92400E/#FFFBEB =  6.84:1 | Dark #FEF3C7/#78350F =  8.15:1
+
+[15] Check occurrences of btn-danger in GET / response:
+  HTML line 164: .btn-danger {
+
+[16] i18n key parity check: ja_count=70, en_count=70, only_in_ja=[], only_in_en=[], null_ja=[], null_en=[]

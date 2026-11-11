@@ -1,0 +1,1753 @@
+openapi: 3.1.0
+info:
+  title: DevForge Personal Learning Loop API
+  version: 1.0.0
+  summary: 外部学習の取り込みと日次3分の実践思考・忘却曲線復習ループ API（001-personal-learning-loop）
+  description: |
+    日々技術記事や業務の知見に触れるエンジニアが、記事URLや学習メモ（10〜2,000文字）を投入し、
+    3秒以内に「6領域のスキル経験値（XP）」「設計・障害・トレードオフを問う実践思考問題1問」
+    「忘却曲線（SM-2）の復習カード」へ自動変換して、1日3分（180秒）以内で消化するためのAPI契約。
+
+    ## 認証方針
+    - 初期リリース（`001-personal-learning-loop`）はローカル/単一ユーザー育成環境のため認証不要（`security: []`）。
+    - 将来のマルチデバイス展開時は破壊的変更なしで Bearer トークンヘッダを追加できるよう拡張余地を保つ。
+
+    ## 決定論的生成モード（Test Seam #5）
+    - デフォルトで外部LLMのAPIキーや外部通信を必要としない「決定論的ルール・ヒューリスティック生成エンジン」で動作する。
+    - キーワード辞書により6領域（`architecture`, `backend`, `data`, `reliability`, `security`, `trend`）を自動判定し、
+      3観点ルーブリック（①前提・制約、②トレードオフ比較、③障害・エッジケース対策）を持つ実践思考問題1問と初回SM-2復習カードを生成する。
+
+    ## エラー形式（RFC 9457 Problem Details + PRD AC-7/AC-9 互換）
+    - すべてのエラー応答は RFC 9457（`application/problem+json`）の標準フィールド（`type`, `title`, `status`, `detail`, `instance`）に加え、
+      PRD AC-7 / AC-9 で定義された `error.code` および `error.message` オブジェクトを同梱して返す。
+
+    ## サーバーの待ち受け・保存先・本番モード（2026-10-30 追補）
+    - 起動コマンドは `python3 -m backend.app`（作業フォルダはリポジトリの根）。待ち受けの既定は `127.0.0.1:8000`（`servers` の URL と同じ）。
+    - 環境変数 `DEVFORGE_HOST`（既定 `127.0.0.1`）と `DEVFORGE_PORT`（既定 `8000`、1〜65535 の整数）で変えられる。
+      認証がないため `DEVFORGE_HOST` はループバック（`127.0.0.0/8` の IPv4、`::1`、`localhost`）だけを受け付ける。
+      それ以外のホストや不正なポートのときは待ち受けを始めず、0 でない終了コードで終わり、標準エラーに変数名を含む理由を出す。
+    - 保存先は環境変数 `DEVFORGE_DB_PATH`（SQLite のファイルのパス。`:memory:` も可だが、プロセスを止めると消える）。
+      未指定のときは `~/.devforge/devforge.sqlite3`（親フォルダがなければ作る）。
+      指定したパスの親フォルダがないときは待ち受けを始めず、0 でない終了コードで終わり、標準エラーに `DEVFORGE_DB_PATH` を含む理由を出す。
+    - 環境変数 `APP_ENV=production` のとき、`/api/v1/test/*` は 403（`TEST_SEAM_DISABLED`）を返し、
+      テスト用ヘッダ（`X-Test-Now`、`X-Test-Url-Fetch-Mode`）は無視する（サーバーの現在時刻と `live` を使う）。
+servers:
+  - url: http://127.0.0.1:8000
+    description: ローカル開発・受け入れテスト用バックエンドサーバー
+tags:
+  - name: ui
+    description: ブラウザUI配信エンドポイント
+  - name: learnings
+    description: 外部学習インプット登録と問題・カード自動生成
+  - name: sessions
+    description: 本日の3分学習セッション取得
+  - name: challenges
+    description: 実践思考問題への回答とルーブリック自己検証
+  - name: reviews
+    description: SM-2忘却曲線カードの4段階想起評価
+  - name: skills
+    description: 6領域スキルツリー・成長サマリー取得
+  - name: test-seams
+    description: 受け入れテスト専用のDB初期化・シード投入エンドポイント（Test Seam #1）
+
+paths:
+  /:
+    get:
+      operationId: getWebAppUi
+      tags:
+        - ui
+      summary: ブラウザUI（日次3分学習ループ＆6領域スキルツリー画面）の配信
+      description: |
+        対応受け入れ条件：AC-1, AC-2, AC-3, AC-4, AC-5, AC-6, AC-7, AC-8, AC-9
+        認証：不要
+
+        単一ページで完結するブラウザUI（HTML/CSS/JS）を返す。
+        - 通知権限やクリップボード権限などのOS/ブラウザ権限APIを一切要求せず、標準DOM操作のみでAC-1〜AC-9が完結する（AC-9）。
+        - テスト用のつなぎ口（Test Seam #4）として、クエリパラメータ `api_base_url`（通信先URLの切り替え・通信切断シミュレーション用）および `lang`（`ja` / `en`）を受け付ける。
+
+        ### 画面の識別子 data-testid（Test Seam #4、AC-1 / AC-6 / AC-8 / AC-9、2026-10-30 追補）
+        - `GET /` が返す HTML の中に、次の10個の `data-testid="…"` 属性を文字どおり書く。
+          サーバーが返す HTML に最初から入れ、JS で後から付けない（受け入れテストは JS を動かさず、返った HTML の文字列を調べる）。
+        - クエリ（`api_base_url`、`lang`）の有無や値に関係なく、10個すべてが入る。
+        - 初めは見えない要素（エラーバナー、再試行ボタン、空状態の案内）は `hidden` 属性などで隠してよいが、要素と属性は HTML に残す。
+        - 属性の値は二重引用符で囲む（例：`data-testid="app-root"`）。
+          | data-testid | 要素 | AC |
+          |---|---|---|
+          | `app-root` | 画面全体の根の要素 | AC-6, AC-9 |
+          | `learning-form` | 学習登録のフォーム | AC-1, AC-6, AC-8 |
+          | `title-input` | タイトルの入力欄 | AC-1, AC-8 |
+          | `url-input` | URL の入力欄 | AC-1, AC-8 |
+          | `memo-input` | 学習メモ本文の入力欄 | AC-1, AC-8 |
+          | `submit-learning-btn` | 登録の送信ボタン | AC-1, AC-8 |
+          | `offline-error-banner` | 通信に失敗したときのエラーバナー | AC-8 |
+          | `retry-submit-btn` | 再試行ボタン | AC-8 |
+          | `empty-state-guide` | 空状態の案内 | AC-6 |
+          | `empty-state-cta-btn` | 空状態から登録フォームへ移るボタン | AC-6 |
+        - 上の10個以外の識別子（設計メモ 3章 Seam #4 の `today-session-panel` など）は JS で後から描いてもよい。
+      security: []
+      parameters:
+        - name: api_base_url
+          in: query
+          required: false
+          description: テスト用APIベースURL上書き（Test Seam #4：通信切断・オフライン時の入力保持と再試行ボタン検証用）
+          schema:
+            type: string
+            example: http://127.0.0.1:59999
+        - name: lang
+          in: query
+          required: false
+          description: 表示言語（`ja` または `en`、既定は `ja`）
+          schema:
+            type: string
+            enum:
+              - ja
+              - en
+            default: ja
+      responses:
+        "200":
+          description: ブラウザUIのHTMLドキュメント
+          content:
+            text/html:
+              schema:
+                type: string
+              examples:
+                defaultUi:
+                  summary: 初期画面HTML
+                  value: "<!DOCTYPE html><html lang=\"ja\"><head><meta charset=\"utf-8\"><title>DevForge</title></head><body><main data-testid=\"app-root\"></main></body></html>"
+                requiredTestIds:
+                  summary: 必須の data-testid 10個を含む HTML の抜粋（2026-10-30 追補）
+                  value: '<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><title>DevForge</title></head><body><main data-testid="app-root"><section data-testid="empty-state-guide" hidden><p>本日の復習はすべて完了しています。新しい記事URLや学びのメモを1件追加して3分ループを始めましょう</p><button type="button" data-testid="empty-state-cta-btn">学びを追加する</button></section><form data-testid="learning-form"><input data-testid="title-input" name="title"><input data-testid="url-input" name="url"><textarea data-testid="memo-input" name="memo"></textarea><button type="submit" data-testid="submit-learning-btn">登録</button></form><div data-testid="offline-error-banner" role="alert" hidden>通信に失敗しました。入力内容は保持されています<button type="button" data-testid="retry-submit-btn">再試行</button></div></main></body></html>'
+
+  /api/v1/learnings:
+    post:
+      operationId: createLearning
+      tags:
+        - learnings
+      summary: 外部学習メモ・公開URLの登録とスキルXP・実践思考問題1問・忘却曲線カードの自動生成
+      description: |
+        対応受け入れ条件：AC-1, AC-7, AC-8, AC-9
+        認証：不要
+
+        タイトル（任意）、公開URL（任意）、学習メモ本文（必須、10〜2,000文字）、スキル領域（任意、未指定時はキーワードから6領域へ自動分類）を受け取り、
+        3秒（3,000ms）以内に以下を同一トランザクションで生成・保存して HTTP 201 を返す：
+        1. スキル領域への初期獲得経験値（`earned_xp: 15`）の加算
+        2. 3つの評価観点（`rubric_items` 3件：①前提・制約、②トレードオフ比較、③障害・エッジケース対策）を持つ実践思考問題1問（`challenge`）
+        3. 初回忘却曲線カード1枚（`review_card`：`interval_days: 1`, `ease_factor: 2.5`, `repetition_count: 0`, `next_review_at: 現在時刻+1日`）
+
+        ### URL取得とフォールバック・SSRF防御（AC-8 / AC-9）
+        - `url` が指定された場合、まずスキーム（`http` / `https` のみ許可）とホスト・解決後IPを検査し、
+          ループバック（`127.0.0.0/8`, `::1`, `localhost`）、プライベートIP（`10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`）、
+          リンクローカル/メタデータIP（`169.254.0.0/16`）、非HTTP(S)スキーム（`file://` 等）の場合は外部リクエストを一切発行せずに
+          HTTP 400（`error.code: "INVALID_URL_SCHEME_OR_HOST"`）を返す（AC-9）。
+        - 公開URLへのGETがタイムアウト（上限2.0秒）またはHTTPエラー/接続失敗となった場合は、エラーにせず入力された `title` と `memo` 本文のみから
+          問題と復習カードを生成し、`url_fetch_status: "fallback_used"` として HTTP 201 を返す（AC-8）。
+
+        ### SSRF の検査の順序と、DNS・テスト用スタブとの関係（AC-8 / AC-9、2026-10-30 追補）
+        `url` があるとき、次の順に調べる。1〜4 は URL の文字列だけで決まり、名前解決（DNS）も外部への接続もしない。
+        1. スキームが `http` か `https` でなければ 400（`INVALID_URL_SCHEME_OR_HOST`）。
+        2. ホストがない、またはホストが `localhost` か `*.localhost`（大文字小文字を区別しない）なら 400。
+        3. ホストが IP の文字（IPv4、`[...]` で囲んだ IPv6、`socket.inet_aton` が受け付ける IPv4 の別表記 `2130706433`・`0x7f.1`・`0177.0.0.1` など）なら、
+           その IP を下の「拒否する IP」で調べ、当たれば 400。IPv4 を埋め込んだ IPv6（`::ffff:127.0.0.1`）は中の IPv4 でも調べる。
+        4. 1〜3 は `X-Test-Url-Fetch-Mode` の値に関係なく、いつも結果の決め方（5）より先に行う。スタブのヘッダがあっても 400 になる。
+        5. 結果の決め方：
+           - `X-Test-Url-Fetch-Mode` が `stub_ok` / `stub_timeout` / `stub_error` なら、ヘッダの値で結果を決める（予約テストドメインの決まりより優先する）。DNS は引かず、外部へ接続しない。
+           - ヘッダがないか `live` で、ホストが予約テストドメイン（`*.example.test`）なら、下の「予約テストドメイン」の表で結果を決める。DNS は引かず、外部へ接続しない。
+           - それ以外（ヘッダがないか `live` で、ふつうのホスト名）のときだけ 6 に進む。
+        6. 本当に取得するとき：ホスト名を1回だけ名前解決し、返ったすべての IP を「拒否する IP」で調べる。1つでも当たれば外部へ接続せずに 400。
+           名前解決に失敗したら、どこにも接続していないので取得失敗として `fallback_used`（201）。
+           接続は、調べた IP に直接つなぐ（ホスト名で解決し直さない。DNS Rebinding 対策）。HTTPS の証明書の確認と SNI、`Host` ヘッダには元のホスト名を使う。環境変数のプロキシは使わない。
+        7. リダイレクトは3回まで追い、行き先ごとに 1〜3 と 6 をやり直す。行き先が拒否に当たったら、そこへは接続せず `fallback_used`（201）にする（利用者が入れた URL は正しいため 400 にしない）。4回目のリダイレクトも `fallback_used`。
+        - 名前解決・接続・読み込み・リダイレクトをすべて合わせて 2.0 秒を上限とし、超えたら `fallback_used`。
+        - 拒否する IP：`ipaddress` の `is_private`、`is_loopback`、`is_link_local`、`is_multicast`、`is_reserved`、`is_unspecified` のどれかが真のもの、および `100.64.0.0/10`。
+          上に書いた `127.0.0.0/8`、`::1`、`10.0.0.0/8`、`172.16.0.0/12`、`192.168.0.0/16`、`169.254.0.0/16` はすべてこれに含まれる。
+        - 受け入れテストで使う URL（IP の文字、`localhost`、予約テストドメイン、スタブのヘッダ付き）は、どれも DNS を引かずに結果が決まる。
+        - `APP_ENV=production` のときは `X-Test-Url-Fetch-Mode` を無視して `live` として扱う。予約テストドメインの決まりは残る（予約テストドメインはどこにも接続しない決まりのため、本番でも外部へ接続しない）。
+
+        ### 予約テストドメイン（Test Seam #3、2026-10-30 追補）
+        | ホスト（`http` / `https`） | ヘッダがないか `live` のときの結果 | 外部への接続 |
+        |---|---|---|
+        | `ok.example.test` | 取得成功として扱う（`url_fetch_status: "fetched"`。取得した本文は空として扱い、`title` と `memo` から作る） | なし |
+        | `timeout.example.test` | 2秒のタイムアウトとして扱う（`url_fetch_status: "fallback_used"`） | なし |
+        | `error.example.test` | 接続失敗 / HTTP 500 として扱う（`url_fetch_status: "fallback_used"`） | なし |
+        | 上の3つ以外の `*.example.test` | 名前解決できないホストとして扱う（`url_fetch_status: "fallback_used"`） | なし |
+        - パス・クエリ・ポートは結果に関係しない（`https://timeout.example.test/slow` と `https://timeout.example.test/article` は同じ結果）。
+        - `timeout.example.test` とヘッダ `stub_timeout` は、実際には2秒待たない（すぐに `fallback_used` で作る）。
+
+        ### Idempotency-Key で送り直したとき（AC-8、2026-10-30 追補。submitChallenge と gradeReviewCard も同じ決まり）
+        - 同じ `Idempotency-Key` で、同じメソッド・同じパス・同じ本文（JSON を正規化して比べる）の要求がもう一度来たら、2回目は処理をやり直さない。
+          1回目の応答と同じ状態コード（ここでは 201）と同じ本文（`learning_id`、`processing_ms`、`created_at` も同じ）を返し、応答ヘッダ `Idempotent-Replayed: true` を付ける。XP・問題・カードは1回分だけ。
+        - 同じキーで、メソッド・パス・本文のどれかが違う要求は、何も変えずに 422（`IDEMPOTENCY_KEY_MISMATCH`、`field: "Idempotency-Key"`）を返す。
+        - 覚えるのは成功（2xx）の応答だけ。4xx や 5xx で終わった要求のキーは覚えないので、同じキーのまま直して送り直せる。
+        - キーは1回目の成功から24時間覚える。過ぎたら新しいキーとして扱う。`POST /api/v1/test/reset` で全部消える。
+        - 同じキーの要求が同時に来たときは1つずつ処理し、2つ目は1つ目が終わってから上の決まりで返す。
+        - 本文の比べ方にヘッダ（`X-Test-Now`、`X-Test-Url-Fetch-Mode` など）は含めない。
+        - キーが1〜128文字でないときは 400（`VALIDATION_ERROR`、`field: "Idempotency-Key"`）。キーがない要求は毎回新しく処理する。
+
+        ### 文字数の数え方と空白だけの入力（AC-7、2026-10-30 追補）
+        - 文字数は Unicode のコードポイントの数で数える（Python の `len(str)`。正規化はしない。結合した絵文字は複数のコードポイントとして数える）。`title`（200まで）と `url`（2,048まで）も同じ。
+        - `memo` は、送られた文字列が 2,000 コードポイント以下で、かつ前後の空白（Python の `str.strip()` が取り除く文字）を除いた長さが 10 以上のときだけ受け付ける。
+          空白だけ、または前後の空白を除くと9以下なら 400（`VALIDATION_ERROR`、`field: "memo"`）。
+        - 保存と応答の `memo` は、送られた文字列のまま（空白を取り除かない）。
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKeyHeader"
+        - $ref: "#/components/parameters/TestNowHeader"
+        - $ref: "#/components/parameters/TestUrlFetchModeHeader"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateLearningRequest"
+            examples:
+              normalWithUrl:
+                summary: AC-1 通常登録（URLあり・カテゴリ自動判定）
+                value:
+                  title: Redisキャッシュ設計
+                  url: https://example.com/redis
+                  memo: キャッシュミス時のDB負荷急増（Cache Stampede）を防ぐにはロックやTTLジッターを使う
+              fallbackTimeoutUrl:
+                summary: AC-8 URLタイムアウト時のメモ本文フォールバック
+                value:
+                  title: 分散ロックの設計
+                  url: https://timeout.example.test/article
+                  memo: 分散環境でのロック取得時はリース期限とフェンシングトークンを組み合わせてスプリットブレインを防ぐ
+      responses:
+        "201":
+          description: 外部学習の登録と実践思考問題・復習カードの生成成功（AC-1, AC-8）
+          headers:
+            Idempotent-Replayed:
+              $ref: "#/components/headers/IdempotentReplayed"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateLearningResponse"
+              examples:
+                createdNormal:
+                  summary: AC-1 正常生成レスポンス
+                  value:
+                    learning_id: lrn_01J8X001
+                    title: Redisキャッシュ設計
+                    url: https://example.com/redis
+                    memo: キャッシュミス時のDB負荷急増（Cache Stampede）を防ぐにはロックやTTLジッターを使う
+                    category: data
+                    earned_xp: 15
+                    url_fetch_status: fetched
+                    processing_ms: 14
+                    challenge:
+                      challenge_id: chl_01J8X001
+                      learning_id: lrn_01J8X001
+                      category: data
+                      question: "【実践思考：Redisキャッシュ設計】「キャッシュミス時のDB負荷急増（Cache Stampede）を防ぐにはロックやTTLジッターを使う」を踏まえ、(1)この設計を採用する前提条件と制約、(2)代替案とのトレードオフ、(3)障害やエッジケース発生時の対策を説明してください。"
+                      rubric_items:
+                        - index: 0
+                          perspective: premise_constraints
+                          label_ja: 前提・制約の明確化
+                          description_ja: トラフィック特性・データ整合性要件・許容レイテンシなどの前提条件と制約を明示しているか
+                        - index: 1
+                          perspective: tradeoff_comparison
+                          label_ja: トレードオフ比較
+                          description_ja: 別案（ロック方式 vs TTLジッター vs 事前ウォームアップ等）との利点・欠点を比較して選択理由を述べているか
+                        - index: 2
+                          perspective: failure_edge_cases
+                          label_ja: 障害・エッジケース対策
+                          description_ja: キャッシュノード障害やロック保持者クラッシュ時などのフォールバック・縮退運転を具体化しているか
+                      status: pending
+                      created_at: "2026-10-30T09:00:00Z"
+                    review_card:
+                      card_id: crd_01J8X001
+                      learning_id: lrn_01J8X001
+                      category: data
+                      front_prompt: "【Redisキャッシュ設計】の要点・トレードオフ・障害対策を自分の言葉で説明してください。"
+                      back_summary: キャッシュミス時のDB負荷急増（Cache Stampede）を防ぐにはロックやTTLジッターを使う
+                      interval_days: 1
+                      ease_factor: 2.5
+                      repetition_count: 0
+                      next_review_at: "2026-10-31T09:00:00Z"
+                    created_at: "2026-10-30T09:00:00Z"
+                createdFallback:
+                  summary: AC-8 URL取得失敗・タイムアウト時のフォールバック成功レスポンス
+                  value:
+                    learning_id: lrn_01J8X002
+                    title: 分散ロックの設計
+                    url: https://timeout.example.test/article
+                    memo: 分散環境でのロック取得時はリース期限とフェンシングトークンを組み合わせてスプリットブレインを防ぐ
+                    category: reliability
+                    earned_xp: 15
+                    url_fetch_status: fallback_used
+                    processing_ms: 2012
+                    challenge:
+                      challenge_id: chl_01J8X002
+                      learning_id: lrn_01J8X002
+                      category: reliability
+                      question: "【実践思考：分散ロックの設計】「分散環境でのロック取得時はリース期限とフェンシングトークンを組み合わせてスプリットブレインを防ぐ」を踏まえ、(1)前提条件と制約、(2)代替案とのトレードオフ、(3)障害・エッジケース対策を説明してください。"
+                      rubric_items:
+                        - index: 0
+                          perspective: premise_constraints
+                          label_ja: 前提・制約の明確化
+                          description_ja: トラフィック特性・データ整合性要件・許容レイテンシなどの前提条件と制約を明示しているか
+                        - index: 1
+                          perspective: tradeoff_comparison
+                          label_ja: トレードオフ比較
+                          description_ja: 別案との利点・欠点を比較して選択理由を述べているか
+                        - index: 2
+                          perspective: failure_edge_cases
+                          label_ja: 障害・エッジケース対策
+                          description_ja: ノード障害やネットワーク分断時のフォールバック・縮退運転を具体化しているか
+                      status: pending
+                      created_at: "2026-10-30T09:00:00Z"
+                    review_card:
+                      card_id: crd_01J8X002
+                      learning_id: lrn_01J8X002
+                      category: reliability
+                      front_prompt: "【分散ロックの設計】の要点・トレードオフ・障害対策を自分の言葉で説明してください。"
+                      back_summary: 分散環境でのロック取得時はリース期限とフェンシングトークンを組み合わせてスプリットブレインを防ぐ
+                      interval_days: 1
+                      ease_factor: 2.5
+                      repetition_count: 0
+                      next_review_at: "2026-10-31T09:00:00Z"
+                    created_at: "2026-10-30T09:00:00Z"
+        "400":
+          description: 入力バリデーションエラー（AC-7）または不正なURLスキーム・SSRF対象ホスト拒否（AC-9）
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              examples:
+                memoTooShort:
+                  summary: AC-7 memo文字数不足エラー
+                  value:
+                    type: https://devforge.local/problems/validation-error
+                    title: 入力内容に誤りがあります
+                    status: 400
+                    detail: memo は10文字以上2000文字以下で入力してください
+                    instance: /api/v1/learnings
+                    error:
+                      code: VALIDATION_ERROR
+                      message: memo は10文字以上2000文字以下で入力してください
+                      field: memo
+                ssrfBlocked:
+                  summary: AC-9 内部IP・非許可スキーム拒否エラー
+                  value:
+                    type: https://devforge.local/problems/invalid-url-scheme-or-host
+                    title: 指定されたURLは許可されていません
+                    status: 400
+                    detail: url には公開 http/https URL のみ指定できます（ローカルホストやプライベートIPは指定できません）
+                    instance: /api/v1/learnings
+                    error:
+                      code: INVALID_URL_SCHEME_OR_HOST
+                      message: url には公開 http/https URL のみ指定できます（ローカルホストやプライベートIPは指定できません）
+                      field: url
+        "422":
+          description: 同じ Idempotency-Key で、メソッド・パス・本文のどれかが違う要求（AC-8、2026-10-30 追補）
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              examples:
+                idempotencyKeyMismatch:
+                  summary: 冪等キーの使い回しエラー
+                  value:
+                    type: https://devforge.local/problems/idempotency-key-mismatch
+                    title: 同じ冪等キーで違う内容が送られました
+                    status: 422
+                    detail: Idempotency-Key は前回と違う内容の要求には使えません
+                    instance: /api/v1/learnings
+                    error:
+                      code: IDEMPOTENCY_KEY_MISMATCH
+                      message: Idempotency-Key は前回と違う内容の要求には使えません
+                      field: Idempotency-Key
+
+  /api/v1/sessions/today:
+    get:
+      operationId: getTodaySession
+      tags:
+        - sessions
+      summary: 本日の3分学習セッション（未回答の実践思考問題最大1問＋期限到来カード最大5枚）の取得
+      description: |
+        対応受け入れ条件：AC-2, AC-6
+        認証：不要
+
+        1秒（1,000ms）以内に以下の日次セッション情報を返す：
+        - `active_challenge`：未回答（`status == "pending"`）の実践思考問題を古い順に最大1件（0件時は `null`）。
+        - `due_reviews`：復習期限（`next_review_at <= 現在時刻`）が到来している復習カードを期限が古い順（`next_review_at ASC, card_id ASC`）に最大5件（0件時は `[]`）。
+        - `total_due_count`：期限到来カード全体の件数（例：7枚到来している場合、`due_reviews` は5件、`total_due_count` は `7`）。
+        - `estimated_seconds`：想定所要秒数（上限 `180` 秒。`active_challenge` 1問＝55秒、`due_reviews` 1枚＝25秒として算出し、0問時は `0`）。
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/TestNowHeader"
+      responses:
+        "200":
+          description: 本日の学習セッション情報（AC-2 通常系 / AC-6 空状態）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TodaySessionResponse"
+              examples:
+                fullSession:
+                  summary: AC-2 思考問題1問＋期限到来カード5枚（全体7枚）
+                  value:
+                    session_date: "2026-10-30"
+                    active_challenge:
+                      challenge_id: chl_01J8X001
+                      learning_id: lrn_01J8X001
+                      category: data
+                      question: "【実践思考：Redisキャッシュ設計】前提条件・トレードオフ・障害対策を説明してください。"
+                      rubric_items:
+                        - index: 0
+                          perspective: premise_constraints
+                          label_ja: 前提・制約の明確化
+                          description_ja: 前提条件と制約を明示しているか
+                        - index: 1
+                          perspective: tradeoff_comparison
+                          label_ja: トレードオフ比較
+                          description_ja: 別案との利点・欠点を比較しているか
+                        - index: 2
+                          perspective: failure_edge_cases
+                          label_ja: 障害・エッジケース対策
+                          description_ja: 障害時の縮退運転を具体化しているか
+                      status: pending
+                      created_at: "2026-10-30T09:00:00Z"
+                    due_reviews:
+                      - card_id: crd_01J8X001
+                        learning_id: lrn_01J8X001
+                        category: data
+                        front_prompt: "【Redisキャッシュ設計】の要点・トレードオフ・障害対策を自分の言葉で説明してください。"
+                        back_summary: キャッシュミス時のDB負荷急増を防ぐにはロックやTTLジッターを使う
+                        interval_days: 1
+                        ease_factor: 2.5
+                        repetition_count: 0
+                        next_review_at: "2026-10-29T09:00:00Z"
+                    total_due_count: 7
+                    total_session_items: 6
+                    estimated_seconds: 180
+                    session_label_ja: 本日のセッション（全6問・目安3分）
+                    is_empty: false
+                emptySession:
+                  summary: AC-6 学習データ0件・本日の復習0件の空状態
+                  value:
+                    session_date: "2026-10-30"
+                    active_challenge: null
+                    due_reviews: []
+                    total_due_count: 0
+                    total_session_items: 0
+                    estimated_seconds: 0
+                    session_label_ja: 本日の復習はすべて完了しています。新しい記事URLや学びのメモを1件追加して3分ループを始めましょう
+                    is_empty: true
+        "500":
+          description: サーバー内部エラー
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              examples:
+                internalError:
+                  summary: 内部エラー例
+                  value:
+                    type: https://devforge.local/problems/internal-error
+                    title: サーバー内部エラーが発生しました
+                    status: 500
+                    detail: セッション情報の取得中に予期しないエラーが発生しました
+                    instance: /api/v1/sessions/today
+                    error:
+                      code: INTERNAL_ERROR
+                      message: セッション情報の取得中に予期しないエラーが発生しました
+
+  /api/v1/challenges/{challenge_id}/submit:
+    post:
+      operationId: submitChallenge
+      tags:
+        - challenges
+      summary: 実践思考問題への記述回答と3観点ルーブリック自己検証によるXP加算
+      description: |
+        対応受け入れ条件：AC-3, AC-7
+        認証：不要
+
+        回答テキスト（`answer`：10文字以上2,000文字以下）と、3つの評価観点のうち自己検証で満たした項目数
+        （`matched_rubric_count`：`0`〜`3`）を受け取り、1秒（1,000ms）以内に以下を更新して HTTP 200 を返す：
+        - 状態 `status` を `"completed"` に更新
+        - 獲得XP `earned_xp = 20 + matched_rubric_count * 10`（`20`, `30`, `40`, `50` のいずれか）を該当スキル領域に加算
+        - 更新後の領域 `total_xp` と `level`（`floor(total_xp / 100) + 1`）を算出
+        - 当日初回の学習完了（思考問題回答またはカード復習）である場合、`streak_days` を `+1` 更新
+        - 3つの評価観点に対応する模範解説 `model_points`（3件の配列）を返却
+
+        ### 送り直しと解答済みの問題（AC-3 / AC-7、2026-10-30 追補）
+        - 同じ `Idempotency-Key` で同じ要求を送り直したときは、`createLearning` の「Idempotency-Key で送り直したとき」と同じ決まりで、
+          1回目と同じ 200 と同じ本文を返し、`Idempotent-Replayed: true` を付ける。XP と連続日数は1回分だけ。本文が違えば 422（`IDEMPOTENCY_KEY_MISMATCH`）。
+        - キーなし、または別のキーで、すでに `completed` の問題に送ったときは、何も変えずに 409（`CHALLENGE_ALREADY_COMPLETED`、`field: "challenge_id"`）。
+        - 調べる順序：キーの形（400）→ 同じキーの送り直し（200 の再生 / 422）→ 問題があるか（404）→ 本文の検査（400）→ 解答済みか（409）。
+        - `answer` の数え方は `createLearning` の `memo` と同じ（コードポイントで数え、2,000 以下、かつ前後の空白を除いて10以上。空白だけは 400、`field: "answer"`）。
+
+        ### 連続日数 streak_days の更新（AC-3 / AC-4、2026-10-30 追補。gradeReviewCard も同じ）
+        - 「日」は基準時刻（`X-Test-Now` か、サーバーの現在時刻）の UTC の暦日。`last_study_date` も UTC の日付。
+        - 完了したとき：`last_study_date` が今日か今日より後なら変えない。昨日なら `+1`。2日以上前か `null`（まだ学習していない）なら `1` に戻す。
+        - `last_study_date` が今日より前だったときは、今日に更新する。
+      security: []
+      parameters:
+        - name: challenge_id
+          in: path
+          required: true
+          description: 回答対象の実践思考問題ID
+          schema:
+            type: string
+            example: chl_01J8X001
+        - $ref: "#/components/parameters/IdempotencyKeyHeader"
+        - $ref: "#/components/parameters/TestNowHeader"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmitChallengeRequest"
+            examples:
+              validSubmission:
+                summary: AC-3 思考問題回答（3観点すべて達成）
+                value:
+                  answer: 秒間1万リクエストの参照系APIを前提とし、単純なロック方式は待機スレッド枯渇の懸念があるためTTLジッターと非同期再計算を併用する。Redis障害時はサーキットブレーカーでDB直読みを制限する。
+                  matched_rubric_count: 3
+                  elapsed_seconds: 50
+      responses:
+        "200":
+          description: 実践思考問題の回答完了とXP加算結果（AC-3）
+          headers:
+            Idempotent-Replayed:
+              $ref: "#/components/headers/IdempotentReplayed"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmitChallengeResponse"
+              examples:
+                completedChallenge:
+                  summary: AC-3 回答完了レスポンス（+50 XP）
+                  value:
+                    challenge_id: chl_01J8X001
+                    status: completed
+                    category: data
+                    answer: 秒間1万リクエストの参照系APIを前提とし、単純なロック方式は待機スレッド枯渇の懸念があるためTTLジッターと非同期再計算を併用する。Redis障害時はサーキットブレーカーでDB直読みを制限する。
+                    matched_rubric_count: 3
+                    earned_xp: 50
+                    total_xp: 65
+                    level: 1
+                    streak_days: 1
+                    model_points:
+                      - "前提・制約：想定QPS、許容レイテンシ、データの鮮度要件（結果整合性でよいか）を明示する"
+                      - "トレードオフ：ミューテックスロック（一貫性高・待ち発生）とTTLジッター/論理期限切れ（スループット高・実装複雑）を比較する"
+                      - "障害・エッジケース：キャッシュ層全損時のDB保護（レート制限・フォールバック応答・コールドスタート対策）を備える"
+                    completed_at: "2026-10-30T09:02:00Z"
+        "400":
+          description: 回答文字数不足・超過またはルーブリック数の範囲外エラー（AC-7）
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              examples:
+                invalidAnswerLength:
+                  summary: AC-7 answer文字数不足エラー
+                  value:
+                    type: https://devforge.local/problems/validation-error
+                    title: 入力内容に誤りがあります
+                    status: 400
+                    detail: answer は10文字以上2000文字以下で入力してください
+                    instance: /api/v1/challenges/chl_01J8X001/submit
+                    error:
+                      code: VALIDATION_ERROR
+                      message: answer は10文字以上2000文字以下で入力してください
+                      field: answer
+        "404":
+          description: 指定された challenge_id が存在しない
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              examples:
+                notFound:
+                  summary: 問題未検出エラー
+                  value:
+                    type: https://devforge.local/problems/resource-not-found
+                    title: 対象のデータが見つかりません
+                    status: 404
+                    detail: 指定された challenge_id は存在しません
+                    instance: /api/v1/challenges/chl_unknown/submit
+                    error:
+                      code: RESOURCE_NOT_FOUND
+                      message: 指定された challenge_id は存在しません
+                      field: challenge_id
+        "409":
+          description: すでに回答済み（completed）の問題に、キーなしか別のキーで送った（AC-3、2026-10-30 追補）
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              examples:
+                alreadyCompleted:
+                  summary: 回答済みの問題への再送
+                  value:
+                    type: https://devforge.local/problems/challenge-already-completed
+                    title: この問題はすでに回答済みです
+                    status: 409
+                    detail: 指定された challenge_id はすでに回答済みです
+                    instance: /api/v1/challenges/chl_01J8X001/submit
+                    error:
+                      code: CHALLENGE_ALREADY_COMPLETED
+                      message: 指定された challenge_id はすでに回答済みです
+                      field: challenge_id
+        "422":
+          description: 同じ Idempotency-Key で、メソッド・パス・本文のどれかが違う要求（2026-10-30 追補）
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              examples:
+                idempotencyKeyMismatch:
+                  summary: 冪等キーの使い回しエラー
+                  value:
+                    type: https://devforge.local/problems/idempotency-key-mismatch
+                    title: 同じ冪等キーで違う内容が送られました
+                    status: 422
+                    detail: Idempotency-Key は前回と違う内容の要求には使えません
+                    instance: /api/v1/challenges/chl_01J8X001/submit
+                    error:
+                      code: IDEMPOTENCY_KEY_MISMATCH
+                      message: Idempotency-Key は前回と違う内容の要求には使えません
+                      field: Idempotency-Key
+
+  /api/v1/reviews/{card_id}/grade:
+    post:
+      operationId: gradeReviewCard
+      tags:
+        - reviews
+      summary: SM-2忘却曲線カードの4段階想起評価による次回予定日と間隔の更新
+      description: |
+        対応受け入れ条件：AC-4, AC-7
+        認証：不要
+
+        復習カード（`card_id`）に対する4段階評価 `grade`（`1`〜`4`）を受け取り、1秒（1,000ms）以内に
+        SM-2 アルゴリズムで次回間隔を更新し、`earned_xp: 10` を加算して HTTP 200 を返す。
+
+        ### SM-2 4段階評価（`grade: 1..4`）の厳密な計算式と端数丸め規則
+        評価前のカード状態を `rep = repetition_count`, `ivl = interval_days`, `ef = ease_factor`（初期値 `2.5`、下限 `1.3`）とし、
+        端数丸め関数 `round_half_up(x) = floor(x + 0.5)`（正数の四捨五入）を用いる：
+        - **`grade = 1`（忘れた：1日後）**：
+          - `new_rep = 0`
+          - `new_ivl = 1`
+          - `new_ef = max(1.3, round(ef - 0.20, 2))`
+        - **`grade = 2`（曖昧：現在間隔×1.2）**：
+          - `new_rep = rep + 1`
+          - `new_ivl = max(1, round_half_up(ivl * 1.2))`
+          - `new_ef = max(1.3, round(ef - 0.15, 2))`
+        - **`grade = 3`（思い出せた：SM-2標準間隔）**：
+          - `new_rep = rep + 1`
+          - `sm2_base_ivl` は、`new_rep == 1`（評価前 `rep == 0`）のとき `1`、`new_rep == 2`（評価前 `rep == 1`）のとき `6`、
+            `new_rep >= 3`（評価前 `rep >= 2`）のとき `max(1, round_half_up(ivl * ef))`
+          - `new_ivl = sm2_base_ivl`
+          - `new_ef = max(1.3, round(ef, 2))`（変更なし）
+        - **`grade = 4`（即答できた：SM-2標準間隔×1.3）**：
+          - `new_rep = rep + 1`
+          - `sm2_base_ivl`（`new_rep == 1` で `1`、`new_rep == 2` で `6`、`new_rep >= 3` で `ivl * ef`）に対し `1.3` を乗じて四捨五入：
+            `new_ivl = max(1, round_half_up(sm2_base_ivl * 1.3))`（例：評価前 `rep == 1` のとき `round_half_up(6 * 1.3) = 8`）
+          - `new_ef = max(1.3, round(ef + 0.10, 2))`
+        - **次回予定日時 `next_review_at`**：基準時刻（`X-Test-Now` または現在UTC時刻）＋ `new_ivl` 日（`new_ivl * 86400` 秒）の ISO8601 日時。
+
+        ### 送り直しと期限前のカード（AC-4 / AC-7、2026-10-30 追補）
+        - 同じ `Idempotency-Key` で同じ要求を送り直したときは、`createLearning` の「Idempotency-Key で送り直したとき」と同じ決まりで、
+          1回目と同じ 200 と同じ本文を返し、`Idempotent-Replayed: true` を付ける。SM-2 の更新・XP・連続日数は1回分だけ。本文が違えば 422（`IDEMPOTENCY_KEY_MISMATCH`）。
+        - キーなし、または別のキーで、まだ期限が来ていないカード（`next_review_at` > 基準時刻）に送ったときは、何も変えずに 409（`REVIEW_CARD_NOT_DUE`、`field: "card_id"`）。
+          評価するとカードの期限は1日以上先に移るため、評価したばかりのカードへの送り直しもこれになる。
+        - 調べる順序：キーの形（400）→ 同じキーの送り直し（200 の再生 / 422）→ カードがあるか（404）→ 本文の検査（400）→ 期限が来ているか（409）。
+        - `streak_days` は `submitChallenge` の「連続日数 streak_days の更新」と同じ決まりで更新する。
+      security: []
+      parameters:
+        - name: card_id
+          in: path
+          required: true
+          description: 評価対象の復習カードID
+          schema:
+            type: string
+            example: crd_01J8X001
+        - $ref: "#/components/parameters/IdempotencyKeyHeader"
+        - $ref: "#/components/parameters/TestNowHeader"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GradeReviewRequest"
+            examples:
+              gradeThree:
+                summary: AC-4 思い出せた（grade=3）
+                value:
+                  grade: 3
+                  elapsed_seconds: 15
+              gradeOne:
+                summary: AC-4 忘れた（grade=1）
+                value:
+                  grade: 1
+                  elapsed_seconds: 20
+      responses:
+        "200":
+          description: 復習カードの評価更新成功（AC-4）
+          headers:
+            Idempotent-Replayed:
+              $ref: "#/components/headers/IdempotentReplayed"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GradeReviewResponse"
+              examples:
+                gradedThreeFromRepOne:
+                  summary: AC-4 grade=3（rep 1 -> 2, interval 1 -> 6, +10 XP）
+                  value:
+                    card_id: crd_01J8X001
+                    category: data
+                    grade: 3
+                    repetition_count: 2
+                    interval_days: 6
+                    ease_factor: 2.5
+                    next_review_at: "2026-11-05T09:00:00Z"
+                    earned_xp: 10
+                    total_xp: 75
+                    level: 1
+                    streak_days: 1
+                    remaining_due_count: 0
+                gradedOneReset:
+                  summary: AC-4 grade=1（rep -> 0, interval -> 1, +10 XP）
+                  value:
+                    card_id: crd_01J8X001
+                    category: data
+                    grade: 1
+                    repetition_count: 0
+                    interval_days: 1
+                    ease_factor: 2.3
+                    next_review_at: "2026-10-31T09:00:00Z"
+                    earned_xp: 10
+                    total_xp: 75
+                    level: 1
+                    streak_days: 1
+                    remaining_due_count: 0
+        "400":
+          description: 不正な評価値（grade が 1〜4 以外）に対するバリデーションエラー（AC-7）
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              examples:
+                invalidGrade:
+                  summary: AC-7 grade範囲外エラー（grade=0 または 5）
+                  value:
+                    type: https://devforge.local/problems/validation-error
+                    title: 入力内容に誤りがあります
+                    status: 400
+                    detail: grade は 1 から 4 の整数で指定してください
+                    instance: /api/v1/reviews/crd_01J8X001/grade
+                    error:
+                      code: VALIDATION_ERROR
+                      message: grade は 1 から 4 の整数で指定してください
+                      field: grade
+        "404":
+          description: 指定された card_id が存在しない
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              examples:
+                cardNotFound:
+                  summary: カード未検出エラー
+                  value:
+                    type: https://devforge.local/problems/resource-not-found
+                    title: 対象のデータが見つかりません
+                    status: 404
+                    detail: 指定された card_id は存在しません
+                    instance: /api/v1/reviews/crd_unknown/grade
+                    error:
+                      code: RESOURCE_NOT_FOUND
+                      message: 指定された card_id は存在しません
+                      field: card_id
+        "409":
+          description: まだ期限が来ていないカード（評価したばかりのカードを含む）に、キーなしか別のキーで送った（AC-4、2026-10-30 追補）
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              examples:
+                cardNotDue:
+                  summary: 期限前のカードへの評価
+                  value:
+                    type: https://devforge.local/problems/review-card-not-due
+                    title: このカードはまだ復習の期限が来ていません
+                    status: 409
+                    detail: 指定された card_id はまだ復習の期限が来ていません
+                    instance: /api/v1/reviews/crd_01J8X001/grade
+                    error:
+                      code: REVIEW_CARD_NOT_DUE
+                      message: 指定された card_id はまだ復習の期限が来ていません
+                      field: card_id
+        "422":
+          description: 同じ Idempotency-Key で、メソッド・パス・本文のどれかが違う要求（2026-10-30 追補）
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              examples:
+                idempotencyKeyMismatch:
+                  summary: 冪等キーの使い回しエラー
+                  value:
+                    type: https://devforge.local/problems/idempotency-key-mismatch
+                    title: 同じ冪等キーで違う内容が送られました
+                    status: 422
+                    detail: Idempotency-Key は前回と違う内容の要求には使えません
+                    instance: /api/v1/reviews/crd_01J8X001/grade
+                    error:
+                      code: IDEMPOTENCY_KEY_MISMATCH
+                      message: Idempotency-Key は前回と違う内容の要求には使えません
+                      field: Idempotency-Key
+
+  /api/v1/skills/summary:
+    get:
+      operationId: getSkillsSummary
+      tags:
+        - skills
+      summary: 6領域スキルツリーと成長サマリーの取得
+      description: |
+        対応受け入れ条件：AC-5, AC-6
+        認証：不要
+
+        固定6領域（`architecture`, `backend`, `data`, `reliability`, `security`, `trend`）ごとの
+        累計XP（`total_xp`）、現在レベル（`level = floor(total_xp / 100) + 1`）、
+        次レベルまでの残りXP（`xp_to_next_level = 100 - (total_xp % 100)`）、および
+        全体の `total_xp`、`overall_level`、`streak_days`、`weekly_mastered_count` を 1秒（1,000ms）以内に返す。
+        - データ0件時（AC-6）は6領域すべて `total_xp: 0`, `level: 1`, `xp_to_next_level: 100`、全体 `total_xp: 0`, `overall_level: 1`, `streak_days: 0`, `weekly_mastered_count: 0` を返す。
+        - 注記：PRD AC-5 本文の誤記（`` `weekly_ mastered_count` ``）を修正し、正式フィールド名はスペースなしの `weekly_mastered_count` とする。
+
+        ### 式と集計の決まり（AC-5 / AC-6、2026-10-30 追補）
+        - 全体の `total_xp` は6領域の `total_xp` の合計。`overall_level = floor(total_xp / 100) + 1`（全体の `total_xp` に領域と同じ式を使う。例：285 → 3、0 → 1）。
+        - `streak_days`：保存している連続日数を、`last_study_date` が今日・昨日・今日より後（基準時刻の UTC の暦日で比べる）のときだけそのまま返す。
+          2日以上前か `null` なら `0` を返す（連続が切れているため。保存している値は変えず、次に完了したときに `submitChallenge` の決まりで `1` になる）。
+        - `weekly_mastered_count`：基準時刻を `now` として、`now - 604,800秒（168時間）<= t <= now` に入るものを数える（両端を含む。暦日では区切らない）。
+          数えるのは「`status: completed` で `completed_at` が範囲に入る問題の数」と「最後の評価 `last_grade >= 3` で `graded_at` が範囲に入るカードの数」の合計。
+          カードは最後の評価だけを持つため、同じカードは1回まで数え、範囲の中で後から 1 か 2 を付けたカードは数えない。
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/TestNowHeader"
+      responses:
+        "200":
+          description: 6領域スキルツリー・成長サマリー（AC-5 通常系 / AC-6 空状態）
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SkillsSummaryResponse"
+              examples:
+                activeSummary:
+                  summary: AC-5 学習実績ありのスキルサマリー
+                  value:
+                    categories:
+                      - category: architecture
+                        label_ja: 設計・アーキテクチャ
+                        label_en: Architecture & Design
+                        total_xp: 120
+                        level: 2
+                        xp_to_next_level: 80
+                      - category: backend
+                        label_ja: バックエンド・API
+                        label_en: Backend & API
+                        total_xp: 45
+                        level: 1
+                        xp_to_next_level: 55
+                      - category: data
+                        label_ja: データ・DB
+                        label_en: Data & Database
+                        total_xp: 75
+                        level: 1
+                        xp_to_next_level: 25
+                      - category: reliability
+                        label_ja: インフラ・信頼性
+                        label_en: Infrastructure & Reliability
+                        total_xp: 30
+                        level: 1
+                        xp_to_next_level: 70
+                      - category: security
+                        label_ja: セキュリティ
+                        label_en: Security
+                        total_xp: 0
+                        level: 1
+                        xp_to_next_level: 100
+                      - category: trend
+                        label_ja: 技術トレンド
+                        label_en: Tech Trends
+                        total_xp: 15
+                        level: 1
+                        xp_to_next_level: 85
+                    total_xp: 285
+                    overall_level: 3
+                    streak_days: 3
+                    weekly_mastered_count: 5
+                emptySummary:
+                  summary: AC-6 初期状態（学習データ0件）のスキルサマリー
+                  value:
+                    categories:
+                      - category: architecture
+                        label_ja: 設計・アーキテクチャ
+                        label_en: Architecture & Design
+                        total_xp: 0
+                        level: 1
+                        xp_to_next_level: 100
+                      - category: backend
+                        label_ja: バックエンド・API
+                        label_en: Backend & API
+                        total_xp: 0
+                        level: 1
+                        xp_to_next_level: 100
+                      - category: data
+                        label_ja: データ・DB
+                        label_en: Data & Database
+                        total_xp: 0
+                        level: 1
+                        xp_to_next_level: 100
+                      - category: reliability
+                        label_ja: インフラ・信頼性
+                        label_en: Infrastructure & Reliability
+                        total_xp: 0
+                        level: 1
+                        xp_to_next_level: 100
+                      - category: security
+                        label_ja: セキュリティ
+                        label_en: Security
+                        total_xp: 0
+                        level: 1
+                        xp_to_next_level: 100
+                      - category: trend
+                        label_ja: 技術トレンド
+                        label_en: Tech Trends
+                        total_xp: 0
+                        level: 1
+                        xp_to_next_level: 100
+                    total_xp: 0
+                    overall_level: 1
+                    streak_days: 0
+                    weekly_mastered_count: 0
+        "500":
+          description: サーバー内部エラー
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              examples:
+                internalError:
+                  summary: 内部エラー例
+                  value:
+                    type: https://devforge.local/problems/internal-error
+                    title: サーバー内部エラーが発生しました
+                    status: 500
+                    detail: スキルサマリーの集計中にエラーが発生しました
+                    instance: /api/v1/skills/summary
+                    error:
+                      code: INTERNAL_ERROR
+                      message: スキルサマリーの集計中にエラーが発生しました
+
+  /api/v1/test/reset:
+    post:
+      operationId: resetTestState
+      tags:
+        - test-seams
+      summary: テスト環境用のDB状態初期化（Test Seam #1）
+      description: |
+        対応受け入れ条件：AC-1, AC-2, AC-3, AC-4, AC-5, AC-6, AC-7, AC-8, AC-9
+        認証：不要（テスト・ローカル検証環境専用）
+
+        受け入れテストごとに独立した空状態（AC-6）や初期状態を即座に作るための初期化エンドポイント。
+        学習データ、実践思考問題、復習カード、スキル領域XP、連続学習日数、冪等キー履歴をすべて初期化する。
+      security: []
+      responses:
+        "200":
+          description: DB状態の初期化完了
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TestResetResponse"
+              examples:
+                resetSuccess:
+                  summary: 初期化成功
+                  value:
+                    status: reset_ok
+        "403":
+          description: 本番環境等でテスト用エンドポイントが無効化されている場合
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              examples:
+                forbiddenInProd:
+                  summary: テストAPI無効エラー
+                  value:
+                    type: https://devforge.local/problems/test-seam-disabled
+                    title: テスト用エンドポイントは利用できません
+                    status: 403
+                    detail: 本番モードでは /api/v1/test/* は無効化されています
+                    instance: /api/v1/test/reset
+                    error:
+                      code: TEST_SEAM_DISABLED
+                      message: 本番モードでは /api/v1/test/* は無効化されています
+
+  /api/v1/test/seed:
+    post:
+      operationId: seedTestState
+      tags:
+        - test-seams
+      summary: テスト環境用のシードデータ一括投入（Test Seam #1）
+      description: |
+        対応受け入れ条件：AC-2, AC-3, AC-4, AC-5
+        認証：不要（テスト・ローカル検証環境専用）
+
+        `sleep` を使わずに AC-2（未回答の実践思考問題2件以上＋期限到来カード7枚）や
+        AC-4（`repetition_count: 1`, `interval_days: 1`, `ease_factor: 2.5` のカード）を即座に構築するためのシード投入エンドポイント。
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TestSeedRequest"
+            examples:
+              seedAc2AndAc4:
+                summary: AC-2（思考問題2件＋期限到来カード7枚）のシード投入例
+                value:
+                  reset_first: true
+                  streak_days: 2
+                  last_study_date: "2026-10-29"
+                  category_xp:
+                    data: 45
+                    backend: 30
+                  challenges:
+                    - challenge_id: chl_seed_1
+                      category: data
+                      question: "【実践思考1】インデックス設計のトレードオフを説明してください。"
+                      status: pending
+                    - challenge_id: chl_seed_2
+                      category: backend
+                      question: "【実践思考2】レートリミットのアルゴリズム比較を説明してください。"
+                      status: pending
+                  review_cards:
+                    - card_id: crd_seed_1
+                      category: data
+                      front_prompt: "カード1"
+                      back_summary: "要点1"
+                      repetition_count: 1
+                      interval_days: 1
+                      ease_factor: 2.5
+                      next_review_at: "2026-10-29T00:00:00Z"
+      responses:
+        "200":
+          description: シードデータ投入完了
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TestSeedResponse"
+              examples:
+                seededOk:
+                  summary: シード投入成功
+                  value:
+                    status: seeded_ok
+                    seeded_challenges_count: 2
+                    seeded_review_cards_count: 1
+        "400":
+          description: シードデータの形式不正
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              examples:
+                invalidSeed:
+                  summary: シード形式エラー
+                  value:
+                    type: https://devforge.local/problems/validation-error
+                    title: 入力内容に誤りがあります
+                    status: 400
+                    detail: シードデータの形式が不正です
+                    instance: /api/v1/test/seed
+                    error:
+                      code: VALIDATION_ERROR
+                      message: シードデータの形式が不正です
+        "403":
+          description: 本番環境等でテスト用エンドポイントが無効化されている場合（APP_ENV=production。2026-10-30 追補）
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+              examples:
+                forbiddenInProd:
+                  summary: テストAPI無効エラー
+                  value:
+                    type: https://devforge.local/problems/test-seam-disabled
+                    title: テスト用エンドポイントは利用できません
+                    status: 403
+                    detail: 本番モードでは /api/v1/test/* は無効化されています
+                    instance: /api/v1/test/seed
+                    error:
+                      code: TEST_SEAM_DISABLED
+                      message: 本番モードでは /api/v1/test/* は無効化されています
+
+components:
+  headers:
+    IdempotentReplayed:
+      description: |
+        同じ Idempotency-Key の送り直しに、保存していた1回目の応答を返したときだけ `true` を付ける（2026-10-30 追補）。
+        1回目の処理の応答と、キーのない要求の応答には付けない。
+      schema:
+        type: string
+        enum:
+          - "true"
+  parameters:
+    IdempotencyKeyHeader:
+      name: Idempotency-Key
+      in: header
+      required: false
+      description: 二重作成・二重送信防止用の冪等キー（1〜128文字の任意文字列またはUUID）
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 128
+        example: idem-001-20261030-01
+    TestNowHeader:
+      name: X-Test-Now
+      in: header
+      required: false
+      description: |
+        テスト用現在時刻注入ヘッダ（Test Seam #2：Clock Injection）。
+        ISO 8601 日時（例：`2026-10-30T09:00:00Z`）を指定すると、サーバー内の期限到来判定・次回予定日算出・連続日数・直近7日間集計の基準時刻として使用する。
+        `APP_ENV=production` のときはこのヘッダを無視し、サーバーの現在時刻を使う（2026-10-30 追補）。
+      schema:
+        type: string
+        format: date-time
+        example: "2026-10-30T09:00:00Z"
+    TestUrlFetchModeHeader:
+      name: X-Test-Url-Fetch-Mode
+      in: header
+      required: false
+      description: |
+        テスト用外部URL取得スタブ制御ヘッダ（Test Seam #3：URL Fetcher Seam）。
+        SSRF検証（AC-9）を通過した後の外部HTTP取得挙動をテスト環境で決定論的に制御する：
+        - `live`（既定）：通常の外部HTTP取得（タイムアウト2.0秒、最大512KB、および `*.example.test` 予約テストドメイン判定）
+        - `stub_ok`：外部通信を行わず即座に正常取得（`url_fetch_status: "fetched"`）として処理
+        - `stub_timeout`：2秒タイムアウト発生をシミュレートし `url_fetch_status: "fallback_used"` でフォールバック生成（AC-8）
+        - `stub_error`：接続失敗/HTTP 500 をシミュレートし `url_fetch_status: "fallback_used"` でフォールバック生成（AC-8）
+        - 2026-10-30 追補：SSRF の検査の順序、予約テストドメイン（`ok.example.test`、`timeout.example.test`、`error.example.test`）との関係、
+          DNS を引かない条件は `createLearning` の説明に書く。`stub_*` は予約テストドメインの決まりより優先し、DNS を引かず外部へ接続しない。
+          `stub_timeout` は実際には2秒待たない。`APP_ENV=production` のときはこのヘッダを無視して `live` として扱う。
+      schema:
+        type: string
+        enum:
+          - live
+          - stub_ok
+          - stub_timeout
+          - stub_error
+        default: live
+
+  schemas:
+    SkillCategory:
+      type: string
+      description: |
+        固定6領域のスキルカテゴリ識別子。
+        古いクライアントが将来の追加値を受信した場合は `unknown`（その他領域）として安全にフォールバック表示する。
+      enum:
+        - architecture
+        - backend
+        - data
+        - reliability
+        - security
+        - trend
+
+    UrlFetchStatus:
+      type: string
+      description: "外部URL取得の結果状態（`fetched`: 取得成功, `not_provided`: URL未指定, `fallback_used`: 失敗/タイムアウトによりメモ本文のみで生成）"
+      enum:
+        - fetched
+        - not_provided
+        - fallback_used
+
+    RubricPerspective:
+      type: string
+      description: 実践思考問題の3つの評価観点識別子
+      enum:
+        - premise_constraints
+        - tradeoff_comparison
+        - failure_edge_cases
+
+    RubricItem:
+      type: object
+      required:
+        - index
+        - perspective
+        - label_ja
+        - description_ja
+      properties:
+        index:
+          type: integer
+          minimum: 0
+          maximum: 2
+        perspective:
+          $ref: "#/components/schemas/RubricPerspective"
+        label_ja:
+          type: string
+        description_ja:
+          type: string
+
+    ChallengeItem:
+      type: object
+      required:
+        - challenge_id
+        - learning_id
+        - category
+        - question
+        - rubric_items
+        - status
+        - created_at
+      properties:
+        challenge_id:
+          type: string
+        learning_id:
+          type: string
+        category:
+          $ref: "#/components/schemas/SkillCategory"
+        question:
+          type: string
+        rubric_items:
+          type: array
+          minItems: 3
+          maxItems: 3
+          items:
+            $ref: "#/components/schemas/RubricItem"
+        status:
+          type: string
+          enum:
+            - pending
+            - completed
+        created_at:
+          type: string
+          format: date-time
+
+    ReviewCardItem:
+      type: object
+      required:
+        - card_id
+        - learning_id
+        - category
+        - front_prompt
+        - back_summary
+        - interval_days
+        - ease_factor
+        - repetition_count
+        - next_review_at
+      properties:
+        card_id:
+          type: string
+        learning_id:
+          type: string
+        category:
+          $ref: "#/components/schemas/SkillCategory"
+        front_prompt:
+          type: string
+        back_summary:
+          type: string
+        interval_days:
+          type: integer
+          minimum: 1
+        ease_factor:
+          type: number
+          minimum: 1.3
+        repetition_count:
+          type: integer
+          minimum: 0
+        next_review_at:
+          type: string
+          format: date-time
+
+    CreateLearningRequest:
+      type: object
+      required:
+        - memo
+      properties:
+        title:
+          type:
+            - string
+            - "null"
+          maxLength: 200
+          description: 学習タイトル（省略時はメモ先頭または取得URLタイトルから自動補完）
+        url:
+          type:
+            - string
+            - "null"
+          maxLength: 2048
+          description: 参照した公開Web記事URL（`http://` または `https://` のみ。ローカルホスト・プライベートIPはAC-9により拒否）
+        memo:
+          type: string
+          minLength: 10
+          maxLength: 2000
+          description: 学習メモ本文（10文字以上2,000文字以下必須）
+        category:
+          oneOf:
+            - $ref: "#/components/schemas/SkillCategory"
+            - type: "null"
+          description: スキル領域（省略または `null` の場合はキーワード辞書により6領域のいずれかへ自動分類）
+
+    CreateLearningResponse:
+      type: object
+      required:
+        - learning_id
+        - title
+        - url
+        - memo
+        - category
+        - earned_xp
+        - url_fetch_status
+        - processing_ms
+        - challenge
+        - review_card
+        - created_at
+      properties:
+        learning_id:
+          type: string
+        title:
+          type: string
+        url:
+          type:
+            - string
+            - "null"
+        memo:
+          type: string
+        category:
+          $ref: "#/components/schemas/SkillCategory"
+        earned_xp:
+          type: integer
+          enum:
+            - 15
+        url_fetch_status:
+          $ref: "#/components/schemas/UrlFetchStatus"
+        processing_ms:
+          type: integer
+          minimum: 0
+        challenge:
+          $ref: "#/components/schemas/ChallengeItem"
+        review_card:
+          $ref: "#/components/schemas/ReviewCardItem"
+        created_at:
+          type: string
+          format: date-time
+
+    TodaySessionResponse:
+      type: object
+      required:
+        - session_date
+        - active_challenge
+        - due_reviews
+        - total_due_count
+        - total_session_items
+        - estimated_seconds
+        - session_label_ja
+        - is_empty
+      properties:
+        session_date:
+          type: string
+          format: date
+        active_challenge:
+          oneOf:
+            - $ref: "#/components/schemas/ChallengeItem"
+            - type: "null"
+        due_reviews:
+          type: array
+          maxItems: 5
+          items:
+            $ref: "#/components/schemas/ReviewCardItem"
+        total_due_count:
+          type: integer
+          minimum: 0
+        total_session_items:
+          type: integer
+          minimum: 0
+          maximum: 6
+        estimated_seconds:
+          type: integer
+          minimum: 0
+          maximum: 180
+        session_label_ja:
+          type: string
+        is_empty:
+          type: boolean
+
+    SubmitChallengeRequest:
+      type: object
+      required:
+        - answer
+        - matched_rubric_count
+      properties:
+        answer:
+          type: string
+          minLength: 10
+          maxLength: 2000
+          description: 実践思考問題への記述回答（10文字以上2,000文字以下）
+        matched_rubric_count:
+          type: integer
+          minimum: 0
+          maximum: 3
+          description: 3つの評価観点のうち自己検証で満たした項目数（0〜3）
+        elapsed_seconds:
+          type: integer
+          minimum: 0
+          default: 60
+
+    SubmitChallengeResponse:
+      type: object
+      required:
+        - challenge_id
+        - status
+        - category
+        - answer
+        - matched_rubric_count
+        - earned_xp
+        - total_xp
+        - level
+        - streak_days
+        - model_points
+        - completed_at
+      properties:
+        challenge_id:
+          type: string
+        status:
+          type: string
+          enum:
+            - completed
+        category:
+          $ref: "#/components/schemas/SkillCategory"
+        answer:
+          type: string
+        matched_rubric_count:
+          type: integer
+          minimum: 0
+          maximum: 3
+        earned_xp:
+          type: integer
+          minimum: 20
+          maximum: 50
+          description: 基本20 XP + matched_rubric_count * 10 XP（20, 30, 40, 50 のいずれか）
+        total_xp:
+          type: integer
+          minimum: 0
+        level:
+          type: integer
+          minimum: 1
+        streak_days:
+          type: integer
+          minimum: 1
+        model_points:
+          type: array
+          minItems: 3
+          maxItems: 3
+          items:
+            type: string
+        completed_at:
+          type: string
+          format: date-time
+
+    GradeReviewRequest:
+      type: object
+      required:
+        - grade
+      properties:
+        grade:
+          type: integer
+          minimum: 1
+          maximum: 4
+          description: "4段階想起評価（1: 忘れた, 2: 曖昧, 3: 思い出せた, 4: 即答できた）"
+        elapsed_seconds:
+          type: integer
+          minimum: 0
+          default: 20
+
+    GradeReviewResponse:
+      type: object
+      required:
+        - card_id
+        - category
+        - grade
+        - repetition_count
+        - interval_days
+        - ease_factor
+        - next_review_at
+        - earned_xp
+        - total_xp
+        - level
+        - streak_days
+        - remaining_due_count
+      properties:
+        card_id:
+          type: string
+        category:
+          $ref: "#/components/schemas/SkillCategory"
+        grade:
+          type: integer
+          minimum: 1
+          maximum: 4
+        repetition_count:
+          type: integer
+          minimum: 0
+        interval_days:
+          type: integer
+          minimum: 1
+        ease_factor:
+          type: number
+          minimum: 1.3
+        next_review_at:
+          type: string
+          format: date-time
+        earned_xp:
+          type: integer
+          enum:
+            - 10
+        total_xp:
+          type: integer
+          minimum: 0
+        level:
+          type: integer
+          minimum: 1
+        streak_days:
+          type: integer
+          minimum: 1
+        remaining_due_count:
+          type: integer
+          minimum: 0
+
+    CategorySkillSummary:
+      type: object
+      required:
+        - category
+        - label_ja
+        - label_en
+        - total_xp
+        - level
+        - xp_to_next_level
+      properties:
+        category:
+          $ref: "#/components/schemas/SkillCategory"
+        label_ja:
+          type: string
+        label_en:
+          type: string
+        total_xp:
+          type: integer
+          minimum: 0
+        level:
+          type: integer
+          minimum: 1
+          description: floor(total_xp / 100) + 1
+        xp_to_next_level:
+          type: integer
+          minimum: 1
+          maximum: 100
+          description: 100 - (total_xp % 100)
+
+    SkillsSummaryResponse:
+      type: object
+      required:
+        - categories
+        - total_xp
+        - overall_level
+        - streak_days
+        - weekly_mastered_count
+      properties:
+        categories:
+          type: array
+          minItems: 6
+          maxItems: 6
+          items:
+            $ref: "#/components/schemas/CategorySkillSummary"
+        total_xp:
+          type: integer
+          minimum: 0
+        overall_level:
+          type: integer
+          minimum: 1
+          description: floor(total_xp / 100) + 1（total_xp は6領域の合計。2026-10-30 追補）
+        streak_days:
+          type: integer
+          minimum: 0
+          description: 連続学習日数。last_study_date が基準時刻の UTC の暦日で2日以上前か null なら 0（2026-10-30 追補）
+        weekly_mastered_count:
+          type: integer
+          minimum: 0
+          description: 直近7日間に思考問題クリアまたは復習 grade >= 3 を達成した件数（PRD L146 の誤記 `weekly_ mastered_count` を正規化したフィールド名）
+
+    TestResetResponse:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum:
+            - reset_ok
+
+    TestSeedChallengeItem:
+      type: object
+      required:
+        - question
+      properties:
+        challenge_id:
+          type: string
+        learning_id:
+          type: string
+        category:
+          $ref: "#/components/schemas/SkillCategory"
+        question:
+          type: string
+        status:
+          type: string
+          enum:
+            - pending
+            - completed
+          default: pending
+        created_at:
+          type: string
+          format: date-time
+        completed_at:
+          type:
+            - string
+            - "null"
+          format: date-time
+
+    TestSeedReviewCardItem:
+      type: object
+      required:
+        - front_prompt
+        - back_summary
+        - next_review_at
+      properties:
+        card_id:
+          type: string
+        learning_id:
+          type: string
+        category:
+          $ref: "#/components/schemas/SkillCategory"
+        front_prompt:
+          type: string
+        back_summary:
+          type: string
+        repetition_count:
+          type: integer
+          minimum: 0
+          default: 0
+        interval_days:
+          type: integer
+          minimum: 1
+          default: 1
+        ease_factor:
+          type: number
+          minimum: 1.3
+          default: 2.5
+        next_review_at:
+          type: string
+          format: date-time
+        last_grade:
+          type:
+            - integer
+            - "null"
+        graded_at:
+          type:
+            - string
+            - "null"
+          format: date-time
+
+    TestSeedRequest:
+      type: object
+      properties:
+        reset_first:
+          type: boolean
+          default: true
+        now:
+          type: string
+          format: date-time
+        streak_days:
+          type: integer
+          minimum: 0
+          default: 0
+        last_study_date:
+          type:
+            - string
+            - "null"
+          format: date
+        category_xp:
+          type: object
+          additionalProperties:
+            type: integer
+            minimum: 0
+        challenges:
+          type: array
+          items:
+            $ref: "#/components/schemas/TestSeedChallengeItem"
+        review_cards:
+          type: array
+          items:
+            $ref: "#/components/schemas/TestSeedReviewCardItem"
+
+    TestSeedResponse:
+      type: object
+      required:
+        - status
+        - seeded_challenges_count
+        - seeded_review_cards_count
+      properties:
+        status:
+          type: string
+          enum:
+            - seeded_ok
+        seeded_challenges_count:
+          type: integer
+          minimum: 0
+        seeded_review_cards_count:
+          type: integer
+          minimum: 0
+
+    ErrorDetailObject:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          enum:
+            - VALIDATION_ERROR
+            - INVALID_URL_SCHEME_OR_HOST
+            - RESOURCE_NOT_FOUND
+            - TEST_SEAM_DISABLED
+            - INTERNAL_ERROR
+            - CHALLENGE_ALREADY_COMPLETED
+            - REVIEW_CARD_NOT_DUE
+            - IDEMPOTENCY_KEY_MISMATCH
+        message:
+          type: string
+        field:
+          type:
+            - string
+            - "null"
+
+    ProblemDetails:
+      type: object
+      description: RFC 9457 Problem Details 準拠かつ PRD AC-7/AC-9 の `error.code` / `error.message` を含むエラー応答
+      required:
+        - type
+        - title
+        - status
+        - detail
+        - error
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+        error:
+          $ref: "#/components/schemas/ErrorDetailObject"
