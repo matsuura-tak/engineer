@@ -16,3 +16,5 @@
 - 2026-10-29 001-personal-learning-loop G0 Takuma待ち PRD承認待ち（docs/prd/001-personal-learning-loop.md）
 - 2026-10-30 001-personal-learning-loop G0 PASS docs/approvals/001-personal-learning-loop-G0.md
 - 2026-10-30 001-personal-learning-loop G1 PASS docs/reviews/001-personal-learning-loop-G1-reviewer-r1.md（stacks が backend だけなので designer と design-reviewer のステップは飛ばした）
+- 2026-11-12 001-personal-learning-loop G2（受け入れテスト） PASS docs/reviews/001-personal-learning-loop-G2-test-tech-lead-r1.md, docs/reviews/001-personal-learning-loop-G2-test-reviewer-r2.md
+- 2026-11-12 001-personal-learning-loop G2 Takuma待ち .claude/org/app.json の commands.backend_test 設定待ち（CLAUDE.md:21、PR #5）
