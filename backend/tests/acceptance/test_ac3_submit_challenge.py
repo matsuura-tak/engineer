@@ -1,7 +1,8 @@
 """AC-3：実践思考問題への記述回答と3観点ルーブリック自己検証によるXP加算（通常系）
 
 根拠：docs/prd/001-personal-learning-loop.md 11章 AC-3（earned_xp = 20 + matched_rubric_count * 10、当日初回完了で streak_days +1）、
-contracts/openapi.yaml submitChallenge、CLAUDE.md（level = floor(total_xp / 100) + 1）。
+contracts/openapi.yaml submitChallenge L481-L485（連続日数は UTC 暦日。昨日なら +1、今日なら不変、2日以上前か null なら 1 に戻す）・
+getSkillsSummary L823-L824（最終学習日が2日以上前か null の間は streak_days 0 を返す）、CLAUDE.md（level = floor(total_xp / 100) + 1）。
 """
 
 import unittest
@@ -20,6 +21,8 @@ ANSWER = (
 )
 TODAY = "2026-10-30"
 YESTERDAY = "2026-10-29"
+TWO_DAYS_AGO = "2026-10-28"
+TEN_DAYS_AGO = "2026-10-20"
 
 
 class AC3_SubmitChallengeTest(AcceptanceTestCase):
@@ -86,19 +89,39 @@ class AC3_SubmitChallengeTest(AcceptanceTestCase):
                 )
 
     def test_AC3_連続日数_当日初回なら1増え当日2回目なら増えない(self):
-        # (説明, 回答前の streak_days, 回答前の last_study_date, 期待する streak_days)
+        # (説明, 回答前の streak_days, 回答前の last_study_date, 回答前の summary の streak_days, 回答後の streak_days)
         table = [
-            ("初めての学習", 0, None, 1),
-            ("前日に学習済み", 2, YESTERDAY, 3),
-            ("当日すでに学習済み", 2, TODAY, 2),
+            ("初めての学習", 0, None, 0, 1),
+            ("前日に学習済み", 2, YESTERDAY, 2, 3),
+            ("当日すでに学習済み", 2, TODAY, 2, 2),
         ]
-        for label, streak, last, expected in table:
+        for label, streak, last, before_summary, expected in table:
             with self.subTest(label=label):
                 self._seed(base_xp=0, streak_days=streak, last_study_date=last)
+                self.assertEqual(self.get_summary().get("streak_days"), before_summary, "回答前の summary の streak_days")
                 resp = self._submit(1)
                 self.assertEqual(resp.status, 200, "submit: %r" % resp)
                 self.assertEqual(resp.json().get("streak_days"), expected)
                 self.assertEqual(self.get_summary().get("streak_days"), expected, "集計に残った streak_days")
+
+    def test_AC3_連続日数_2日以上空いた間はsummaryが0で回答すると1に戻る(self):
+        # contracts/openapi.yaml L481-L485, L823-L824: 最終学習日が2日以上前のとき summary は 0、完了したとき 1 に戻す
+        cases = [
+            ("2日前に学習済み（境界）", 5, TWO_DAYS_AGO),
+            ("10日前に学習済み", 10, TEN_DAYS_AGO),
+        ]
+        for label, saved_streak, last_date in cases:
+            with self.subTest(label=label):
+                self._seed(base_xp=0, streak_days=saved_streak, last_study_date=last_date)
+                self.assertEqual(
+                    self.get_summary().get("streak_days"), 0,
+                    "連続が切れている間の summary は 0 を返す",
+                )
+                resp = self._submit(1)
+                self.assertEqual(resp.status, 200, "submit: %r" % resp)
+                self.assertWithin(resp, LIMIT_READ_MS)
+                self.assertEqual(resp.json().get("streak_days"), 1, "2日以上空いた後の完了で streak_days は 1 に戻る")
+                self.assertEqual(self.get_summary().get("streak_days"), 1, "完了後の summary も 1")
 
 
 if __name__ == "__main__":

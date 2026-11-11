@@ -4,14 +4,16 @@
 サーバーは本物のプロセスとして起動し、本物の HTTP（urllib）で呼びます。
 
 起動のしかた（根拠）:
-- 起動コマンド: `python3 -m backend.app`、既定の接続先 `http://127.0.0.1:8000`（CLAUDE.md「ローカルサーバー起動（実装後）」）
+- 起動コマンド: `python3 -m backend.app`、作業フォルダはリポジトリの根（contracts/openapi.yaml L24-L25、CLAUDE.md「ローカルサーバー起動（実装後）」）。
   python3 の代わりに、このテストを動かしている同じインタプリタ（sys.executable）を使う。
-- テスト用の DB: 環境変数 `DEVFORGE_DB_PATH`（CLAUDE.md「DB とトランザクション」、設計メモ 3章 Seam #1）
-- テストごとの初期化: `POST /api/v1/test/reset`（contracts/openapi.yaml resetTestState）
-- データの投入: `POST /api/v1/test/seed`（contracts/openapi.yaml seedTestState）
-- 時刻の固定: ヘッダ `X-Test-Now`（contracts/openapi.yaml components.parameters.TestNowHeader）
-- 外部 URL の取得: ヘッダ `X-Test-Url-Fetch-Mode`（contracts/openapi.yaml components.parameters.TestUrlFetchModeHeader）
-- `APP_ENV=production` のときテスト用エンドポイントは 403 になる（設計メモ 7章 E）ため、子プロセスの環境から APP_ENV を外す。
+- 待ち受けのホストとポート: 環境変数 `DEVFORGE_HOST`（`127.0.0.1`）と `DEVFORGE_PORT`（動的に選んだ空きローカルポート）を渡す（contracts/openapi.yaml L26-L28）。
+  既定ポート 8000 の競合でテストが止まったり別のプロセスに向いたりしないようにする。
+- テスト用の DB: 環境変数 `DEVFORGE_DB_PATH`（contracts/openapi.yaml L29-L31、CLAUDE.md「DB とトランザクション」、設計メモ 3章 Seam #1・D-2）
+- テストごとの初期化: `POST /api/v1/test/reset`（contracts/openapi.yaml resetTestState L946-L988）
+- データの投入: `POST /api/v1/test/seed`（contracts/openapi.yaml seedTestState L990-L1086）
+- 時刻の固定: ヘッダ `X-Test-Now`（contracts/openapi.yaml components.parameters.TestNowHeader L1109-L1120）
+- 外部 URL の取得: ヘッダ `X-Test-Url-Fetch-Mode`（contracts/openapi.yaml components.parameters.TestUrlFetchModeHeader L1121-L1142）
+- `APP_ENV=production` のときテスト用エンドポイントは 403、テスト用ヘッダは無視になる（contracts/openapi.yaml L32-L33）ため、子プロセスの環境から APP_ENV を外す。
 
 既に起動しているサーバーに向けたいとき（任意）:
 - 環境変数 `DEVFORGE_ACCEPTANCE_BASE_URL`（例 `http://127.0.0.1:8000`）を付けると、サーバーを起動せずにその接続先を使う。
@@ -39,7 +41,6 @@ import urllib.request
 
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 DEFAULT_HOST = "127.0.0.1"
-DEFAULT_PORT = 8000
 SERVER_MODULE = "backend.app"
 STARTUP_DEADLINE_SECONDS = 10.0  # 起動の待ちの上限（1か所の定数）。設計メモ 6章の起動目標は 500ms。
 REQUEST_TIMEOUT_SECONDS = 10.0   # 1回の HTTP の待ちの上限（応答時間の合否は各テストで AC の値と比べる）
@@ -77,12 +78,10 @@ class _ServerState:
 _STATE = _ServerState()
 
 
-def _port_is_open(host, port):
-    try:
-        with socket.create_connection((host, port), timeout=0.5):
-            return True
-    except OSError:
-        return False
+def _pick_free_port(host):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.bind((host, 0))
+        return sock.getsockname()[1]
 
 
 def _log_tail(max_chars=2000):
@@ -114,18 +113,16 @@ def _stop_server():
 
 def _start_server():
     """サーバーを起動する。_STATE.workdir があれば同じ DB ファイルを使う（再起動の確認のため）。"""
-    host, port = DEFAULT_HOST, DEFAULT_PORT
-    if _port_is_open(host, port):
-        raise RuntimeError(
-            "サーバーを起動する前から %s:%d が使われている。別のプロセスに向けてテストしないよう止めた。"
-            "既存のサーバーを使うなら DEVFORGE_ACCEPTANCE_BASE_URL を付ける。" % (host, port)
-        )
+    host = DEFAULT_HOST
+    port = _pick_free_port(host)
     if _STATE.workdir is None:
         _STATE.workdir = tempfile.mkdtemp(prefix="devforge-acceptance-")
         _STATE.log_path = os.path.join(_STATE.workdir, "server.log")
         atexit.register(_stop_server)
     env = dict(os.environ)
     env.pop("APP_ENV", None)
+    env["DEVFORGE_HOST"] = host
+    env["DEVFORGE_PORT"] = str(port)
     env["DEVFORGE_DB_PATH"] = os.path.join(_STATE.workdir, "acceptance.sqlite3")
     env["PYTHONUNBUFFERED"] = "1"
     log_file = open(_STATE.log_path, "a", encoding="utf-8")
@@ -349,12 +346,8 @@ class AcceptanceTestCase(unittest.TestCase):
         self.assertEqual(parse_dt(actual_iso), parse_dt(expected_iso), "%s: %r（期待 %s）" % (label, actual_iso, expected_iso))
 
     def assertTestIdInHtml(self, html, testid):
-        needle_double = 'data-testid="%s"' % testid
-        needle_single = "data-testid='%s'" % testid
-        self.assertTrue(
-            needle_double in html or needle_single in html,
-            "GET / の HTML に %s がない" % needle_double,
-        )
+        needle = 'data-testid="%s"' % testid
+        self.assertIn(needle, html, "GET / の HTML に %s がない" % needle)
 
     def assertCreatedLearning(self, resp, memo, title=None, category=None):
         """AC-1 / AC-8 の 201 応答の中身（PRD AC-1 の Then、contracts の CreateLearningResponse）。"""
