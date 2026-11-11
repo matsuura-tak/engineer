@@ -1,0 +1,36 @@
+{
+  "formatVersion": 1,
+  "app": "kyounoitte",
+  "firstOpenDate": "2026-11-01",
+  "diagnosis": {
+    "area": "backend",
+    "level": "intermediate",
+    "years": "1to3",
+    "completedOn": "2026-11-01"
+  },
+  "levels": {
+    "backend": "intermediate"
+  },
+  "history": [
+    {
+      "date": "2026-11-01",
+      "taskId": "backend-intermediate-001",
+      "area": "backend",
+      "level": "intermediate",
+      "mode": "in_app",
+      "report": "done",
+      "answer": "",
+      "helpful": "helpful"
+    },
+    {
+      "date": "2026-11-02",
+      "taskId": "backend-intermediate-002",
+      "area": "backend",
+      "level": "intermediate",
+      "mode": "in_app",
+      "report": "done",
+      "answer": "",
+      "helpful": "not_helpful"
+    }
+  ]
+}

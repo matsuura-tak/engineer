@@ -1,0 +1,418 @@
+{
+  "config": {
+    "argv": [
+      "/usr/local/bin/node",
+      "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/node_modules/.bin/playwright",
+      "test",
+      "--project=chromium-ac15",
+      "--no-deps",
+      "--workers=1",
+      "--repeat-each=5",
+      "--retries=0",
+      "--reporter=list,json"
+    ],
+    "configFile": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/playwright.config.mjs",
+    "rootDir": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/global-setup.mjs",
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests",
+        "testIgnore": [
+          "/ac15-/"
+        ],
+        "testMatch": [
+          "/.*\\.spec\\.mjs$/"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests",
+        "testIgnore": [
+          "/ac15-/"
+        ],
+        "testMatch": [
+          "/.*\\.spec\\.mjs$/"
+        ],
+        "timeout": 60000
+      },
+      {
+        "outputDir": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results",
+        "repeatEach": 5,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium-ac15",
+        "name": "chromium-ac15",
+        "testDir": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "/ac15-.*\\.spec\\.mjs$/"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results",
+        "repeatEach": 5,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "chromium-ac15",
+        "testDir": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests",
+        "snapshotDir": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests",
+        "testIgnore": [],
+        "testMatch": {},
+        "timeout": 60000,
+        "use": {
+          "locale": "ja-JP",
+          "timezoneId": "Asia/Tokyo",
+          "viewport": {
+            "width": 1024,
+            "height": 768
+          },
+          "acceptDownloads": true,
+          "screenshot": "only-on-failure",
+          "trace": "retain-on-failure",
+          "testIdAttribute": "data-testid",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Safari/537.36",
+          "screen": {
+            "width": 1920,
+            "height": 1080
+          },
+          "deviceScaleFactor": 1,
+          "isMobile": false,
+          "hasTouch": false,
+          "defaultBrowserType": "chromium"
+        },
+        "dependencies": [
+          "chromium",
+          "webkit"
+        ],
+        "ignoreSnapshots": false,
+        "__projectId": "chromium-ac15"
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list"
+      ],
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "ac15-load-time.spec.mjs",
+      "file": "ac15-load-time.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "AC15_遅い回線とCPU4倍の制限でキャッシュなしに開き_data-debug-load-msが5回とも2000以下",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "data-debug-load-ms × 5",
+                  "description": "1142, 1101, 1098, 1097, 1088"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "chromium-ac15",
+              "projectName": "chromium-ac15",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 8671,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T12:22:01.517Z",
+                  "annotations": [
+                    {
+                      "type": "data-debug-load-ms × 5",
+                      "description": "1142, 1101, 1098, 1097, 1088"
+                    }
+                  ],
+                  "attachments": [
+                    {
+                      "name": "AC15_task.today",
+                      "contentType": "image/png",
+                      "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/ac15-load-time-AC15-遅い回線とC-79112-ta-debug-load-msが5回とも2000以下-chromium-ac15/attachments/AC15-task-today-0a277b93e355b9d5f95cfcdf2c401fa9badf375f.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6c02eb940c572aa0646c-31a5f0338098f6b2a385",
+          "file": "ac15-load-time.spec.mjs",
+          "line": 7,
+          "column": 1
+        },
+        {
+          "title": "AC15_遅い回線とCPU4倍の制限でキャッシュなしに開き_data-debug-load-msが5回とも2000以下",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "data-debug-load-ms × 5",
+                  "description": "1096, 1095, 1094, 1102, 1101"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "chromium-ac15",
+              "projectName": "chromium-ac15",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 8407,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T12:22:11.394Z",
+                  "annotations": [
+                    {
+                      "type": "data-debug-load-ms × 5",
+                      "description": "1096, 1095, 1094, 1102, 1101"
+                    }
+                  ],
+                  "attachments": [
+                    {
+                      "name": "AC15_task.today",
+                      "contentType": "image/png",
+                      "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/ac15-load-time-AC15-遅い回線とC-79112-ta-debug-load-msが5回とも2000以下-chromium-ac15-repeat1/attachments/AC15-task-today-8e6a1ddbbb45a9c326240acf347861478942fd2b.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6c02eb940c572aa0646c-eac9eb2dfa53efd85c3d",
+          "file": "ac15-load-time.spec.mjs",
+          "line": 7,
+          "column": 1
+        },
+        {
+          "title": "AC15_遅い回線とCPU4倍の制限でキャッシュなしに開き_data-debug-load-msが5回とも2000以下",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "data-debug-load-ms × 5",
+                  "description": "1098, 1101, 1097, 1101, 1112"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "chromium-ac15",
+              "projectName": "chromium-ac15",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 9123,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T12:22:20.494Z",
+                  "annotations": [
+                    {
+                      "type": "data-debug-load-ms × 5",
+                      "description": "1098, 1101, 1097, 1101, 1112"
+                    }
+                  ],
+                  "attachments": [
+                    {
+                      "name": "AC15_task.today",
+                      "contentType": "image/png",
+                      "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/ac15-load-time-AC15-遅い回線とC-79112-ta-debug-load-msが5回とも2000以下-chromium-ac15-repeat2/attachments/AC15-task-today-a5aab36a114fe83c259081f87a3e441eef6216a7.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6c02eb940c572aa0646c-36f25afc241cb3337cba",
+          "file": "ac15-load-time.spec.mjs",
+          "line": 7,
+          "column": 1
+        },
+        {
+          "title": "AC15_遅い回線とCPU4倍の制限でキャッシュなしに開き_data-debug-load-msが5回とも2000以下",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "data-debug-load-ms × 5",
+                  "description": "1138, 1112, 1112, 1105, 1102"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "chromium-ac15",
+              "projectName": "chromium-ac15",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 9183,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T12:22:30.863Z",
+                  "annotations": [
+                    {
+                      "type": "data-debug-load-ms × 5",
+                      "description": "1138, 1112, 1112, 1105, 1102"
+                    }
+                  ],
+                  "attachments": [
+                    {
+                      "name": "AC15_task.today",
+                      "contentType": "image/png",
+                      "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/ac15-load-time-AC15-遅い回線とC-79112-ta-debug-load-msが5回とも2000以下-chromium-ac15-repeat3/attachments/AC15-task-today-74242642e91b5103a8855ffd83d4ffb70fa25ac7.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6c02eb940c572aa0646c-b5aa5317b48c703bd0c3",
+          "file": "ac15-load-time.spec.mjs",
+          "line": 7,
+          "column": 1
+        },
+        {
+          "title": "AC15_遅い回線とCPU4倍の制限でキャッシュなしに開き_data-debug-load-msが5回とも2000以下",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "data-debug-load-ms × 5",
+                  "description": "1107, 1090, 1100, 1098, 1108"
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "chromium-ac15",
+              "projectName": "chromium-ac15",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 8757,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-05T12:22:41.526Z",
+                  "annotations": [
+                    {
+                      "type": "data-debug-load-ms × 5",
+                      "description": "1107, 1090, 1100, 1098, 1108"
+                    }
+                  ],
+                  "attachments": [
+                    {
+                      "name": "AC15_task.today",
+                      "contentType": "image/png",
+                      "path": "/Users/takumamatsuura/src/engineer/backend/tests/acceptance/test-results/ac15-load-time-AC15-遅い回線とC-79112-ta-debug-load-msが5回とも2000以下-chromium-ac15-repeat4/attachments/AC15-task-today-cff30c126176e362ed879e7eb3a8619ca285c0db.png"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "6c02eb940c572aa0646c-de6261862c3fbe6b19a5",
+          "file": "ac15-load-time.spec.mjs",
+          "line": 7,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-05T12:22:01.065Z",
+    "duration": 49697.578,
+    "expected": 5,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

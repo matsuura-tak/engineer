@@ -1,0 +1,103 @@
+# date: 2026-11-05 21:59:19 +0900
+# commit: a3affdc9351ffa811d066ba0d990381b60d12e3b
+# command: npx playwright test tests/explore-g3r3-320x200.spec.mjs --retries=0 --reporter=list,json
+npm notice run npx
+npm notice run 'playwright' test tests/explore-g3r3-320x200.spec.mjs --retries=0 --reporter=list,json
+
+Running 22 tests using 5 workers
+
+  ✓   1 [chromium] › tests/explore-g3r3-320x200.spec.mjs:152:1 › EXPLORE_320x200_S7_allDone (1.5s)
+  ✓   5 [chromium] › tests/explore-g3r3-320x200.spec.mjs:162:1 › EXPLORE_320x200_S7_seenNext (1.5s)
+  ✓   4 [chromium] › tests/explore-g3r3-320x200.spec.mjs:122:1 › EXPLORE_320x200_S6_too_hard（levelHint） (1.7s)
+  ✓   3 [chromium] › tests/explore-g3r3-320x200.spec.mjs:143:1 › EXPLORE_320x200_S7_levelDone (1.7s)
+  ✓   2 [chromium] › tests/explore-g3r3-320x200.spec.mjs:130:1 › EXPLORE_320x200_S6_levelChanged_note.last (1.9s)
+  ✓   6 [chromium] › tests/explore-g3r3-320x200.spec.mjs:171:1 › EXPLORE_320x200_S7_nextDone (796ms)
+  ✓   9 [chromium] › tests/explore-g3r3-320x200.spec.mjs:189:1 › EXPLORE_320x200_S9_stats (832ms)
+  ✓  10 [chromium] › tests/explore-g3r3-320x200.spec.mjs:212:1 › EXPLORE_320x200_dialog_delete (736ms)
+  ✓   8 [chromium] › tests/explore-g3r3-320x200.spec.mjs:199:1 › EXPLORE_320x200_S10_history (983ms)
+  ✘   7 [chromium] › tests/explore-g3r3-320x200.spec.mjs:182:1 › EXPLORE_320x200_S8_settings (1.2s)
+  ✓  11 [chromium] › tests/explore-g3r3-320x200.spec.mjs:222:1 › EXPLORE_320x200_dialog_import (492ms)
+  ✓  12 [webkit] › tests/explore-g3r3-320x200.spec.mjs:143:1 › EXPLORE_320x200_S7_levelDone (2.6s)
+  ✓  16 [webkit] › tests/explore-g3r3-320x200.spec.mjs:162:1 › EXPLORE_320x200_S7_seenNext (2.6s)
+  ✓  15 [webkit] › tests/explore-g3r3-320x200.spec.mjs:152:1 › EXPLORE_320x200_S7_allDone (2.7s)
+  ✓  14 [webkit] › tests/explore-g3r3-320x200.spec.mjs:122:1 › EXPLORE_320x200_S6_too_hard（levelHint） (2.8s)
+  ✓  13 [webkit] › tests/explore-g3r3-320x200.spec.mjs:130:1 › EXPLORE_320x200_S6_levelChanged_note.last (3.0s)
+  ✓  17 [webkit] › tests/explore-g3r3-320x200.spec.mjs:171:1 › EXPLORE_320x200_S7_nextDone (975ms)
+  ✓  19 [webkit] › tests/explore-g3r3-320x200.spec.mjs:189:1 › EXPLORE_320x200_S9_stats (996ms)
+  ✓  21 [webkit] › tests/explore-g3r3-320x200.spec.mjs:212:1 › EXPLORE_320x200_dialog_delete (778ms)
+  ✓  20 [webkit] › tests/explore-g3r3-320x200.spec.mjs:199:1 › EXPLORE_320x200_S10_history (1.2s)
+  ✘  18 [webkit] › tests/explore-g3r3-320x200.spec.mjs:182:1 › EXPLORE_320x200_S8_settings (1.4s)
+  ✓  22 [webkit] › tests/explore-g3r3-320x200.spec.mjs:222:1 › EXPLORE_320x200_dialog_import (603ms)
+
+
+  1) [chromium] › tests/explore-g3r3-320x200.spec.mjs:182:1 › EXPLORE_320x200_S8_settings ──────────
+
+    Error: S8_settings の主な操作 settings.homeScreen.open の件数
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      100 |   expect(o.clipped, `${scene} の overflow で切れた文字`).toEqual([]);
+      101 |   for (const op of operations.filter((x) => x.required)) {
+    > 102 |     expect(op.count, `${scene} の主な操作 ${op.id} の件数`).toBe(1);
+          |                                                     ^
+      103 |     expect(op.visible, `${scene} の主な操作 ${op.id} が見える`).toBe(true);
+      104 |     expect(op.inViewAfterScroll, `${scene} の主な操作 ${op.id} がスクロールで表示域に収まる ${JSON.stringify(op.box)}`).toBe(true);
+      105 |     expect(op.size44, `${scene} の主な操作 ${op.id} が 44×44 以上 ${JSON.stringify(op.box)}`).toBe(true);
+        at record (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:102:53)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:186:3
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/explore-g3r3-320x200-EXPLORE-320x200-S8-settings-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/explore-g3r3-320x200-EXPLORE-320x200-S8-settings-chromium/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/explore-g3r3-320x200-EXPLORE-320x200-S8-settings-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/explore-g3r3-320x200-EXPLORE-320x200-S8-settings-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [webkit] › tests/explore-g3r3-320x200.spec.mjs:182:1 › EXPLORE_320x200_S8_settings ────────────
+
+    Error: S8_settings の主な操作 settings.homeScreen.open の件数
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+      100 |   expect(o.clipped, `${scene} の overflow で切れた文字`).toEqual([]);
+      101 |   for (const op of operations.filter((x) => x.required)) {
+    > 102 |     expect(op.count, `${scene} の主な操作 ${op.id} の件数`).toBe(1);
+          |                                                     ^
+      103 |     expect(op.visible, `${scene} の主な操作 ${op.id} が見える`).toBe(true);
+      104 |     expect(op.inViewAfterScroll, `${scene} の主な操作 ${op.id} がスクロールで表示域に収まる ${JSON.stringify(op.box)}`).toBe(true);
+      105 |     expect(op.size44, `${scene} の主な操作 ${op.id} が 44×44 以上 ${JSON.stringify(op.box)}`).toBe(true);
+        at record (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:102:53)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3-320x200.spec.mjs:186:3
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/explore-g3r3-320x200-EXPLORE-320x200-S8-settings-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/explore-g3r3-320x200-EXPLORE-320x200-S8-settings-webkit/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/explore-g3r3-320x200-EXPLORE-320x200-S8-settings-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/explore-g3r3-320x200-EXPLORE-320x200-S8-settings-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [chromium] › tests/explore-g3r3-320x200.spec.mjs:182:1 › EXPLORE_320x200_S8_settings ───────────
+    [webkit] › tests/explore-g3r3-320x200.spec.mjs:182:1 › EXPLORE_320x200_S8_settings ─────────────
+  20 passed (10.4s)
+# exit: 1

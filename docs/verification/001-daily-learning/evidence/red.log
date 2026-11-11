@@ -1,0 +1,3345 @@
+# red.log：実装の前に受け入れテストを動かして落ちた記録（001-daily-learning）
+# 日付：2026-11-01 20:53 JST　コミット：6f6ff8e（PRD r7 の承認と Q11 を契約と設計メモに反映した後。r4 で AC-14 の 2 通り目のテストを 1 本足した未コミットの作業ツリー）　node v24.22.1　@playwright/test 1.64.1　@axe-core/playwright 4.14.0　ajv 8.20.0
+# 実行したコマンド：
+#   cd backend/tests/acceptance && npx playwright test --reporter=list（依存とブラウザは r3 の npm ci && npx playwright install chromium webkit で入れたものをそのまま使った）
+# 終了コード：1
+# 前提：backend/scripts/build.mjs と backend/public/ はまだない（実装前）。global-setup.mjs がビルドできないことを各ワーカーに渡し、全テスト（133 本 = r3 の 131 本 + AC-14 の 2 通り目 × 2 ブラウザ）が「配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）」で落ちる。
+# 落ちた理由：機能（配布物とビルドの手順）がまだないこと。テストの書き間違いや設定の誤りではない（SyntaxError、TypeError、ReferenceError、Cannot find module は 0 件。`node --check` と `npx playwright test --list`（Total: 133 tests in 16 files）は通る）。
+# r4 で足したテスト：ac14-ac16-redo-delete.spec.mjs:44 AC14_今日の課題が出ている日に設定からやり直して別の領域を選んでも_その日は同じdata-task-idのtask.todayのままで完了の履歴は3件_翌日は新しい領域の課題が出る（chromium #38、webkit #105。どちらも同じ理由で落ちる）。
+# テストの本体が動くこと（サーバー、baseURL、seed、request、スキーマの配線）は r3 の stub-chromium.log、stub-webkit.log、timing.log で確かめた（stub はリポジトリに入れていない）。r4 で足した 1 本は既存のヘルパー（loadContractFixture、injectSeed、fixDate、open、expectState、readTask、goSettings、diagnose、goHistory、readHistoryRows、shot）だけで書いており、stub では動かしていない。
+
+npm notice run npx
+npm notice run 'playwright' test --reporter=list
+
+Running 133 tests using 5 workers
+
+  ✘    1 [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_frontend_beginner (0ms)
+  ✘    2 [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_backend_intermediate (0ms)
+  ✘    3 [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:12:1 › AC1_初めて開くと診断が始まり3問で終わる_進み具合n/3_切り替え500ms以内 (0ms)
+  ✘    4 [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_git_advanced (0ms)
+  ✘    5 [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:13:1 › AC3_課題集の全件が4要素を持ち所要時間が1〜15分 (0ms)
+  ✘    6 [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:31:1 › AC4_課題集は126件以上で18組すべて7件以上でIDの重複が0件 (0ms)
+  ✘    7 [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:47:1 › BUDGET2_課題集の本文の平均600字以下_gzip後106000バイト以下 (0ms)
+  ✘    8 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:20:1 › AC5_完了するとtask.rateになり_答えるとtask.done_同じ日に再読み込みしてもtask.doneのまま (0ms)
+  ✘    9 [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:62:1 › AC29_各組でexternalが20%以下_in_appにURLもtoolsもなく_externalはtoolsが1件以上 (0ms)
+  ✘   10 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:40:1 › AC6_翌日には過去に出した課題のIDと一致しない課題が出る (0ms)
+  ✘   11 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_too_hardを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない (0ms)
+  ✘   12 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_too_easyを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない (0ms)
+  ✘   13 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_no_timeを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない (0ms)
+  ✘   14 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:78:1 › AC9_役に立ったを選ぶとtask.doneになり_再び聞かれず_履歴のdata-helpfulがhelpful (0ms)
+  ✘   15 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:92:1 › AC9_立たなかったを選ぶと履歴のdata-helpfulがnot_helpful (0ms)
+  ✘   16 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:103:1 › AC9_選ばずに再読み込みするとtask.doneになり_履歴のdata-helpfulがunanswered (0ms)
+  ✘   17 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_2通り目_中で簡単すぎ簡単すぎ→上 (1ms)
+  ✘   18 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:116:1 › AC9_今回は答えないを押すとtask.doneになり_履歴のdata-helpfulがunanswered (1ms)
+  ✘   19 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_1通り目_中で難しすぎ難しすぎ→初 (1ms)
+  ✘   20 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_3通り目_中で難しすぎ1回だけ→中のまま (0ms)
+  ✘   21 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_4通り目_中で簡単すぎ1回だけ→中のまま (0ms)
+  ✘   22 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_6通り目_初で難しすぎ2回連続→初のまま (0ms)
+  ✘   23 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_5b通り目_中で難しすぎ今日はできない難しすぎ→中のまま (0ms)
+  ✘   24 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_5a通り目_中で難しすぎ完了難しすぎ→中のまま (0ms)
+  ✘   25 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_7通り目_上で簡単すぎ2回連続→上のまま (0ms)
+  ✘   26 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_8通り目_中で難しすぎ_none_難しすぎ→初（noneは数えず流れも切らない） (0ms)
+  ✘   27 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_9通り目_上で2回難しすぎで中になった翌日に中で難しすぎ1回→中のまま (0ms)
+  ✘   28 [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:33:1 › AC30_in_appを出し終えた翌日はexternalの課題が出て_印と要る道具が題名と同じ画面に見える (0ms)
+  ✘   29 [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:12:1 › AC10_課題が尽きるとtask.exhaustedと文言とやり直しの操作が出て_同じ領域と段階でやり直すと同じ日に再びtask.exhausted (0ms)
+  ✘   30 [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:77:1 › AC30_in_appの課題を出した日はdata-task-modeがin_appで印が0件 (0ms)
+  ✘   31 [chromium] › tests/ac11-ac13-storage.spec.mjs:44:1 › AC13_persistを断られても完了と再読み込みでtask.done_履歴1件_設定にnotPersistedと書き出しがある (0ms)
+  ✘   32 [chromium] › tests/ac12-ac23-offline.spec.mjs:12:1 › AC12_オフラインでもAC-1_AC-2_AC-5_AC-9の操作が動き_送信は0件 (0ms)
+  ✘   33 [chromium] › tests/ac11-ac13-storage.spec.mjs:8:1 › AC11_2問目の保存が失敗してもerror.storage.messageと選択が残り_やり直すと3問目に進み課題が回答と一致する (0ms)
+  ✘   34 [chromium] › tests/ac12-ac23-offline.spec.mjs:47:1 › AC12_オフラインでもAC-7の申告が動き_送信は0件 (0ms)
+  ✘   35 [chromium] › tests/ac12-ac23-offline.spec.mjs:112:1 › AC23_task.todayを表示した後にオフラインで再読み込みと新しいタブ_3秒以内に同じdata-task-id_送信0件 (0ms)
+  ✘   36 [chromium] › tests/ac12-ac23-offline.spec.mjs:120:1 › AC23_task.doneを表示した後にオフラインで再読み込みと新しいタブ_3秒以内にtask.done_送信0件 (0ms)
+  ✘   37 [chromium] › tests/ac14-ac16-redo-delete.spec.mjs:6:1 › AC14_今日の課題を出していない日に設定からやり直して別の領域を選ぶと_新しい領域の課題が出て完了の履歴は3件のまま (0ms)
+  ✘   38 [chromium] › tests/ac14-ac16-redo-delete.spec.mjs:44:1 › AC14_今日の課題が出ている日に設定からやり直して別の領域を選んでも_その日は同じdata-task-idのtask.todayのままで完了の履歴は3件_翌日は新しい領域の課題が出る (0ms)
+  ✘   39 [chromium] › tests/ac14-ac16-redo-delete.spec.mjs:100:1 › AC16_すべてのデータを削除すると再読み込みでdiagnosis.startになり_やり直した後の履歴は0件 (0ms)
+  ✘   40 [chromium] › tests/ac15-load-time.spec.mjs:7:1 › AC15_遅い回線とCPU4倍の制限でキャッシュなしに開き_data-debug-load-msが5回とも2000以下 (0ms)
+  ✘   41 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_diagnosis.start_横スクロール0_切り詰め0_操作できる要素がすべて押せる (0ms)
+  ✘   43 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.done_横スクロール0_切り詰め0_操作できる要素がすべて押せる (1ms)
+  ✘   42 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.today_横スクロール0_切り詰め0_操作できる要素がすべて押せる (0ms)
+  ✘   44 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.exhausted_横スクロール0_切り詰め0_操作できる要素がすべて押せる (1ms)
+  ✘   45 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:104:1 › AC18_移動キー(Tab系)とEnter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上 (0ms)
+  ✘   47 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_diagnosis.question_axe-coreでserious以上の違反が0件 (1ms)
+  ✘   46 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.today_axe-coreでserious以上の違反が0件 (0ms)
+  ✘   48 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_diagnosis.start_axe-coreでserious以上の違反が0件 (1ms)
+  ✘   49 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.done_axe-coreでserious以上の違反が0件 (0ms)
+  ✘   50 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.exhausted_axe-coreでserious以上の違反が0件 (0ms)
+  ✘   51 [chromium] › tests/ac19-ac20-ac25-export-import.spec.mjs:12:1 › AC19_書き出すとJSONが1つダウンロードされ_診断_段階_履歴3件（50文字のanswer）_初めて開いた日_版番号を含む (1ms)
+  ✘   52 [chromium] › tests/ac19-ac20-ac25-export-import.spec.mjs:91:1 › AC25_版番号が新しいファイルはerror.import.messageで拒み_履歴1件と診断と状態は変わらない (0ms)
+  ✘   53 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_settings_axe-coreでserious以上の違反が0件 (1ms)
+  ✘   54 [chromium] › tests/ac19-ac20-ac25-export-import.spec.mjs:48:1 › AC20_保存データのないブラウザで読み込むと_診断と段階が同じで履歴3件（answerも同じ）_状態はtask.todayかtask.done (1ms)
+  ✘   55 [chromium] › tests/ac21-ac22-home-screen.spec.mjs:21:3 › AC-21 iPhone の Safari の偽装 › AC21_iOS_Safariでは診断の前に案内が出て_閉じると再読み込みしても出ず_設定から再び開ける (0ms)
+  ✘   56 [chromium] › tests/ac21-ac22-home-screen.spec.mjs:58:1 › AC21_UAを偽装しないChromiumとWebKitでは案内が0回出る (1ms)
+  ✘   57 [chromium] › tests/ac21-ac22-home-screen.spec.mjs:47:3 › AC-21 iPadOS の Safari の偽装（Mac の UA と maxTouchPoints > 1） › AC21_iPadOS_Safari（MacのUAとmaxTouchPoints5）でも診断の前に案内が出る (0ms)
+  ✘   58 [chromium] › tests/ac21-ac22-home-screen.spec.mjs:70:1 › AC22_スタンドアロンで初めて開くと読み込みの案内が出て_再読み込みでも出て_ファイルを読み込むとAC-20の状態になる (1ms)
+  ✘   59 [chromium] › tests/ac24-stats.spec.mjs:18:1 › AC24_統計の9つの値が期待どおりで_数値7つと日付1つは同じ文字が見え_真偽値はfirstDayCompleted.yesの文言が見える (1ms)
+  ✘   60 [chromium] › tests/ac26-language.spec.mjs:40:3 › AC-26 locale en-US › AC26_en-USではdiagnosis.startの文言が英語の文言ファイルと一致し_キーの差が0件 (0ms)
+  ✘   62 [chromium] › tests/ac26-language.spec.mjs:47:3 › AC-26 locale ja-JP › AC26_ja-JPではdiagnosis.startの文言が日本語の文言ファイルと一致する (1ms)
+  ✘   63 [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:51:1 › AC31_今日の課題を完了済みなら操作0回でtask.doneが見え_重なる要素0件 (1ms)
+  ✘   61 [chromium] › tests/ac28-update.spec.mjs:17:1 › AC28_差し替え後2秒おきの再読み込み3回以内でdata-build-versionが新版になり_旧版に戻らず_履歴3件と診断と段階は同じ (0ms)
+  ✘   64 [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:31:1 › AC31_診断済みで開くと操作0回でtask.todayが見え_題名と4要素と答えの欄と4つの申告が同じ画面にあり_重なる要素0件 (0ms)
+  ✘   65 [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:79:1 › AC32_200文字を入力して再読み込みすると_同じdata-task-idで答えがそのまま入っている (0ms)
+  ✘   66 [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:12:1 › AC1_初めて開くと診断が始まり3問で終わる_進み具合n/3_切り替え500ms以内 (0ms)
+  ✘   67 [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_backend_intermediate (0ms)
+  ✘   68 [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:88:1 › AC32_200文字を入力してタブを閉じ新しいタブで開くと_同じdata-task-idで答えがそのまま入っている (6ms)
+  ✘   69 [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:98:1 › AC32_翌日に開くと新しい課題の答えの欄は空で_前日の200文字は書き出しのnoneの行のanswerに残る (5ms)
+  ✘   70 [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_frontend_beginner (3ms)
+  ✘   71 [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_git_advanced (0ms)
+  ✘   72 [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:13:1 › AC3_課題集の全件が4要素を持ち所要時間が1〜15分 (0ms)
+  ✘   74 [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:31:1 › AC4_課題集は126件以上で18組すべて7件以上でIDの重複が0件 (0ms)
+  ✘   75 [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:47:1 › BUDGET2_課題集の本文の平均600字以下_gzip後106000バイト以下 (1ms)
+  ✘   73 [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:62:1 › AC29_各組でexternalが20%以下_in_appにURLもtoolsもなく_externalはtoolsが1件以上 (1ms)
+  ✘   76 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:40:1 › AC6_翌日には過去に出した課題のIDと一致しない課題が出る (0ms)
+  ✘   77 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:20:1 › AC5_完了するとtask.rateになり_答えるとtask.done_同じ日に再読み込みしてもtask.doneのまま (0ms)
+  ✘   79 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_too_hardを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない (0ms)
+  ✘   78 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_no_timeを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない (0ms)
+  ✘   80 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_too_easyを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない (0ms)
+  ✘   81 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:78:1 › AC9_役に立ったを選ぶとtask.doneになり_再び聞かれず_履歴のdata-helpfulがhelpful (0ms)
+  ✘   82 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:92:1 › AC9_立たなかったを選ぶと履歴のdata-helpfulがnot_helpful (0ms)
+  ✘   83 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:103:1 › AC9_選ばずに再読み込みするとtask.doneになり_履歴のdata-helpfulがunanswered (0ms)
+  ✘   84 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_1通り目_中で難しすぎ難しすぎ→初 (0ms)
+  ✘   85 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:116:1 › AC9_今回は答えないを押すとtask.doneになり_履歴のdata-helpfulがunanswered (0ms)
+  ✘   86 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_2通り目_中で簡単すぎ簡単すぎ→上 (0ms)
+  ✘   87 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_5b通り目_中で難しすぎ今日はできない難しすぎ→中のまま (1ms)
+  ✘   88 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_3通り目_中で難しすぎ1回だけ→中のまま (1ms)
+  ✘   89 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_4通り目_中で簡単すぎ1回だけ→中のまま (0ms)
+  ✘   90 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_5a通り目_中で難しすぎ完了難しすぎ→中のまま (0ms)
+  ✘   92 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_9通り目_上で2回難しすぎで中になった翌日に中で難しすぎ1回→中のまま (0ms)
+  ✘   91 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_6通り目_初で難しすぎ2回連続→初のまま (0ms)
+  ✘   93 [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:12:1 › AC10_課題が尽きるとtask.exhaustedと文言とやり直しの操作が出て_同じ領域と段階でやり直すと同じ日に再びtask.exhausted (0ms)
+  ✘   94 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_8通り目_中で難しすぎ_none_難しすぎ→初（noneは数えず流れも切らない） (2ms)
+  ✘   95 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_7通り目_上で簡単すぎ2回連続→上のまま (1ms)
+  ✘   96 [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:33:1 › AC30_in_appを出し終えた翌日はexternalの課題が出て_印と要る道具が題名と同じ画面に見える (1ms)
+  ✘   97 [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:77:1 › AC30_in_appの課題を出した日はdata-task-modeがin_appで印が0件 (0ms)
+  ✘   98 [webkit] › tests/ac11-ac13-storage.spec.mjs:8:1 › AC11_2問目の保存が失敗してもerror.storage.messageと選択が残り_やり直すと3問目に進み課題が回答と一致する (0ms)
+  ✘   99 [webkit] › tests/ac12-ac23-offline.spec.mjs:12:1 › AC12_オフラインでもAC-1_AC-2_AC-5_AC-9の操作が動き_送信は0件 (0ms)
+  ✘  100 [webkit] › tests/ac11-ac13-storage.spec.mjs:44:1 › AC13_persistを断られても完了と再読み込みでtask.done_履歴1件_設定にnotPersistedと書き出しがある (0ms)
+  ✘  101 [webkit] › tests/ac12-ac23-offline.spec.mjs:112:1 › AC23_task.todayを表示した後にオフラインで再読み込みと新しいタブ_3秒以内に同じdata-task-id_送信0件 (1ms)
+  ✘  102 [webkit] › tests/ac12-ac23-offline.spec.mjs:120:1 › AC23_task.doneを表示した後にオフラインで再読み込みと新しいタブ_3秒以内にtask.done_送信0件 (0ms)
+  ✘  103 [webkit] › tests/ac12-ac23-offline.spec.mjs:47:1 › AC12_オフラインでもAC-7の申告が動き_送信は0件 (1ms)
+  ✘  104 [webkit] › tests/ac14-ac16-redo-delete.spec.mjs:6:1 › AC14_今日の課題を出していない日に設定からやり直して別の領域を選ぶと_新しい領域の課題が出て完了の履歴は3件のまま (0ms)
+  ✘  105 [webkit] › tests/ac14-ac16-redo-delete.spec.mjs:44:1 › AC14_今日の課題が出ている日に設定からやり直して別の領域を選んでも_その日は同じdata-task-idのtask.todayのままで完了の履歴は3件_翌日は新しい領域の課題が出る (0ms)
+  ✘  106 [webkit] › tests/ac14-ac16-redo-delete.spec.mjs:100:1 › AC16_すべてのデータを削除すると再読み込みでdiagnosis.startになり_やり直した後の履歴は0件 (0ms)
+  ✘  107 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_diagnosis.start_横スクロール0_切り詰め0_操作できる要素がすべて押せる (0ms)
+  ✘  108 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.today_横スクロール0_切り詰め0_操作できる要素がすべて押せる (1ms)
+  ✘  109 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.done_横スクロール0_切り詰め0_操作できる要素がすべて押せる (1ms)
+  ✘  110 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.exhausted_横スクロール0_切り詰め0_操作できる要素がすべて押せる (0ms)
+  ✘  112 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:104:1 › AC18_移動キー(Tab系)とEnter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上 (1ms)
+  ✘  113 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_diagnosis.question_axe-coreでserious以上の違反が0件 (1ms)
+  ✘  111 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_diagnosis.start_axe-coreでserious以上の違反が0件 (2ms)
+  ✘  114 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.today_axe-coreでserious以上の違反が0件 (0ms)
+  ✘  115 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.done_axe-coreでserious以上の違反が0件 (0ms)
+  ✘  116 [webkit] › tests/ac19-ac20-ac25-export-import.spec.mjs:12:1 › AC19_書き出すとJSONが1つダウンロードされ_診断_段階_履歴3件（50文字のanswer）_初めて開いた日_版番号を含む (0ms)
+  ✘  117 [webkit] › tests/ac19-ac20-ac25-export-import.spec.mjs:48:1 › AC20_保存データのないブラウザで読み込むと_診断と段階が同じで履歴3件（answerも同じ）_状態はtask.todayかtask.done (0ms)
+  ✘  118 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.exhausted_axe-coreでserious以上の違反が0件 (0ms)
+  ✘  119 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_settings_axe-coreでserious以上の違反が0件 (0ms)
+  ✘  120 [webkit] › tests/ac19-ac20-ac25-export-import.spec.mjs:91:1 › AC25_版番号が新しいファイルはerror.import.messageで拒み_履歴1件と診断と状態は変わらない (0ms)
+  ✘  122 [webkit] › tests/ac21-ac22-home-screen.spec.mjs:21:3 › AC-21 iPhone の Safari の偽装 › AC21_iOS_Safariでは診断の前に案内が出て_閉じると再読み込みしても出ず_設定から再び開ける (0ms)
+  ✘  121 [webkit] › tests/ac21-ac22-home-screen.spec.mjs:47:3 › AC-21 iPadOS の Safari の偽装（Mac の UA と maxTouchPoints > 1） › AC21_iPadOS_Safari（MacのUAとmaxTouchPoints5）でも診断の前に案内が出る (1ms)
+  ✘  124 [webkit] › tests/ac21-ac22-home-screen.spec.mjs:58:1 › AC21_UAを偽装しないChromiumとWebKitでは案内が0回出る (0ms)
+  ✘  123 [webkit] › tests/ac21-ac22-home-screen.spec.mjs:70:1 › AC22_スタンドアロンで初めて開くと読み込みの案内が出て_再読み込みでも出て_ファイルを読み込むとAC-20の状態になる (0ms)
+  ✘  125 [webkit] › tests/ac24-stats.spec.mjs:18:1 › AC24_統計の9つの値が期待どおりで_数値7つと日付1つは同じ文字が見え_真偽値はfirstDayCompleted.yesの文言が見える (1ms)
+  ✘  126 [webkit] › tests/ac26-language.spec.mjs:47:3 › AC-26 locale ja-JP › AC26_ja-JPではdiagnosis.startの文言が日本語の文言ファイルと一致する (1ms)
+  ✘  127 [webkit] › tests/ac26-language.spec.mjs:40:3 › AC-26 locale en-US › AC26_en-USではdiagnosis.startの文言が英語の文言ファイルと一致し_キーの差が0件 (0ms)
+  ✘  128 [webkit] › tests/ac28-update.spec.mjs:17:1 › AC28_差し替え後2秒おきの再読み込み3回以内でdata-build-versionが新版になり_旧版に戻らず_履歴3件と診断と段階は同じ (0ms)
+  ✘  129 [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:31:1 › AC31_診断済みで開くと操作0回でtask.todayが見え_題名と4要素と答えの欄と4つの申告が同じ画面にあり_重なる要素0件 (0ms)
+  ✘  130 [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:51:1 › AC31_今日の課題を完了済みなら操作0回でtask.doneが見え_重なる要素0件 (0ms)
+  ✘  131 [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:79:1 › AC32_200文字を入力して再読み込みすると_同じdata-task-idで答えがそのまま入っている (0ms)
+  ✘  133 [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:88:1 › AC32_200文字を入力してタブを閉じ新しいタブで開くと_同じdata-task-idで答えがそのまま入っている (0ms)
+  ✘  132 [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:98:1 › AC32_翌日に開くと新しい課題の答えの欄は空で_前日の200文字は書き出しのnoneの行のanswerに残る (0ms)
+
+
+  1) [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:12:1 › AC1_初めて開くと診断が始まり3問で終わる_進み具合n/3_切り替え500ms以内 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac01-ac02-diagnosis-AC1-初め-9dc67-り3問で終わる-進み具合n-3-切り替え500ms以内-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac01-ac02-diagnosis-AC1-初め-9dc67-り3問で終わる-進み具合n-3-切り替え500ms以内-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_backend_intermediate 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac01-ac02-diagnosis-AC2-診断-36ebf-階が一致する-backend-intermediate-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac01-ac02-diagnosis-AC2-診断-36ebf-階が一致する-backend-intermediate-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_frontend_beginner 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac01-ac02-diagnosis-AC2-診断-648f5-域と段階が一致する-frontend-beginner-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac01-ac02-diagnosis-AC2-診断-648f5-域と段階が一致する-frontend-beginner-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_git_advanced 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac01-ac02-diagnosis-AC2-診断-ffc27-1件出て領域と段階が一致する-git-advanced-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac01-ac02-diagnosis-AC2-診断-ffc27-1件出て領域と段階が一致する-git-advanced-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:13:1 › AC3_課題集の全件が4要素を持ち所要時間が1〜15分 ──────
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac03-ac04-ac29-tasks-json-AC3-課題集の全件が4要素を持ち所要時間が1〜15分-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac03-ac04-ac29-tasks-json-AC3-課題集の全件が4要素を持ち所要時間が1〜15分-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:31:1 › AC4_課題集は126件以上で18組すべて7件以上でIDの重複が0件 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac03-ac04-ac29-tasks-json-AC4-課題集は126件以上で18組すべて7件以上でIDの重複が0件-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac03-ac04-ac29-tasks-json-AC4-課題集は126件以上で18組すべて7件以上でIDの重複が0件-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  7) [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:47:1 › BUDGET2_課題集の本文の平均600字以下_gzip後106000バイト以下 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac03-ac04-ac29-tasks-json--fde99-文の平均600字以下-gzip後106000バイト以下-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac03-ac04-ac29-tasks-json--fde99-文の平均600字以下-gzip後106000バイト以下-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  8) [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:62:1 › AC29_各組でexternalが20%以下_in_appにURLもtoolsもなく_externalはtoolsが1件以上 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac03-ac04-ac29-tasks-json--d4690-oolsもなく-externalはtoolsが1件以上-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac03-ac04-ac29-tasks-json--d4690-oolsもなく-externalはtoolsが1件以上-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  9) [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:20:1 › AC5_完了するとtask.rateになり_答えるとtask.done_同じ日に再読み込みしてもtask.doneのまま 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-99bbf-ne-同じ日に再読み込みしてもtask-doneのまま-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac05-ac06-ac07-ac09-report-99bbf-ne-同じ日に再読み込みしてもtask-doneのまま-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  10) [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:40:1 › AC6_翌日には過去に出した課題のIDと一致しない課題が出る ─
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-AC6-翌日には過去に出した課題のIDと一致しない課題が出る-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac05-ac06-ac07-ac09-report-AC6-翌日には過去に出した課題のIDと一致しない課題が出る-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  11) [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_too_hardを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-9d549-dになり履歴に残り-再読み込みしても新しい課題は出ない-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac05-ac06-ac07-ac09-report-9d549-dになり履歴に残り-再読み込みしても新しい課題は出ない-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  12) [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_too_easyを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-7673b-dになり履歴に残り-再読み込みしても新しい課題は出ない-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac05-ac06-ac07-ac09-report-7673b-dになり履歴に残り-再読み込みしても新しい課題は出ない-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  13) [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_no_timeを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-7ad20-dになり履歴に残り-再読み込みしても新しい課題は出ない-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac05-ac06-ac07-ac09-report-7ad20-dになり履歴に残り-再読み込みしても新しい課題は出ない-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  14) [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:78:1 › AC9_役に立ったを選ぶとtask.doneになり_再び聞かれず_履歴のdata-helpfulがhelpful 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-224a1-かれず-履歴のdata-helpfulがhelpful-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac05-ac06-ac07-ac09-report-224a1-かれず-履歴のdata-helpfulがhelpful-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  15) [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:92:1 › AC9_立たなかったを選ぶと履歴のdata-helpfulがnot_helpful 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-d1dfa-履歴のdata-helpfulがnot-helpful-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac05-ac06-ac07-ac09-report-d1dfa-履歴のdata-helpfulがnot-helpful-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  16) [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:103:1 › AC9_選ばずに再読み込みするとtask.doneになり_履歴のdata-helpfulがunanswered 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-e7b6d--履歴のdata-helpfulがunanswered-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac05-ac06-ac07-ac09-report-e7b6d--履歴のdata-helpfulがunanswered-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  17) [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:116:1 › AC9_今回は答えないを押すとtask.doneになり_履歴のdata-helpfulがunanswered 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-bff91--履歴のdata-helpfulがunanswered-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac05-ac06-ac07-ac09-report-bff91--履歴のdata-helpfulがunanswered-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  18) [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_1通り目_中で難しすぎ難しすぎ→初 ─────────────────────
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac08-level-rule-AC8-1通り目-中で難しすぎ難しすぎ→初-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac08-level-rule-AC8-1通り目-中で難しすぎ難しすぎ→初-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  19) [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_2通り目_中で簡単すぎ簡単すぎ→上 ─────────────────────
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac08-level-rule-AC8-2通り目-中で簡単すぎ簡単すぎ→上-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac08-level-rule-AC8-2通り目-中で簡単すぎ簡単すぎ→上-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  20) [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_3通り目_中で難しすぎ1回だけ→中のまま ──────────────────
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac08-level-rule-AC8-3通り目-中で難しすぎ1回だけ→中のまま-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac08-level-rule-AC8-3通り目-中で難しすぎ1回だけ→中のまま-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  21) [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_4通り目_中で簡単すぎ1回だけ→中のまま ──────────────────
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac08-level-rule-AC8-4通り目-中で簡単すぎ1回だけ→中のまま-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac08-level-rule-AC8-4通り目-中で簡単すぎ1回だけ→中のまま-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  22) [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_5a通り目_中で難しすぎ完了難しすぎ→中のまま ───────────────
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac08-level-rule-AC8-5a通り目-中で難しすぎ完了難しすぎ→中のまま-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac08-level-rule-AC8-5a通り目-中で難しすぎ完了難しすぎ→中のまま-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  23) [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_5b通り目_中で難しすぎ今日はできない難しすぎ→中のまま ──────────
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac08-level-rule-AC8-5b通り目-中で難しすぎ今日はできない難しすぎ→中のまま-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac08-level-rule-AC8-5b通り目-中で難しすぎ今日はできない難しすぎ→中のまま-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  24) [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_6通り目_初で難しすぎ2回連続→初のまま ──────────────────
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac08-level-rule-AC8-6通り目-初で難しすぎ2回連続→初のまま-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac08-level-rule-AC8-6通り目-初で難しすぎ2回連続→初のまま-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  25) [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_7通り目_上で簡単すぎ2回連続→上のまま ──────────────────
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac08-level-rule-AC8-7通り目-上で簡単すぎ2回連続→上のまま-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac08-level-rule-AC8-7通り目-上で簡単すぎ2回連続→上のまま-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  26) [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_8通り目_中で難しすぎ_none_難しすぎ→初（noneは数えず流れも切らない） 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac08-level-rule-AC8-8通り目-中で難しすぎ-none-難しすぎ→初（noneは数えず流れも切らない）-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac08-level-rule-AC8-8通り目-中で難しすぎ-none-難しすぎ→初（noneは数えず流れも切らない）-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  27) [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_9通り目_上で2回難しすぎで中になった翌日に中で難しすぎ1回→中のまま ───
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac08-level-rule-AC8-9通り目-上で2回難しすぎで中になった翌日に中で難しすぎ1回→中のまま-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac08-level-rule-AC8-9通り目-上で2回難しすぎで中になった翌日に中で難しすぎ1回→中のまま-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  28) [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:12:1 › AC10_課題が尽きるとtask.exhaustedと文言とやり直しの操作が出て_同じ領域と段階でやり直すと同じ日に再びtask.exhausted 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac10-ac30-exhausted-extern-509d7-階でやり直すと同じ日に再びtask-exhausted-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac10-ac30-exhausted-extern-509d7-階でやり直すと同じ日に再びtask-exhausted-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  29) [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:33:1 › AC30_in_appを出し終えた翌日はexternalの課題が出て_印と要る道具が題名と同じ画面に見える 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac10-ac30-exhausted-extern-f09fe-alの課題が出て-印と要る道具が題名と同じ画面に見える-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac10-ac30-exhausted-extern-f09fe-alの課題が出て-印と要る道具が題名と同じ画面に見える-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  30) [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:77:1 › AC30_in_appの課題を出した日はdata-task-modeがin_appで印が0件 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac10-ac30-exhausted-extern-5f3b0-はdata-task-modeがin-appで印が0件-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac10-ac30-exhausted-extern-5f3b0-はdata-task-modeがin-appで印が0件-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  31) [chromium] › tests/ac11-ac13-storage.spec.mjs:8:1 › AC11_2問目の保存が失敗してもerror.storage.messageと選択が残り_やり直すと3問目に進み課題が回答と一致する 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac11-ac13-storage-AC11-2問目-22b7a-選択が残り-やり直すと3問目に進み課題が回答と一致する-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac11-ac13-storage-AC11-2問目-22b7a-選択が残り-やり直すと3問目に進み課題が回答と一致する-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  32) [chromium] › tests/ac11-ac13-storage.spec.mjs:44:1 › AC13_persistを断られても完了と再読み込みでtask.done_履歴1件_設定にnotPersistedと書き出しがある 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac11-ac13-storage-AC13-per-6148e-歴1件-設定にnotPersistedと書き出しがある-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac11-ac13-storage-AC13-per-6148e-歴1件-設定にnotPersistedと書き出しがある-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  33) [chromium] › tests/ac12-ac23-offline.spec.mjs:12:1 › AC12_オフラインでもAC-1_AC-2_AC-5_AC-9の操作が動き_送信は0件 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac12-ac23-offline-AC12-オフラ-0af55--AC-2-AC-5-AC-9の操作が動き-送信は0件-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac12-ac23-offline-AC12-オフラ-0af55--AC-2-AC-5-AC-9の操作が動き-送信は0件-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  34) [chromium] › tests/ac12-ac23-offline.spec.mjs:47:1 › AC12_オフラインでもAC-7の申告が動き_送信は0件 ────────────
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac12-ac23-offline-AC12-オフラインでもAC-7の申告が動き-送信は0件-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac12-ac23-offline-AC12-オフラインでもAC-7の申告が動き-送信は0件-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  35) [chromium] › tests/ac12-ac23-offline.spec.mjs:112:1 › AC23_task.todayを表示した後にオフラインで再読み込みと新しいタブ_3秒以内に同じdata-task-id_送信0件 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac12-ac23-offline-AC23-tas-15630-タブ-3秒以内に同じdata-task-id-送信0件-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac12-ac23-offline-AC23-tas-15630-タブ-3秒以内に同じdata-task-id-送信0件-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  36) [chromium] › tests/ac12-ac23-offline.spec.mjs:120:1 › AC23_task.doneを表示した後にオフラインで再読み込みと新しいタブ_3秒以内にtask.done_送信0件 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac12-ac23-offline-AC23-tas-7ca62-みと新しいタブ-3秒以内にtask-done-送信0件-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac12-ac23-offline-AC23-tas-7ca62-みと新しいタブ-3秒以内にtask-done-送信0件-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  37) [chromium] › tests/ac14-ac16-redo-delete.spec.mjs:6:1 › AC14_今日の課題を出していない日に設定からやり直して別の領域を選ぶと_新しい領域の課題が出て完了の履歴は3件のまま 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac14-ac16-redo-delete-AC14-99525-を選ぶと-新しい領域の課題が出て完了の履歴は3件のまま-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac14-ac16-redo-delete-AC14-99525-を選ぶと-新しい領域の課題が出て完了の履歴は3件のまま-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  38) [chromium] › tests/ac14-ac16-redo-delete.spec.mjs:44:1 › AC14_今日の課題が出ている日に設定からやり直して別の領域を選んでも_その日は同じdata-task-idのtask.todayのままで完了の履歴は3件_翌日は新しい領域の課題が出る 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac14-ac16-redo-delete-AC14-744db-のままで完了の履歴は3件-翌日は新しい領域の課題が出る-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac14-ac16-redo-delete-AC14-744db-のままで完了の履歴は3件-翌日は新しい領域の課題が出る-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  39) [chromium] › tests/ac14-ac16-redo-delete.spec.mjs:100:1 › AC16_すべてのデータを削除すると再読み込みでdiagnosis.startになり_やり直した後の履歴は0件 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac14-ac16-redo-delete-AC16-64121-nosis-startになり-やり直した後の履歴は0件-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac14-ac16-redo-delete-AC16-64121-nosis-startになり-やり直した後の履歴は0件-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  40) [chromium] › tests/ac15-load-time.spec.mjs:7:1 › AC15_遅い回線とCPU4倍の制限でキャッシュなしに開き_data-debug-load-msが5回とも2000以下 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac15-load-time-AC15-遅い回線とC-79112-ta-debug-load-msが5回とも2000以下-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac15-load-time-AC15-遅い回線とC-79112-ta-debug-load-msが5回とも2000以下-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  41) [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_diagnosis.start_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac17-ac18-ac27-a11y-AC-17--c30fa-スクロール0-切り詰め0-操作できる要素がすべて押せる-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac17-ac18-ac27-a11y-AC-17--c30fa-スクロール0-切り詰め0-操作できる要素がすべて押せる-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  42) [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.today_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac17-ac18-ac27-a11y-AC-17--c71fc-スクロール0-切り詰め0-操作できる要素がすべて押せる-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac17-ac18-ac27-a11y-AC-17--c71fc-スクロール0-切り詰め0-操作できる要素がすべて押せる-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  43) [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.done_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac17-ac18-ac27-a11y-AC-17--a8967-スクロール0-切り詰め0-操作できる要素がすべて押せる-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac17-ac18-ac27-a11y-AC-17--a8967-スクロール0-切り詰め0-操作できる要素がすべて押せる-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  44) [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.exhausted_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac17-ac18-ac27-a11y-AC-17--1dedc-スクロール0-切り詰め0-操作できる要素がすべて押せる-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac17-ac18-ac27-a11y-AC-17--1dedc-スクロール0-切り詰め0-操作できる要素がすべて押せる-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  45) [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:104:1 › AC18_移動キー(Tab系)とEnter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac17-ac18-ac27-a11y-AC18-移-74b17-作した要素がfocus-visibleで枠が3px以上-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac17-ac18-ac27-a11y-AC18-移-74b17-作した要素がfocus-visibleで枠が3px以上-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  46) [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_diagnosis.start_axe-coreでserious以上の違反が0件 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac17-ac18-ac27-a11y-AC27-d-ffb4e-rt-axe-coreでserious以上の違反が0件-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac17-ac18-ac27-a11y-AC27-d-ffb4e-rt-axe-coreでserious以上の違反が0件-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  47) [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_diagnosis.question_axe-coreでserious以上の違反が0件 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac17-ac18-ac27-a11y-AC27-d-639b9-on-axe-coreでserious以上の違反が0件-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac17-ac18-ac27-a11y-AC27-d-639b9-on-axe-coreでserious以上の違反が0件-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  48) [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.today_axe-coreでserious以上の違反が0件 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac17-ac18-ac27-a11y-AC27-task-today-axe-coreでserious以上の違反が0件-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac17-ac18-ac27-a11y-AC27-task-today-axe-coreでserious以上の違反が0件-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  49) [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.done_axe-coreでserious以上の違反が0件 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac17-ac18-ac27-a11y-AC27-task-done-axe-coreでserious以上の違反が0件-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac17-ac18-ac27-a11y-AC27-task-done-axe-coreでserious以上の違反が0件-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  50) [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.exhausted_axe-coreでserious以上の違反が0件 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac17-ac18-ac27-a11y-AC27-t-96fcd-ed-axe-coreでserious以上の違反が0件-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac17-ac18-ac27-a11y-AC27-t-96fcd-ed-axe-coreでserious以上の違反が0件-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  51) [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_settings_axe-coreでserious以上の違反が0件 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac17-ac18-ac27-a11y-AC27-settings-axe-coreでserious以上の違反が0件-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac17-ac18-ac27-a11y-AC27-settings-axe-coreでserious以上の違反が0件-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  52) [chromium] › tests/ac19-ac20-ac25-export-import.spec.mjs:12:1 › AC19_書き出すとJSONが1つダウンロードされ_診断_段階_履歴3件（50文字のanswer）_初めて開いた日_版番号を含む 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac19-ac20-ac25-export-impo-ae496-50文字のanswer）-初めて開いた日-版番号を含む-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac19-ac20-ac25-export-impo-ae496-50文字のanswer）-初めて開いた日-版番号を含む-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  53) [chromium] › tests/ac19-ac20-ac25-export-import.spec.mjs:48:1 › AC20_保存データのないブラウザで読み込むと_診断と段階が同じで履歴3件（answerも同じ）_状態はtask.todayかtask.done 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac19-ac20-ac25-export-impo-34c78-同じ）-状態はtask-todayかtask-done-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac19-ac20-ac25-export-impo-34c78-同じ）-状態はtask-todayかtask-done-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  54) [chromium] › tests/ac19-ac20-ac25-export-import.spec.mjs:91:1 › AC25_版番号が新しいファイルはerror.import.messageで拒み_履歴1件と診断と状態は変わらない 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac19-ac20-ac25-export-impo-e6f55-messageで拒み-履歴1件と診断と状態は変わらない-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac19-ac20-ac25-export-impo-e6f55-messageで拒み-履歴1件と診断と状態は変わらない-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  55) [chromium] › tests/ac21-ac22-home-screen.spec.mjs:21:3 › AC-21 iPhone の Safari の偽装 › AC21_iOS_Safariでは診断の前に案内が出て_閉じると再読み込みしても出ず_設定から再び開ける 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac21-ac22-home-screen-AC-2-22442-出て-閉じると再読み込みしても出ず-設定から再び開ける-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac21-ac22-home-screen-AC-2-22442-出て-閉じると再読み込みしても出ず-設定から再び開ける-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  56) [chromium] › tests/ac21-ac22-home-screen.spec.mjs:47:3 › AC-21 iPadOS の Safari の偽装（Mac の UA と maxTouchPoints > 1） › AC21_iPadOS_Safari（MacのUAとmaxTouchPoints5）でも診断の前に案内が出る 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac21-ac22-home-screen-AC-2-71601-axTouchPoints5）でも診断の前に案内が出る-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac21-ac22-home-screen-AC-2-71601-axTouchPoints5）でも診断の前に案内が出る-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  57) [chromium] › tests/ac21-ac22-home-screen.spec.mjs:58:1 › AC21_UAを偽装しないChromiumとWebKitでは案内が0回出る 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac21-ac22-home-screen-AC21-UAを偽装しないChromiumとWebKitでは案内が0回出る-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac21-ac22-home-screen-AC21-UAを偽装しないChromiumとWebKitでは案内が0回出る-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  58) [chromium] › tests/ac21-ac22-home-screen.spec.mjs:70:1 › AC22_スタンドアロンで初めて開くと読み込みの案内が出て_再読み込みでも出て_ファイルを読み込むとAC-20の状態になる 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac21-ac22-home-screen-AC22-cca57-みでも出て-ファイルを読み込むとAC-20の状態になる-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac21-ac22-home-screen-AC22-cca57-みでも出て-ファイルを読み込むとAC-20の状態になる-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  59) [chromium] › tests/ac24-stats.spec.mjs:18:1 › AC24_統計の9つの値が期待どおりで_数値7つと日付1つは同じ文字が見え_真偽値はfirstDayCompleted.yesの文言が見える 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac24-stats-AC24-統計の9つの値が期待-c595b-irstDayCompleted-yesの文言が見える-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac24-stats-AC24-統計の9つの値が期待-c595b-irstDayCompleted-yesの文言が見える-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  60) [chromium] › tests/ac26-language.spec.mjs:40:3 › AC-26 locale en-US › AC26_en-USではdiagnosis.startの文言が英語の文言ファイルと一致し_キーの差が0件 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac26-language-AC-26-locale-45d1a-rtの文言が英語の文言ファイルと一致し-キーの差が0件-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac26-language-AC-26-locale-45d1a-rtの文言が英語の文言ファイルと一致し-キーの差が0件-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  61) [chromium] › tests/ac26-language.spec.mjs:47:3 › AC-26 locale ja-JP › AC26_ja-JPではdiagnosis.startの文言が日本語の文言ファイルと一致する 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac26-language-AC-26-locale-7adf2-is-startの文言が日本語の文言ファイルと一致する-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac26-language-AC-26-locale-7adf2-is-startの文言が日本語の文言ファイルと一致する-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  62) [chromium] › tests/ac28-update.spec.mjs:17:1 › AC28_差し替え後2秒おきの再読み込み3回以内でdata-build-versionが新版になり_旧版に戻らず_履歴3件と診断と段階は同じ 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac28-update-AC28-差し替え後2秒おき-ce23c-が新版になり-旧版に戻らず-履歴3件と診断と段階は同じ-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac28-update-AC28-差し替え後2秒おき-ce23c-が新版になり-旧版に戻らず-履歴3件と診断と段階は同じ-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  63) [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:31:1 › AC31_診断済みで開くと操作0回でtask.todayが見え_題名と4要素と答えの欄と4つの申告が同じ画面にあり_重なる要素0件 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac31-ac32-zero-ops-answer--e6f3f-と答えの欄と4つの申告が同じ画面にあり-重なる要素0件-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac31-ac32-zero-ops-answer--e6f3f-と答えの欄と4つの申告が同じ画面にあり-重なる要素0件-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  64) [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:51:1 › AC31_今日の課題を完了済みなら操作0回でtask.doneが見え_重なる要素0件 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac31-ac32-zero-ops-answer--50d9d-なら操作0回でtask-doneが見え-重なる要素0件-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac31-ac32-zero-ops-answer--50d9d-なら操作0回でtask-doneが見え-重なる要素0件-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  65) [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:79:1 › AC32_200文字を入力して再読み込みすると_同じdata-task-idで答えがそのまま入っている 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac31-ac32-zero-ops-answer--38df9-同じdata-task-idで答えがそのまま入っている-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac31-ac32-zero-ops-answer--38df9-同じdata-task-idで答えがそのまま入っている-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  66) [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:88:1 › AC32_200文字を入力してタブを閉じ新しいタブで開くと_同じdata-task-idで答えがそのまま入っている 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac31-ac32-zero-ops-answer--56470-同じdata-task-idで答えがそのまま入っている-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac31-ac32-zero-ops-answer--56470-同じdata-task-idで答えがそのまま入っている-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  67) [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:98:1 › AC32_翌日に開くと新しい課題の答えの欄は空で_前日の200文字は書き出しのnoneの行のanswerに残る 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac31-ac32-zero-ops-answer--dcd8b-200文字は書き出しのnoneの行のanswerに残る-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac31-ac32-zero-ops-answer--dcd8b-200文字は書き出しのnoneの行のanswerに残る-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  68) [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:12:1 › AC1_初めて開くと診断が始まり3問で終わる_進み具合n/3_切り替え500ms以内 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac01-ac02-diagnosis-AC1-初め-9dc67-り3問で終わる-進み具合n-3-切り替え500ms以内-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac01-ac02-diagnosis-AC1-初め-9dc67-り3問で終わる-進み具合n-3-切り替え500ms以内-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  69) [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_backend_intermediate 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac01-ac02-diagnosis-AC2-診断-36ebf-階が一致する-backend-intermediate-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac01-ac02-diagnosis-AC2-診断-36ebf-階が一致する-backend-intermediate-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  70) [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_frontend_beginner 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac01-ac02-diagnosis-AC2-診断-648f5-域と段階が一致する-frontend-beginner-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac01-ac02-diagnosis-AC2-診断-648f5-域と段階が一致する-frontend-beginner-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  71) [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_git_advanced 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac01-ac02-diagnosis-AC2-診断-ffc27-1件出て領域と段階が一致する-git-advanced-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac01-ac02-diagnosis-AC2-診断-ffc27-1件出て領域と段階が一致する-git-advanced-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  72) [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:13:1 › AC3_課題集の全件が4要素を持ち所要時間が1〜15分 ───────
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac03-ac04-ac29-tasks-json-AC3-課題集の全件が4要素を持ち所要時間が1〜15分-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac03-ac04-ac29-tasks-json-AC3-課題集の全件が4要素を持ち所要時間が1〜15分-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  73) [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:31:1 › AC4_課題集は126件以上で18組すべて7件以上でIDの重複が0件 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac03-ac04-ac29-tasks-json-AC4-課題集は126件以上で18組すべて7件以上でIDの重複が0件-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac03-ac04-ac29-tasks-json-AC4-課題集は126件以上で18組すべて7件以上でIDの重複が0件-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  74) [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:47:1 › BUDGET2_課題集の本文の平均600字以下_gzip後106000バイト以下 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac03-ac04-ac29-tasks-json--fde99-文の平均600字以下-gzip後106000バイト以下-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac03-ac04-ac29-tasks-json--fde99-文の平均600字以下-gzip後106000バイト以下-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  75) [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:62:1 › AC29_各組でexternalが20%以下_in_appにURLもtoolsもなく_externalはtoolsが1件以上 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac03-ac04-ac29-tasks-json--d4690-oolsもなく-externalはtoolsが1件以上-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac03-ac04-ac29-tasks-json--d4690-oolsもなく-externalはtoolsが1件以上-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  76) [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:20:1 › AC5_完了するとtask.rateになり_答えるとtask.done_同じ日に再読み込みしてもtask.doneのまま 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-99bbf-ne-同じ日に再読み込みしてもtask-doneのまま-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac05-ac06-ac07-ac09-report-99bbf-ne-同じ日に再読み込みしてもtask-doneのまま-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  77) [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:40:1 › AC6_翌日には過去に出した課題のIDと一致しない課題が出る ───
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-AC6-翌日には過去に出した課題のIDと一致しない課題が出る-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac05-ac06-ac07-ac09-report-AC6-翌日には過去に出した課題のIDと一致しない課題が出る-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  78) [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_too_hardを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-9d549-dになり履歴に残り-再読み込みしても新しい課題は出ない-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac05-ac06-ac07-ac09-report-9d549-dになり履歴に残り-再読み込みしても新しい課題は出ない-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  79) [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_too_easyを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-7673b-dになり履歴に残り-再読み込みしても新しい課題は出ない-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac05-ac06-ac07-ac09-report-7673b-dになり履歴に残り-再読み込みしても新しい課題は出ない-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  80) [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_no_timeを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-7ad20-dになり履歴に残り-再読み込みしても新しい課題は出ない-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac05-ac06-ac07-ac09-report-7ad20-dになり履歴に残り-再読み込みしても新しい課題は出ない-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  81) [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:78:1 › AC9_役に立ったを選ぶとtask.doneになり_再び聞かれず_履歴のdata-helpfulがhelpful 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-224a1-かれず-履歴のdata-helpfulがhelpful-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac05-ac06-ac07-ac09-report-224a1-かれず-履歴のdata-helpfulがhelpful-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  82) [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:92:1 › AC9_立たなかったを選ぶと履歴のdata-helpfulがnot_helpful 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-d1dfa-履歴のdata-helpfulがnot-helpful-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac05-ac06-ac07-ac09-report-d1dfa-履歴のdata-helpfulがnot-helpful-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  83) [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:103:1 › AC9_選ばずに再読み込みするとtask.doneになり_履歴のdata-helpfulがunanswered 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-e7b6d--履歴のdata-helpfulがunanswered-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac05-ac06-ac07-ac09-report-e7b6d--履歴のdata-helpfulがunanswered-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  84) [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:116:1 › AC9_今回は答えないを押すとtask.doneになり_履歴のdata-helpfulがunanswered 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-bff91--履歴のdata-helpfulがunanswered-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac05-ac06-ac07-ac09-report-bff91--履歴のdata-helpfulがunanswered-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  85) [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_1通り目_中で難しすぎ難しすぎ→初 ───────────────────────
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac08-level-rule-AC8-1通り目-中で難しすぎ難しすぎ→初-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac08-level-rule-AC8-1通り目-中で難しすぎ難しすぎ→初-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  86) [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_2通り目_中で簡単すぎ簡単すぎ→上 ───────────────────────
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac08-level-rule-AC8-2通り目-中で簡単すぎ簡単すぎ→上-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac08-level-rule-AC8-2通り目-中で簡単すぎ簡単すぎ→上-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  87) [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_3通り目_中で難しすぎ1回だけ→中のまま ────────────────────
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac08-level-rule-AC8-3通り目-中で難しすぎ1回だけ→中のまま-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac08-level-rule-AC8-3通り目-中で難しすぎ1回だけ→中のまま-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  88) [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_4通り目_中で簡単すぎ1回だけ→中のまま ────────────────────
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac08-level-rule-AC8-4通り目-中で簡単すぎ1回だけ→中のまま-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac08-level-rule-AC8-4通り目-中で簡単すぎ1回だけ→中のまま-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  89) [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_5a通り目_中で難しすぎ完了難しすぎ→中のまま ─────────────────
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac08-level-rule-AC8-5a通り目-中で難しすぎ完了難しすぎ→中のまま-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac08-level-rule-AC8-5a通り目-中で難しすぎ完了難しすぎ→中のまま-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  90) [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_5b通り目_中で難しすぎ今日はできない難しすぎ→中のまま ────────────
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac08-level-rule-AC8-5b通り目-中で難しすぎ今日はできない難しすぎ→中のまま-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac08-level-rule-AC8-5b通り目-中で難しすぎ今日はできない難しすぎ→中のまま-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  91) [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_6通り目_初で難しすぎ2回連続→初のまま ────────────────────
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac08-level-rule-AC8-6通り目-初で難しすぎ2回連続→初のまま-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac08-level-rule-AC8-6通り目-初で難しすぎ2回連続→初のまま-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  92) [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_7通り目_上で簡単すぎ2回連続→上のまま ────────────────────
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac08-level-rule-AC8-7通り目-上で簡単すぎ2回連続→上のまま-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac08-level-rule-AC8-7通り目-上で簡単すぎ2回連続→上のまま-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  93) [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_8通り目_中で難しすぎ_none_難しすぎ→初（noneは数えず流れも切らない） 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac08-level-rule-AC8-8通り目-中で難しすぎ-none-難しすぎ→初（noneは数えず流れも切らない）-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac08-level-rule-AC8-8通り目-中で難しすぎ-none-難しすぎ→初（noneは数えず流れも切らない）-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  94) [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_9通り目_上で2回難しすぎで中になった翌日に中で難しすぎ1回→中のまま ─────
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac08-level-rule-AC8-9通り目-上で2回難しすぎで中になった翌日に中で難しすぎ1回→中のまま-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac08-level-rule-AC8-9通り目-上で2回難しすぎで中になった翌日に中で難しすぎ1回→中のまま-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  95) [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:12:1 › AC10_課題が尽きるとtask.exhaustedと文言とやり直しの操作が出て_同じ領域と段階でやり直すと同じ日に再びtask.exhausted 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac10-ac30-exhausted-extern-509d7-階でやり直すと同じ日に再びtask-exhausted-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac10-ac30-exhausted-extern-509d7-階でやり直すと同じ日に再びtask-exhausted-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  96) [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:33:1 › AC30_in_appを出し終えた翌日はexternalの課題が出て_印と要る道具が題名と同じ画面に見える 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac10-ac30-exhausted-extern-f09fe-alの課題が出て-印と要る道具が題名と同じ画面に見える-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac10-ac30-exhausted-extern-f09fe-alの課題が出て-印と要る道具が題名と同じ画面に見える-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  97) [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:77:1 › AC30_in_appの課題を出した日はdata-task-modeがin_appで印が0件 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac10-ac30-exhausted-extern-5f3b0-はdata-task-modeがin-appで印が0件-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac10-ac30-exhausted-extern-5f3b0-はdata-task-modeがin-appで印が0件-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  98) [webkit] › tests/ac11-ac13-storage.spec.mjs:8:1 › AC11_2問目の保存が失敗してもerror.storage.messageと選択が残り_やり直すと3問目に進み課題が回答と一致する 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac11-ac13-storage-AC11-2問目-22b7a-選択が残り-やり直すと3問目に進み課題が回答と一致する-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac11-ac13-storage-AC11-2問目-22b7a-選択が残り-やり直すと3問目に進み課題が回答と一致する-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  99) [webkit] › tests/ac11-ac13-storage.spec.mjs:44:1 › AC13_persistを断られても完了と再読み込みでtask.done_履歴1件_設定にnotPersistedと書き出しがある 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac11-ac13-storage-AC13-per-6148e-歴1件-設定にnotPersistedと書き出しがある-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac11-ac13-storage-AC13-per-6148e-歴1件-設定にnotPersistedと書き出しがある-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  100) [webkit] › tests/ac12-ac23-offline.spec.mjs:12:1 › AC12_オフラインでもAC-1_AC-2_AC-5_AC-9の操作が動き_送信は0件 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac12-ac23-offline-AC12-オフラ-0af55--AC-2-AC-5-AC-9の操作が動き-送信は0件-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac12-ac23-offline-AC12-オフラ-0af55--AC-2-AC-5-AC-9の操作が動き-送信は0件-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  101) [webkit] › tests/ac12-ac23-offline.spec.mjs:47:1 › AC12_オフラインでもAC-7の申告が動き_送信は0件 ─────────────
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac12-ac23-offline-AC12-オフラインでもAC-7の申告が動き-送信は0件-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac12-ac23-offline-AC12-オフラインでもAC-7の申告が動き-送信は0件-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  102) [webkit] › tests/ac12-ac23-offline.spec.mjs:112:1 › AC23_task.todayを表示した後にオフラインで再読み込みと新しいタブ_3秒以内に同じdata-task-id_送信0件 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac12-ac23-offline-AC23-tas-15630-タブ-3秒以内に同じdata-task-id-送信0件-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac12-ac23-offline-AC23-tas-15630-タブ-3秒以内に同じdata-task-id-送信0件-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  103) [webkit] › tests/ac12-ac23-offline.spec.mjs:120:1 › AC23_task.doneを表示した後にオフラインで再読み込みと新しいタブ_3秒以内にtask.done_送信0件 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac12-ac23-offline-AC23-tas-7ca62-みと新しいタブ-3秒以内にtask-done-送信0件-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac12-ac23-offline-AC23-tas-7ca62-みと新しいタブ-3秒以内にtask-done-送信0件-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  104) [webkit] › tests/ac14-ac16-redo-delete.spec.mjs:6:1 › AC14_今日の課題を出していない日に設定からやり直して別の領域を選ぶと_新しい領域の課題が出て完了の履歴は3件のまま 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac14-ac16-redo-delete-AC14-99525-を選ぶと-新しい領域の課題が出て完了の履歴は3件のまま-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac14-ac16-redo-delete-AC14-99525-を選ぶと-新しい領域の課題が出て完了の履歴は3件のまま-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  105) [webkit] › tests/ac14-ac16-redo-delete.spec.mjs:44:1 › AC14_今日の課題が出ている日に設定からやり直して別の領域を選んでも_その日は同じdata-task-idのtask.todayのままで完了の履歴は3件_翌日は新しい領域の課題が出る 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac14-ac16-redo-delete-AC14-744db-のままで完了の履歴は3件-翌日は新しい領域の課題が出る-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac14-ac16-redo-delete-AC14-744db-のままで完了の履歴は3件-翌日は新しい領域の課題が出る-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  106) [webkit] › tests/ac14-ac16-redo-delete.spec.mjs:100:1 › AC16_すべてのデータを削除すると再読み込みでdiagnosis.startになり_やり直した後の履歴は0件 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac14-ac16-redo-delete-AC16-64121-nosis-startになり-やり直した後の履歴は0件-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac14-ac16-redo-delete-AC16-64121-nosis-startになり-やり直した後の履歴は0件-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  107) [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_diagnosis.start_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac17-ac18-ac27-a11y-AC-17--c30fa-スクロール0-切り詰め0-操作できる要素がすべて押せる-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac17-ac18-ac27-a11y-AC-17--c30fa-スクロール0-切り詰め0-操作できる要素がすべて押せる-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  108) [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.today_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac17-ac18-ac27-a11y-AC-17--c71fc-スクロール0-切り詰め0-操作できる要素がすべて押せる-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac17-ac18-ac27-a11y-AC-17--c71fc-スクロール0-切り詰め0-操作できる要素がすべて押せる-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  109) [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.done_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac17-ac18-ac27-a11y-AC-17--a8967-スクロール0-切り詰め0-操作できる要素がすべて押せる-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac17-ac18-ac27-a11y-AC-17--a8967-スクロール0-切り詰め0-操作できる要素がすべて押せる-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  110) [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.exhausted_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac17-ac18-ac27-a11y-AC-17--1dedc-スクロール0-切り詰め0-操作できる要素がすべて押せる-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac17-ac18-ac27-a11y-AC-17--1dedc-スクロール0-切り詰め0-操作できる要素がすべて押せる-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  111) [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:104:1 › AC18_移動キー(Tab系)とEnter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac17-ac18-ac27-a11y-AC18-移-74b17-作した要素がfocus-visibleで枠が3px以上-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac17-ac18-ac27-a11y-AC18-移-74b17-作した要素がfocus-visibleで枠が3px以上-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  112) [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_diagnosis.start_axe-coreでserious以上の違反が0件 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac17-ac18-ac27-a11y-AC27-d-ffb4e-rt-axe-coreでserious以上の違反が0件-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac17-ac18-ac27-a11y-AC27-d-ffb4e-rt-axe-coreでserious以上の違反が0件-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  113) [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_diagnosis.question_axe-coreでserious以上の違反が0件 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac17-ac18-ac27-a11y-AC27-d-639b9-on-axe-coreでserious以上の違反が0件-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac17-ac18-ac27-a11y-AC27-d-639b9-on-axe-coreでserious以上の違反が0件-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  114) [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.today_axe-coreでserious以上の違反が0件 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac17-ac18-ac27-a11y-AC27-task-today-axe-coreでserious以上の違反が0件-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac17-ac18-ac27-a11y-AC27-task-today-axe-coreでserious以上の違反が0件-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  115) [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.done_axe-coreでserious以上の違反が0件 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac17-ac18-ac27-a11y-AC27-task-done-axe-coreでserious以上の違反が0件-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac17-ac18-ac27-a11y-AC27-task-done-axe-coreでserious以上の違反が0件-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  116) [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.exhausted_axe-coreでserious以上の違反が0件 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac17-ac18-ac27-a11y-AC27-t-96fcd-ed-axe-coreでserious以上の違反が0件-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac17-ac18-ac27-a11y-AC27-t-96fcd-ed-axe-coreでserious以上の違反が0件-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  117) [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_settings_axe-coreでserious以上の違反が0件 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac17-ac18-ac27-a11y-AC27-settings-axe-coreでserious以上の違反が0件-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac17-ac18-ac27-a11y-AC27-settings-axe-coreでserious以上の違反が0件-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  118) [webkit] › tests/ac19-ac20-ac25-export-import.spec.mjs:12:1 › AC19_書き出すとJSONが1つダウンロードされ_診断_段階_履歴3件（50文字のanswer）_初めて開いた日_版番号を含む 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac19-ac20-ac25-export-impo-ae496-50文字のanswer）-初めて開いた日-版番号を含む-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac19-ac20-ac25-export-impo-ae496-50文字のanswer）-初めて開いた日-版番号を含む-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  119) [webkit] › tests/ac19-ac20-ac25-export-import.spec.mjs:48:1 › AC20_保存データのないブラウザで読み込むと_診断と段階が同じで履歴3件（answerも同じ）_状態はtask.todayかtask.done 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac19-ac20-ac25-export-impo-34c78-同じ）-状態はtask-todayかtask-done-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac19-ac20-ac25-export-impo-34c78-同じ）-状態はtask-todayかtask-done-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  120) [webkit] › tests/ac19-ac20-ac25-export-import.spec.mjs:91:1 › AC25_版番号が新しいファイルはerror.import.messageで拒み_履歴1件と診断と状態は変わらない 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac19-ac20-ac25-export-impo-e6f55-messageで拒み-履歴1件と診断と状態は変わらない-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac19-ac20-ac25-export-impo-e6f55-messageで拒み-履歴1件と診断と状態は変わらない-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  121) [webkit] › tests/ac21-ac22-home-screen.spec.mjs:21:3 › AC-21 iPhone の Safari の偽装 › AC21_iOS_Safariでは診断の前に案内が出て_閉じると再読み込みしても出ず_設定から再び開ける 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac21-ac22-home-screen-AC-2-22442-出て-閉じると再読み込みしても出ず-設定から再び開ける-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac21-ac22-home-screen-AC-2-22442-出て-閉じると再読み込みしても出ず-設定から再び開ける-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  122) [webkit] › tests/ac21-ac22-home-screen.spec.mjs:47:3 › AC-21 iPadOS の Safari の偽装（Mac の UA と maxTouchPoints > 1） › AC21_iPadOS_Safari（MacのUAとmaxTouchPoints5）でも診断の前に案内が出る 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac21-ac22-home-screen-AC-2-71601-axTouchPoints5）でも診断の前に案内が出る-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac21-ac22-home-screen-AC-2-71601-axTouchPoints5）でも診断の前に案内が出る-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  123) [webkit] › tests/ac21-ac22-home-screen.spec.mjs:58:1 › AC21_UAを偽装しないChromiumとWebKitでは案内が0回出る 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac21-ac22-home-screen-AC21-UAを偽装しないChromiumとWebKitでは案内が0回出る-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac21-ac22-home-screen-AC21-UAを偽装しないChromiumとWebKitでは案内が0回出る-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  124) [webkit] › tests/ac21-ac22-home-screen.spec.mjs:70:1 › AC22_スタンドアロンで初めて開くと読み込みの案内が出て_再読み込みでも出て_ファイルを読み込むとAC-20の状態になる 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac21-ac22-home-screen-AC22-cca57-みでも出て-ファイルを読み込むとAC-20の状態になる-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac21-ac22-home-screen-AC22-cca57-みでも出て-ファイルを読み込むとAC-20の状態になる-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  125) [webkit] › tests/ac24-stats.spec.mjs:18:1 › AC24_統計の9つの値が期待どおりで_数値7つと日付1つは同じ文字が見え_真偽値はfirstDayCompleted.yesの文言が見える 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac24-stats-AC24-統計の9つの値が期待-c595b-irstDayCompleted-yesの文言が見える-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac24-stats-AC24-統計の9つの値が期待-c595b-irstDayCompleted-yesの文言が見える-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  126) [webkit] › tests/ac26-language.spec.mjs:40:3 › AC-26 locale en-US › AC26_en-USではdiagnosis.startの文言が英語の文言ファイルと一致し_キーの差が0件 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac26-language-AC-26-locale-45d1a-rtの文言が英語の文言ファイルと一致し-キーの差が0件-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac26-language-AC-26-locale-45d1a-rtの文言が英語の文言ファイルと一致し-キーの差が0件-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  127) [webkit] › tests/ac26-language.spec.mjs:47:3 › AC-26 locale ja-JP › AC26_ja-JPではdiagnosis.startの文言が日本語の文言ファイルと一致する 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac26-language-AC-26-locale-7adf2-is-startの文言が日本語の文言ファイルと一致する-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac26-language-AC-26-locale-7adf2-is-startの文言が日本語の文言ファイルと一致する-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  128) [webkit] › tests/ac28-update.spec.mjs:17:1 › AC28_差し替え後2秒おきの再読み込み3回以内でdata-build-versionが新版になり_旧版に戻らず_履歴3件と診断と段階は同じ 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac28-update-AC28-差し替え後2秒おき-ce23c-が新版になり-旧版に戻らず-履歴3件と診断と段階は同じ-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac28-update-AC28-差し替え後2秒おき-ce23c-が新版になり-旧版に戻らず-履歴3件と診断と段階は同じ-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  129) [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:31:1 › AC31_診断済みで開くと操作0回でtask.todayが見え_題名と4要素と答えの欄と4つの申告が同じ画面にあり_重なる要素0件 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac31-ac32-zero-ops-answer--e6f3f-と答えの欄と4つの申告が同じ画面にあり-重なる要素0件-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac31-ac32-zero-ops-answer--e6f3f-と答えの欄と4つの申告が同じ画面にあり-重なる要素0件-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  130) [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:51:1 › AC31_今日の課題を完了済みなら操作0回でtask.doneが見え_重なる要素0件 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac31-ac32-zero-ops-answer--50d9d-なら操作0回でtask-doneが見え-重なる要素0件-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac31-ac32-zero-ops-answer--50d9d-なら操作0回でtask-doneが見え-重なる要素0件-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  131) [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:79:1 › AC32_200文字を入力して再読み込みすると_同じdata-task-idで答えがそのまま入っている 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac31-ac32-zero-ops-answer--38df9-同じdata-task-idで答えがそのまま入っている-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac31-ac32-zero-ops-answer--38df9-同じdata-task-idで答えがそのまま入っている-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  132) [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:88:1 › AC32_200文字を入力してタブを閉じ新しいタブで開くと_同じdata-task-idで答えがそのまま入っている 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac31-ac32-zero-ops-answer--56470-同じdata-task-idで答えがそのまま入っている-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac31-ac32-zero-ops-answer--56470-同じdata-task-idで答えがそのまま入っている-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  133) [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:98:1 › AC32_翌日に開くと新しい課題の答えの欄は空で_前日の200文字は書き出しのnoneの行のanswerに残る 
+
+    Error: 配布物を作れないので受け入れテストを動かせない：backend/scripts/build.mjs が見つからない（実装がまだない）
+
+       at ../helpers/fixtures.mjs:11
+
+       9 |     async ({}, use) => {
+      10 |       if (process.env.KYOUNOITTE_BUILD_ERROR) {
+    > 11 |         throw new Error(`配布物を作れないので受け入れテストを動かせない：${process.env.KYOUNOITTE_BUILD_ERROR}`);
+         |               ^
+      12 |       }
+      13 |       if (!process.env.KYOUNOITTE_DIST) {
+      14 |         throw new Error('global-setup が配布物の場所（KYOUNOITTE_DIST）を渡していない');
+        at Object.base.extend.dist.scope (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/fixtures.mjs:11:15)
+
+    attachment #1: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac31-ac32-zero-ops-answer--dcd8b-200文字は書き出しのnoneの行のanswerに残る-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac31-ac32-zero-ops-answer--dcd8b-200文字は書き出しのnoneの行のanswerに残る-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  133 failed
+    [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:12:1 › AC1_初めて開くと診断が始まり3問で終わる_進み具合n/3_切り替え500ms以内 
+    [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_backend_intermediate 
+    [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_frontend_beginner 
+    [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_git_advanced 
+    [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:13:1 › AC3_課題集の全件が4要素を持ち所要時間が1〜15分 ───────
+    [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:31:1 › AC4_課題集は126件以上で18組すべて7件以上でIDの重複が0件 
+    [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:47:1 › BUDGET2_課題集の本文の平均600字以下_gzip後106000バイト以下 
+    [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:62:1 › AC29_各組でexternalが20%以下_in_appにURLもtoolsもなく_externalはtoolsが1件以上 
+    [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:20:1 › AC5_完了するとtask.rateになり_答えるとtask.done_同じ日に再読み込みしてもtask.doneのまま 
+    [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:40:1 › AC6_翌日には過去に出した課題のIDと一致しない課題が出る ───
+    [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_too_hardを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない 
+    [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_too_easyを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない 
+    [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_no_timeを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない 
+    [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:78:1 › AC9_役に立ったを選ぶとtask.doneになり_再び聞かれず_履歴のdata-helpfulがhelpful 
+    [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:92:1 › AC9_立たなかったを選ぶと履歴のdata-helpfulがnot_helpful 
+    [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:103:1 › AC9_選ばずに再読み込みするとtask.doneになり_履歴のdata-helpfulがunanswered 
+    [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:116:1 › AC9_今回は答えないを押すとtask.doneになり_履歴のdata-helpfulがunanswered 
+    [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_1通り目_中で難しすぎ難しすぎ→初 ───────────────────────
+    [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_2通り目_中で簡単すぎ簡単すぎ→上 ───────────────────────
+    [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_3通り目_中で難しすぎ1回だけ→中のまま ────────────────────
+    [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_4通り目_中で簡単すぎ1回だけ→中のまま ────────────────────
+    [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_5a通り目_中で難しすぎ完了難しすぎ→中のまま ─────────────────
+    [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_5b通り目_中で難しすぎ今日はできない難しすぎ→中のまま ────────────
+    [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_6通り目_初で難しすぎ2回連続→初のまま ────────────────────
+    [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_7通り目_上で簡単すぎ2回連続→上のまま ────────────────────
+    [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_8通り目_中で難しすぎ_none_難しすぎ→初（noneは数えず流れも切らない） 
+    [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_9通り目_上で2回難しすぎで中になった翌日に中で難しすぎ1回→中のまま ─────
+    [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:12:1 › AC10_課題が尽きるとtask.exhaustedと文言とやり直しの操作が出て_同じ領域と段階でやり直すと同じ日に再びtask.exhausted 
+    [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:33:1 › AC30_in_appを出し終えた翌日はexternalの課題が出て_印と要る道具が題名と同じ画面に見える 
+    [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:77:1 › AC30_in_appの課題を出した日はdata-task-modeがin_appで印が0件 
+    [chromium] › tests/ac11-ac13-storage.spec.mjs:8:1 › AC11_2問目の保存が失敗してもerror.storage.messageと選択が残り_やり直すと3問目に進み課題が回答と一致する 
+    [chromium] › tests/ac11-ac13-storage.spec.mjs:44:1 › AC13_persistを断られても完了と再読み込みでtask.done_履歴1件_設定にnotPersistedと書き出しがある 
+    [chromium] › tests/ac12-ac23-offline.spec.mjs:12:1 › AC12_オフラインでもAC-1_AC-2_AC-5_AC-9の操作が動き_送信は0件 
+    [chromium] › tests/ac12-ac23-offline.spec.mjs:47:1 › AC12_オフラインでもAC-7の申告が動き_送信は0件 ──────────────
+    [chromium] › tests/ac12-ac23-offline.spec.mjs:112:1 › AC23_task.todayを表示した後にオフラインで再読み込みと新しいタブ_3秒以内に同じdata-task-id_送信0件 
+    [chromium] › tests/ac12-ac23-offline.spec.mjs:120:1 › AC23_task.doneを表示した後にオフラインで再読み込みと新しいタブ_3秒以内にtask.done_送信0件 
+    [chromium] › tests/ac14-ac16-redo-delete.spec.mjs:6:1 › AC14_今日の課題を出していない日に設定からやり直して別の領域を選ぶと_新しい領域の課題が出て完了の履歴は3件のまま 
+    [chromium] › tests/ac14-ac16-redo-delete.spec.mjs:44:1 › AC14_今日の課題が出ている日に設定からやり直して別の領域を選んでも_その日は同じdata-task-idのtask.todayのままで完了の履歴は3件_翌日は新しい領域の課題が出る 
+    [chromium] › tests/ac14-ac16-redo-delete.spec.mjs:100:1 › AC16_すべてのデータを削除すると再読み込みでdiagnosis.startになり_やり直した後の履歴は0件 
+    [chromium] › tests/ac15-load-time.spec.mjs:7:1 › AC15_遅い回線とCPU4倍の制限でキャッシュなしに開き_data-debug-load-msが5回とも2000以下 
+    [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_diagnosis.start_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
+    [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.today_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
+    [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.done_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
+    [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.exhausted_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
+    [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:104:1 › AC18_移動キー(Tab系)とEnter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上 
+    [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_diagnosis.start_axe-coreでserious以上の違反が0件 
+    [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_diagnosis.question_axe-coreでserious以上の違反が0件 
+    [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.today_axe-coreでserious以上の違反が0件 
+    [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.done_axe-coreでserious以上の違反が0件 
+    [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.exhausted_axe-coreでserious以上の違反が0件 
+    [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_settings_axe-coreでserious以上の違反が0件 ─
+    [chromium] › tests/ac19-ac20-ac25-export-import.spec.mjs:12:1 › AC19_書き出すとJSONが1つダウンロードされ_診断_段階_履歴3件（50文字のanswer）_初めて開いた日_版番号を含む 
+    [chromium] › tests/ac19-ac20-ac25-export-import.spec.mjs:48:1 › AC20_保存データのないブラウザで読み込むと_診断と段階が同じで履歴3件（answerも同じ）_状態はtask.todayかtask.done 
+    [chromium] › tests/ac19-ac20-ac25-export-import.spec.mjs:91:1 › AC25_版番号が新しいファイルはerror.import.messageで拒み_履歴1件と診断と状態は変わらない 
+    [chromium] › tests/ac21-ac22-home-screen.spec.mjs:21:3 › AC-21 iPhone の Safari の偽装 › AC21_iOS_Safariでは診断の前に案内が出て_閉じると再読み込みしても出ず_設定から再び開ける 
+    [chromium] › tests/ac21-ac22-home-screen.spec.mjs:47:3 › AC-21 iPadOS の Safari の偽装（Mac の UA と maxTouchPoints > 1） › AC21_iPadOS_Safari（MacのUAとmaxTouchPoints5）でも診断の前に案内が出る 
+    [chromium] › tests/ac21-ac22-home-screen.spec.mjs:58:1 › AC21_UAを偽装しないChromiumとWebKitでは案内が0回出る ─
+    [chromium] › tests/ac21-ac22-home-screen.spec.mjs:70:1 › AC22_スタンドアロンで初めて開くと読み込みの案内が出て_再読み込みでも出て_ファイルを読み込むとAC-20の状態になる 
+    [chromium] › tests/ac24-stats.spec.mjs:18:1 › AC24_統計の9つの値が期待どおりで_数値7つと日付1つは同じ文字が見え_真偽値はfirstDayCompleted.yesの文言が見える 
+    [chromium] › tests/ac26-language.spec.mjs:40:3 › AC-26 locale en-US › AC26_en-USではdiagnosis.startの文言が英語の文言ファイルと一致し_キーの差が0件 
+    [chromium] › tests/ac26-language.spec.mjs:47:3 › AC-26 locale ja-JP › AC26_ja-JPではdiagnosis.startの文言が日本語の文言ファイルと一致する 
+    [chromium] › tests/ac28-update.spec.mjs:17:1 › AC28_差し替え後2秒おきの再読み込み3回以内でdata-build-versionが新版になり_旧版に戻らず_履歴3件と診断と段階は同じ 
+    [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:31:1 › AC31_診断済みで開くと操作0回でtask.todayが見え_題名と4要素と答えの欄と4つの申告が同じ画面にあり_重なる要素0件 
+    [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:51:1 › AC31_今日の課題を完了済みなら操作0回でtask.doneが見え_重なる要素0件 
+    [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:79:1 › AC32_200文字を入力して再読み込みすると_同じdata-task-idで答えがそのまま入っている 
+    [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:88:1 › AC32_200文字を入力してタブを閉じ新しいタブで開くと_同じdata-task-idで答えがそのまま入っている 
+    [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:98:1 › AC32_翌日に開くと新しい課題の答えの欄は空で_前日の200文字は書き出しのnoneの行のanswerに残る 
+    [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:12:1 › AC1_初めて開くと診断が始まり3問で終わる_進み具合n/3_切り替え500ms以内 
+    [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_backend_intermediate 
+    [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_frontend_beginner 
+    [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_git_advanced 
+    [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:13:1 › AC3_課題集の全件が4要素を持ち所要時間が1〜15分 ─────────
+    [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:31:1 › AC4_課題集は126件以上で18組すべて7件以上でIDの重複が0件 ──
+    [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:47:1 › BUDGET2_課題集の本文の平均600字以下_gzip後106000バイト以下 
+    [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:62:1 › AC29_各組でexternalが20%以下_in_appにURLもtoolsもなく_externalはtoolsが1件以上 
+    [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:20:1 › AC5_完了するとtask.rateになり_答えるとtask.done_同じ日に再読み込みしてもtask.doneのまま 
+    [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:40:1 › AC6_翌日には過去に出した課題のIDと一致しない課題が出る ─────
+    [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_too_hardを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない 
+    [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_too_easyを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない 
+    [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_no_timeを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない 
+    [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:78:1 › AC9_役に立ったを選ぶとtask.doneになり_再び聞かれず_履歴のdata-helpfulがhelpful 
+    [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:92:1 › AC9_立たなかったを選ぶと履歴のdata-helpfulがnot_helpful 
+    [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:103:1 › AC9_選ばずに再読み込みするとtask.doneになり_履歴のdata-helpfulがunanswered 
+    [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:116:1 › AC9_今回は答えないを押すとtask.doneになり_履歴のdata-helpfulがunanswered 
+    [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_1通り目_中で難しすぎ難しすぎ→初 ─────────────────────────
+    [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_2通り目_中で簡単すぎ簡単すぎ→上 ─────────────────────────
+    [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_3通り目_中で難しすぎ1回だけ→中のまま ──────────────────────
+    [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_4通り目_中で簡単すぎ1回だけ→中のまま ──────────────────────
+    [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_5a通り目_中で難しすぎ完了難しすぎ→中のまま ───────────────────
+    [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_5b通り目_中で難しすぎ今日はできない難しすぎ→中のまま ──────────────
+    [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_6通り目_初で難しすぎ2回連続→初のまま ──────────────────────
+    [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_7通り目_上で簡単すぎ2回連続→上のまま ──────────────────────
+    [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_8通り目_中で難しすぎ_none_難しすぎ→初（noneは数えず流れも切らない） ──
+    [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_9通り目_上で2回難しすぎで中になった翌日に中で難しすぎ1回→中のまま ───────
+    [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:12:1 › AC10_課題が尽きるとtask.exhaustedと文言とやり直しの操作が出て_同じ領域と段階でやり直すと同じ日に再びtask.exhausted 
+    [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:33:1 › AC30_in_appを出し終えた翌日はexternalの課題が出て_印と要る道具が題名と同じ画面に見える 
+    [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:77:1 › AC30_in_appの課題を出した日はdata-task-modeがin_appで印が0件 
+    [webkit] › tests/ac11-ac13-storage.spec.mjs:8:1 › AC11_2問目の保存が失敗してもerror.storage.messageと選択が残り_やり直すと3問目に進み課題が回答と一致する 
+    [webkit] › tests/ac11-ac13-storage.spec.mjs:44:1 › AC13_persistを断られても完了と再読み込みでtask.done_履歴1件_設定にnotPersistedと書き出しがある 
+    [webkit] › tests/ac12-ac23-offline.spec.mjs:12:1 › AC12_オフラインでもAC-1_AC-2_AC-5_AC-9の操作が動き_送信は0件 ─
+    [webkit] › tests/ac12-ac23-offline.spec.mjs:47:1 › AC12_オフラインでもAC-7の申告が動き_送信は0件 ────────────────
+    [webkit] › tests/ac12-ac23-offline.spec.mjs:112:1 › AC23_task.todayを表示した後にオフラインで再読み込みと新しいタブ_3秒以内に同じdata-task-id_送信0件 
+    [webkit] › tests/ac12-ac23-offline.spec.mjs:120:1 › AC23_task.doneを表示した後にオフラインで再読み込みと新しいタブ_3秒以内にtask.done_送信0件 
+    [webkit] › tests/ac14-ac16-redo-delete.spec.mjs:6:1 › AC14_今日の課題を出していない日に設定からやり直して別の領域を選ぶと_新しい領域の課題が出て完了の履歴は3件のまま 
+    [webkit] › tests/ac14-ac16-redo-delete.spec.mjs:44:1 › AC14_今日の課題が出ている日に設定からやり直して別の領域を選んでも_その日は同じdata-task-idのtask.todayのままで完了の履歴は3件_翌日は新しい領域の課題が出る 
+    [webkit] › tests/ac14-ac16-redo-delete.spec.mjs:100:1 › AC16_すべてのデータを削除すると再読み込みでdiagnosis.startになり_やり直した後の履歴は0件 
+    [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_diagnosis.start_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
+    [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.today_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
+    [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.done_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
+    [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.exhausted_横スクロール0_切り詰め0_操作できる要素がすべて押せる 
+    [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:104:1 › AC18_移動キー(Tab系)とEnter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上 
+    [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_diagnosis.start_axe-coreでserious以上の違反が0件 
+    [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_diagnosis.question_axe-coreでserious以上の違反が0件 
+    [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.today_axe-coreでserious以上の違反が0件 ─
+    [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.done_axe-coreでserious以上の違反が0件 ──
+    [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.exhausted_axe-coreでserious以上の違反が0件 
+    [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_settings_axe-coreでserious以上の違反が0件 ───
+    [webkit] › tests/ac19-ac20-ac25-export-import.spec.mjs:12:1 › AC19_書き出すとJSONが1つダウンロードされ_診断_段階_履歴3件（50文字のanswer）_初めて開いた日_版番号を含む 
+    [webkit] › tests/ac19-ac20-ac25-export-import.spec.mjs:48:1 › AC20_保存データのないブラウザで読み込むと_診断と段階が同じで履歴3件（answerも同じ）_状態はtask.todayかtask.done 
+    [webkit] › tests/ac19-ac20-ac25-export-import.spec.mjs:91:1 › AC25_版番号が新しいファイルはerror.import.messageで拒み_履歴1件と診断と状態は変わらない 
+    [webkit] › tests/ac21-ac22-home-screen.spec.mjs:21:3 › AC-21 iPhone の Safari の偽装 › AC21_iOS_Safariでは診断の前に案内が出て_閉じると再読み込みしても出ず_設定から再び開ける 
+    [webkit] › tests/ac21-ac22-home-screen.spec.mjs:47:3 › AC-21 iPadOS の Safari の偽装（Mac の UA と maxTouchPoints > 1） › AC21_iPadOS_Safari（MacのUAとmaxTouchPoints5）でも診断の前に案内が出る 
+    [webkit] › tests/ac21-ac22-home-screen.spec.mjs:58:1 › AC21_UAを偽装しないChromiumとWebKitでは案内が0回出る ───
+    [webkit] › tests/ac21-ac22-home-screen.spec.mjs:70:1 › AC22_スタンドアロンで初めて開くと読み込みの案内が出て_再読み込みでも出て_ファイルを読み込むとAC-20の状態になる 
+    [webkit] › tests/ac24-stats.spec.mjs:18:1 › AC24_統計の9つの値が期待どおりで_数値7つと日付1つは同じ文字が見え_真偽値はfirstDayCompleted.yesの文言が見える 
+    [webkit] › tests/ac26-language.spec.mjs:40:3 › AC-26 locale en-US › AC26_en-USではdiagnosis.startの文言が英語の文言ファイルと一致し_キーの差が0件 
+    [webkit] › tests/ac26-language.spec.mjs:47:3 › AC-26 locale ja-JP › AC26_ja-JPではdiagnosis.startの文言が日本語の文言ファイルと一致する 
+    [webkit] › tests/ac28-update.spec.mjs:17:1 › AC28_差し替え後2秒おきの再読み込み3回以内でdata-build-versionが新版になり_旧版に戻らず_履歴3件と診断と段階は同じ 
+    [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:31:1 › AC31_診断済みで開くと操作0回でtask.todayが見え_題名と4要素と答えの欄と4つの申告が同じ画面にあり_重なる要素0件 
+    [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:51:1 › AC31_今日の課題を完了済みなら操作0回でtask.doneが見え_重なる要素0件 
+    [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:79:1 › AC32_200文字を入力して再読み込みすると_同じdata-task-idで答えがそのまま入っている 
+    [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:88:1 › AC32_200文字を入力してタブを閉じ新しいタブで開くと_同じdata-task-idで答えがそのまま入っている 
+    [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:98:1 › AC32_翌日に開くと新しい課題の答えの欄は空で_前日の200文字は書き出しのnoneの行のanswerに残る 
+
+# 要約： 133 failed 　成功 0　飛ばし 0　終了コード 1

@@ -1,0 +1,19 @@
+{
+  "name": "kyounoitte",
+  "private": true,
+  "type": "module",
+  "description": "今日の一手（001-daily-learning）。ブラウザだけで動く Web アプリ。本番の依存は 0 件（ADR 0001）。",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs --out dist",
+    "check:contracts": "node ../contracts/tools/check-schemas.mjs",
+    "test:unit": "node --test 'tests/unit/**/*.test.mjs'",
+    "test:acceptance": "cd tests/acceptance && npm ci && npx playwright install chromium webkit && npx playwright test",
+    "test": "npm run check:contracts && npm run test:unit && npm run test:acceptance"
+  },
+  "devDependencies": {
+    "ajv": "8.20.0"
+  }
+}

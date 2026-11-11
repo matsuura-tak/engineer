@@ -1,0 +1,36 @@
+# セッション R4（chromium、2026-11-03T14:29:50.807Z、配布物 2026-11-30.1）
+1. 旧版を読み込み SW の準備を待つ
+  version=2026-11-30.1 caches=["kyounoitte-2026-11-30.1"]
+  data-state=task.today
+2. 新版に差し替え、0.5 秒おきに 6 回再読み込み
+  versions=2026-11-30.1 → 2026-11-30.1 → 2026-11-30.1 → 2026-11-30.1 → 2026-11-30.1 → 2026-11-30.1 caches=["kyounoitte-2026-11-30.1"]
+  !! 疑問/不具合候補：6 回の再読み込みで新版にならない
+  data-state=task.today
+3. オフラインで /engineer/index.html と /engineer/?v=1 と新しいタブ
+  http://127.0.0.1:60802/engineer/index.html → status 200 fromSW=true state=task.today version=2026-11-30.1 requestfailed=0
+  http://127.0.0.1:60802/engineer/?v=1 → status 200 fromSW=true state=task.today version=2026-11-30.1 requestfailed=0
+  http://127.0.0.1:60802/engineer/ → status 200 fromSW=true state=task.today version=2026-11-30.1 requestfailed=0
+  data-state=task.today
+4. オフラインで manifest.webmanifest と icon-180.png と tasks.json を fetch
+  manifest.webmanifest → {"ok":true,"status":200,"type":"application/manifest+json","len":231}
+  icon-180.png → {"ok":true,"status":200,"type":"image/png","len":2107}
+  data/tasks.json → {"ok":true,"status":200,"type":"application/json","len":124721}
+  i18n/en.json → {"ok":true,"status":200,"type":"application/json","len":9229}
+  sw.js → {"ok":true,"status":200,"type":"text/javascript","len":1875}
+  data-state=task.today
+5. （別のコンテキスト）install の途中でオフライン → 再読み込み
+  commit 直後にオフライン → state=タイムアウト console.error=15：Failed to load resource: net::ERR_INTERNET_DISCONNECTED
+  オフラインのまま再読み込み → ブラウザのエラー（page.reload: net::ERR_INTERNET_DISCONNECTED）
+  オンラインに戻して再読み込み → state=diagnosis.start
+  data-state=task.today
+  console.error / pageerror 合計=0
+# 操作 5 件、9 秒、疑問/不具合候補 1 件
+- 6 回の再読み込みで新版にならない
+# R4 の追試（2026-11-03 23:31:28 +0900、chromium）：再読み込みの間隔を 500 / 1000 / 2000 ms にして 6 回、その後 2.5 秒あけて 1 回
+間隔 500 ms × 6：2026-11-30.1 → 2026-11-30.1 → 2026-11-30.1 → 2026-11-30.1 → 2026-11-30.1 → 2026-11-30.1 SW={"installing":false,"waiting":false,"active":true,"caches":["kyounoitte-2026-11-30.1"]}
+  その後 2.5 秒あけて再読み込み：2026-12-14.1 SW={"installing":false,"waiting":false,"active":true,"caches":["kyounoitte-2026-12-14.1"]}
+間隔 1000 ms × 6：2026-11-30.1 → 2026-11-30.1 → 2026-12-14.1 → 2026-12-14.1 → 2026-12-14.1 → 2026-12-14.1 SW={"installing":false,"waiting":false,"active":true,"caches":["kyounoitte-2026-12-14.1"]}
+  その後 2.5 秒あけて再読み込み：2026-12-14.1 SW={"installing":false,"waiting":false,"active":true,"caches":["kyounoitte-2026-12-14.1"]}
+間隔 2000 ms × 6：2026-11-30.1 → 2026-12-14.1 → 2026-12-14.1 → 2026-12-14.1 → 2026-12-14.1 → 2026-12-14.1 SW={"installing":false,"waiting":false,"active":true,"caches":["kyounoitte-2026-12-14.1"]}
+  その後 2.5 秒あけて再読み込み：2026-12-14.1 SW={"installing":false,"waiting":false,"active":true,"caches":["kyounoitte-2026-12-14.1"]}
+# exit: 0

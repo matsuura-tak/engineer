@@ -1,0 +1,17 @@
+# date: 2026-11-05 21:22:00 +0900
+# commit: 7a59e8415de426d9eb40f09e8f6397eb5ba090fa
+# why: W-11「AC-15 は他のテストと並列にしない」の設定（project chromium-ac15、--no-deps --workers=1）で、AC-15 だけを 5 回。期待値 2,000 ms と 1 回の中の 5 回は変えない
+# cmd: cd backend/tests/acceptance && PLAYWRIGHT_JSON_OUTPUT_NAME=evidence/g3r4-repeat5-ac15.json npm run test:ac15 -- --repeat-each=5 --retries=0 --reporter=list,json
+npm notice run test:ac15
+npm notice run playwright test --project=chromium-ac15 --no-deps --workers=1 --repeat-each=5 --retries=0 --reporter=list,json
+
+Running 5 tests using 1 worker
+
+  ✓  1 [chromium-ac15] › tests/ac15-load-time.spec.mjs:7:1 › AC15_遅い回線とCPU4倍の制限でキャッシュなしに開き_data-debug-load-msが5回とも2000以下 (8.7s)
+  ✓  2 [chromium-ac15] › tests/ac15-load-time.spec.mjs:7:1 › AC15_遅い回線とCPU4倍の制限でキャッシュなしに開き_data-debug-load-msが5回とも2000以下 (8.4s)
+  ✓  3 [chromium-ac15] › tests/ac15-load-time.spec.mjs:7:1 › AC15_遅い回線とCPU4倍の制限でキャッシュなしに開き_data-debug-load-msが5回とも2000以下 (9.1s)
+  ✓  4 [chromium-ac15] › tests/ac15-load-time.spec.mjs:7:1 › AC15_遅い回線とCPU4倍の制限でキャッシュなしに開き_data-debug-load-msが5回とも2000以下 (9.2s)
+  ✓  5 [chromium-ac15] › tests/ac15-load-time.spec.mjs:7:1 › AC15_遅い回線とCPU4倍の制限でキャッシュなしに開き_data-debug-load-msが5回とも2000以下 (8.8s)
+
+  5 passed (49.7s)
+# exit: 0

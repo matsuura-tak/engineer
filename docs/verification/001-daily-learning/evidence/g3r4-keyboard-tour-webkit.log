@@ -1,0 +1,24 @@
+# browser: webkit、移動キー：Alt+Tab / Alt+Shift+Tab、日付 2026-11-03、seed seed-three-done-one-answer.json
+S5 task.done に到達（操作 0 回）
+[S5 task.done] Alt+Tab の順：app.name > nav.history > nav.settings > task.next > task.done.history > BODY(focus-visible なし)
+S5 task.done.history を Enter → history
+[S10 history] Alt+Tab の順：history.row.answer > BODY(focus-visible なし)
+S10 history.row.answer を Enter → details.open=true
+S10 history.row.answer を Space → details.open=false
+S10 Alt+Shift+Tab → nav.settings
+S10 nav.settings を Enter → settings
+[S8 settings] Alt+Tab の順：settings.export > settings.import > settings.redo > settings.stats.open > settings.history.open > settings.delete > BODY(focus-visible なし)
+S8 settings.delete を Enter → ダイアログ、初期フォーカス settings.delete.confirm.cancel
+ダイアログ内で Alt+Tab ×6：BODY > settings.delete.confirm > settings.delete.confirm.ok > settings.delete.confirm.cancel > BODY > settings.delete.confirm
+Escape → ダイアログが閉じ、フォーカス settings.delete、data-state settings
+S8 settings.stats.open を Enter → settings.stats
+[S9 settings.stats] Alt+Tab の順：settings.stats.back > BODY(focus-visible なし)
+S9 settings.stats.back を Enter → settings
+S8 settings.redo を Enter → diagnosis.question（diagnosis.progress にフォーカス）
+[S2 diagnosis.question（やり直し）] Alt+Tab の順：area.backend > diagnosis.next > diagnosis.cancel > BODY(focus-visible なし)
+S2 radio で ArrowDown → checked=area.frontend、フォーカス area.frontend
+S2 diagnosis.cancel を Enter → settings
+S8 app.name を Enter → task.done
+# 問題：2 件
+- S8：settings.privacy に止まらない
+- ダイアログの外にフォーカスが出た：BODY > settings.delete.confirm > settings.delete.confirm.ok > settings.delete.confirm.cancel > BODY > settings.delete.confirm

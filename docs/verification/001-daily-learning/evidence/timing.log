@@ -1,0 +1,89 @@
+# timing.log：時間の計測が契約（contracts/test-hooks.md「時間の計り方」）どおりに動くことの確認（001-daily-learning、r3）
+# 日付：2026-10-31　コミット：009322d（r3 の未コミットの作業ツリー）　node v24.22.1　@playwright/test 1.64.1　macOS　chromium と webkit
+# 何を確かめたか：
+#   - AC-1、AC-2、AC-12 (a) の区間（ページの中：click の capture 段の performance.now() → MutationObserver が data-state / data-question-index の条件を見た時刻）が、
+#     stub の本当の遅れ（setTimeout）に対して +0〜+3 ms に収まる。
+#   - AC-23（テスト側：Date.now() → reload / goto（waitUntil: 'commit'）→ expect.poll（intervals [20]、timeout 3000）→ Date.now()）が、本当の遅れに対して +13〜+40 ms に収まる。
+#   - 遅れ 300 ms では AC-1、AC-2、AC-12、AC-23 の 16 本（8 本 × 2 ブラウザ）がすべて通る。
+#   - 遅れ 900 ms では、500 ms が上限の区間を持つ AC-1 と AC-12 (a) が両ブラウザで落ち（計った値 900〜903）、上限 1,000 ms の AC-2（finish）と 3,000 ms の AC-23 は通る。
+# stub（リポジトリに入れない。スクラッチパッド verifier-timing/tools/gen-stub.mjs で生成）：
+#   index.html（data-state="loading"）、app.js（S1 → S2 の 3 問 → task.today → task.rate / task.done / task.skipped → history。localStorage の kyounoitte:data を読み書きし、
+#   seed の履歴で task.done / task.today を決める）、sw.js（install で全ファイルをキャッシュ、skipWaiting、clients.claim）、data/tasks.json（18 組 × 7 件 = 126 件）、i18n/ja.json、en.json。
+#   遅れ：begin、next、finish の click と起動の描画（loading → 最初の状態）を setTimeout(fn, DELAY) で遅らせる。DELAY は 0 / 300 / 900。
+# 実行したコマンド（遅れごとに 1 回。両ブラウザ、再試行なし）：
+#   cd backend/tests/acceptance && KYOUNOITTE_DIST=<スクラッチパッド>/verifier-timing/stub-d<遅れ> npx playwright test -g 'AC1_|AC2_|AC12_|AC23_' --reporter=list,json
+# 終了コード：遅れ 0 → 0（16 passed）、300 → 0（16 passed）、900 → 1（12 passed / 4 failed）
+# 下の表は JSON レポートの annotation（テストが記録した ms の整数）と結果。列：project、結果、テスト名、annotation、落ちた理由。
+
+## 遅れ 0 ms
+chromium passed  AC12_オフラインでもAC-1_AC-2_AC-5_AC-9の操作が動き_送信は0件        切り替えの時間 ms（始める→1、1→2、2→3、3→課題）: 12, 15, 15, 15
+chromium passed  AC12_オフラインでもAC-7の申告が動き_送信は0件                       
+chromium passed  AC1_初めて開くと診断が始まり3問で終わる_進み具合n/3_切り替え500ms以内         切り替えの時間 ms（始める→1、1→2、2→3、3→課題）: 始める → 1 問目: 14, 1 問目 → 2 問目: 14, 2 問目 → 3 問目: 16, 3 問目 → 課題（AC-2 の 1 秒）: 15
+chromium passed  AC23_task.doneを表示した後にオフラインで再読み込みと新しいタブ_3秒以内にtask   表示までの ms（再読み込み / 新しいタブ）: 13 / 52
+chromium passed  AC23_task.todayを表示した後にオフラインで再読み込みと新しいタブ_3秒以内に同じd   表示までの ms（再読み込み / 新しいタブ）: 15 / 46
+chromium passed  AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_backend_interm   最後の回答の確定から task.today の表示まで ms: 15
+chromium passed  AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_frontend_begin   最後の回答の確定から task.today の表示まで ms: 14
+chromium passed  AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_git_advanced     最後の回答の確定から task.today の表示まで ms: 15
+webkit   passed  AC12_オフラインでもAC-1_AC-2_AC-5_AC-9の操作が動き_送信は0件        切り替えの時間 ms（始める→1、1→2、2→3、3→課題）: 0, 0, 1, 1
+webkit   passed  AC12_オフラインでもAC-7の申告が動き_送信は0件                       
+webkit   passed  AC1_初めて開くと診断が始まり3問で終わる_進み具合n/3_切り替え500ms以内         切り替えの時間 ms（始める→1、1→2、2→3、3→課題）: 始める → 1 問目: 0, 1 問目 → 2 問目: 0, 2 問目 → 3 問目: 1, 3 問目 → 課題（AC-2 の 1 秒）: 2
+webkit   passed  AC23_task.doneを表示した後にオフラインで再読み込みと新しいタブ_3秒以内にtask   表示までの ms（再読み込み / 新しいタブ）: 12 / 58
+webkit   passed  AC23_task.todayを表示した後にオフラインで再読み込みと新しいタブ_3秒以内に同じd   表示までの ms（再読み込み / 新しいタブ）: 18 / 76
+webkit   passed  AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_backend_interm   最後の回答の確定から task.today の表示まで ms: 1
+webkit   passed  AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_frontend_begin   最後の回答の確定から task.today の表示まで ms: 1
+webkit   passed  AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_git_advanced     最後の回答の確定から task.today の表示まで ms: 1
+stats: expected=16 unexpected=0 skipped=0 flaky=0
+
+## 遅れ 300 ms
+chromium passed  AC12_オフラインでもAC-1_AC-2_AC-5_AC-9の操作が動き_送信は0件        切り替えの時間 ms（始める→1、1→2、2→3、3→課題）: 302, 302, 301, 302
+chromium passed  AC12_オフラインでもAC-7の申告が動き_送信は0件                       
+chromium passed  AC1_初めて開くと診断が始まり3問で終わる_進み具合n/3_切り替え500ms以内         切り替えの時間 ms（始める→1、1→2、2→3、3→課題）: 始める → 1 問目: 302, 1 問目 → 2 問目: 301, 2 問目 → 3 問目: 301, 3 問目 → 課題（AC-2 の 1 秒）: 302
+chromium passed  AC23_task.doneを表示した後にオフラインで再読み込みと新しいタブ_3秒以内にtask   表示までの ms（再読み込み / 新しいタブ）: 333 / 331
+chromium passed  AC23_task.todayを表示した後にオフラインで再読み込みと新しいタブ_3秒以内に同じd   表示までの ms（再読み込み / 新しいタブ）: 321 / 327
+chromium passed  AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_backend_interm   最後の回答の確定から task.today の表示まで ms: 302
+chromium passed  AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_frontend_begin   最後の回答の確定から task.today の表示まで ms: 302
+chromium passed  AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_git_advanced     最後の回答の確定から task.today の表示まで ms: 302
+webkit   passed  AC12_オフラインでもAC-1_AC-2_AC-5_AC-9の操作が動き_送信は0件        切り替えの時間 ms（始める→1、1→2、2→3、3→課題）: 301, 301, 301, 301
+webkit   passed  AC12_オフラインでもAC-7の申告が動き_送信は0件                       
+webkit   passed  AC1_初めて開くと診断が始まり3問で終わる_進み具合n/3_切り替え500ms以内         切り替えの時間 ms（始める→1、1→2、2→3、3→課題）: 始める → 1 問目: 302, 1 問目 → 2 問目: 301, 2 問目 → 3 問目: 301, 3 問目 → 課題（AC-2 の 1 秒）: 301
+webkit   passed  AC23_task.doneを表示した後にオフラインで再読み込みと新しいタブ_3秒以内にtask   表示までの ms（再読み込み / 新しいタブ）: 329 / 326
+webkit   passed  AC23_task.todayを表示した後にオフラインで再読み込みと新しいタブ_3秒以内に同じd   表示までの ms（再読み込み / 新しいタブ）: 322 / 337
+webkit   passed  AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_backend_interm   最後の回答の確定から task.today の表示まで ms: 301
+webkit   passed  AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_frontend_begin   最後の回答の確定から task.today の表示まで ms: 301
+webkit   passed  AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_git_advanced     最後の回答の確定から task.today の表示まで ms: 302
+stats: expected=16 unexpected=0 skipped=0 flaky=0
+
+## 遅れ 900 ms
+chromium failed  AC12_オフラインでもAC-1_AC-2_AC-5_AC-9の操作が動き_送信は0件        切り替えの時間 ms（始める→1、1→2、2→3、3→課題）: 901, 901, 901, 902 ｜ Error: 始める → 1 問目 Expected: <= 500 Received:    901
+chromium failed  AC1_初めて開くと診断が始まり3問で終わる_進み具合n/3_切り替え500ms以内         切り替えの時間 ms（始める→1、1→2、2→3、3→課題）: 始める → 1 問目: 902, 1 問目 → 2 問目: 902, 2 問目 → 3 問目: 901, 3 問目 → 課題（AC-2 の 1 秒）: 903 ｜ Error: 始める → 1 問目（500 ms 以内） Expected: <= 500 Received:    902
+chromium passed  AC12_オフラインでもAC-7の申告が動き_送信は0件                       
+chromium passed  AC23_task.doneを表示した後にオフラインで再読み込みと新しいタブ_3秒以内にtask   表示までの ms（再読み込み / 新しいタブ）: 926 / 929
+chromium passed  AC23_task.todayを表示した後にオフラインで再読み込みと新しいタブ_3秒以内に同じd   表示までの ms（再読み込み / 新しいタブ）: 927 / 932
+chromium passed  AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_backend_interm   最後の回答の確定から task.today の表示まで ms: 903
+chromium passed  AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_frontend_begin   最後の回答の確定から task.today の表示まで ms: 902
+chromium passed  AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_git_advanced     最後の回答の確定から task.today の表示まで ms: 902
+webkit   failed  AC12_オフラインでもAC-1_AC-2_AC-5_AC-9の操作が動き_送信は0件        切り替えの時間 ms（始める→1、1→2、2→3、3→課題）: 900, 901, 901, 902 ｜ Error: 始める → 1 問目 Expected: <= 500 Received:    900
+webkit   failed  AC1_初めて開くと診断が始まり3問で終わる_進み具合n/3_切り替え500ms以内         切り替えの時間 ms（始める→1、1→2、2→3、3→課題）: 始める → 1 問目: 902, 1 問目 → 2 問目: 900, 2 問目 → 3 問目: 902, 3 問目 → 課題（AC-2 の 1 秒）: 901 ｜ Error: 始める → 1 問目（500 ms 以内） Expected: <= 500 Received:    902
+webkit   passed  AC12_オフラインでもAC-7の申告が動き_送信は0件                       
+webkit   passed  AC23_task.doneを表示した後にオフラインで再読み込みと新しいタブ_3秒以内にtask   表示までの ms（再読み込み / 新しいタブ）: 940 / 934
+webkit   passed  AC23_task.todayを表示した後にオフラインで再読み込みと新しいタブ_3秒以内に同じd   表示までの ms（再読み込み / 新しいタブ）: 920 / 928
+webkit   passed  AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_backend_interm   最後の回答の確定から task.today の表示まで ms: 902
+webkit   passed  AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_frontend_begin   最後の回答の確定から task.today の表示まで ms: 902
+webkit   passed  AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_git_advanced     最後の回答の確定から task.today の表示まで ms: 901
+stats: expected=12 unexpected=4 skipped=0 flaky=0
+
+## 計った値 − 本当の遅れ（ms。chromium / webkit。上の表から）
+| 区間 | 遅れ 0 | 遅れ 300 | 遅れ 900 |
+|---|---|---|---|
+| AC-1 始める → 1 問目 | 14 / 0 | 302 / 302 | 902 / 902 |
+| AC-1 1 → 2、2 → 3 | 14、16 / 0、1 | 301、301 / 301、301 | 902、901 / 900、902 |
+| AC-1 3 問目 → 課題 | 15 / 2 | 302 / 301 | 903 / 901 |
+| AC-2 finish → task.today（3 本） | 14〜15 / 1 | 302 / 301〜302 | 902〜903 / 901〜902 |
+| AC-12 (a) 4 区間 | 12〜15 / 0〜1 | 301〜302 / 301 | 901〜902 / 900〜902 |
+| AC-23 再読み込み / 新しいタブ（today、done） | 13〜15 / 46〜52 ・ 12〜18 / 58〜76 | 321〜333 / 327〜331 ・ 322〜329 / 326〜337 | 926〜927 / 929〜932 ・ 920〜940 / 928〜934 |
+
+## 付け足し：SW のない stub（r2 の stubdist：静的な diagnosis.start だけ）で AC12 ×1（chromium）
+#   waitServiceWorkerReady が WAIT_MS（10,000 ms）で「SW が登録されない」と落ちる（以前はテストの timeout 60 s まで止まっていた）。
+✘  1 [chromium] › tests/ac12-ac23-offline.spec.mjs:47:1 › AC12_オフラインでもAC-7の申告が動き_送信は0件 (10.2s)
+Error: page.evaluate: Error: SW が登録されない：navigator.serviceWorker.ready と controller が 10000 ms で満たされない（W-13）
+1 failed

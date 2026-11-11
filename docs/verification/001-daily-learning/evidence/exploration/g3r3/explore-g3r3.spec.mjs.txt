@@ -1,0 +1,297 @@
+// G3 r3 の探索（verifier。使い捨て。test-plan 6 章のチャーター R1〜R4 と指揮役の指示 5）。
+// 終わったら tests/ から消し、写しを docs/verification/001-daily-learning/evidence/exploration/ に残す。
+// 期待する値は PRD 11、contracts/data.md の 4、5、9、identifiers.md の 3、4 から。実装は見ていない。
+import { test, expect } from '../helpers/fixtures.mjs';
+import * as app from '../helpers/app.mjs';
+import {
+  injectSeed, injectStorageFailure, armStorageFailure, loadContractFixture, pickNext, readStoredData, completedSeed, tasksOf,
+} from '../helpers/seed.mjs';
+
+const SEED_AC14 = 'seeds/seed-ac14-three-completed.json';
+const TODAY = '2026-11-04'; // 水曜
+
+/** 横スクロールがないか（PRD AC-17 の幅 320 の確かめ方と同じ）。 */
+async function overflow(page) {
+  return page.evaluate(() => {
+    const d = document.documentElement;
+    const wide = [...document.querySelectorAll('body *')].filter((el) => {
+      const r = el.getBoundingClientRect();
+      return r.width > 0 && (r.right > d.clientWidth + 1 || r.left < -1);
+    }).map((el) => `${el.tagName.toLowerCase()}[data-testid=${el.getAttribute('data-testid')}] right=${Math.round(el.getBoundingClientRect().right)}`);
+    return { scrollWidth: d.scrollWidth, clientWidth: d.clientWidth, wide: wide.slice(0, 5) };
+  });
+}
+async function font200(page) {
+  await page.evaluate(() => { document.documentElement.style.fontSize = '200%'; });
+}
+
+test.describe('EXPLORE R2+R3+R4 同じ日に初級→中級→上級→allDone まで 35 件', () => {
+  test.setTimeout(240_000);
+  test('EXPLORE_R2R3R4_35件', async ({ context, page, baseURL, request }, testInfo) => {
+    const tasks = await app.loadTasks(request);
+    const ja = await app.loadStrings(request, 'ja');
+    await app.fixDate(page, TODAY);
+    await app.open(page, baseURL);
+    await app.expectState(page, 'diagnosis.start');
+    await app.diagnose(page, { area: 'backend', level: 'beginner', years: 'never' });
+    const seen = [];
+    const log = [];
+    const groupCount = (area, level) => seen.filter((s) => s.area === area && s.level === level).length;
+    let advances = 0;
+    for (let i = 1; i <= 60; i++) {
+      const t = await app.readTask(page);
+      expect(seen.map((s) => s.id), `${i} 件目 ${t.id} は過去に出ていない`).not.toContain(t.id);
+      expect(t.nthToday, `${i} 件目の data-task-nth-today`).toBe(String(seen.length + 1));
+      expect(t.progressIndex, `${i} 件目の data-progress-index`).toBe(String(groupCount(t.area, t.level) + 1));
+      expect(t.progressTotal).toBe(String(tasksOf(tasks, t.area, t.level).length));
+      await expect(app.tid(page, 'task.dayChanged')).toHaveCount(0);
+      if (i === 12) await app.shot(page, testInfo, 'EXPLORE_S3_nth12');
+      seen.push(t);
+      await app.tid(page, 'task.report.done').click();
+      await app.expectState(page, 'task.rate');
+      const total = await app.tid(page, 'task.total.value').getAttribute('data-stat-completed');
+      expect(total, `${i} 件目の完了後の累計`).toBe(String(seen.length));
+      const milestone = await app.tid(page, 'task.cheer').getAttribute('data-milestone');
+      expect(milestone).toBe([7, 30, 100].includes(seen.length) ? String(seen.length) : 'none');
+      const cheerKey = { 7: 'task.cheer.at7', 30: 'task.cheer.at30', 100: 'task.cheer.at100' }[seen.length] ?? 'task.cheer.default';
+      await expect(app.tid(page, 'task.cheer')).toHaveText(app.fill(app.text(ja, cheerKey), { count: seen.length }));
+      await expect(app.tid(page, 'task.progress.done')).toHaveAttribute('data-progress-index', t.progressIndex);
+      if (seen.length === 7 || seen.length === 30) {
+        await page.waitForTimeout(1000);
+        await app.shot(page, testInfo, `EXPLORE_S4_at${seen.length}`);
+      }
+      await app.tid(page, i % 2 ? 'task.rate.helpful' : 'task.rate.notHelpful').click();
+      await app.expectState(page, 'task.done');
+      await expect(app.tid(page, 'task.week')).toHaveAttribute('data-stat-days-completed-week', '1');
+      const unissued = tasksOf(tasks, t.area, t.level).filter((x) => !seen.some((s) => s.id === x.id)).length;
+      await expect(app.tid(page, 'task.next.note')).toHaveText(app.fill(app.text(ja, unissued === 0 ? 'task.next.note.last' : 'task.next.note'), { area: app.text(ja, `area.${t.area}`), level: app.text(ja, `level.${t.level}`) }));
+      await app.tid(page, 'task.next').click();
+      await expect(app.root(page)).toHaveAttribute('data-state', /^task\.(today|exhausted)$/, { timeout: app.WAIT_MS });
+      const state = await app.readState(page);
+      log.push({ i, id: t.id, level: t.level, nth: t.nthToday, progress: `${t.progressIndex}/${t.progressTotal}`, total, milestone, unissued, after: state });
+      if (state === 'task.exhausted') {
+        await expect(app.tid(page, 'task.total.value')).toHaveAttribute('data-stat-completed', String(seen.length));
+        await expect(app.tid(page, 'task.exhausted.seenNext')).toHaveCount(0);
+        await expect(app.tid(page, 'task.exhausted.nextDone')).toHaveCount(0);
+        if (t.level === 'advanced') {
+          await expect(app.tid(page, 'task.exhausted.allDone')).toHaveCount(1);
+          await expect(app.tid(page, 'task.exhausted.advance')).toHaveCount(0);
+          await app.shot(page, testInfo, 'EXPLORE_S7_allDone');
+          break;
+        }
+        await expect(app.tid(page, 'task.exhausted.levelDone')).toHaveCount(1);
+        await app.shot(page, testInfo, `EXPLORE_S7_levelDone_${t.level}`);
+        await app.tid(page, 'task.exhausted.advance').click();
+        await app.expectState(page, 'task.today');
+        advances++;
+      }
+    }
+    expect(seen.length).toBe(35);
+    expect(advances).toBe(2);
+    expect(seen.map((s) => s.level)).toEqual([...Array(14).fill('beginner'), ...Array(14).fill('intermediate'), ...Array(7).fill('advanced')]);
+    // S7（操作で着いた）の再読み込みは S5 に戻り、もう一度 task.next で S7（data.md 4「S7 を再読み込みしたとき」）
+    await page.reload();
+    await app.expectState(page, 'task.done');
+    await expect(app.tid(page, 'task.next.note')).toHaveText(app.fill(app.text(ja, 'task.next.note.last'), { area: app.text(ja, 'area.backend'), level: app.text(ja, 'level.advanced') }));
+    await app.next(page, { to: 'task.exhausted' });
+    await expect(app.tid(page, 'task.exhausted.allDone')).toHaveCount(1);
+    // 統計
+    await app.goSettings(page);
+    const stats = await app.readStats(page);
+    log.push({ stats });
+    expect(stats['data-stat-issued']).toBe('35');
+    expect(stats['data-stat-completed']).toBe('35');
+    expect(stats['data-stat-extra-completed']).toBe('34');
+    expect(stats['data-stat-days-completed-7d']).toBe('1');
+    expect(stats['data-stat-days-completed-week']).toBe('1');
+    expect(stats['data-stat-first-day-completed']).toBe('true');
+    expect(stats['data-stat-helpful']).toBe('18');
+    expect(stats['data-stat-rated']).toBe('35');
+    expect(stats['data-stat-first-open-date']).toBe(TODAY);
+    await app.shot(page, testInfo, 'EXPLORE_S9_after35');
+    const stored = await readStoredData(page);
+    expect(stored.history.length).toBe(35);
+    expect(stored.current).toBeUndefined();
+    expect(stored.levels.backend).toBe('advanced');
+    expect(new Set(stored.history.map((r) => r.date)).size).toBe(1);
+    await app.goHistory(page);
+    expect((await app.readHistoryRows(page)).length).toBe(35);
+    await app.shot(page, testInfo, 'EXPLORE_S10_after35');
+    await testInfo.attach('EXPLORE_R2R3R4_log', { body: JSON.stringify(log, null, 1), contentType: 'application/json' });
+  });
+});
+
+test('EXPLORE_R3_U17_日付が変わった後のtask.nextと_保存の失敗からの再試行', async ({ context, page, baseURL, request }, testInfo) => {
+  const seed = loadContractFixture(SEED_AC14);
+  const tasks = await app.loadTasks(request);
+  await injectSeed(context, seed);
+  await injectStorageFailure(context);
+  await app.fixDate(page, TODAY, '23:50:00');
+  await app.open(page, baseURL);
+  await app.expectState(page, 'task.today');
+  const t1 = await app.readTask(page);
+  expect(t1.id).toBe('backend-intermediate-004');
+  await app.tid(page, 'task.report.done').click();
+  await app.expectState(page, 'task.rate');
+  await app.tid(page, 'task.rate.close').click();
+  await app.expectState(page, 'task.done');
+  // 日付が変わってから task.next（U-17：知らせを出さず翌日の 1 件目）
+  await app.fixDate(page, '2026-11-05', '00:01:00');
+  await app.tid(page, 'task.next').click();
+  await app.expectState(page, 'task.today');
+  await expect(app.tid(page, 'task.dayChanged')).toHaveCount(0);
+  const t2 = await app.readTask(page);
+  expect(t2.id).toBe('backend-intermediate-005');
+  expect(t2.nthToday).toBe('1');
+  let stored = await readStoredData(page);
+  expect(stored.current.date).toBe('2026-11-05');
+  expect(stored.history.at(-1)).toMatchObject({ taskId: 'backend-intermediate-004', date: TODAY, report: 'done' });
+  await app.shot(page, testInfo, 'EXPLORE_U17_next_after_midnight');
+  // 保存の失敗 → 再試行（S6 の task.next）
+  await app.tid(page, 'task.report.noTime').click();
+  await app.expectState(page, 'task.skipped');
+  await armStorageFailure(page);
+  await app.tid(page, 'task.next').click();
+  await expect(app.tid(page, 'error.storage.retry')).toHaveCount(1);
+  await app.shot(page, testInfo, 'EXPLORE_U17_S6_storage_error');
+  const stateAtError = await app.readState(page);
+  await app.tid(page, 'error.storage.retry').click();
+  await app.expectState(page, 'task.today');
+  const t3 = await app.readTask(page);
+  expect(t3.id).toBe('backend-intermediate-006');
+  expect(t3.nthToday).toBe('2');
+  await expect(app.tid(page, 'task.dayChanged')).toHaveCount(0);
+  stored = await readStoredData(page);
+  expect(stored.current.taskId).toBe('backend-intermediate-006');
+  expect(stored.history.at(-1)).toMatchObject({ taskId: 'backend-intermediate-005', report: 'no_time', date: '2026-11-05' });
+  // 失敗を抱えたまま日付が変わり、task.next（U-17 の例外と、起動時の保存の失敗の扱いが重なる）
+  await app.tid(page, 'task.report.done').click();
+  await app.expectState(page, 'task.rate');
+  await app.tid(page, 'task.rate.close').click();
+  await app.expectState(page, 'task.done');
+  await armStorageFailure(page);
+  await app.fixDate(page, '2026-11-06', '00:01:00');
+  await app.tid(page, 'task.next').click();
+  await expect(app.root(page)).toHaveAttribute('data-state', /^(task\.today|task\.done|task\.exhausted|error)$/, { timeout: app.WAIT_MS });
+  const s = await app.readState(page);
+  const retry = await app.tid(page, 'error.storage.retry').count();
+  const dayChanged = await app.tid(page, 'task.dayChanged').count();
+  await app.shot(page, testInfo, 'EXPLORE_U17_next_after_midnight_with_failure');
+  if (retry) {
+    await app.tid(page, 'error.storage.retry').click();
+    await app.expectState(page, 'task.today');
+  }
+  const t4 = await app.readTask(page);
+  stored = await readStoredData(page);
+  await testInfo.attach('EXPLORE_U17_log', {
+    body: JSON.stringify({ stateAtError, afterMidnightWithFailure: { state: s, retry, dayChanged }, t4, current: stored.current, lastRows: stored.history.slice(-3), expectedNext: pickNext(tasks, { ...stored, current: undefined }) }, null, 1),
+    contentType: 'application/json',
+  });
+  expect(t4.nthToday).toBe('1');
+  expect(stored.current.date).toBe('2026-11-06');
+  expect(stored.history.at(-1)).toMatchObject({ taskId: 'backend-intermediate-006', report: 'done', date: '2026-11-05' });
+});
+
+test('EXPLORE_R1_書き出し→削除→読み込み→next→書き出しで行とcurrentとlevelsが欠けない', async ({ context, page, baseURL }, testInfo) => {
+  const seed = loadContractFixture(SEED_AC14);
+  await injectSeed(context, seed);
+  await app.fixDate(page, TODAY);
+  await app.open(page, baseURL);
+  await app.expectState(page, 'task.today');
+  await app.tid(page, 'task.answer').fill('下書き');
+  await expect(app.tid(page, 'task.answer.saved')).toHaveCount(1);
+  await app.goSettings(page);
+  const e1 = await app.exportJson(page);
+  expect(e1.json.history.length).toBe(3);
+  expect(e1.json.current.taskId).toBe('backend-intermediate-004');
+  expect(e1.json.current.answer).toBe('下書き');
+  await app.tid(page, 'settings.delete').click();
+  await app.tid(page, 'settings.delete.confirm.ok').click();
+  await app.expectState(page, 'diagnosis.start');
+  expect(await readStoredData(page)).toBeNull();
+  await app.goSettings(page);
+  await app.tid(page, 'settings.import.file').setInputFiles(e1.file);
+  await expect(app.root(page)).toHaveAttribute('data-state', /^task\.today$/, { timeout: app.WAIT_MS });
+  const t = await app.readTask(page);
+  expect(t.id).toBe('backend-intermediate-004');
+  await expect(app.tid(page, 'task.answer')).toHaveValue('下書き');
+  await app.tid(page, 'task.report.tooEasy').click();
+  await app.expectState(page, 'task.skipped');
+  await app.next(page);
+  expect((await app.readTask(page)).id).toBe('backend-intermediate-005');
+  await app.goSettings(page);
+  const e2 = await app.exportJson(page);
+  expect(e2.json.history.length).toBe(4);
+  expect(e2.json.history.slice(0, 3)).toEqual(e1.json.history);
+  expect(e2.json.history[3]).toMatchObject({ taskId: 'backend-intermediate-004', report: 'too_easy', answer: '下書き', date: TODAY });
+  expect(e2.json.current.taskId).toBe('backend-intermediate-005');
+  expect(e2.json.levels).toEqual(e1.json.levels);
+  expect(e2.json.diagnosis).toEqual(e1.json.diagnosis);
+  expect(e2.json.firstOpenDate).toBe(e1.json.firstOpenDate);
+  await testInfo.attach('EXPLORE_R1_exports', { body: JSON.stringify({ e1: e1.json, e2: e2.json }, null, 1), contentType: 'application/json' });
+});
+
+test.describe('EXPLORE 幅 320 と文字 200%（未経験の入口、節目、修了）', () => {
+  test.use({ viewport: { width: 320, height: 568 } });
+  test('EXPLORE_R8_320_200_診断3問_S4節目_S5_S7', async ({ context, page, baseURL, request }, testInfo) => {
+    const tasks = await app.loadTasks(request);
+    const ja = await app.loadStrings(request, 'ja');
+    const results = [];
+    const check = async (name) => {
+      const o = await overflow(page);
+      results.push({ name, ...o });
+      await app.shot(page, testInfo, `EXPLORE_320_200_${name}`);
+      expect(o.scrollWidth, `${name} の横スクロール ${JSON.stringify(o.wide)}`).toBeLessThanOrEqual(o.clientWidth);
+    };
+    await app.fixDate(page, TODAY);
+    await app.open(page, baseURL);
+    await app.expectState(page, 'diagnosis.start');
+    await font200(page);
+    await check('S1');
+    await app.tid(page, 'diagnosis.start.begin').click();
+    await app.expectState(page, 'diagnosis.question');
+    for (const a of ['backend', 'frontend', 'database', 'infra', 'testing', 'git']) {
+      await expect(app.tid(page, `area.${a}.desc`)).toHaveText(app.text(ja, `area.${a}.desc`));
+    }
+    await check('S2_q1');
+    await app.tid(page, 'area.testing').check();
+    await app.tid(page, 'diagnosis.next').click();
+    await check('S2_q2');
+    await app.tid(page, 'level.beginner').check();
+    await app.tid(page, 'diagnosis.next').click();
+    const radios = page.getByRole('radio');
+    expect(await radios.count()).toBe(5);
+    expect(await radios.first().getAttribute('data-testid')).toBe('years.never');
+    await check('S2_q3');
+    await app.tid(page, 'years.never').check();
+    await app.tid(page, 'diagnosis.finish').click();
+    await app.expectState(page, 'task.today');
+    await font200(page);
+    await check('S3');
+    await context.close();
+    // 節目 7（別のコンテキスト）
+    const ctx2 = await page.context().browser().newContext({ viewport: { width: 320, height: 568 }, locale: 'ja-JP', timezoneId: 'Asia/Tokyo' });
+    const p2 = await ctx2.newPage();
+    const { seed, nextDate } = completedSeed(tasks, { n: 6, area: 'backend', level: 'intermediate', firstOpenDate: '2026-10-20' });
+    await injectSeed(ctx2, seed);
+    await p2.clock.setFixedTime(app.jst(nextDate));
+    await p2.goto(baseURL);
+    await app.expectState(p2, 'task.today');
+    await font200(p2);
+    await app.tid(p2, 'task.report.done').click();
+    await app.expectState(p2, 'task.rate');
+    await p2.waitForTimeout(1000);
+    const o4 = await overflow(p2);
+    results.push({ name: 'S4_at7', ...o4 });
+    await app.shot(p2, testInfo, 'EXPLORE_320_200_S4_at7');
+    expect(o4.scrollWidth).toBeLessThanOrEqual(o4.clientWidth);
+    await app.tid(p2, 'task.rate.helpful').click();
+    await app.expectState(p2, 'task.done');
+    const o5 = await overflow(p2);
+    results.push({ name: 'S5_at7', ...o5 });
+    await app.shot(p2, testInfo, 'EXPLORE_320_200_S5_at7');
+    expect(o5.scrollWidth).toBeLessThanOrEqual(o5.clientWidth);
+    await ctx2.close();
+    await testInfo.attach('EXPLORE_320_200_results', { body: JSON.stringify(results, null, 1), contentType: 'application/json' });
+  });
+});

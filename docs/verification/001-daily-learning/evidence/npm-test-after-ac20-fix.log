@@ -1,0 +1,300 @@
+npm notice run test
+npm notice run npm run check:contracts && npm run test:unit && npm run test:acceptance
+npm notice run check:contracts
+npm notice run node ../contracts/tools/check-schemas.mjs
+ajv 8.20.0（Ajv2020、strict）
+OK  メタスキーマ data.schema.json
+OK  組み立て data.schema.json
+OK  メタスキーマ strings.schema.json
+OK  組み立て strings.schema.json
+OK  メタスキーマ tasks.schema.json
+OK  組み立て tasks.schema.json
+OK  data/invalid-answer-too-long.json 期待：落ちる → 落ちた（data/current/answer must NOT have more than 2000 characters）
+OK  data/invalid-current-before-diagnosis.json 期待：落ちる → 落ちた（data/diagnosis must have required property 'completedOn' / data must match "then" schema）
+OK  data/invalid-done-without-helpful.json 期待：落ちる → 落ちた（data/history/2 must have required property 'helpful' / data/history/2 must match "then" schema）
+OK  data/invalid-extra-field.json 期待：落ちる → 落ちた（data must NOT have additional properties）
+OK  data/invalid-helpful-on-skipped.json 期待：落ちる → 落ちた（data/history/3 must NOT be valid / data/history/3 must match "else" schema）
+OK  data/invalid-history-without-first-open-date.json 期待：落ちる → 落ちた（data/history must NOT have more than 0 items / data must match "then" schema）
+OK  data/invalid-in-progress-without-first-open-date.json 期待：落ちる → 落ちた（data/diagnosis must NOT have more than 0 properties / data must match "then" schema）
+OK  data/invalid-levels-without-first-open-date.json 期待：落ちる → 落ちた（data/levels must NOT have more than 0 properties / data must match "then" schema）
+OK  data/invalid-newer-version.json 期待：落ちる → 落ちた（data/formatVersion must be equal to constant）
+OK  data/invalid-not-json.json 期待：落ちる → 落ちた（JSON.parse の失敗）
+OK  data/invalid-other-app.json 期待：落ちる → 落ちた（data/app must be equal to constant）
+OK  data/invalid-unknown-area.json 期待：落ちる → 落ちた（data/levels must NOT have additional properties）
+OK  data/invalid-utc-datetime.json 期待：落ちる → 落ちた（data/history/0/date must match pattern "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$"）
+OK  data/invalid-years-without-level.json 期待：落ちる → 落ちた（data/diagnosis must have required property 'completedOn' / data must match "then" schema / data/diagnosis must have property level when property years is presen）
+OK  data/v1/valid-all-fields.json 期待：通る → 通った
+OK  data/v1/valid-export-three-completed.json 期待：通る → 通った
+OK  data/v1/valid-guide-closed-only.json 期待：通る → 通った
+OK  data/v1/valid-guide-closed-then-in-progress.json 期待：通る → 通った
+OK  data/v1/valid-in-progress.json 期待：通る → 通った
+OK  seeds/seed-ac14-three-completed.json 期待：通る → 通った
+OK  seeds/seed-ac24-stats.json 期待：通る → 通った
+OK  seeds/seed-ac8-intermediate-after-advanced-two-too-hard.json 期待：通る → 通った
+OK  seeds/seed-ac8-intermediate-one-too-hard.json 期待：通る → 通った
+OK  seeds/seed-ac8-intermediate-too-hard-then-none.json 期待：通る → 通った
+OK  strings/invalid-app-name-english.json 期待：落ちる → 落ちた（data/app.name must be equal to constant）
+OK  strings/invalid-empty-value.json 期待：落ちる → 落ちた（data/nav.history must NOT have fewer than 1 characters / data/nav.history must match pattern "\S"）
+OK  strings/invalid-extra-key.json 期待：落ちる → 落ちた（data must NOT have additional properties）
+OK  strings/invalid-missing-key.json 期待：落ちる → 落ちた（data must have required property 'task.rate.close'）
+OK  strings/invalid-placeholder-missing.json 期待：落ちる → 落ちた（data/diagnosis.progress must match pattern "\{total[,}]"）
+OK  strings/invalid-unexpected-placeholder.json 期待：落ちる → 落ちた（data/nav.history must NOT be valid）
+OK  strings/valid-en.json 期待：通る → 通った
+OK  strings/valid-ja.json 期待：通る → 通った
+OK  tasks/invalid-blank-goal.json 期待：落ちる → 落ちた（data/tasks/0/goal must match pattern "\S"）
+OK  tasks/invalid-code-fence.json 期待：落ちる → 落ちた（data/tasks/2/how must NOT be valid）
+OK  tasks/invalid-external-no-tools.json 期待：落ちる → 落ちた（data/tasks/1/tools must NOT have fewer than 1 items / data/tasks/1 must match "then" schema）
+OK  tasks/invalid-id-area-mismatch.json 期待：落ちる → 落ちた（data/tasks/0/id must match pattern "^backend-" / data/tasks/0 must match "then" schema）
+OK  tasks/invalid-in-app-tools.json 期待：落ちる → 落ちた（data/tasks/0/tools must NOT have more than 0 items / data/tasks/0 must match "else" schema）
+OK  tasks/invalid-in-app-url.json 期待：落ちる → 落ちた（data/tasks/0/how must NOT be valid / data/tasks/0 must match "else" schema）
+OK  tasks/invalid-minutes-16.json 期待：落ちる → 落ちた（data/tasks/0/minutes must be <= 15）
+OK  tasks/invalid-unknown-mode.json 期待：落ちる → 落ちた（data/tasks/0/mode must be equal to one of the allowed values）
+OK  tasks/valid-sample.json 期待：通る → 通った
+見本 41 件、期待と違う結果 0 件
+npm notice run test:unit
+npm notice run node --test 'tests/unit/**/*.test.mjs'
+✔ ビルドすると版が index.html と sw.js に入り、FILES が配布物と一致し、JS は 15 個以下 (42.508333ms)
+✔ 配布物は gzip 後の合計 150,000 バイト以下（contracts/budgets.md の 1） (23.080917ms)
+✔ 版の形が違うと終了コード 1 で、出力を作らない (235.649042ms)
+✔ スキーマに通らない課題集（--tasks）はビルドを止める (45.711917ms)
+✔ 元のフォルダや、ビルドの出力でない空でないフォルダには書かない (7.770834ms)
+✔ ymd は端末の暦の日付を 0 埋めで返す (5.635708ms)
+✔ ymdShift は月末、年末、うるう日をまたぐ (0.319542ms)
+✔ 東京の 0 時台（UTC では前日）でも端末の日付になる（toISOString の誤りを防ぐ） (65.042417ms)
+✔ 夏時間のある地域で、切り替えの日をまたいでも 1 日ずつ進む (60.579125ms)
+✔ 配る文言 ja.json と en.json が strings.schema.json に通り、キーの集合が同じ（AC-26） (8.714875ms)
+✔ pickLang：ja で始まれば ja、それ以外と空は en (0.131667ms)
+✔ format：差し込みと plural、知らない名前はそのまま残す (5.948583ms)
+✔ format：差し込む値は文字として入る（<script> を解釈しない。表示は textContent） (0.144ms)
+✔ 読み込み：正しいファイルは ok、版が新しければ version、その他は schema（AC-20、AC-25） (2.105458ms)
+✔ 読み込み：5,000,000 バイトを超えるファイルは読まずに schema (0.136583ms)
+✔ 読み込み：スキーマに通っても中身が「なし」なら schema で止める（削除の確認を素通りさせない） (0.14725ms)
+✔ AC-8 段階の規則 1：中で完了、中で難しすぎ → 難しすぎ → beginner (4.305917ms)
+✔ AC-8 段階の規則 2：中で簡単すぎ → 簡単すぎ → advanced (0.263417ms)
+✔ AC-8 段階の規則 3：難しすぎの後に完了で途切れる → intermediate (0.276375ms)
+✔ AC-8 段階の規則 4：難しすぎと簡単すぎが混ざると動かない → intermediate (0.194542ms)
+✔ AC-8 段階の規則 5：今日はできないで途切れる → intermediate (0.189125ms)
+✔ AC-8 段階の規則 6：初級で難しすぎが続いても下がらない → beginner (0.209583ms)
+✔ AC-8 段階の規則 7：上級で簡単すぎが続いても上がらない → advanced (0.166125ms)
+✔ AC-8 段階の規則 8：中で難しすぎ、中で none → 難しすぎ（none は数えず流れも切らない） → beginner (0.137416ms)
+✔ AC-8 段階の規則 9：上で難しすぎ 2 回（levels は中）→ 難しすぎ（段階の違う行は数えない） → intermediate (0.145916ms)
+✔ AC-8 契約の seed 3 件（1、8、9 通り目）が data.md の 5 の表どおり (0.655917ms)
+✔ 変わった段階は翌日から効く（申告した日は新しい課題を出さない） (0.178709ms)
+✔ pickTask は目標の組で、出していない課題のうち ID が最小のもの（AC-6） (0.141125ms)
+✔ 課題を出し尽くすと task.exhausted（AC-10、AC-14） (0.165ms)
+✔ 日付が変わると、申告のない current は report=none の行になり答えも残る（AC-32） (0.255125ms)
+✔ 同じ日にもう一度開いても課題は増えず、データも変えない (0.119709ms)
+✔ 規則の関数は渡したデータを書き換えない (0.256375ms)
+✔ 診断：1 問目で firstOpenDate を書き、領域を変えると 2 問目以降を消す（data.md の 2、3） (0.252083ms)
+✔ 完了の申告は helpful=unanswered で記録し、評価で置き換える（AC-7） (0.229792ms)
+✔ 書き出しは device を除き、読み込みは今のブラウザの device を残す（data.md の 7） (0.3125ms)
+✔ 統計の 9 つの値（AC-24、data.md の 9）を seed-ac24-stats で数える (2.765167ms)
+✔ 直近 7 暦日は今日から 6 日前までで、同じ日は 1 つに数える (0.107ms)
+✔ キーは kyounoitte:data (0.566917ms)
+✔ 何もなければ data=null（「なし」） (0.165625ms)
+✔ 正しいデータは読める (1.954084ms)
+✔ 壊れたデータは unreadable で、元の文字列をそのまま持つ（書き換えない） (0.615375ms)
+✔ localStorage を開けない、読めないときは unavailable（例外を外に出さない） (1.499083ms)
+✔ save は 1 回の setItem で JSON を書き、容量切れなら false (0.438708ms)
+✔ removeAll は kyounoitte:data だけを消し、他のキーは残す（AC-16） (0.233791ms)
+✔ 課題集の見本 invalid-blank-goal.json：手書きの検査と ajv が同じ合否 (4.989042ms)
+✔ 課題集の見本 invalid-code-fence.json：手書きの検査と ajv が同じ合否 (0.634666ms)
+✔ 課題集の見本 invalid-external-no-tools.json：手書きの検査と ajv が同じ合否 (0.973542ms)
+✔ 課題集の見本 invalid-id-area-mismatch.json：手書きの検査と ajv が同じ合否 (0.585583ms)
+✔ 課題集の見本 invalid-in-app-tools.json：手書きの検査と ajv が同じ合否 (0.644ms)
+✔ 課題集の見本 invalid-in-app-url.json：手書きの検査と ajv が同じ合否 (0.51675ms)
+✔ 課題集の見本 invalid-minutes-16.json：手書きの検査と ajv が同じ合否 (2.568042ms)
+✔ 課題集の見本 invalid-unknown-mode.json：手書きの検査と ajv が同じ合否 (0.206333ms)
+✔ 課題集の見本 valid-sample.json：手書きの検査と ajv が同じ合否 (0.303708ms)
+✔ public/data/tasks.json は docs/prd/001-daily-learning/tasks.v1.json と同じバイト列 (1.8615ms)
+✔ 配る課題集が ajv と手書きの両方に通り、ID が重複しない (5.9485ms)
+✔ 見本の数が 0 でない（data と seeds） (0.731709ms)
+✔ 見本 data/invalid-answer-too-long.json：手書きの検査と ajv が同じ合否で、期待（落ちる）どおり (2.937458ms)
+✔ 見本 data/invalid-current-before-diagnosis.json：手書きの検査と ajv が同じ合否で、期待（落ちる）どおり (1.6585ms)
+✔ 見本 data/invalid-done-without-helpful.json：手書きの検査と ajv が同じ合否で、期待（落ちる）どおり (0.755125ms)
+✔ 見本 data/invalid-extra-field.json：手書きの検査と ajv が同じ合否で、期待（落ちる）どおり (0.3765ms)
+✔ 見本 data/invalid-helpful-on-skipped.json：手書きの検査と ajv が同じ合否で、期待（落ちる）どおり (0.249542ms)
+✔ 見本 data/invalid-history-without-first-open-date.json：手書きの検査と ajv が同じ合否で、期待（落ちる）どおり (1.06225ms)
+✔ 見本 data/invalid-in-progress-without-first-open-date.json：手書きの検査と ajv が同じ合否で、期待（落ちる）どおり (0.219125ms)
+✔ 見本 data/invalid-levels-without-first-open-date.json：手書きの検査と ajv が同じ合否で、期待（落ちる）どおり (0.167333ms)
+✔ 見本 data/invalid-newer-version.json：手書きの検査と ajv が同じ合否で、期待（落ちる）どおり (0.257208ms)
+✔ 見本 data/invalid-not-json.json：手書きの検査と ajv が同じ合否で、期待（落ちる）どおり (0.153917ms)
+✔ 見本 data/invalid-other-app.json：手書きの検査と ajv が同じ合否で、期待（落ちる）どおり (0.177375ms)
+✔ 見本 data/invalid-unknown-area.json：手書きの検査と ajv が同じ合否で、期待（落ちる）どおり (0.198375ms)
+✔ 見本 data/invalid-utc-datetime.json：手書きの検査と ajv が同じ合否で、期待（落ちる）どおり (0.147458ms)
+✔ 見本 data/invalid-years-without-level.json：手書きの検査と ajv が同じ合否で、期待（落ちる）どおり (0.149875ms)
+✔ 見本 data/v1/valid-all-fields.json：手書きの検査と ajv が同じ合否で、期待（通る）どおり (0.374917ms)
+✔ 見本 data/v1/valid-export-three-completed.json：手書きの検査と ajv が同じ合否で、期待（通る）どおり (0.135958ms)
+✔ 見本 data/v1/valid-guide-closed-only.json：手書きの検査と ajv が同じ合否で、期待（通る）どおり (0.120667ms)
+✔ 見本 data/v1/valid-guide-closed-then-in-progress.json：手書きの検査と ajv が同じ合否で、期待（通る）どおり (0.129084ms)
+✔ 見本 data/v1/valid-in-progress.json：手書きの検査と ajv が同じ合否で、期待（通る）どおり (0.111125ms)
+✔ 見本 seeds/seed-ac14-three-completed.json：手書きの検査と ajv が同じ合否で、期待（通る）どおり (0.115958ms)
+✔ 見本 seeds/seed-ac24-stats.json：手書きの検査と ajv が同じ合否で、期待（通る）どおり (0.113583ms)
+✔ 見本 seeds/seed-ac8-intermediate-after-advanced-two-too-hard.json：手書きの検査と ajv が同じ合否で、期待（通る）どおり (0.093541ms)
+✔ 見本 seeds/seed-ac8-intermediate-one-too-hard.json：手書きの検査と ajv が同じ合否で、期待（通る）どおり (0.086458ms)
+✔ 見本 seeds/seed-ac8-intermediate-too-hard-then-none.json：手書きの検査と ajv が同じ合否で、期待（通る）どおり (0.082291ms)
+✔ 版が新しいファイルは reason=version、それ以外の失敗は reason=schema（AC-25、data.md の 7） (0.317834ms)
+✔ formatVersion が小数や文字列なら版でなく形の誤り (1.069417ms)
+✔ answer は 2000 コードポイントまで（絵文字は 1 字と数える） (2.244458ms)
+✔ 知らない項目（割り当てすぎ）を足すと、どの階層でも落ちる (0.6825ms)
+✔ __proto__ を含むファイルでも Object.prototype を汚さない (0.069208ms)
+ℹ tests 85
+ℹ suites 0
+ℹ pass 85
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 475.188666
+npm notice run test:acceptance
+npm notice run cd tests/acceptance && npm ci && npx playwright install chromium webkit && npx playwright test
+
+added 10 packages, and audited 11 packages in 666ms
+
+2 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+npm notice run npx
+npm notice run 'playwright' install chromium webkit
+npm notice run npx
+npm notice run 'playwright' test
+
+Running 133 tests using 5 workers
+
+  ✓    5 [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:13:1 › AC3_課題集の全件が4要素を持ち所要時間が1〜15分 (68ms)
+  ✓    6 [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:31:1 › AC4_課題集は126件以上で18組すべて7件以上でIDの重複が0件 (19ms)
+  ✓    7 [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:47:1 › BUDGET2_課題集の本文の平均600字以下_gzip後106000バイト以下 (16ms)
+  ✓    8 [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:62:1 › AC29_各組でexternalが20%以下_in_appにURLもtoolsもなく_externalはtoolsが1件以上 (12ms)
+  ✓    4 [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_backend_intermediate (1.2s)
+  ✓    1 [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_frontend_beginner (1.3s)
+  ✓    9 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:20:1 › AC5_完了するとtask.rateになり_答えるとtask.done_同じ日に再読み込みしてもtask.doneのまま (1.3s)
+  ✓    3 [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_git_advanced (1.3s)
+  ✓    2 [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:12:1 › AC1_初めて開くと診断が始まり3問で終わる_進み具合n/3_切り替え500ms以内 (1.4s)
+  ✓   11 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:40:1 › AC6_翌日には過去に出した課題のIDと一致しない課題が出る (624ms)
+  ✓   10 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_too_easyを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない (714ms)
+  ✓   12 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_too_hardを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない (697ms)
+  ✓   13 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_no_timeを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない (765ms)
+  ✓   14 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:78:1 › AC9_役に立ったを選ぶとtask.doneになり_再び聞かれず_履歴のdata-helpfulがhelpful (930ms)
+  ✓   15 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:92:1 › AC9_立たなかったを選ぶと履歴のdata-helpfulがnot_helpful (682ms)
+  ✓   16 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:103:1 › AC9_選ばずに再読み込みするとtask.doneになり_履歴のdata-helpfulがunanswered (683ms)
+  ✓   17 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:116:1 › AC9_今回は答えないを押すとtask.doneになり_履歴のdata-helpfulがunanswered (704ms)
+  ✓   18 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_1通り目_中で難しすぎ難しすぎ→初 (654ms)
+  ✓   19 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_2通り目_中で簡単すぎ簡単すぎ→上 (656ms)
+  ✓   20 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_3通り目_中で難しすぎ1回だけ→中のまま (664ms)
+  ✓   22 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_5a通り目_中で難しすぎ完了難しすぎ→中のまま (682ms)
+  ✓   21 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_4通り目_中で簡単すぎ1回だけ→中のまま (709ms)
+  ✓   23 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_5b通り目_中で難しすぎ今日はできない難しすぎ→中のまま (673ms)
+  ✓   24 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_6通り目_初で難しすぎ2回連続→初のまま (591ms)
+  ✓   25 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_7通り目_上で簡単すぎ2回連続→上のまま (646ms)
+  ✓   26 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_8通り目_中で難しすぎ_none_難しすぎ→初（noneは数えず流れも切らない） (654ms)
+  ✓   27 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_9通り目_上で2回難しすぎで中になった翌日に中で難しすぎ1回→中のまま (671ms)
+  ✓   29 [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:33:1 › AC30_in_appを出し終えた翌日はexternalの課題が出て_印と要る道具が題名と同じ画面に見える (655ms)
+  ✓   28 [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:12:1 › AC10_課題が尽きるとtask.exhaustedと文言とやり直しの操作が出て_同じ領域と段階でやり直すと同じ日に再びtask.exhausted (999ms)
+  ✓   30 [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:77:1 › AC30_in_appの課題を出した日はdata-task-modeがin_appで印が0件 (513ms)
+  ✓   31 [chromium] › tests/ac11-ac13-storage.spec.mjs:8:1 › AC11_2問目の保存が失敗してもerror.storage.messageと選択が残り_やり直すと3問目に進み課題が回答と一致する (776ms)
+  ✓   35 [chromium] › tests/ac12-ac23-offline.spec.mjs:112:1 › AC23_task.todayを表示した後にオフラインで再読み込みと新しいタブ_3秒以内に同じdata-task-id_送信0件 (640ms)
+  ✓   32 [chromium] › tests/ac11-ac13-storage.spec.mjs:44:1 › AC13_persistを断られても完了と再読み込みでtask.done_履歴1件_設定にnotPersistedと書き出しがある (1.1s)
+  ✓   33 [chromium] › tests/ac12-ac23-offline.spec.mjs:12:1 › AC12_オフラインでもAC-1_AC-2_AC-5_AC-9の操作が動き_送信は0件 (851ms)
+  ✓   34 [chromium] › tests/ac12-ac23-offline.spec.mjs:47:1 › AC12_オフラインでもAC-7の申告が動き_送信は0件 (859ms)
+  ✓   36 [chromium] › tests/ac12-ac23-offline.spec.mjs:120:1 › AC23_task.doneを表示した後にオフラインで再読み込みと新しいタブ_3秒以内にtask.done_送信0件 (483ms)
+  ✓   41 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_diagnosis.start_横スクロール0_切り詰め0_操作できる要素がすべて押せる (480ms)
+  ✓   37 [chromium] › tests/ac14-ac16-redo-delete.spec.mjs:6:1 › AC14_今日の課題を出していない日に設定からやり直して別の領域を選ぶと_新しい領域の課題が出て完了の履歴は3件のまま (846ms)
+  ✓   39 [chromium] › tests/ac14-ac16-redo-delete.spec.mjs:100:1 › AC16_すべてのデータを削除すると再読み込みでdiagnosis.startになり_やり直した後の履歴は0件 (924ms)
+  ✓   38 [chromium] › tests/ac14-ac16-redo-delete.spec.mjs:44:1 › AC14_今日の課題が出ている日に設定からやり直して別の領域を選んでも_その日は同じdata-task-idのtask.todayのままで完了の履歴は3件_翌日は新しい領域の課題が出る (1.1s)
+  ✓   43 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.done_横スクロール0_切り詰め0_操作できる要素がすべて押せる (563ms)
+  ✓   44 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.exhausted_横スクロール0_切り詰め0_操作できる要素がすべて押せる (547ms)
+  ✓   42 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.today_横スクロール0_切り詰め0_操作できる要素がすべて押せる (921ms)
+  ✓   45 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:104:1 › AC18_移動キー(Tab系)とEnter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上 (575ms)
+  ✓   46 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_diagnosis.start_axe-coreでserious以上の違反が0件 (894ms)
+  ✓   47 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_diagnosis.question_axe-coreでserious以上の違反が0件 (1.0s)
+  ✓   48 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.today_axe-coreでserious以上の違反が0件 (956ms)
+  ✓   49 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.done_axe-coreでserious以上の違反が0件 (936ms)
+  ✓   50 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.exhausted_axe-coreでserious以上の違反が0件 (838ms)
+  ✓   52 [chromium] › tests/ac19-ac20-ac25-export-import.spec.mjs:12:1 › AC19_書き出すとJSONが1つダウンロードされ_診断_段階_履歴3件（50文字のanswer）_初めて開いた日_版番号を含む (927ms)
+  ✓   51 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_settings_axe-coreでserious以上の違反が0件 (1.0s)
+  ✓   53 [chromium] › tests/ac19-ac20-ac25-export-import.spec.mjs:48:1 › AC20_保存データのないブラウザで読み込むと_診断と段階が同じで履歴3件（answerも同じ）_状態はtask.todayかtask.done (1.0s)
+  ✓   54 [chromium] › tests/ac19-ac20-ac25-export-import.spec.mjs:91:1 › AC25_版番号が新しいファイルはerror.import.messageで拒み_履歴1件と診断と状態は変わらない (569ms)
+  ✓   56 [chromium] › tests/ac21-ac22-home-screen.spec.mjs:47:3 › AC-21 iPadOS の Safari の偽装（Mac の UA と maxTouchPoints > 1） › AC21_iPadOS_Safari（MacのUAとmaxTouchPoints5）でも診断の前に案内が出る (286ms)
+  ✓   57 [chromium] › tests/ac21-ac22-home-screen.spec.mjs:58:1 › AC21_UAを偽装しないChromiumとWebKitでは案内が0回出る (496ms)
+  ✓   58 [chromium] › tests/ac21-ac22-home-screen.spec.mjs:70:1 › AC22_スタンドアロンで初めて開くと読み込みの案内が出て_再読み込みでも出て_ファイルを読み込むとAC-20の状態になる (745ms)
+  ✓   59 [chromium] › tests/ac24-stats.spec.mjs:18:1 › AC24_統計の9つの値が期待どおりで_数値7つと日付1つは同じ文字が見え_真偽値はfirstDayCompleted.yesの文言が見える (639ms)
+  ✓   55 [chromium] › tests/ac21-ac22-home-screen.spec.mjs:21:3 › AC-21 iPhone の Safari の偽装 › AC21_iOS_Safariでは診断の前に案内が出て_閉じると再読み込みしても出ず_設定から再び開ける (998ms)
+  ✓   60 [chromium] › tests/ac26-language.spec.mjs:40:3 › AC-26 locale en-US › AC26_en-USではdiagnosis.startの文言が英語の文言ファイルと一致し_キーの差が0件 (443ms)
+  ✓   64 [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:51:1 › AC31_今日の課題を完了済みなら操作0回でtask.doneが見え_重なる要素0件 (275ms)
+  ✓   61 [chromium] › tests/ac26-language.spec.mjs:47:3 › AC-26 locale ja-JP › AC26_ja-JPではdiagnosis.startの文言が日本語の文言ファイルと一致する (490ms)
+  ✓   63 [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:31:1 › AC31_診断済みで開くと操作0回でtask.todayが見え_題名と4要素と答えの欄と4つの申告が同じ画面にあり_重なる要素0件 (422ms)
+  ✓   65 [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:79:1 › AC32_200文字を入力して再読み込みすると_同じdata-task-idで答えがそのまま入っている (700ms)
+  ✓   66 [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:88:1 › AC32_200文字を入力してタブを閉じ新しいタブで開くと_同じdata-task-idで答えがそのまま入っている (913ms)
+  ✓   40 [chromium] › tests/ac15-load-time.spec.mjs:7:1 › AC15_遅い回線とCPU4倍の制限でキャッシュなしに開き_data-debug-load-msが5回とも2000以下 (5.9s)
+  ✓   67 [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:98:1 › AC32_翌日に開くと新しい課題の答えの欄は空で_前日の200文字は書き出しのnoneの行のanswerに残る (956ms)
+  ✓   69 [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_backend_intermediate (2.4s)
+  ✓   70 [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_frontend_beginner (2.4s)
+  ✓   71 [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_git_advanced (2.4s)
+  ✓   68 [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:12:1 › AC1_初めて開くと診断が始まり3問で終わる_進み具合n/3_切り替え500ms以内 (2.5s)
+  ✓   72 [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:31:1 › AC4_課題集は126件以上で18組すべて7件以上でIDの重複が0件 (23ms)
+  ✓   74 [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:47:1 › BUDGET2_課題集の本文の平均600字以下_gzip後106000バイト以下 (21ms)
+  ✓   75 [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:62:1 › AC29_各組でexternalが20%以下_in_appにURLもtoolsもなく_externalはtoolsが1件以上 (33ms)
+  ✓   73 [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:13:1 › AC3_課題集の全件が4要素を持ち所要時間が1〜15分 (73ms)
+  ✓   77 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:40:1 › AC6_翌日には過去に出した課題のIDと一致しない課題が出る (1.0s)
+  ✓   79 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_too_easyを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない (965ms)
+  ✓   78 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_too_hardを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない (1.1s)
+  ✓   76 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:20:1 › AC5_完了するとtask.rateになり_答えるとtask.done_同じ日に再読み込みしてもtask.doneのまま (1.2s)
+  ✓   80 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_no_timeを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない (1.1s)
+  ✓   81 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:78:1 › AC9_役に立ったを選ぶとtask.doneになり_再び聞かれず_履歴のdata-helpfulがhelpful (1.1s)
+  ✓   82 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:92:1 › AC9_立たなかったを選ぶと履歴のdata-helpfulがnot_helpful (1.1s)
+  ✓   83 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:103:1 › AC9_選ばずに再読み込みするとtask.doneになり_履歴のdata-helpfulがunanswered (1.1s)
+  ✓   62 [chromium] › tests/ac28-update.spec.mjs:17:1 › AC28_差し替え後2秒おきの再読み込み3回以内でdata-build-versionが新版になり_旧版に戻らず_履歴3件と診断と段階は同じ (8.5s)
+  ✓   86 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_2通り目_中で簡単すぎ簡単すぎ→上 (1.1s)
+  ✓   85 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_1通り目_中で難しすぎ難しすぎ→初 (1.1s)
+  ✓   84 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:116:1 › AC9_今回は答えないを押すとtask.doneになり_履歴のdata-helpfulがunanswered (1.2s)
+  ✓   87 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_3通り目_中で難しすぎ1回だけ→中のまま (1.0s)
+  ✓   88 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_5a通り目_中で難しすぎ完了難しすぎ→中のまま (918ms)
+  ✓   89 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_5b通り目_中で難しすぎ今日はできない難しすぎ→中のまま (887ms)
+  ✓   90 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_6通り目_初で難しすぎ2回連続→初のまま (958ms)
+  ✓   91 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_7通り目_上で簡単すぎ2回連続→上のまま (1.0s)
+  ✓   93 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_8通り目_中で難しすぎ_none_難しすぎ→初（noneは数えず流れも切らない） (1.1s)
+  ✓   94 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_9通り目_上で2回難しすぎで中になった翌日に中で難しすぎ1回→中のまま (1.1s)
+  ✓   96 [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:33:1 › AC30_in_appを出し終えた翌日はexternalの課題が出て_印と要る道具が題名と同じ画面に見える (925ms)
+  ✓   95 [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:12:1 › AC10_課題が尽きるとtask.exhaustedと文言とやり直しの操作が出て_同じ領域と段階でやり直すと同じ日に再びtask.exhausted (1.4s)
+  ✓   97 [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:77:1 › AC30_in_appの課題を出した日はdata-task-modeがin_appで印が0件 (1.1s)
+  ✓   98 [webkit] › tests/ac11-ac13-storage.spec.mjs:8:1 › AC11_2問目の保存が失敗してもerror.storage.messageと選択が残り_やり直すと3問目に進み課題が回答と一致する (1.8s)
+  ✓   92 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_4通り目_中で簡単すぎ1回だけ→中のまま (1.8s)
+  ✓   99 [webkit] › tests/ac11-ac13-storage.spec.mjs:44:1 › AC13_persistを断られても完了と再読み込みでtask.done_履歴1件_設定にnotPersistedと書き出しがある (2.2s)
+  ✓  100 [webkit] › tests/ac12-ac23-offline.spec.mjs:12:1 › AC12_オフラインでもAC-1_AC-2_AC-5_AC-9の操作が動き_送信は0件 (2.0s)
+  ✓  101 [webkit] › tests/ac12-ac23-offline.spec.mjs:47:1 › AC12_オフラインでもAC-7の申告が動き_送信は0件 (1.9s)
+  ✓  102 [webkit] › tests/ac12-ac23-offline.spec.mjs:112:1 › AC23_task.todayを表示した後にオフラインで再読み込みと新しいタブ_3秒以内に同じdata-task-id_送信0件 (1.9s)
+  ✓  103 [webkit] › tests/ac12-ac23-offline.spec.mjs:120:1 › AC23_task.doneを表示した後にオフラインで再読み込みと新しいタブ_3秒以内にtask.done_送信0件 (1.9s)
+  ✓  104 [webkit] › tests/ac14-ac16-redo-delete.spec.mjs:6:1 › AC14_今日の課題を出していない日に設定からやり直して別の領域を選ぶと_新しい領域の課題が出て完了の履歴は3件のまま (2.5s)
+  ✓  107 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_diagnosis.start_横スクロール0_切り詰め0_操作できる要素がすべて押せる (1.1s)
+  ✓  106 [webkit] › tests/ac14-ac16-redo-delete.spec.mjs:100:1 › AC16_すべてのデータを削除すると再読み込みでdiagnosis.startになり_やり直した後の履歴は0件 (2.2s)
+  ✓  105 [webkit] › tests/ac14-ac16-redo-delete.spec.mjs:44:1 › AC14_今日の課題が出ている日に設定からやり直して別の領域を選んでも_その日は同じdata-task-idのtask.todayのままで完了の履歴は3件_翌日は新しい領域の課題が出る (3.3s)
+  ✓  110 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.done_横スクロール0_切り詰め0_操作できる要素がすべて押せる (1.2s)
+  ✓  108 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.today_横スクロール0_切り詰め0_操作できる要素がすべて押せる (2.1s)
+  ✓  109 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:61:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.exhausted_横スクロール0_切り詰め0_操作できる要素がすべて押せる (1.3s)
+  ✓  111 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:104:1 › AC18_移動キー(Tab系)とEnter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上 (1.8s)
+  ✓  112 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_diagnosis.start_axe-coreでserious以上の違反が0件 (2.1s)
+  ✓  114 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.today_axe-coreでserious以上の違反が0件 (1.9s)
+  ✓  115 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.done_axe-coreでserious以上の違反が0件 (1.9s)
+  ✓  113 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_diagnosis.question_axe-coreでserious以上の違反が0件 (2.0s)
+  ✓  116 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_task.exhausted_axe-coreでserious以上の違反が0件 (1.8s)
+  ✓  120 [webkit] › tests/ac19-ac20-ac25-export-import.spec.mjs:91:1 › AC25_版番号が新しいファイルはerror.import.messageで拒み_履歴1件と診断と状態は変わらない (1.3s)
+  ✓  119 [webkit] › tests/ac19-ac20-ac25-export-import.spec.mjs:12:1 › AC19_書き出すとJSONが1つダウンロードされ_診断_段階_履歴3件（50文字のanswer）_初めて開いた日_版番号を含む (1.5s)
+  ✓  117 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:162:3 › AC27_settings_axe-coreでserious以上の違反が0件 (2.1s)
+  ✓  121 [webkit] › tests/ac21-ac22-home-screen.spec.mjs:21:3 › AC-21 iPhone の Safari の偽装 › AC21_iOS_Safariでは診断の前に案内が出て_閉じると再読み込みしても出ず_設定から再び開ける (1.2s)
+  ✓  122 [webkit] › tests/ac21-ac22-home-screen.spec.mjs:47:3 › AC-21 iPadOS の Safari の偽装（Mac の UA と maxTouchPoints > 1） › AC21_iPadOS_Safari（MacのUAとmaxTouchPoints5）でも診断の前に案内が出る (744ms)
+  ✓  118 [webkit] › tests/ac19-ac20-ac25-export-import.spec.mjs:48:1 › AC20_保存データのないブラウザで読み込むと_診断と段階が同じで履歴3件（answerも同じ）_状態はtask.todayかtask.done (2.3s)
+  ✓  123 [webkit] › tests/ac21-ac22-home-screen.spec.mjs:58:1 › AC21_UAを偽装しないChromiumとWebKitでは案内が0回出る (893ms)
+  ✓  126 [webkit] › tests/ac26-language.spec.mjs:40:3 › AC-26 locale en-US › AC26_en-USではdiagnosis.startの文言が英語の文言ファイルと一致し_キーの差が0件 (890ms)
+  ✓  127 [webkit] › tests/ac26-language.spec.mjs:47:3 › AC-26 locale ja-JP › AC26_ja-JPではdiagnosis.startの文言が日本語の文言ファイルと一致する (891ms)
+  ✓  125 [webkit] › tests/ac24-stats.spec.mjs:18:1 › AC24_統計の9つの値が期待どおりで_数値7つと日付1つは同じ文字が見え_真偽値はfirstDayCompleted.yesの文言が見える (1.1s)
+  ✓  124 [webkit] › tests/ac21-ac22-home-screen.spec.mjs:70:1 › AC22_スタンドアロンで初めて開くと読み込みの案内が出て_再読み込みでも出て_ファイルを読み込むとAC-20の状態になる (1.4s)
+  ✓  130 [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:51:1 › AC31_今日の課題を完了済みなら操作0回でtask.doneが見え_重なる要素0件 (791ms)
+  ✓  129 [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:31:1 › AC31_診断済みで開くと操作0回でtask.todayが見え_題名と4要素と答えの欄と4つの申告が同じ画面にあり_重なる要素0件 (1.1s)
+  ✓  131 [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:79:1 › AC32_200文字を入力して再読み込みすると_同じdata-task-idで答えがそのまま入っている (1.4s)
+  ✓  132 [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:88:1 › AC32_200文字を入力してタブを閉じ新しいタブで開くと_同じdata-task-idで答えがそのまま入っている (1.5s)
+  ✓  133 [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:98:1 › AC32_翌日に開くと新しい課題の答えの欄は空で_前日の200文字は書き出しのnoneの行のanswerに残る (1.3s)
+  ✓  128 [webkit] › tests/ac28-update.spec.mjs:17:1 › AC28_差し替え後2秒おきの再読み込み3回以内でdata-build-versionが新版になり_旧版に戻らず_履歴3件と診断と段階は同じ (7.9s)
+
+  133 passed (40.3s)
+EXIT=0

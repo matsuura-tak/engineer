@@ -1,0 +1,1870 @@
+npm notice run npx
+npm notice run 'playwright' test --reporter=list tests/ac03-ac04-ac29-tasks-json.spec.mjs tests/ac05-ac06-ac07-ac09-report.spec.mjs tests/ac10-ac30-exhausted-external.spec.mjs tests/ac12-ac23-offline.spec.mjs tests/ac14-ac16-redo-delete.spec.mjs tests/ac24-stats.spec.mjs tests/design-d30-day-changed.spec.mjs
+
+Running 70 tests using 5 workers
+
+  ✓   1 [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:64:1 › BUDGET2_課題集はgzip後105000バイト以下 (28ms)
+  ✓   3 [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:54:1 › BUDGET2_本文4要素と解説の字数の平均が480字以下 (27ms)
+  ✓   4 [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:73:1 › AC29_各組でexternalが20%以下_in_appにURLもtoolsもなく_externalはtoolsが1件以上 (35ms)
+  ✘   5 [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:35:1 › AC4_課題集は210件以上で初級と中級の12組が14件以上_上級の6組が7件以上_IDの重複が0件 (41ms)
+  ✘   2 [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:17:1 › AC3_課題集の全件が4要素を持ち所要時間が1〜15分 (73ms)
+  ✘   6 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:22:1 › AC5_完了するとtask.rateになり_答えるとtask.done_同じ日に再読み込みしてもtask.doneのままで_task.nextを押さない限りissuedは4のまま (811ms)
+  ✘   8 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:67:1 › AC6_翌日には過去に出した課題のIDと一致しない課題が出る (1.0s)
+  ✓  12 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:111:1 › AC9_役に立ったを選ぶとtask.doneになり_再び聞かれず_履歴のdata-helpfulがhelpful (391ms)
+  ✓  13 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:125:1 › AC9_立たなかったを選ぶと履歴のdata-helpfulがnot_helpful (264ms)
+  ✓  14 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:136:1 › AC9_選ばずに再読み込みするとtask.doneになり_履歴のdata-helpfulがunanswered (307ms)
+  ✓  15 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:149:1 › AC9_今回は答えないを押すとtask.doneになり_履歴のdata-helpfulがunanswered (288ms)
+  ✘  10 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:89:3 › AC7_too_easyを申告するとtask.skippedになり履歴に残り_再読み込みしてもtask.skippedのままで_task.nextを押さない限りissuedは4のまま (5.9s)
+  ✘   7 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:52:1 › AC5_完了して答えずに再読み込みするとtask.doneになり_issuedは4のまま (6.0s)
+  ✘   9 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:89:3 › AC7_too_hardを申告するとtask.skippedになり履歴に残り_再読み込みしてもtask.skippedのままで_task.nextを押さない限りissuedは4のまま (6.0s)
+  ✘  11 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:89:3 › AC7_no_timeを申告するとtask.skippedになり履歴に残り_再読み込みしてもtask.skippedのままで_task.nextを押さない限りissuedは4のまま (5.3s)
+  ✘  20 [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:103:1 › AC30_in_appを出し終えた翌日はexternalの課題が出て_印と要る道具が題名と同じ画面に見える (137ms)
+  ✘  16 [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:53:3 › AC10_初級を出し終えて翌日に読み込むと_levelDoneと次の段階へ進むと別の領域を選ぶが出て_進むと同じ日にintermediateのtask.today (5.2s)
+  ✓  21 [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:145:1 › AC30_in_appの課題を出した日はdata-task-modeがin_appで印が0件 (300ms)
+  ✓  22 [chromium] › tests/ac12-ac23-offline.spec.mjs:60:1 › AC12_オフラインでもAC-7の申告が動き_送信は0件 (544ms)
+  ✓  24 [chromium] › tests/ac12-ac23-offline.spec.mjs:125:1 › AC23_task.todayを表示した後にオフラインで再読み込みと新しいタブ_3秒以内に同じdata-task-id_送信0件 (455ms)
+  ✓  25 [chromium] › tests/ac12-ac23-offline.spec.mjs:133:1 › AC23_task.doneを表示した後にオフラインで再読み込みと新しいタブ_3秒以内にtask.done_送信0件 (273ms)
+  ✓  26 [chromium] › tests/ac14-ac16-redo-delete.spec.mjs:6:1 › AC14_今日の課題を出していない日に設定からやり直して別の領域を選ぶと_新しい領域の課題が出て完了の履歴は3件のまま (603ms)
+  ✘  27 [chromium] › tests/ac14-ac16-redo-delete.spec.mjs:44:1 › AC14_今日の課題が出ている日に設定からやり直して別の領域を選んでも_同じdata-task-idのtask.todayのままで完了の履歴は3件_完了してtask.nextを押すと同じ日に新しい領域の課題が出る (152ms)
+  ✓  28 [chromium] › tests/ac14-ac16-redo-delete.spec.mjs:106:1 › AC16_すべてのデータを削除すると再読み込みでdiagnosis.startになり_やり直した後の履歴は0件 (672ms)
+  ✘  18 [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:81:3 › AC10_上級を出し終えて翌日に読み込むと_allDoneと別の領域を選ぶが出て次の段階へ進むは0件_同じ領域と段階でやり直すと同じ日に再びtask.exhausted (5.3s)
+  ✘  19 [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:53:3 › AC10_初級を出し終えて同じ日にtask.nextを押すと_levelDoneと次の段階へ進むと別の領域を選ぶが出て_進むと同じ日にintermediateのtask.today (5.5s)
+  ✘  17 [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:81:3 › AC10_上級を出し終えて同じ日にtask.nextを押すと_allDoneと別の領域を選ぶが出て次の段階へ進むは0件_同じ領域と段階でやり直すと同じ日に再びtask.exhausted (5.5s)
+  ✘  32 [chromium] › tests/design-d30-day-changed.spec.mjs:114:1 › DESIGN_D30_最後の課題を開いたまま翌日になった後に完了を押すと_task.exhaustedの先頭にtask.dayChangedが1件でフォーカスがあり_前の課題はnoneの行に移る (456ms)
+  ✓  31 [chromium] › tests/design-d30-day-changed.spec.mjs:89:1 › DESIGN_D30_task.rateのまま翌日になった後に役に立ったを押すと_評価は記録されずhelpfulはunansweredのままで_翌日のS3にtask.dayChangedが1件 (535ms)
+  ✓  30 [chromium] › tests/design-d30-day-changed.spec.mjs:53:1 › DESIGN_D30_画面を開いたまま翌日になった後に完了を押すと_翌日のS3の先頭にtask.dayChangedが1件でフォーカスがあり_入力では消えず_次の操作と再読み込みで消える (941ms)
+  ✓  33 [chromium] › tests/design-d30-day-changed.spec.mjs:183:1 › DESIGN_D30_知らせのあるS3で申告の保存が失敗してS3に留まっても_task.dayChangedは次の操作の始めに0件になりerror.storage.messageが出て_やり直すとtask.rate (331ms)
+  ✘  36 [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:17:1 › AC3_課題集の全件が4要素を持ち所要時間が1〜15分 (60ms)
+  ✘  23 [chromium] › tests/ac12-ac23-offline.spec.mjs:12:1 › AC12_オフラインでもAC-1_AC-2_AC-5_AC-9_AC-33の操作が動き_送信は0件 (5.6s)
+  ✓  34 [chromium] › tests/design-d30-day-changed.spec.mjs:206:1 › DESIGN_D30_task.today.dayChanged_axe-coreでserious以上の違反が0件 (825ms)
+  ✓  35 [chromium] › tests/design-d30-day-changed.spec.mjs:148:1 › DESIGN_U15_初回の診断の2問目を23時59分に出して0時1分に確定すると_そのまま3問目に進み_firstOpenDateは1問目の日でcompletedOnと課題の日付は確定した日 (593ms)
+  ✘  37 [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:35:1 › AC4_課題集は210件以上で初級と中級の12組が14件以上_上級の6組が7件以上_IDの重複が0件 (34ms)
+  ✓  38 [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:54:1 › BUDGET2_本文4要素と解説の字数の平均が480字以下 (25ms)
+  ✓  39 [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:64:1 › BUDGET2_課題集はgzip後105000バイト以下 (25ms)
+  ✓  42 [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:73:1 › AC29_各組でexternalが20%以下_in_appにURLもtoolsもなく_externalはtoolsが1件以上 (27ms)
+  ✘  29 [chromium] › tests/ac24-stats.spec.mjs:23:1 › AC24_統計の11の値が期待どおりで_数値9つと日付1つは同じ文字が見え_真偽値はfirstDayCompleted.yesの文言が見える (5.4s)
+  ✘  41 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:22:1 › AC5_完了するとtask.rateになり_答えるとtask.done_同じ日に再読み込みしてもtask.doneのままで_task.nextを押さない限りissuedは4のまま (1.7s)
+  ✘  43 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:67:1 › AC6_翌日には過去に出した課題のIDと一致しない課題が出る (1.9s)
+  ✓  47 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:111:1 › AC9_役に立ったを選ぶとtask.doneになり_再び聞かれず_履歴のdata-helpfulがhelpful (868ms)
+  ✓  48 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:125:1 › AC9_立たなかったを選ぶと履歴のdata-helpfulがnot_helpful (456ms)
+  ✓  49 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:136:1 › AC9_選ばずに再読み込みするとtask.doneになり_履歴のdata-helpfulがunanswered (478ms)
+  ✓  50 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:149:1 › AC9_今回は答えないを押すとtask.doneになり_履歴のdata-helpfulがunanswered (472ms)
+  ✘  44 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:89:3 › AC7_too_hardを申告するとtask.skippedになり履歴に残り_再読み込みしてもtask.skippedのままで_task.nextを押さない限りissuedは4のまま (6.7s)
+  ✘  40 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:52:1 › AC5_完了して答えずに再読み込みするとtask.doneになり_issuedは4のまま (6.8s)
+  ✘  45 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:89:3 › AC7_too_easyを申告するとtask.skippedになり履歴に残り_再読み込みしてもtask.skippedのままで_task.nextを押さない限りissuedは4のまま (6.1s)
+  ✘  46 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:89:3 › AC7_no_timeを申告するとtask.skippedになり履歴に残り_再読み込みしてもtask.skippedのままで_task.nextを押さない限りissuedは4のまま (5.8s)
+  ✘  55 [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:103:1 › AC30_in_appを出し終えた翌日はexternalの課題が出て_印と要る道具が題名と同じ画面に見える (521ms)
+  ✘  51 [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:53:3 › AC10_初級を出し終えて翌日に読み込むと_levelDoneと次の段階へ進むと別の領域を選ぶが出て_進むと同じ日にintermediateのtask.today (5.4s)
+  ✓  56 [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:145:1 › AC30_in_appの課題を出した日はdata-task-modeがin_appで印が0件 (717ms)
+  ✓  58 [webkit] › tests/ac12-ac23-offline.spec.mjs:60:1 › AC12_オフラインでもAC-7の申告が動き_送信は0件 (764ms)
+  ✓  59 [webkit] › tests/ac12-ac23-offline.spec.mjs:125:1 › AC23_task.todayを表示した後にオフラインで再読み込みと新しいタブ_3秒以内に同じdata-task-id_送信0件 (786ms)
+  ✓  60 [webkit] › tests/ac12-ac23-offline.spec.mjs:133:1 › AC23_task.doneを表示した後にオフラインで再読み込みと新しいタブ_3秒以内にtask.done_送信0件 (640ms)
+  ✘  52 [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:81:3 › AC10_上級を出し終えて翌日に読み込むと_allDoneと別の領域を選ぶが出て次の段階へ進むは0件_同じ領域と段階でやり直すと同じ日に再びtask.exhausted (5.8s)
+  ✘  53 [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:53:3 › AC10_初級を出し終えて同じ日にtask.nextを押すと_levelDoneと次の段階へ進むと別の領域を選ぶが出て_進むと同じ日にintermediateのtask.today (5.9s)
+  ✓  61 [webkit] › tests/ac14-ac16-redo-delete.spec.mjs:6:1 › AC14_今日の課題を出していない日に設定からやり直して別の領域を選ぶと_新しい領域の課題が出て完了の履歴は3件のまま (794ms)
+  ✘  54 [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:81:3 › AC10_上級を出し終えて同じ日にtask.nextを押すと_allDoneと別の領域を選ぶが出て次の段階へ進むは0件_同じ領域と段階でやり直すと同じ日に再びtask.exhausted (5.7s)
+  ✘  62 [webkit] › tests/ac14-ac16-redo-delete.spec.mjs:44:1 › AC14_今日の課題が出ている日に設定からやり直して別の領域を選んでも_同じdata-task-idのtask.todayのままで完了の履歴は3件_完了してtask.nextを押すと同じ日に新しい領域の課題が出る (660ms)
+  ✓  64 [webkit] › tests/ac14-ac16-redo-delete.spec.mjs:106:1 › AC16_すべてのデータを削除すると再読み込みでdiagnosis.startになり_やり直した後の履歴は0件 (1.2s)
+  ✘  67 [webkit] › tests/design-d30-day-changed.spec.mjs:114:1 › DESIGN_D30_最後の課題を開いたまま翌日になった後に完了を押すと_task.exhaustedの先頭にtask.dayChangedが1件でフォーカスがあり_前の課題はnoneの行に移る (558ms)
+  ✓  66 [webkit] › tests/design-d30-day-changed.spec.mjs:89:1 › DESIGN_D30_task.rateのまま翌日になった後に役に立ったを押すと_評価は記録されずhelpfulはunansweredのままで_翌日のS3にtask.dayChangedが1件 (925ms)
+  ✓  65 [webkit] › tests/design-d30-day-changed.spec.mjs:53:1 › DESIGN_D30_画面を開いたまま翌日になった後に完了を押すと_翌日のS3の先頭にtask.dayChangedが1件でフォーカスがあり_入力では消えず_次の操作と再読み込みで消える (1.4s)
+  ✓  68 [webkit] › tests/design-d30-day-changed.spec.mjs:183:1 › DESIGN_D30_知らせのあるS3で申告の保存が失敗してS3に留まっても_task.dayChangedは次の操作の始めに0件になりerror.storage.messageが出て_やり直すとtask.rate (498ms)
+  ✘  57 [webkit] › tests/ac12-ac23-offline.spec.mjs:12:1 › AC12_オフラインでもAC-1_AC-2_AC-5_AC-9_AC-33の操作が動き_送信は0件 (5.9s)
+  ✓  69 [webkit] › tests/design-d30-day-changed.spec.mjs:148:1 › DESIGN_U15_初回の診断の2問目を23時59分に出して0時1分に確定すると_そのまま3問目に進み_firstOpenDateは1問目の日でcompletedOnと課題の日付は確定した日 (812ms)
+  ✓  70 [webkit] › tests/design-d30-day-changed.spec.mjs:206:1 › DESIGN_D30_task.today.dayChanged_axe-coreでserious以上の違反が0件 (1.2s)
+  ✘  63 [webkit] › tests/ac24-stats.spec.mjs:23:1 › AC24_統計の11の値が期待どおりで_数値9つと日付1つは同じ文字が見え_真偽値はfirstDayCompleted.yesの文言が見える (5.7s)
+
+
+  1) [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:17:1 › AC3_課題集の全件が4要素を持ち所要時間が1〜15分 ──────
+
+    Error: tasks.schema.json：data/tasks/0 must have required property 'insight'
+    data/tasks/1 must have required property 'insight'
+    data/tasks/2 must have required property 'insight'
+    data/tasks/3 must have required property 'insight'
+    data/tasks/4 must have required property 'insight'
+    data/tasks/5 must have required property 'insight'
+    data/tasks/6 must have required property 'insight'
+    data/tasks/7 must have required property 'insight'
+    data/tasks/8 must have required property 'insight'
+    data/tasks/9 must have required property 'insight'
+    data/tasks/10 must have required property 'insight'
+    data/tasks/11 must have required property 'insight'
+    data/tasks/12 must have required property 'insight'
+    data/tasks/13 must have required property 'insight'
+    data/tasks/14 must have required property 'insight'
+    data/tasks/15 must have required property 'insight'
+    data/tasks/16 must have required property 'insight'
+    data/tasks/17 must have required property 'insight'
+    data/tasks/18 must have required property 'insight'
+    data/tasks/19 must have required property 'insight'
+    data/tasks/20 must have required property 'insight'
+    data/tasks/21 must have required property 'insight'
+    data/tasks/22 must have required property 'insight'
+    data/tasks/23 must have required property 'insight'
+    data/tasks/24 must have required property 'insight'
+    data/tasks/25 must have required property 'insight'
+    data/tasks/26 must have required property 'insight'
+    data/tasks/27 must have required property 'insight'
+    data/tasks/28 must have required property 'insight'
+    data/tasks/29 must have required property 'insight'
+    data/tasks/30 must have required property 'insight'
+    data/tasks/31 must have required property 'insight'
+    data/tasks/32 must have required property 'insight'
+    data/tasks/33 must have required property 'insight'
+    data/tasks/34 must have required property 'insight'
+    data/tasks/35 must have required property 'insight'
+    data/tasks/36 must have required property 'insight'
+    data/tasks/37 must have required property 'insight'
+    data/tasks/38 must have required property 'insight'
+    data/tasks/39 must have required property 'insight'
+    data/tasks/40 must have required property 'insight'
+    data/tasks/41 must have required property 'insight'
+    data/tasks/42 must have required property 'insight'
+    data/tasks/43 must have required property 'insight'
+    data/tasks/44 must have required property 'insight'
+    data/tasks/45 must have required property 'insight'
+    data/tasks/46 must have required property 'insight'
+    data/tasks/47 must have required property 'insight'
+    data/tasks/48 must have required property 'insight'
+    data/tasks/49 must have required property 'insight'
+    data/tasks/50 must have required property 'insight'
+    data/tasks/51 must have required property 'insight'
+    data/tasks/52 must have required property 'insight'
+    data/tasks/53 must have required property 'insight'
+    data/tasks/54 must have required property 'insight'
+    data/tasks/55 must have required property 'insight'
+    data/tasks/56 must have required property 'insight'
+    data/tasks/57 must have required property 'insight'
+    data/tasks/58 must have required property 'insight'
+    data/tasks/59 must have required property 'insight'
+    data/tasks/60 must have required property 'insight'
+    data/tasks/61 must have required property 'insight'
+    data/tasks/62 must have required property 'insight'
+    data/tasks/63 must have required property 'insight'
+    data/tasks/64 must have required property 'insight'
+    data/tasks/65 must have required property 'insight'
+    data/tasks/66 must have required property 'insight'
+    data/tasks/67 must have required property 'insight'
+    data/tasks/68 must have required property 'insight'
+    data/tasks/69 must have required property 'insight'
+    data/tasks/70 must have required property 'insight'
+    data/tasks/71 must have required property 'insight'
+    data/tasks/72 must have required property 'insight'
+    data/tasks/73 must have required property 'insight'
+    data/tasks/74 must have required property 'insight'
+    data/tasks/75 must have required property 'insight'
+    data/tasks/76 must have required property 'insight'
+    data/tasks/77 must have required property 'insight'
+    data/tasks/78 must have required property 'insight'
+    data/tasks/79 must have required property 'insight'
+    data/tasks/80 must have required property 'insight'
+    data/tasks/81 must have required property 'insight'
+    data/tasks/82 must have required property 'insight'
+    data/tasks/83 must have required property 'insight'
+    data/tasks/84 must have required property 'insight'
+    data/tasks/85 must have required property 'insight'
+    data/tasks/86 must have required property 'insight'
+    data/tasks/87 must have required property 'insight'
+    data/tasks/88 must have required property 'insight'
+    data/tasks/89 must have required property 'insight'
+    data/tasks/90 must have required property 'insight'
+    data/tasks/91 must have required property 'insight'
+    data/tasks/92 must have required property 'insight'
+    data/tasks/93 must have required property 'insight'
+    data/tasks/94 must have required property 'insight'
+    data/tasks/95 must have required property 'insight'
+    data/tasks/96 must have required property 'insight'
+    data/tasks/97 must have required property 'insight'
+    data/tasks/98 must have required property 'insight'
+    data/tasks/99 must have required property 'insight'
+    data/tasks/100 must have required property 'insight'
+    data/tasks/101 must have required property 'insight'
+    data/tasks/102 must have required property 'insight'
+    data/tasks/103 must have required property 'insight'
+    data/tasks/104 must have required property 'insight'
+    data/tasks/105 must have required property 'insight'
+    data/tasks/106 must have required property 'insight'
+    data/tasks/107 must have required property 'insight'
+    data/tasks/108 must have required property 'insight'
+    data/tasks/109 must have required property 'insight'
+    data/tasks/110 must have required property 'insight'
+    data/tasks/111 must have required property 'insight'
+    data/tasks/112 must have required property 'insight'
+    data/tasks/113 must have required property 'insight'
+    data/tasks/114 must have required property 'insight'
+    data/tasks/115 must have required property 'insight'
+    data/tasks/116 must have required property 'insight'
+    data/tasks/117 must have required property 'insight'
+    data/tasks/118 must have required property 'insight'
+    data/tasks/119 must have required property 'insight'
+    data/tasks/120 must have required property 'insight'
+    data/tasks/121 must have required property 'insight'
+    data/tasks/122 must have required property 'insight'
+    data/tasks/123 must have required property 'insight'
+    data/tasks/124 must have required property 'insight'
+    data/tasks/125 must have required property 'insight'
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      22 |
+      23 |   const { ok, errors } = validate('tasks', tasks);
+    > 24 |   expect(ok, `tasks.schema.json：${errors}`).toBe(true);
+         |                                             ^
+      25 |
+      26 |   const bad = [];
+      27 |   for (const t of tasks.tasks) {
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac03-ac04-ac29-tasks-json.spec.mjs:24:45
+
+    Error Context: test-results/ac03-ac04-ac29-tasks-json-AC3-課題集の全件が4要素を持ち所要時間が1〜15分-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac03-ac04-ac29-tasks-json-AC3-課題集の全件が4要素を持ち所要時間が1〜15分-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac03-ac04-ac29-tasks-json-AC3-課題集の全件が4要素を持ち所要時間が1〜15分-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:35:1 › AC4_課題集は210件以上で初級と中級の12組が14件以上_上級の6組が7件以上_IDの重複が0件 
+
+    Error: 全体の件数（210 以上）
+
+    expect(received).toBeGreaterThanOrEqual(expected)
+
+    Expected: >= 210
+    Received:    126
+
+      43 |   testInfo.annotations.push({ type: '件数', description: `全体 ${n}、組ごと ${JSON.stringify(counts)}` });
+      44 |
+    > 45 |   expect(n, `全体の件数（${MIN_TOTAL} 以上）`).toBeGreaterThanOrEqual(MIN_TOTAL);
+         |                                       ^
+      46 |   expect(Object.keys(counts)).toHaveLength(18);
+      47 |   for (const [combo, c] of Object.entries(counts)) {
+      48 |     const level = combo.split('/')[1];
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac03-ac04-ac29-tasks-json.spec.mjs:45:39
+
+    Error Context: test-results/ac03-ac04-ac29-tasks-json--f946f-組が14件以上-上級の6組が7件以上-IDの重複が0件-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac03-ac04-ac29-tasks-json--f946f-組が14件以上-上級の6組が7件以上-IDの重複が0件-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac03-ac04-ac29-tasks-json--f946f-組が14件以上-上級の6組が7件以上-IDの重複が0件-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:22:1 › AC5_完了するとtask.rateになり_答えるとtask.done_同じ日に再読み込みしてもtask.doneのままで_task.nextを押さない限りissuedは4のまま 
+
+    Error: その日の 1 件目
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "1"
+    Received: null
+
+      22 | test('AC5_完了するとtask.rateになり_答えるとtask.done_同じ日に再読み込みしてもtask.doneのままで_task.nextを押さない限りissuedは4のまま', async ({ context, page, baseURL }, testInfo) => {
+      23 |   const task = await openToday(context, page, baseURL);
+    > 24 |   expect(task.nthToday, 'その日の 1 件目').toBe('1');
+         |                                      ^
+      25 |   expect((await app.readStats(page))['data-stat-issued'], '開いた直後の issued').toBe(ISSUED_AFTER_OPEN);
+      26 |   await page.reload();
+      27 |   await app.expectState(page, 'task.today');
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac05-ac06-ac07-ac09-report.spec.mjs:24:38
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-09e17-task-nextを押さない限りissuedは4のまま-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac05-ac06-ac07-ac09-report-09e17-task-nextを押さない限りissuedは4のまま-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-09e17-task-nextを押さない限りissuedは4のまま-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac05-ac06-ac07-ac09-report-09e17-task-nextを押さない限りissuedは4のまま-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:52:1 › AC5_完了して答えずに再読み込みするとtask.doneになり_issuedは4のまま 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('task.next')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByTestId('task.next') with timeout 5000ms
+      - waiting for getByTestId('task.next')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      57 |   await app.expectState(page, 'task.done');
+      58 |   await expect(app.tid(page, 'task.today')).toHaveCount(0);
+    > 59 |   await expect(app.tid(page, 'task.next')).toHaveCount(1);
+         |                                            ^
+      60 |   expect((await app.readStats(page))['data-stat-issued']).toBe(ISSUED_AFTER_OPEN);
+      61 |   await page.reload();
+      62 |   await app.expectState(page, 'task.done');
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac05-ac06-ac07-ac09-report.spec.mjs:59:44
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-8216b-するとtask-doneになり-issuedは4のまま-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac05-ac06-ac07-ac09-report-8216b-するとtask-doneになり-issuedは4のまま-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-8216b-するとtask-doneになり-issuedは4のまま-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac05-ac06-ac07-ac09-report-8216b-するとtask-doneになり-issuedは4のまま-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:67:1 › AC6_翌日には過去に出した課題のIDと一致しない課題が出る ──
+
+    Error: 翌日の 1 件目
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "1"
+    Received: null
+
+      79 |   expect([...SEEDED_IDS, first.id]).not.toContain(next.id);
+      80 |   expect(next.area).toBe('backend');
+    > 81 |   expect(next.nthToday, '翌日の 1 件目').toBe('1');
+         |                                     ^
+      82 | });
+      83 |
+      84 | for (const [button, report] of [
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac05-ac06-ac07-ac09-report.spec.mjs:81:37
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-AC6-翌日には過去に出した課題のIDと一致しない課題が出る-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac05-ac06-ac07-ac09-report-AC6-翌日には過去に出した課題のIDと一致しない課題が出る-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-AC6-翌日には過去に出した課題のIDと一致しない課題が出る-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac05-ac06-ac07-ac09-report-AC6-翌日には過去に出した課題のIDと一致しない課題が出る-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:89:3 › AC7_too_hardを申告するとtask.skippedになり履歴に残り_再読み込みしてもtask.skippedのままで_task.nextを押さない限りissuedは4のまま 
+
+    Error: 「次の一手に進む」が 1 つ（押さない）
+
+    expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('task.next')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - 「次の一手に進む」が 1 つ（押さない） getByTestId('task.next') with timeout 5000ms
+      - waiting for getByTestId('task.next')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      91 |     await app.tid(page, button).click();
+      92 |     await app.expectState(page, 'task.skipped');
+    > 93 |     await expect(app.tid(page, 'task.next'), '「次の一手に進む」が 1 つ（押さない）').toHaveCount(1);
+         |                                                                      ^
+      94 |     await app.shot(page, testInfo, `AC7_task.skipped_${report}`);
+      95 |
+      96 |     await app.goHistory(page);
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac05-ac06-ac07-ac09-report.spec.mjs:93:70
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-c83ee-task-nextを押さない限りissuedは4のまま-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac05-ac06-ac07-ac09-report-c83ee-task-nextを押さない限りissuedは4のまま-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-c83ee-task-nextを押さない限りissuedは4のまま-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac05-ac06-ac07-ac09-report-c83ee-task-nextを押さない限りissuedは4のまま-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  7) [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:89:3 › AC7_too_easyを申告するとtask.skippedになり履歴に残り_再読み込みしてもtask.skippedのままで_task.nextを押さない限りissuedは4のまま 
+
+    Error: 「次の一手に進む」が 1 つ（押さない）
+
+    expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('task.next')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - 「次の一手に進む」が 1 つ（押さない） getByTestId('task.next') with timeout 5000ms
+      - waiting for getByTestId('task.next')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      91 |     await app.tid(page, button).click();
+      92 |     await app.expectState(page, 'task.skipped');
+    > 93 |     await expect(app.tid(page, 'task.next'), '「次の一手に進む」が 1 つ（押さない）').toHaveCount(1);
+         |                                                                      ^
+      94 |     await app.shot(page, testInfo, `AC7_task.skipped_${report}`);
+      95 |
+      96 |     await app.goHistory(page);
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac05-ac06-ac07-ac09-report.spec.mjs:93:70
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-f10af-task-nextを押さない限りissuedは4のまま-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac05-ac06-ac07-ac09-report-f10af-task-nextを押さない限りissuedは4のまま-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-f10af-task-nextを押さない限りissuedは4のまま-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac05-ac06-ac07-ac09-report-f10af-task-nextを押さない限りissuedは4のまま-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  8) [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:89:3 › AC7_no_timeを申告するとtask.skippedになり履歴に残り_再読み込みしてもtask.skippedのままで_task.nextを押さない限りissuedは4のまま 
+
+    Error: 「次の一手に進む」が 1 つ（押さない）
+
+    expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('task.next')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - 「次の一手に進む」が 1 つ（押さない） getByTestId('task.next') with timeout 5000ms
+      - waiting for getByTestId('task.next')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      91 |     await app.tid(page, button).click();
+      92 |     await app.expectState(page, 'task.skipped');
+    > 93 |     await expect(app.tid(page, 'task.next'), '「次の一手に進む」が 1 つ（押さない）').toHaveCount(1);
+         |                                                                      ^
+      94 |     await app.shot(page, testInfo, `AC7_task.skipped_${report}`);
+      95 |
+      96 |     await app.goHistory(page);
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac05-ac06-ac07-ac09-report.spec.mjs:93:70
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-faf7d-task-nextを押さない限りissuedは4のまま-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac05-ac06-ac07-ac09-report-faf7d-task-nextを押さない限りissuedは4のまま-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-faf7d-task-nextを押さない限りissuedは4のまま-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac05-ac06-ac07-ac09-report-faf7d-task-nextを押さない限りissuedは4のまま-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  9) [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:53:3 › AC10_初級を出し終えて翌日に読み込むと_levelDoneと次の段階へ進むと別の領域を選ぶが出て_進むと同じ日にintermediateのtask.today 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('task.exhausted.levelDone')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByTestId('task.exhausted.levelDone') with timeout 5000ms
+      - waiting for getByTestId('task.exhausted.levelDone')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      56 |     const { nthAfterAdvance } = await reachExhausted({ context, page, baseURL, tasks, level: 'beginner', via });
+      57 |
+    > 58 |     await expect(app.tid(page, 'task.exhausted.levelDone')).toHaveCount(1);
+         |                                                             ^
+      59 |     await expect(app.tid(page, 'task.exhausted.levelDone')).toHaveText(app.fill(ja['task.exhausted.levelDone'], { area: ja[`area.${AREA}`], level: ja['level.beginner'] }));
+      60 |     await expect(app.tid(page, 'task.exhausted.allDone')).toHaveCount(0);
+      61 |     await expect(app.tid(page, 'task.exhausted.advance')).toHaveCount(1);
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac10-ac30-exhausted-external.spec.mjs:58:61
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac10-ac30-exhausted-extern-337f1-同じ日にintermediateのtask-today-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac10-ac30-exhausted-extern-337f1-同じ日にintermediateのtask-today-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac10-ac30-exhausted-extern-337f1-同じ日にintermediateのtask-today-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac10-ac30-exhausted-extern-337f1-同じ日にintermediateのtask-today-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  10) [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:81:3 › AC10_上級を出し終えて翌日に読み込むと_allDoneと別の領域を選ぶが出て次の段階へ進むは0件_同じ領域と段階でやり直すと同じ日に再びtask.exhausted 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('task.exhausted.allDone')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByTestId('task.exhausted.allDone') with timeout 5000ms
+      - waiting for getByTestId('task.exhausted.allDone')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      84 |     await reachExhausted({ context, page, baseURL, tasks, level: 'advanced', via });
+      85 |
+    > 86 |     await expect(app.tid(page, 'task.exhausted.allDone')).toHaveCount(1);
+         |                                                           ^
+      87 |     await expect(app.tid(page, 'task.exhausted.allDone')).toHaveText(app.fill(ja['task.exhausted.allDone'], { area: ja[`area.${AREA}`] }));
+      88 |     await expect(app.tid(page, 'task.exhausted.levelDone')).toHaveCount(0);
+      89 |     await expect(app.tid(page, 'task.exhausted.advance')).toHaveCount(0);
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac10-ac30-exhausted-external.spec.mjs:86:59
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac10-ac30-exhausted-extern-49177-階でやり直すと同じ日に再びtask-exhausted-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac10-ac30-exhausted-extern-49177-階でやり直すと同じ日に再びtask-exhausted-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac10-ac30-exhausted-extern-49177-階でやり直すと同じ日に再びtask-exhausted-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac10-ac30-exhausted-extern-49177-階でやり直すと同じ日に再びtask-exhausted-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  11) [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:53:3 › AC10_初級を出し終えて同じ日にtask.nextを押すと_levelDoneと次の段階へ進むと別の領域を選ぶが出て_進むと同じ日にintermediateのtask.today 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('task.next')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByTestId('task.next') with timeout 5000ms
+      - waiting for getByTestId('task.next')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+       at ../helpers/app.mjs:58
+
+      56 |  */
+      57 | export async function next(page, { to = 'task.today', timeout = WAIT_MS } = {}) {
+    > 58 |   await expect(tid(page, 'task.next')).toHaveCount(1);
+         |                                        ^
+      59 |   await tid(page, 'task.next').click();
+      60 |   await expectState(page, to, timeout);
+      61 | }
+        at Module.next (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/app.mjs:58:40)
+        at reachExhausted (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac10-ac30-exhausted-external.spec.mjs:46:13)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac10-ac30-exhausted-external.spec.mjs:56:33
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac10-ac30-exhausted-extern-5cf75-同じ日にintermediateのtask-today-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac10-ac30-exhausted-extern-5cf75-同じ日にintermediateのtask-today-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac10-ac30-exhausted-extern-5cf75-同じ日にintermediateのtask-today-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac10-ac30-exhausted-extern-5cf75-同じ日にintermediateのtask-today-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  12) [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:81:3 › AC10_上級を出し終えて同じ日にtask.nextを押すと_allDoneと別の領域を選ぶが出て次の段階へ進むは0件_同じ領域と段階でやり直すと同じ日に再びtask.exhausted 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('task.next')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByTestId('task.next') with timeout 5000ms
+      - waiting for getByTestId('task.next')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+       at ../helpers/app.mjs:58
+
+      56 |  */
+      57 | export async function next(page, { to = 'task.today', timeout = WAIT_MS } = {}) {
+    > 58 |   await expect(tid(page, 'task.next')).toHaveCount(1);
+         |                                        ^
+      59 |   await tid(page, 'task.next').click();
+      60 |   await expectState(page, to, timeout);
+      61 | }
+        at Module.next (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/app.mjs:58:40)
+        at reachExhausted (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac10-ac30-exhausted-external.spec.mjs:46:13)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac10-ac30-exhausted-external.spec.mjs:84:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac10-ac30-exhausted-extern-d98f9-階でやり直すと同じ日に再びtask-exhausted-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac10-ac30-exhausted-extern-d98f9-階でやり直すと同じ日に再びtask-exhausted-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac10-ac30-exhausted-extern-d98f9-階でやり直すと同じ日に再びtask-exhausted-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac10-ac30-exhausted-extern-d98f9-階でやり直すと同じ日に再びtask-exhausted-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  13) [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:103:1 › AC30_in_appを出し終えた翌日はexternalの課題が出て_印と要る道具が題名と同じ画面に見える 
+
+    Error: tasks.schema.json：data/tasks/0 must have required property 'insight'
+    data/tasks/1 must have required property 'insight'
+    data/tasks/2 must have required property 'insight'
+    data/tasks/3 must have required property 'insight'
+    data/tasks/4 must have required property 'insight'
+    data/tasks/5 must have required property 'insight'
+    data/tasks/6 must have required property 'insight'
+    data/tasks/7 must have required property 'insight'
+    data/tasks/8 must have required property 'insight'
+    data/tasks/9 must have required property 'insight'
+    data/tasks/10 must have required property 'insight'
+    data/tasks/11 must have required property 'insight'
+    data/tasks/12 must have required property 'insight'
+    data/tasks/13 must have required property 'insight'
+    data/tasks/14 must have required property 'insight'
+    data/tasks/15 must have required property 'insight'
+    data/tasks/16 must have required property 'insight'
+    data/tasks/17 must have required property 'insight'
+    data/tasks/18 must have required property 'insight'
+    data/tasks/19 must have required property 'insight'
+    data/tasks/20 must have required property 'insight'
+    data/tasks/21 must have required property 'insight'
+    data/tasks/22 must have required property 'insight'
+    data/tasks/23 must have required property 'insight'
+    data/tasks/24 must have required property 'insight'
+    data/tasks/25 must have required property 'insight'
+    data/tasks/26 must have required property 'insight'
+    data/tasks/27 must have required property 'insight'
+    data/tasks/28 must have required property 'insight'
+    data/tasks/29 must have required property 'insight'
+    data/tasks/30 must have required property 'insight'
+    data/tasks/31 must have required property 'insight'
+    data/tasks/32 must have required property 'insight'
+    data/tasks/33 must have required property 'insight'
+    data/tasks/34 must have required property 'insight'
+    data/tasks/35 must have required property 'insight'
+    data/tasks/36 must have required property 'insight'
+    data/tasks/37 must have required property 'insight'
+    data/tasks/38 must have required property 'insight'
+    data/tasks/39 must have required property 'insight'
+    data/tasks/40 must have required property 'insight'
+    data/tasks/41 must have required property 'insight'
+    data/tasks/42 must have required property 'insight'
+    data/tasks/43 must have required property 'insight'
+    data/tasks/44 must have required property 'insight'
+    data/tasks/45 must have required property 'insight'
+    data/tasks/46 must have required property 'insight'
+    data/tasks/47 must have required property 'insight'
+    data/tasks/48 must have required property 'insight'
+    data/tasks/49 must have required property 'insight'
+    data/tasks/50 must have required property 'insight'
+    data/tasks/51 must have required property 'insight'
+    data/tasks/52 must have required property 'insight'
+    data/tasks/53 must have required property 'insight'
+    data/tasks/54 must have required property 'insight'
+    data/tasks/55 must have required property 'insight'
+    data/tasks/56 must have required property 'insight'
+    data/tasks/57 must have required property 'insight'
+    data/tasks/58 must have required property 'insight'
+    data/tasks/59 must have required property 'insight'
+    data/tasks/60 must have required property 'insight'
+    data/tasks/61 must have required property 'insight'
+    data/tasks/62 must have required property 'insight'
+    data/tasks/63 must have required property 'insight'
+    data/tasks/64 must have required property 'insight'
+    data/tasks/65 must have required property 'insight'
+    data/tasks/66 must have required property 'insight'
+    data/tasks/67 must have required property 'insight'
+    data/tasks/68 must have required property 'insight'
+    data/tasks/69 must have required property 'insight'
+    data/tasks/70 must have required property 'insight'
+    data/tasks/71 must have required property 'insight'
+    data/tasks/72 must have required property 'insight'
+    data/tasks/73 must have required property 'insight'
+    data/tasks/74 must have required property 'insight'
+    data/tasks/75 must have required property 'insight'
+    data/tasks/76 must have required property 'insight'
+    data/tasks/77 must have required property 'insight'
+    data/tasks/78 must have required property 'insight'
+    data/tasks/79 must have required property 'insight'
+    data/tasks/80 must have required property 'insight'
+    data/tasks/81 must have required property 'insight'
+    data/tasks/82 must have required property 'insight'
+    data/tasks/83 must have required property 'insight'
+    data/tasks/84 must have required property 'insight'
+    data/tasks/85 must have required property 'insight'
+    data/tasks/86 must have required property 'insight'
+    data/tasks/87 must have required property 'insight'
+    data/tasks/88 must have required property 'insight'
+    data/tasks/89 must have required property 'insight'
+    data/tasks/90 must have required property 'insight'
+    data/tasks/91 must have required property 'insight'
+    data/tasks/92 must have required property 'insight'
+    data/tasks/93 must have required property 'insight'
+    data/tasks/94 must have required property 'insight'
+    data/tasks/95 must have required property 'insight'
+    data/tasks/96 must have required property 'insight'
+    data/tasks/97 must have required property 'insight'
+    data/tasks/98 must have required property 'insight'
+    data/tasks/99 must have required property 'insight'
+    data/tasks/100 must have required property 'insight'
+    data/tasks/101 must have required property 'insight'
+    data/tasks/102 must have required property 'insight'
+    data/tasks/103 must have required property 'insight'
+    data/tasks/104 must have required property 'insight'
+    data/tasks/105 must have required property 'insight'
+    data/tasks/106 must have required property 'insight'
+    data/tasks/107 must have required property 'insight'
+    data/tasks/108 must have required property 'insight'
+    data/tasks/109 must have required property 'insight'
+    data/tasks/110 must have required property 'insight'
+    data/tasks/111 must have required property 'insight'
+    data/tasks/112 must have required property 'insight'
+    data/tasks/113 must have required property 'insight'
+    data/tasks/114 must have required property 'insight'
+    data/tasks/115 must have required property 'insight'
+    data/tasks/116 must have required property 'insight'
+    data/tasks/117 must have required property 'insight'
+    data/tasks/118 must have required property 'insight'
+    data/tasks/119 must have required property 'insight'
+    data/tasks/120 must have required property 'insight'
+    data/tasks/121 must have required property 'insight'
+    data/tasks/122 must have required property 'insight'
+    data/tasks/123 must have required property 'insight'
+    data/tasks/124 must have required property 'insight'
+    data/tasks/125 must have required property 'insight'
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      107 |   // 課題集そのものが本物（tasks.schema.json に通り、AC-4（PRD r11）の量：210 件以上、初級と中級は 14 以上、上級は 7 以上）であることを先に確かめる。
+      108 |   const { ok, errors } = validate('tasks', tasks);
+    > 109 |   expect(ok, `tasks.schema.json：${errors}`).toBe(true);
+          |                                             ^
+      110 |   expect(tasks.tasks.length, '課題集の件数（210 以上）').toBeGreaterThanOrEqual(210);
+      111 |   for (const a of AREAS) for (const l of LEVELS) expect(tasksOf(tasks, a, l).length, `組 ${a}/${l} の件数`).toBeGreaterThanOrEqual(l === 'advanced' ? 7 : 14);
+      112 |
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac10-ac30-exhausted-external.spec.mjs:109:45
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac10-ac30-exhausted-extern-f09fe-alの課題が出て-印と要る道具が題名と同じ画面に見える-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac10-ac30-exhausted-extern-f09fe-alの課題が出て-印と要る道具が題名と同じ画面に見える-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac10-ac30-exhausted-extern-f09fe-alの課題が出て-印と要る道具が題名と同じ画面に見える-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac10-ac30-exhausted-extern-f09fe-alの課題が出て-印と要る道具が題名と同じ画面に見える-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  14) [chromium] › tests/ac12-ac23-offline.spec.mjs:12:1 › AC12_オフラインでもAC-1_AC-2_AC-5_AC-9_AC-33の操作が動き_送信は0件 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('task.next')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByTestId('task.next') with timeout 5000ms
+      - waiting for getByTestId('task.next')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+       at ../helpers/app.mjs:58
+
+      56 |  */
+      57 | export async function next(page, { to = 'task.today', timeout = WAIT_MS } = {}) {
+    > 58 |   await expect(tid(page, 'task.next')).toHaveCount(1);
+         |                                        ^
+      59 |   await tid(page, 'task.next').click();
+      60 |   await expectState(page, to, timeout);
+      61 | }
+        at Module.next (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/app.mjs:58:40)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac12-ac23-offline.spec.mjs:39:13
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac12-ac23-offline-AC12-オフラ-add47-AC-5-AC-9-AC-33の操作が動き-送信は0件-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac12-ac23-offline-AC12-オフラ-add47-AC-5-AC-9-AC-33の操作が動き-送信は0件-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac12-ac23-offline-AC12-オフラ-add47-AC-5-AC-9-AC-33の操作が動き-送信は0件-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac12-ac23-offline-AC12-オフラ-add47-AC-5-AC-9-AC-33の操作が動き-送信は0件-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  15) [chromium] › tests/ac14-ac16-redo-delete.spec.mjs:44:1 › AC14_今日の課題が出ている日に設定からやり直して別の領域を選んでも_同じdata-task-idのtask.todayのままで完了の履歴は3件_完了してtask.nextを押すと同じ日に新しい領域の課題が出る 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: "1"
+    Received: null
+
+      59 |   expect(before.id).toBeTruthy();
+      60 |   expect(before.area).toBe('backend');
+    > 61 |   expect(before.nthToday).toBe('1');
+         |                           ^
+      62 |   testInfo.annotations.push({ type: 'やり直しの前', description: `2026-11-04 の task.today：${before.id}（${before.area}/${before.level}）` });
+      63 |
+      64 |   // When：設定から診断をやり直し、別の領域（frontend）を選んで 3 問に答える
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac14-ac16-redo-delete.spec.mjs:61:27
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac14-ac16-redo-delete-AC14-7a5ce-ask-nextを押すと同じ日に新しい領域の課題が出る-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac14-ac16-redo-delete-AC14-7a5ce-ask-nextを押すと同じ日に新しい領域の課題が出る-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac14-ac16-redo-delete-AC14-7a5ce-ask-nextを押すと同じ日に新しい領域の課題が出る-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac14-ac16-redo-delete-AC14-7a5ce-ask-nextを押すと同じ日に新しい領域の課題が出る-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  16) [chromium] › tests/ac24-stats.spec.mjs:23:1 › AC24_統計の11の値が期待どおりで_数値9つと日付1つは同じ文字が見え_真偽値はfirstDayCompleted.yesの文言が見える 
+
+    Error: settings.stats.daysCompletedWeek.value
+
+    expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('settings.stats.daysCompletedWeek.value')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - settings.stats.daysCompletedWeek.value getByTestId('settings.stats.daysCompletedWeek.value') with timeout 5000ms
+      - waiting for getByTestId('settings.stats.daysCompletedWeek.value')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      39 |   for (const [testId, [attr, value]] of Object.entries(EXPECTED)) {
+      40 |     const dd = app.tid(page, testId);
+    > 41 |     await expect(dd, testId).toHaveCount(1);
+         |                              ^
+      42 |     await expect(dd, `${attr}`).toHaveAttribute(attr, value);
+      43 |     if (attr === 'data-stat-first-day-completed') {
+      44 |       await expect(dd).toHaveText(ja['settings.stats.firstDayCompleted.yes']);
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac24-stats.spec.mjs:41:30
+
+    attachment #1: AC24_settings.stats (image/png) ─────────────────────────────────────────────────
+    test-results/ac24-stats-AC24-統計の11の値が期待-21d6f-irstDayCompleted-yesの文言が見える-chromium/attachments/AC24-settings-stats-3ca4a79c91e22394b9f34df6e03b22c8bb4d3b70.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac24-stats-AC24-統計の11の値が期待-21d6f-irstDayCompleted-yesの文言が見える-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac24-stats-AC24-統計の11の値が期待-21d6f-irstDayCompleted-yesの文言が見える-chromium/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac24-stats-AC24-統計の11の値が期待-21d6f-irstDayCompleted-yesの文言が見える-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac24-stats-AC24-統計の11の値が期待-21d6f-irstDayCompleted-yesの文言が見える-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  17) [chromium] › tests/design-d30-day-changed.spec.mjs:114:1 › DESIGN_D30_最後の課題を開いたまま翌日になった後に完了を押すと_task.exhaustedの先頭にtask.dayChangedが1件でフォーカスがあり_前の課題はnoneの行に移る 
+
+    Error: task.dayChanged が task.exhausted.levelDone より前にある
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: null
+
+      31 |     firstTestIdOfScreen,
+      32 |   );
+    > 33 |   expect(precedes, `task.dayChanged が ${firstTestIdOfScreen} より前にある`).toBe(true);
+         |                                                                       ^
+      34 | }
+      35 |
+      36 | /** 知らせのある S3 を作る：seed-ac14 を 11-04 23:55 に開き、11-05 0:05 に固定して読み込まずに task.report.done（design 2 の表の下の手順、W-3）。前の課題と翌日の課題の素性を返す。 */
+        at expectDayChangedNotice (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/design-d30-day-changed.spec.mjs:33:71)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/design-d30-day-changed.spec.mjs:138:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/design-d30-day-changed-DES-d825e-が1件でフォーカスがあり-前の課題はnoneの行に移る-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/design-d30-day-changed-DES-d825e-が1件でフォーカスがあり-前の課題はnoneの行に移る-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/design-d30-day-changed-DES-d825e-が1件でフォーカスがあり-前の課題はnoneの行に移る-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/design-d30-day-changed-DES-d825e-が1件でフォーカスがあり-前の課題はnoneの行に移る-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  18) [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:17:1 › AC3_課題集の全件が4要素を持ち所要時間が1〜15分 ───────
+
+    Error: tasks.schema.json：data/tasks/0 must have required property 'insight'
+    data/tasks/1 must have required property 'insight'
+    data/tasks/2 must have required property 'insight'
+    data/tasks/3 must have required property 'insight'
+    data/tasks/4 must have required property 'insight'
+    data/tasks/5 must have required property 'insight'
+    data/tasks/6 must have required property 'insight'
+    data/tasks/7 must have required property 'insight'
+    data/tasks/8 must have required property 'insight'
+    data/tasks/9 must have required property 'insight'
+    data/tasks/10 must have required property 'insight'
+    data/tasks/11 must have required property 'insight'
+    data/tasks/12 must have required property 'insight'
+    data/tasks/13 must have required property 'insight'
+    data/tasks/14 must have required property 'insight'
+    data/tasks/15 must have required property 'insight'
+    data/tasks/16 must have required property 'insight'
+    data/tasks/17 must have required property 'insight'
+    data/tasks/18 must have required property 'insight'
+    data/tasks/19 must have required property 'insight'
+    data/tasks/20 must have required property 'insight'
+    data/tasks/21 must have required property 'insight'
+    data/tasks/22 must have required property 'insight'
+    data/tasks/23 must have required property 'insight'
+    data/tasks/24 must have required property 'insight'
+    data/tasks/25 must have required property 'insight'
+    data/tasks/26 must have required property 'insight'
+    data/tasks/27 must have required property 'insight'
+    data/tasks/28 must have required property 'insight'
+    data/tasks/29 must have required property 'insight'
+    data/tasks/30 must have required property 'insight'
+    data/tasks/31 must have required property 'insight'
+    data/tasks/32 must have required property 'insight'
+    data/tasks/33 must have required property 'insight'
+    data/tasks/34 must have required property 'insight'
+    data/tasks/35 must have required property 'insight'
+    data/tasks/36 must have required property 'insight'
+    data/tasks/37 must have required property 'insight'
+    data/tasks/38 must have required property 'insight'
+    data/tasks/39 must have required property 'insight'
+    data/tasks/40 must have required property 'insight'
+    data/tasks/41 must have required property 'insight'
+    data/tasks/42 must have required property 'insight'
+    data/tasks/43 must have required property 'insight'
+    data/tasks/44 must have required property 'insight'
+    data/tasks/45 must have required property 'insight'
+    data/tasks/46 must have required property 'insight'
+    data/tasks/47 must have required property 'insight'
+    data/tasks/48 must have required property 'insight'
+    data/tasks/49 must have required property 'insight'
+    data/tasks/50 must have required property 'insight'
+    data/tasks/51 must have required property 'insight'
+    data/tasks/52 must have required property 'insight'
+    data/tasks/53 must have required property 'insight'
+    data/tasks/54 must have required property 'insight'
+    data/tasks/55 must have required property 'insight'
+    data/tasks/56 must have required property 'insight'
+    data/tasks/57 must have required property 'insight'
+    data/tasks/58 must have required property 'insight'
+    data/tasks/59 must have required property 'insight'
+    data/tasks/60 must have required property 'insight'
+    data/tasks/61 must have required property 'insight'
+    data/tasks/62 must have required property 'insight'
+    data/tasks/63 must have required property 'insight'
+    data/tasks/64 must have required property 'insight'
+    data/tasks/65 must have required property 'insight'
+    data/tasks/66 must have required property 'insight'
+    data/tasks/67 must have required property 'insight'
+    data/tasks/68 must have required property 'insight'
+    data/tasks/69 must have required property 'insight'
+    data/tasks/70 must have required property 'insight'
+    data/tasks/71 must have required property 'insight'
+    data/tasks/72 must have required property 'insight'
+    data/tasks/73 must have required property 'insight'
+    data/tasks/74 must have required property 'insight'
+    data/tasks/75 must have required property 'insight'
+    data/tasks/76 must have required property 'insight'
+    data/tasks/77 must have required property 'insight'
+    data/tasks/78 must have required property 'insight'
+    data/tasks/79 must have required property 'insight'
+    data/tasks/80 must have required property 'insight'
+    data/tasks/81 must have required property 'insight'
+    data/tasks/82 must have required property 'insight'
+    data/tasks/83 must have required property 'insight'
+    data/tasks/84 must have required property 'insight'
+    data/tasks/85 must have required property 'insight'
+    data/tasks/86 must have required property 'insight'
+    data/tasks/87 must have required property 'insight'
+    data/tasks/88 must have required property 'insight'
+    data/tasks/89 must have required property 'insight'
+    data/tasks/90 must have required property 'insight'
+    data/tasks/91 must have required property 'insight'
+    data/tasks/92 must have required property 'insight'
+    data/tasks/93 must have required property 'insight'
+    data/tasks/94 must have required property 'insight'
+    data/tasks/95 must have required property 'insight'
+    data/tasks/96 must have required property 'insight'
+    data/tasks/97 must have required property 'insight'
+    data/tasks/98 must have required property 'insight'
+    data/tasks/99 must have required property 'insight'
+    data/tasks/100 must have required property 'insight'
+    data/tasks/101 must have required property 'insight'
+    data/tasks/102 must have required property 'insight'
+    data/tasks/103 must have required property 'insight'
+    data/tasks/104 must have required property 'insight'
+    data/tasks/105 must have required property 'insight'
+    data/tasks/106 must have required property 'insight'
+    data/tasks/107 must have required property 'insight'
+    data/tasks/108 must have required property 'insight'
+    data/tasks/109 must have required property 'insight'
+    data/tasks/110 must have required property 'insight'
+    data/tasks/111 must have required property 'insight'
+    data/tasks/112 must have required property 'insight'
+    data/tasks/113 must have required property 'insight'
+    data/tasks/114 must have required property 'insight'
+    data/tasks/115 must have required property 'insight'
+    data/tasks/116 must have required property 'insight'
+    data/tasks/117 must have required property 'insight'
+    data/tasks/118 must have required property 'insight'
+    data/tasks/119 must have required property 'insight'
+    data/tasks/120 must have required property 'insight'
+    data/tasks/121 must have required property 'insight'
+    data/tasks/122 must have required property 'insight'
+    data/tasks/123 must have required property 'insight'
+    data/tasks/124 must have required property 'insight'
+    data/tasks/125 must have required property 'insight'
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      22 |
+      23 |   const { ok, errors } = validate('tasks', tasks);
+    > 24 |   expect(ok, `tasks.schema.json：${errors}`).toBe(true);
+         |                                             ^
+      25 |
+      26 |   const bad = [];
+      27 |   for (const t of tasks.tasks) {
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac03-ac04-ac29-tasks-json.spec.mjs:24:45
+
+    Error Context: test-results/ac03-ac04-ac29-tasks-json-AC3-課題集の全件が4要素を持ち所要時間が1〜15分-webkit/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac03-ac04-ac29-tasks-json-AC3-課題集の全件が4要素を持ち所要時間が1〜15分-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac03-ac04-ac29-tasks-json-AC3-課題集の全件が4要素を持ち所要時間が1〜15分-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  19) [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:35:1 › AC4_課題集は210件以上で初級と中級の12組が14件以上_上級の6組が7件以上_IDの重複が0件 
+
+    Error: 全体の件数（210 以上）
+
+    expect(received).toBeGreaterThanOrEqual(expected)
+
+    Expected: >= 210
+    Received:    126
+
+      43 |   testInfo.annotations.push({ type: '件数', description: `全体 ${n}、組ごと ${JSON.stringify(counts)}` });
+      44 |
+    > 45 |   expect(n, `全体の件数（${MIN_TOTAL} 以上）`).toBeGreaterThanOrEqual(MIN_TOTAL);
+         |                                       ^
+      46 |   expect(Object.keys(counts)).toHaveLength(18);
+      47 |   for (const [combo, c] of Object.entries(counts)) {
+      48 |     const level = combo.split('/')[1];
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac03-ac04-ac29-tasks-json.spec.mjs:45:39
+
+    Error Context: test-results/ac03-ac04-ac29-tasks-json--f946f-組が14件以上-上級の6組が7件以上-IDの重複が0件-webkit/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac03-ac04-ac29-tasks-json--f946f-組が14件以上-上級の6組が7件以上-IDの重複が0件-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac03-ac04-ac29-tasks-json--f946f-組が14件以上-上級の6組が7件以上-IDの重複が0件-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  20) [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:22:1 › AC5_完了するとtask.rateになり_答えるとtask.done_同じ日に再読み込みしてもtask.doneのままで_task.nextを押さない限りissuedは4のまま 
+
+    Error: その日の 1 件目
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "1"
+    Received: null
+
+      22 | test('AC5_完了するとtask.rateになり_答えるとtask.done_同じ日に再読み込みしてもtask.doneのままで_task.nextを押さない限りissuedは4のまま', async ({ context, page, baseURL }, testInfo) => {
+      23 |   const task = await openToday(context, page, baseURL);
+    > 24 |   expect(task.nthToday, 'その日の 1 件目').toBe('1');
+         |                                      ^
+      25 |   expect((await app.readStats(page))['data-stat-issued'], '開いた直後の issued').toBe(ISSUED_AFTER_OPEN);
+      26 |   await page.reload();
+      27 |   await app.expectState(page, 'task.today');
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac05-ac06-ac07-ac09-report.spec.mjs:24:38
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-09e17-task-nextを押さない限りissuedは4のまま-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac05-ac06-ac07-ac09-report-09e17-task-nextを押さない限りissuedは4のまま-webkit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-09e17-task-nextを押さない限りissuedは4のまま-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac05-ac06-ac07-ac09-report-09e17-task-nextを押さない限りissuedは4のまま-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  21) [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:52:1 › AC5_完了して答えずに再読み込みするとtask.doneになり_issuedは4のまま 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('task.next')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByTestId('task.next') with timeout 5000ms
+      - waiting for getByTestId('task.next')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      57 |   await app.expectState(page, 'task.done');
+      58 |   await expect(app.tid(page, 'task.today')).toHaveCount(0);
+    > 59 |   await expect(app.tid(page, 'task.next')).toHaveCount(1);
+         |                                            ^
+      60 |   expect((await app.readStats(page))['data-stat-issued']).toBe(ISSUED_AFTER_OPEN);
+      61 |   await page.reload();
+      62 |   await app.expectState(page, 'task.done');
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac05-ac06-ac07-ac09-report.spec.mjs:59:44
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-8216b-するとtask-doneになり-issuedは4のまま-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac05-ac06-ac07-ac09-report-8216b-するとtask-doneになり-issuedは4のまま-webkit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-8216b-するとtask-doneになり-issuedは4のまま-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac05-ac06-ac07-ac09-report-8216b-するとtask-doneになり-issuedは4のまま-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  22) [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:67:1 › AC6_翌日には過去に出した課題のIDと一致しない課題が出る ───
+
+    Error: 翌日の 1 件目
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "1"
+    Received: null
+
+      79 |   expect([...SEEDED_IDS, first.id]).not.toContain(next.id);
+      80 |   expect(next.area).toBe('backend');
+    > 81 |   expect(next.nthToday, '翌日の 1 件目').toBe('1');
+         |                                     ^
+      82 | });
+      83 |
+      84 | for (const [button, report] of [
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac05-ac06-ac07-ac09-report.spec.mjs:81:37
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-AC6-翌日には過去に出した課題のIDと一致しない課題が出る-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac05-ac06-ac07-ac09-report-AC6-翌日には過去に出した課題のIDと一致しない課題が出る-webkit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-AC6-翌日には過去に出した課題のIDと一致しない課題が出る-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac05-ac06-ac07-ac09-report-AC6-翌日には過去に出した課題のIDと一致しない課題が出る-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  23) [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:89:3 › AC7_too_hardを申告するとtask.skippedになり履歴に残り_再読み込みしてもtask.skippedのままで_task.nextを押さない限りissuedは4のまま 
+
+    Error: 「次の一手に進む」が 1 つ（押さない）
+
+    expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('task.next')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - 「次の一手に進む」が 1 つ（押さない） getByTestId('task.next') with timeout 5000ms
+      - waiting for getByTestId('task.next')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      91 |     await app.tid(page, button).click();
+      92 |     await app.expectState(page, 'task.skipped');
+    > 93 |     await expect(app.tid(page, 'task.next'), '「次の一手に進む」が 1 つ（押さない）').toHaveCount(1);
+         |                                                                      ^
+      94 |     await app.shot(page, testInfo, `AC7_task.skipped_${report}`);
+      95 |
+      96 |     await app.goHistory(page);
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac05-ac06-ac07-ac09-report.spec.mjs:93:70
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-c83ee-task-nextを押さない限りissuedは4のまま-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac05-ac06-ac07-ac09-report-c83ee-task-nextを押さない限りissuedは4のまま-webkit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-c83ee-task-nextを押さない限りissuedは4のまま-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac05-ac06-ac07-ac09-report-c83ee-task-nextを押さない限りissuedは4のまま-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  24) [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:89:3 › AC7_too_easyを申告するとtask.skippedになり履歴に残り_再読み込みしてもtask.skippedのままで_task.nextを押さない限りissuedは4のまま 
+
+    Error: 「次の一手に進む」が 1 つ（押さない）
+
+    expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('task.next')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - 「次の一手に進む」が 1 つ（押さない） getByTestId('task.next') with timeout 5000ms
+      - waiting for getByTestId('task.next')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      91 |     await app.tid(page, button).click();
+      92 |     await app.expectState(page, 'task.skipped');
+    > 93 |     await expect(app.tid(page, 'task.next'), '「次の一手に進む」が 1 つ（押さない）').toHaveCount(1);
+         |                                                                      ^
+      94 |     await app.shot(page, testInfo, `AC7_task.skipped_${report}`);
+      95 |
+      96 |     await app.goHistory(page);
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac05-ac06-ac07-ac09-report.spec.mjs:93:70
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-f10af-task-nextを押さない限りissuedは4のまま-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac05-ac06-ac07-ac09-report-f10af-task-nextを押さない限りissuedは4のまま-webkit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-f10af-task-nextを押さない限りissuedは4のまま-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac05-ac06-ac07-ac09-report-f10af-task-nextを押さない限りissuedは4のまま-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  25) [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:89:3 › AC7_no_timeを申告するとtask.skippedになり履歴に残り_再読み込みしてもtask.skippedのままで_task.nextを押さない限りissuedは4のまま 
+
+    Error: 「次の一手に進む」が 1 つ（押さない）
+
+    expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('task.next')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - 「次の一手に進む」が 1 つ（押さない） getByTestId('task.next') with timeout 5000ms
+      - waiting for getByTestId('task.next')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      91 |     await app.tid(page, button).click();
+      92 |     await app.expectState(page, 'task.skipped');
+    > 93 |     await expect(app.tid(page, 'task.next'), '「次の一手に進む」が 1 つ（押さない）').toHaveCount(1);
+         |                                                                      ^
+      94 |     await app.shot(page, testInfo, `AC7_task.skipped_${report}`);
+      95 |
+      96 |     await app.goHistory(page);
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac05-ac06-ac07-ac09-report.spec.mjs:93:70
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-faf7d-task-nextを押さない限りissuedは4のまま-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac05-ac06-ac07-ac09-report-faf7d-task-nextを押さない限りissuedは4のまま-webkit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac05-ac06-ac07-ac09-report-faf7d-task-nextを押さない限りissuedは4のまま-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac05-ac06-ac07-ac09-report-faf7d-task-nextを押さない限りissuedは4のまま-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  26) [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:53:3 › AC10_初級を出し終えて翌日に読み込むと_levelDoneと次の段階へ進むと別の領域を選ぶが出て_進むと同じ日にintermediateのtask.today 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('task.exhausted.levelDone')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByTestId('task.exhausted.levelDone') with timeout 5000ms
+      - waiting for getByTestId('task.exhausted.levelDone')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      56 |     const { nthAfterAdvance } = await reachExhausted({ context, page, baseURL, tasks, level: 'beginner', via });
+      57 |
+    > 58 |     await expect(app.tid(page, 'task.exhausted.levelDone')).toHaveCount(1);
+         |                                                             ^
+      59 |     await expect(app.tid(page, 'task.exhausted.levelDone')).toHaveText(app.fill(ja['task.exhausted.levelDone'], { area: ja[`area.${AREA}`], level: ja['level.beginner'] }));
+      60 |     await expect(app.tid(page, 'task.exhausted.allDone')).toHaveCount(0);
+      61 |     await expect(app.tid(page, 'task.exhausted.advance')).toHaveCount(1);
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac10-ac30-exhausted-external.spec.mjs:58:61
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac10-ac30-exhausted-extern-337f1-同じ日にintermediateのtask-today-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac10-ac30-exhausted-extern-337f1-同じ日にintermediateのtask-today-webkit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac10-ac30-exhausted-extern-337f1-同じ日にintermediateのtask-today-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac10-ac30-exhausted-extern-337f1-同じ日にintermediateのtask-today-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  27) [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:81:3 › AC10_上級を出し終えて翌日に読み込むと_allDoneと別の領域を選ぶが出て次の段階へ進むは0件_同じ領域と段階でやり直すと同じ日に再びtask.exhausted 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('task.exhausted.allDone')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByTestId('task.exhausted.allDone') with timeout 5000ms
+      - waiting for getByTestId('task.exhausted.allDone')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      84 |     await reachExhausted({ context, page, baseURL, tasks, level: 'advanced', via });
+      85 |
+    > 86 |     await expect(app.tid(page, 'task.exhausted.allDone')).toHaveCount(1);
+         |                                                           ^
+      87 |     await expect(app.tid(page, 'task.exhausted.allDone')).toHaveText(app.fill(ja['task.exhausted.allDone'], { area: ja[`area.${AREA}`] }));
+      88 |     await expect(app.tid(page, 'task.exhausted.levelDone')).toHaveCount(0);
+      89 |     await expect(app.tid(page, 'task.exhausted.advance')).toHaveCount(0);
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac10-ac30-exhausted-external.spec.mjs:86:59
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac10-ac30-exhausted-extern-49177-階でやり直すと同じ日に再びtask-exhausted-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac10-ac30-exhausted-extern-49177-階でやり直すと同じ日に再びtask-exhausted-webkit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac10-ac30-exhausted-extern-49177-階でやり直すと同じ日に再びtask-exhausted-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac10-ac30-exhausted-extern-49177-階でやり直すと同じ日に再びtask-exhausted-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  28) [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:53:3 › AC10_初級を出し終えて同じ日にtask.nextを押すと_levelDoneと次の段階へ進むと別の領域を選ぶが出て_進むと同じ日にintermediateのtask.today 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('task.next')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByTestId('task.next') with timeout 5000ms
+      - waiting for getByTestId('task.next')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+       at ../helpers/app.mjs:58
+
+      56 |  */
+      57 | export async function next(page, { to = 'task.today', timeout = WAIT_MS } = {}) {
+    > 58 |   await expect(tid(page, 'task.next')).toHaveCount(1);
+         |                                        ^
+      59 |   await tid(page, 'task.next').click();
+      60 |   await expectState(page, to, timeout);
+      61 | }
+        at Module.next (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/app.mjs:58:40)
+        at reachExhausted (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac10-ac30-exhausted-external.spec.mjs:46:13)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac10-ac30-exhausted-external.spec.mjs:56:33
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac10-ac30-exhausted-extern-5cf75-同じ日にintermediateのtask-today-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac10-ac30-exhausted-extern-5cf75-同じ日にintermediateのtask-today-webkit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac10-ac30-exhausted-extern-5cf75-同じ日にintermediateのtask-today-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac10-ac30-exhausted-extern-5cf75-同じ日にintermediateのtask-today-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  29) [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:81:3 › AC10_上級を出し終えて同じ日にtask.nextを押すと_allDoneと別の領域を選ぶが出て次の段階へ進むは0件_同じ領域と段階でやり直すと同じ日に再びtask.exhausted 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('task.next')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByTestId('task.next') with timeout 5000ms
+      - waiting for getByTestId('task.next')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+       at ../helpers/app.mjs:58
+
+      56 |  */
+      57 | export async function next(page, { to = 'task.today', timeout = WAIT_MS } = {}) {
+    > 58 |   await expect(tid(page, 'task.next')).toHaveCount(1);
+         |                                        ^
+      59 |   await tid(page, 'task.next').click();
+      60 |   await expectState(page, to, timeout);
+      61 | }
+        at Module.next (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/app.mjs:58:40)
+        at reachExhausted (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac10-ac30-exhausted-external.spec.mjs:46:13)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac10-ac30-exhausted-external.spec.mjs:84:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac10-ac30-exhausted-extern-d98f9-階でやり直すと同じ日に再びtask-exhausted-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac10-ac30-exhausted-extern-d98f9-階でやり直すと同じ日に再びtask-exhausted-webkit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac10-ac30-exhausted-extern-d98f9-階でやり直すと同じ日に再びtask-exhausted-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac10-ac30-exhausted-extern-d98f9-階でやり直すと同じ日に再びtask-exhausted-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  30) [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:103:1 › AC30_in_appを出し終えた翌日はexternalの課題が出て_印と要る道具が題名と同じ画面に見える 
+
+    Error: tasks.schema.json：data/tasks/0 must have required property 'insight'
+    data/tasks/1 must have required property 'insight'
+    data/tasks/2 must have required property 'insight'
+    data/tasks/3 must have required property 'insight'
+    data/tasks/4 must have required property 'insight'
+    data/tasks/5 must have required property 'insight'
+    data/tasks/6 must have required property 'insight'
+    data/tasks/7 must have required property 'insight'
+    data/tasks/8 must have required property 'insight'
+    data/tasks/9 must have required property 'insight'
+    data/tasks/10 must have required property 'insight'
+    data/tasks/11 must have required property 'insight'
+    data/tasks/12 must have required property 'insight'
+    data/tasks/13 must have required property 'insight'
+    data/tasks/14 must have required property 'insight'
+    data/tasks/15 must have required property 'insight'
+    data/tasks/16 must have required property 'insight'
+    data/tasks/17 must have required property 'insight'
+    data/tasks/18 must have required property 'insight'
+    data/tasks/19 must have required property 'insight'
+    data/tasks/20 must have required property 'insight'
+    data/tasks/21 must have required property 'insight'
+    data/tasks/22 must have required property 'insight'
+    data/tasks/23 must have required property 'insight'
+    data/tasks/24 must have required property 'insight'
+    data/tasks/25 must have required property 'insight'
+    data/tasks/26 must have required property 'insight'
+    data/tasks/27 must have required property 'insight'
+    data/tasks/28 must have required property 'insight'
+    data/tasks/29 must have required property 'insight'
+    data/tasks/30 must have required property 'insight'
+    data/tasks/31 must have required property 'insight'
+    data/tasks/32 must have required property 'insight'
+    data/tasks/33 must have required property 'insight'
+    data/tasks/34 must have required property 'insight'
+    data/tasks/35 must have required property 'insight'
+    data/tasks/36 must have required property 'insight'
+    data/tasks/37 must have required property 'insight'
+    data/tasks/38 must have required property 'insight'
+    data/tasks/39 must have required property 'insight'
+    data/tasks/40 must have required property 'insight'
+    data/tasks/41 must have required property 'insight'
+    data/tasks/42 must have required property 'insight'
+    data/tasks/43 must have required property 'insight'
+    data/tasks/44 must have required property 'insight'
+    data/tasks/45 must have required property 'insight'
+    data/tasks/46 must have required property 'insight'
+    data/tasks/47 must have required property 'insight'
+    data/tasks/48 must have required property 'insight'
+    data/tasks/49 must have required property 'insight'
+    data/tasks/50 must have required property 'insight'
+    data/tasks/51 must have required property 'insight'
+    data/tasks/52 must have required property 'insight'
+    data/tasks/53 must have required property 'insight'
+    data/tasks/54 must have required property 'insight'
+    data/tasks/55 must have required property 'insight'
+    data/tasks/56 must have required property 'insight'
+    data/tasks/57 must have required property 'insight'
+    data/tasks/58 must have required property 'insight'
+    data/tasks/59 must have required property 'insight'
+    data/tasks/60 must have required property 'insight'
+    data/tasks/61 must have required property 'insight'
+    data/tasks/62 must have required property 'insight'
+    data/tasks/63 must have required property 'insight'
+    data/tasks/64 must have required property 'insight'
+    data/tasks/65 must have required property 'insight'
+    data/tasks/66 must have required property 'insight'
+    data/tasks/67 must have required property 'insight'
+    data/tasks/68 must have required property 'insight'
+    data/tasks/69 must have required property 'insight'
+    data/tasks/70 must have required property 'insight'
+    data/tasks/71 must have required property 'insight'
+    data/tasks/72 must have required property 'insight'
+    data/tasks/73 must have required property 'insight'
+    data/tasks/74 must have required property 'insight'
+    data/tasks/75 must have required property 'insight'
+    data/tasks/76 must have required property 'insight'
+    data/tasks/77 must have required property 'insight'
+    data/tasks/78 must have required property 'insight'
+    data/tasks/79 must have required property 'insight'
+    data/tasks/80 must have required property 'insight'
+    data/tasks/81 must have required property 'insight'
+    data/tasks/82 must have required property 'insight'
+    data/tasks/83 must have required property 'insight'
+    data/tasks/84 must have required property 'insight'
+    data/tasks/85 must have required property 'insight'
+    data/tasks/86 must have required property 'insight'
+    data/tasks/87 must have required property 'insight'
+    data/tasks/88 must have required property 'insight'
+    data/tasks/89 must have required property 'insight'
+    data/tasks/90 must have required property 'insight'
+    data/tasks/91 must have required property 'insight'
+    data/tasks/92 must have required property 'insight'
+    data/tasks/93 must have required property 'insight'
+    data/tasks/94 must have required property 'insight'
+    data/tasks/95 must have required property 'insight'
+    data/tasks/96 must have required property 'insight'
+    data/tasks/97 must have required property 'insight'
+    data/tasks/98 must have required property 'insight'
+    data/tasks/99 must have required property 'insight'
+    data/tasks/100 must have required property 'insight'
+    data/tasks/101 must have required property 'insight'
+    data/tasks/102 must have required property 'insight'
+    data/tasks/103 must have required property 'insight'
+    data/tasks/104 must have required property 'insight'
+    data/tasks/105 must have required property 'insight'
+    data/tasks/106 must have required property 'insight'
+    data/tasks/107 must have required property 'insight'
+    data/tasks/108 must have required property 'insight'
+    data/tasks/109 must have required property 'insight'
+    data/tasks/110 must have required property 'insight'
+    data/tasks/111 must have required property 'insight'
+    data/tasks/112 must have required property 'insight'
+    data/tasks/113 must have required property 'insight'
+    data/tasks/114 must have required property 'insight'
+    data/tasks/115 must have required property 'insight'
+    data/tasks/116 must have required property 'insight'
+    data/tasks/117 must have required property 'insight'
+    data/tasks/118 must have required property 'insight'
+    data/tasks/119 must have required property 'insight'
+    data/tasks/120 must have required property 'insight'
+    data/tasks/121 must have required property 'insight'
+    data/tasks/122 must have required property 'insight'
+    data/tasks/123 must have required property 'insight'
+    data/tasks/124 must have required property 'insight'
+    data/tasks/125 must have required property 'insight'
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      107 |   // 課題集そのものが本物（tasks.schema.json に通り、AC-4（PRD r11）の量：210 件以上、初級と中級は 14 以上、上級は 7 以上）であることを先に確かめる。
+      108 |   const { ok, errors } = validate('tasks', tasks);
+    > 109 |   expect(ok, `tasks.schema.json：${errors}`).toBe(true);
+          |                                             ^
+      110 |   expect(tasks.tasks.length, '課題集の件数（210 以上）').toBeGreaterThanOrEqual(210);
+      111 |   for (const a of AREAS) for (const l of LEVELS) expect(tasksOf(tasks, a, l).length, `組 ${a}/${l} の件数`).toBeGreaterThanOrEqual(l === 'advanced' ? 7 : 14);
+      112 |
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac10-ac30-exhausted-external.spec.mjs:109:45
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac10-ac30-exhausted-extern-f09fe-alの課題が出て-印と要る道具が題名と同じ画面に見える-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac10-ac30-exhausted-extern-f09fe-alの課題が出て-印と要る道具が題名と同じ画面に見える-webkit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac10-ac30-exhausted-extern-f09fe-alの課題が出て-印と要る道具が題名と同じ画面に見える-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac10-ac30-exhausted-extern-f09fe-alの課題が出て-印と要る道具が題名と同じ画面に見える-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  31) [webkit] › tests/ac12-ac23-offline.spec.mjs:12:1 › AC12_オフラインでもAC-1_AC-2_AC-5_AC-9_AC-33の操作が動き_送信は0件 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('task.next')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByTestId('task.next') with timeout 5000ms
+      - waiting for getByTestId('task.next')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+       at ../helpers/app.mjs:58
+
+      56 |  */
+      57 | export async function next(page, { to = 'task.today', timeout = WAIT_MS } = {}) {
+    > 58 |   await expect(tid(page, 'task.next')).toHaveCount(1);
+         |                                        ^
+      59 |   await tid(page, 'task.next').click();
+      60 |   await expectState(page, to, timeout);
+      61 | }
+        at Module.next (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/helpers/app.mjs:58:40)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac12-ac23-offline.spec.mjs:39:13
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac12-ac23-offline-AC12-オフラ-add47-AC-5-AC-9-AC-33の操作が動き-送信は0件-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac12-ac23-offline-AC12-オフラ-add47-AC-5-AC-9-AC-33の操作が動き-送信は0件-webkit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac12-ac23-offline-AC12-オフラ-add47-AC-5-AC-9-AC-33の操作が動き-送信は0件-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac12-ac23-offline-AC12-オフラ-add47-AC-5-AC-9-AC-33の操作が動き-送信は0件-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  32) [webkit] › tests/ac14-ac16-redo-delete.spec.mjs:44:1 › AC14_今日の課題が出ている日に設定からやり直して別の領域を選んでも_同じdata-task-idのtask.todayのままで完了の履歴は3件_完了してtask.nextを押すと同じ日に新しい領域の課題が出る 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: "1"
+    Received: null
+
+      59 |   expect(before.id).toBeTruthy();
+      60 |   expect(before.area).toBe('backend');
+    > 61 |   expect(before.nthToday).toBe('1');
+         |                           ^
+      62 |   testInfo.annotations.push({ type: 'やり直しの前', description: `2026-11-04 の task.today：${before.id}（${before.area}/${before.level}）` });
+      63 |
+      64 |   // When：設定から診断をやり直し、別の領域（frontend）を選んで 3 問に答える
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac14-ac16-redo-delete.spec.mjs:61:27
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac14-ac16-redo-delete-AC14-7a5ce-ask-nextを押すと同じ日に新しい領域の課題が出る-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac14-ac16-redo-delete-AC14-7a5ce-ask-nextを押すと同じ日に新しい領域の課題が出る-webkit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac14-ac16-redo-delete-AC14-7a5ce-ask-nextを押すと同じ日に新しい領域の課題が出る-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac14-ac16-redo-delete-AC14-7a5ce-ask-nextを押すと同じ日に新しい領域の課題が出る-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  33) [webkit] › tests/ac24-stats.spec.mjs:23:1 › AC24_統計の11の値が期待どおりで_数値9つと日付1つは同じ文字が見え_真偽値はfirstDayCompleted.yesの文言が見える 
+
+    Error: settings.stats.daysCompletedWeek.value
+
+    expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('settings.stats.daysCompletedWeek.value')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - settings.stats.daysCompletedWeek.value getByTestId('settings.stats.daysCompletedWeek.value') with timeout 5000ms
+      - waiting for getByTestId('settings.stats.daysCompletedWeek.value')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      39 |   for (const [testId, [attr, value]] of Object.entries(EXPECTED)) {
+      40 |     const dd = app.tid(page, testId);
+    > 41 |     await expect(dd, testId).toHaveCount(1);
+         |                              ^
+      42 |     await expect(dd, `${attr}`).toHaveAttribute(attr, value);
+      43 |     if (attr === 'data-stat-first-day-completed') {
+      44 |       await expect(dd).toHaveText(ja['settings.stats.firstDayCompleted.yes']);
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac24-stats.spec.mjs:41:30
+
+    attachment #1: AC24_settings.stats (image/png) ─────────────────────────────────────────────────
+    test-results/ac24-stats-AC24-統計の11の値が期待-21d6f-irstDayCompleted-yesの文言が見える-webkit/attachments/AC24-settings-stats-550461a28a1e91fad07415ff30c5406c34d883fc.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac24-stats-AC24-統計の11の値が期待-21d6f-irstDayCompleted-yesの文言が見える-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac24-stats-AC24-統計の11の値が期待-21d6f-irstDayCompleted-yesの文言が見える-webkit/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac24-stats-AC24-統計の11の値が期待-21d6f-irstDayCompleted-yesの文言が見える-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac24-stats-AC24-統計の11の値が期待-21d6f-irstDayCompleted-yesの文言が見える-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  34) [webkit] › tests/design-d30-day-changed.spec.mjs:114:1 › DESIGN_D30_最後の課題を開いたまま翌日になった後に完了を押すと_task.exhaustedの先頭にtask.dayChangedが1件でフォーカスがあり_前の課題はnoneの行に移る 
+
+    Error: task.dayChanged が task.exhausted.levelDone より前にある
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: null
+
+      31 |     firstTestIdOfScreen,
+      32 |   );
+    > 33 |   expect(precedes, `task.dayChanged が ${firstTestIdOfScreen} より前にある`).toBe(true);
+         |                                                                       ^
+      34 | }
+      35 |
+      36 | /** 知らせのある S3 を作る：seed-ac14 を 11-04 23:55 に開き、11-05 0:05 に固定して読み込まずに task.report.done（design 2 の表の下の手順、W-3）。前の課題と翌日の課題の素性を返す。 */
+        at expectDayChangedNotice (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/design-d30-day-changed.spec.mjs:33:71)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/design-d30-day-changed.spec.mjs:138:3
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/design-d30-day-changed-DES-d825e-が1件でフォーカスがあり-前の課題はnoneの行に移る-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/design-d30-day-changed-DES-d825e-が1件でフォーカスがあり-前の課題はnoneの行に移る-webkit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/design-d30-day-changed-DES-d825e-が1件でフォーカスがあり-前の課題はnoneの行に移る-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/design-d30-day-changed-DES-d825e-が1件でフォーカスがあり-前の課題はnoneの行に移る-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  34 failed
+    [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:17:1 › AC3_課題集の全件が4要素を持ち所要時間が1〜15分 ───────
+    [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:35:1 › AC4_課題集は210件以上で初級と中級の12組が14件以上_上級の6組が7件以上_IDの重複が0件 
+    [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:22:1 › AC5_完了するとtask.rateになり_答えるとtask.done_同じ日に再読み込みしてもtask.doneのままで_task.nextを押さない限りissuedは4のまま 
+    [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:52:1 › AC5_完了して答えずに再読み込みするとtask.doneになり_issuedは4のまま 
+    [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:67:1 › AC6_翌日には過去に出した課題のIDと一致しない課題が出る ───
+    [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:89:3 › AC7_too_hardを申告するとtask.skippedになり履歴に残り_再読み込みしてもtask.skippedのままで_task.nextを押さない限りissuedは4のまま 
+    [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:89:3 › AC7_too_easyを申告するとtask.skippedになり履歴に残り_再読み込みしてもtask.skippedのままで_task.nextを押さない限りissuedは4のまま 
+    [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:89:3 › AC7_no_timeを申告するとtask.skippedになり履歴に残り_再読み込みしてもtask.skippedのままで_task.nextを押さない限りissuedは4のまま 
+    [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:53:3 › AC10_初級を出し終えて翌日に読み込むと_levelDoneと次の段階へ進むと別の領域を選ぶが出て_進むと同じ日にintermediateのtask.today 
+    [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:81:3 › AC10_上級を出し終えて翌日に読み込むと_allDoneと別の領域を選ぶが出て次の段階へ進むは0件_同じ領域と段階でやり直すと同じ日に再びtask.exhausted 
+    [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:53:3 › AC10_初級を出し終えて同じ日にtask.nextを押すと_levelDoneと次の段階へ進むと別の領域を選ぶが出て_進むと同じ日にintermediateのtask.today 
+    [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:81:3 › AC10_上級を出し終えて同じ日にtask.nextを押すと_allDoneと別の領域を選ぶが出て次の段階へ進むは0件_同じ領域と段階でやり直すと同じ日に再びtask.exhausted 
+    [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:103:1 › AC30_in_appを出し終えた翌日はexternalの課題が出て_印と要る道具が題名と同じ画面に見える 
+    [chromium] › tests/ac12-ac23-offline.spec.mjs:12:1 › AC12_オフラインでもAC-1_AC-2_AC-5_AC-9_AC-33の操作が動き_送信は0件 
+    [chromium] › tests/ac14-ac16-redo-delete.spec.mjs:44:1 › AC14_今日の課題が出ている日に設定からやり直して別の領域を選んでも_同じdata-task-idのtask.todayのままで完了の履歴は3件_完了してtask.nextを押すと同じ日に新しい領域の課題が出る 
+    [chromium] › tests/ac24-stats.spec.mjs:23:1 › AC24_統計の11の値が期待どおりで_数値9つと日付1つは同じ文字が見え_真偽値はfirstDayCompleted.yesの文言が見える 
+    [chromium] › tests/design-d30-day-changed.spec.mjs:114:1 › DESIGN_D30_最後の課題を開いたまま翌日になった後に完了を押すと_task.exhaustedの先頭にtask.dayChangedが1件でフォーカスがあり_前の課題はnoneの行に移る 
+    [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:17:1 › AC3_課題集の全件が4要素を持ち所要時間が1〜15分 ─────────
+    [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:35:1 › AC4_課題集は210件以上で初級と中級の12組が14件以上_上級の6組が7件以上_IDの重複が0件 
+    [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:22:1 › AC5_完了するとtask.rateになり_答えるとtask.done_同じ日に再読み込みしてもtask.doneのままで_task.nextを押さない限りissuedは4のまま 
+    [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:52:1 › AC5_完了して答えずに再読み込みするとtask.doneになり_issuedは4のまま 
+    [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:67:1 › AC6_翌日には過去に出した課題のIDと一致しない課題が出る ─────
+    [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:89:3 › AC7_too_hardを申告するとtask.skippedになり履歴に残り_再読み込みしてもtask.skippedのままで_task.nextを押さない限りissuedは4のまま 
+    [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:89:3 › AC7_too_easyを申告するとtask.skippedになり履歴に残り_再読み込みしてもtask.skippedのままで_task.nextを押さない限りissuedは4のまま 
+    [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:89:3 › AC7_no_timeを申告するとtask.skippedになり履歴に残り_再読み込みしてもtask.skippedのままで_task.nextを押さない限りissuedは4のまま 
+    [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:53:3 › AC10_初級を出し終えて翌日に読み込むと_levelDoneと次の段階へ進むと別の領域を選ぶが出て_進むと同じ日にintermediateのtask.today 
+    [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:81:3 › AC10_上級を出し終えて翌日に読み込むと_allDoneと別の領域を選ぶが出て次の段階へ進むは0件_同じ領域と段階でやり直すと同じ日に再びtask.exhausted 
+    [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:53:3 › AC10_初級を出し終えて同じ日にtask.nextを押すと_levelDoneと次の段階へ進むと別の領域を選ぶが出て_進むと同じ日にintermediateのtask.today 
+    [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:81:3 › AC10_上級を出し終えて同じ日にtask.nextを押すと_allDoneと別の領域を選ぶが出て次の段階へ進むは0件_同じ領域と段階でやり直すと同じ日に再びtask.exhausted 
+    [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:103:1 › AC30_in_appを出し終えた翌日はexternalの課題が出て_印と要る道具が題名と同じ画面に見える 
+    [webkit] › tests/ac12-ac23-offline.spec.mjs:12:1 › AC12_オフラインでもAC-1_AC-2_AC-5_AC-9_AC-33の操作が動き_送信は0件 
+    [webkit] › tests/ac14-ac16-redo-delete.spec.mjs:44:1 › AC14_今日の課題が出ている日に設定からやり直して別の領域を選んでも_同じdata-task-idのtask.todayのままで完了の履歴は3件_完了してtask.nextを押すと同じ日に新しい領域の課題が出る 
+    [webkit] › tests/ac24-stats.spec.mjs:23:1 › AC24_統計の11の値が期待どおりで_数値9つと日付1つは同じ文字が見え_真偽値はfirstDayCompleted.yesの文言が見える 
+    [webkit] › tests/design-d30-day-changed.spec.mjs:114:1 › DESIGN_D30_最後の課題を開いたまま翌日になった後に完了を押すと_task.exhaustedの先頭にtask.dayChangedが1件でフォーカスがあり_前の課題はnoneの行に移る 
+  36 passed (36.3s)
+exit=1

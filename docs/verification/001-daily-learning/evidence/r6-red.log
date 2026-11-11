@@ -1,0 +1,755 @@
+# r6 の赤の証拠（実装の前。design r6 と契約の更新（3b7068a、3689e3d）に合わせて受け入れテストを直した後の実行）
+# 日時：2026-11-03T15:24:43Z  コミット：b9b37e1（作業ツリー：受け入れテストの変更は未コミット）  node v24.22.1  @playwright/test 1.64.1
+# コマンド：cd backend/tests/acceptance && npx playwright test --retries=0 --reporter=list
+
+npm notice run npx
+npm notice run 'playwright' test --retries=0 --reporter=list
+
+Running 145 tests using 5 workers
+
+  ✓    5 [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:13:1 › AC3_課題集の全件が4要素を持ち所要時間が1〜15分 (54ms)
+  ✓    6 [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:31:1 › AC4_課題集は126件以上で18組すべて7件以上でIDの重複が0件 (13ms)
+  ✓    7 [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:47:1 › BUDGET2_課題集の本文の平均600字以下_gzip後106000バイト以下 (13ms)
+  ✓    8 [chromium] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:62:1 › AC29_各組でexternalが20%以下_in_appにURLもtoolsもなく_externalはtoolsが1件以上 (9ms)
+  ✓    9 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:20:1 › AC5_完了するとtask.rateになり_答えるとtask.done_同じ日に再読み込みしてもtask.doneのまま (1.1s)
+  ✓    1 [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_git_advanced (1.1s)
+  ✓    4 [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_backend_intermediate (1.2s)
+  ✓    2 [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_frontend_beginner (1.2s)
+  ✓    3 [chromium] › tests/ac01-ac02-diagnosis.spec.mjs:12:1 › AC1_初めて開くと診断が始まり3問で終わる_進み具合n/3_切り替え500ms以内 (1.3s)
+  ✓   10 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:40:1 › AC6_翌日には過去に出した課題のIDと一致しない課題が出る (452ms)
+  ✓   11 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_too_hardを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない (588ms)
+  ✓   12 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_too_easyを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない (737ms)
+  ✓   14 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:78:1 › AC9_役に立ったを選ぶとtask.doneになり_再び聞かれず_履歴のdata-helpfulがhelpful (726ms)
+  ✓   13 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_no_timeを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない (793ms)
+  ✓   15 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:92:1 › AC9_立たなかったを選ぶと履歴のdata-helpfulがnot_helpful (544ms)
+  ✓   16 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:103:1 › AC9_選ばずに再読み込みするとtask.doneになり_履歴のdata-helpfulがunanswered (616ms)
+  ✓   18 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_1通り目_中で難しすぎ難しすぎ→初 (653ms)
+  ✓   19 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_2通り目_中で簡単すぎ簡単すぎ→上 (644ms)
+  ✓   17 [chromium] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:116:1 › AC9_今回は答えないを押すとtask.doneになり_履歴のdata-helpfulがunanswered (768ms)
+  ✓   20 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_3通り目_中で難しすぎ1回だけ→中のまま (720ms)
+  ✓   21 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_4通り目_中で簡単すぎ1回だけ→中のまま (678ms)
+  ✓   22 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_5a通り目_中で難しすぎ完了難しすぎ→中のまま (763ms)
+  ✓   23 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_5b通り目_中で難しすぎ今日はできない難しすぎ→中のまま (743ms)
+  ✓   24 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_6通り目_初で難しすぎ2回連続→初のまま (775ms)
+  ✓   25 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_7通り目_上で簡単すぎ2回連続→上のまま (710ms)
+  ✓   26 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_8通り目_中で難しすぎ_none_難しすぎ→初（noneは数えず流れも切らない） (600ms)
+  ✓   27 [chromium] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_9通り目_上で2回難しすぎで中になった翌日に中で難しすぎ1回→中のまま (492ms)
+  ✓   29 [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:33:1 › AC30_in_appを出し終えた翌日はexternalの課題が出て_印と要る道具が題名と同じ画面に見える (491ms)
+  ✓   30 [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:77:1 › AC30_in_appの課題を出した日はdata-task-modeがin_appで印が0件 (398ms)
+  ✓   28 [chromium] › tests/ac10-ac30-exhausted-external.spec.mjs:12:1 › AC10_課題が尽きるとtask.exhaustedと文言とやり直しの操作が出て_同じ領域と段階でやり直すと同じ日に再びtask.exhausted (706ms)
+  ✓   31 [chromium] › tests/ac11-ac13-storage.spec.mjs:8:1 › AC11_2問目の保存が失敗してもerror.storage.messageと選択が残り_やり直すと3問目に進み課題が回答と一致する (662ms)
+  ✓   35 [chromium] › tests/ac12-ac23-offline.spec.mjs:112:1 › AC23_task.todayを表示した後にオフラインで再読み込みと新しいタブ_3秒以内に同じdata-task-id_送信0件 (527ms)
+  ✘   32 [chromium] › tests/ac11-ac13-storage.spec.mjs:44:1 › AC13_persistを断られても完了と再読み込みでtask.done_履歴1件_設定にnotPersistedと書き出しがある (691ms)
+  ✓   34 [chromium] › tests/ac12-ac23-offline.spec.mjs:47:1 › AC12_オフラインでもAC-7の申告が動き_送信は0件 (722ms)
+  ✓   36 [chromium] › tests/ac12-ac23-offline.spec.mjs:120:1 › AC23_task.doneを表示した後にオフラインで再読み込みと新しいタブ_3秒以内にtask.done_送信0件 (409ms)
+  ✓   33 [chromium] › tests/ac12-ac23-offline.spec.mjs:12:1 › AC12_オフラインでもAC-1_AC-2_AC-5_AC-9の操作が動き_送信は0件 (826ms)
+  ✓   40 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:72:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_diagnosis.start_横スクロール0_切り詰め0_操作できる要素がすべて押せる (433ms)
+  ✓   37 [chromium] › tests/ac14-ac16-redo-delete.spec.mjs:6:1 › AC14_今日の課題を出していない日に設定からやり直して別の領域を選ぶと_新しい領域の課題が出て完了の履歴は3件のまま (738ms)
+  ✓   38 [chromium] › tests/ac14-ac16-redo-delete.spec.mjs:100:1 › AC16_すべてのデータを削除すると再読み込みでdiagnosis.startになり_やり直した後の履歴は0件 (749ms)
+  ✓   44 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:72:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.exhausted_横スクロール0_切り詰め0_操作できる要素がすべて押せる (608ms)
+  ✓   43 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:72:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.done_横スクロール0_切り詰め0_操作できる要素がすべて押せる (673ms)
+  ✓   42 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:72:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.today_横スクロール0_切り詰め0_操作できる要素がすべて押せる (875ms)
+  ✓   45 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:115:1 › AC18_移動キー(Tab系)とEnter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上 (846ms)
+  ✓   41 [chromium] › tests/ac14-ac16-redo-delete.spec.mjs:44:1 › AC14_今日の課題が出ている日に設定からやり直して別の領域を選んでも_その日は同じdata-task-idのtask.todayのままで完了の履歴は3件_翌日は新しい領域の課題が出る (1.6s)
+  ✓   46 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:174:3 › AC27_diagnosis.start_axe-coreでserious以上の違反が0件 (1.2s)
+  ✓   47 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:174:3 › AC27_diagnosis.question_axe-coreでserious以上の違反が0件 (1.3s)
+  ✓   48 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:174:3 › AC27_task.today_axe-coreでserious以上の違反が0件 (885ms)
+  ✓   49 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:174:3 › AC27_task.done_axe-coreでserious以上の違反が0件 (900ms)
+  ✓   50 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:174:3 › AC27_task.exhausted_axe-coreでserious以上の違反が0件 (827ms)
+  ✓   51 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:174:3 › AC27_settings_axe-coreでserious以上の違反が0件 (925ms)
+  ✓   53 [chromium] › tests/ac19-ac20-ac25-export-import.spec.mjs:12:1 › AC19_書き出すとJSONが1つダウンロードされ_診断_段階_履歴3件（50文字のanswer）_初めて開いた日_版番号を含む (846ms)
+  ✓   55 [chromium] › tests/ac19-ac20-ac25-export-import.spec.mjs:91:1 › AC25_版番号が新しいファイルはerror.import.messageで拒み_履歴1件と診断と状態は変わらない (438ms)
+  ✓   54 [chromium] › tests/ac19-ac20-ac25-export-import.spec.mjs:48:1 › AC20_保存データのないブラウザで読み込むと_診断と段階が同じで履歴3件（answerも同じ）_状態はtask.todayかtask.done (797ms)
+  ✓   57 [chromium] › tests/ac21-ac22-home-screen.spec.mjs:47:3 › AC-21 iPadOS の Safari の偽装（Mac の UA と maxTouchPoints > 1） › AC21_iPadOS_Safari（MacのUAとmaxTouchPoints5）でも診断の前に案内が出る (192ms)
+  ✓   58 [chromium] › tests/ac21-ac22-home-screen.spec.mjs:58:1 › AC21_UAを偽装しないChromiumとWebKitでは案内が0回出る (307ms)
+  ✓   59 [chromium] › tests/ac21-ac22-home-screen.spec.mjs:70:1 › AC22_スタンドアロンで初めて開くと読み込みの案内が出て_再読み込みでも出て_ファイルを読み込むとAC-20の状態になる (562ms)
+  ✓   56 [chromium] › tests/ac21-ac22-home-screen.spec.mjs:21:3 › AC-21 iPhone の Safari の偽装 › AC21_iOS_Safariでは診断の前に案内が出て_閉じると再読み込みしても出ず_設定から再び開ける (802ms)
+  ✓   60 [chromium] › tests/ac24-stats.spec.mjs:18:1 › AC24_統計の9つの値が期待どおりで_数値7つと日付1つは同じ文字が見え_真偽値はfirstDayCompleted.yesの文言が見える (370ms)
+  ✘   62 [chromium] › tests/ac26-language.spec.mjs:47:3 › AC-26 locale ja-JP › AC26_ja-JPではdiagnosis.startの文言が日本語の文言ファイルと一致する (140ms)
+  ✘   61 [chromium] › tests/ac26-language.spec.mjs:40:3 › AC-26 locale en-US › AC26_en-USではdiagnosis.startの文言が英語の文言ファイルと一致し_キーの差が0件 (148ms)
+  ✓   39 [chromium] › tests/ac15-load-time.spec.mjs:7:1 › AC15_遅い回線とCPU4倍の制限でキャッシュなしに開き_data-debug-load-msが5回とも2000以下 (5.7s)
+  ✓   65 [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:51:1 › AC31_今日の課題を完了済みなら操作0回でtask.doneが見え_重なる要素0件 (318ms)
+  ✓   64 [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:31:1 › AC31_診断済みで開くと操作0回でtask.todayが見え_題名と4要素と答えの欄と4つの申告が同じ画面にあり_重なる要素0件 (369ms)
+  ✓   66 [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:79:1 › AC32_200文字を入力して再読み込みすると_同じdata-task-idで答えがそのまま入っている (673ms)
+  ✓   67 [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:88:1 › AC32_200文字を入力してタブを閉じ新しいタブで開くと_同じdata-task-idで答えがそのまま入っている (653ms)
+  ✘   70 [chromium] › tests/design-d30-day-changed.spec.mjs:34:1 › DESIGN_D30_画面を開いたまま翌日になった後に完了を押すと_翌日のS3の先頭にtask.dayChangedが1件でフォーカスがあり_入力では消えず_次の操作と再読み込みで消える (88ms)
+  ✓   68 [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:98:1 › AC32_翌日に開くと新しい課題の答えの欄は空で_前日の200文字は書き出しのnoneの行のanswerに残る (736ms)
+  ✓   69 [chromium] › tests/ac31-ac32-zero-ops-answer.spec.mjs:117:1 › AC32_画面を開いたまま翌日になった後に読み込まずに完了を押すと_完了は記録されず翌日の課題の答えの欄は空で_前日の200文字は書き出しのnoneの行のanswerに残る (812ms)
+  ✘   52 [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:174:3 › AC27_task.today.dayChanged_axe-coreでserious以上の違反が0件 (5.3s)
+  ✓   74 [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:12:1 › AC1_初めて開くと診断が始まり3問で終わる_進み具合n/3_切り替え500ms以内 (1.3s)
+  ✓   75 [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_backend_intermediate (653ms)
+  ✓   76 [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_frontend_beginner (633ms)
+  ✘   71 [chromium] › tests/design-d30-day-changed.spec.mjs:95:1 › DESIGN_D30_最後の課題を開いたまま翌日になった後に完了を押すと_task.exhaustedの先頭にtask.dayChangedが1件でフォーカスがあり_前の課題はnoneの行に移る (5.2s)
+  ✓   63 [chromium] › tests/ac28-update.spec.mjs:17:1 › AC28_差し替え後2秒おきの再読み込み3回以内でdata-build-versionが新版になり_旧版に戻らず_履歴3件と診断と段階は同じ (7.3s)
+  ✓   78 [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:13:1 › AC3_課題集の全件が4要素を持ち所要時間が1〜15分 (57ms)
+  ✓   79 [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:47:1 › BUDGET2_課題集の本文の平均600字以下_gzip後106000バイト以下 (11ms)
+  ✓   80 [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:62:1 › AC29_各組でexternalが20%以下_in_appにURLもtoolsもなく_externalはtoolsが1件以上 (15ms)
+  ✓   77 [webkit] › tests/ac01-ac02-diagnosis.spec.mjs:78:3 › AC2_診断を終えると1秒以内に課題が1件出て領域と段階が一致する_git_advanced (630ms)
+  ✘   72 [chromium] › tests/design-d30-day-changed.spec.mjs:70:1 › DESIGN_D30_task.rateのまま翌日になった後に役に立ったを押すと_評価は記録されずhelpfulはunansweredのままで_翌日のS3にtask.dayChangedが1件 (5.4s)
+  ✘   73 [chromium] › tests/design-d30-day-changed.spec.mjs:129:1 › DESIGN_U15_初回の診断の2問目を23時59分に出して0時1分に確定すると_そのまま3問目に進み_firstOpenDateは1問目の日でcompletedOnと課題の日付は確定した日 (5.3s)
+  ✓   83 [webkit] › tests/ac03-ac04-ac29-tasks-json.spec.mjs:31:1 › AC4_課題集は126件以上で18組すべて7件以上でIDの重複が0件 (68ms)
+  ✓   82 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:40:1 › AC6_翌日には過去に出した課題のIDと一致しない課題が出る (618ms)
+  ✓   81 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:20:1 › AC5_完了するとtask.rateになり_答えるとtask.done_同じ日に再読み込みしてもtask.doneのまま (1.3s)
+  ✓   87 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:78:1 › AC9_役に立ったを選ぶとtask.doneになり_再び聞かれず_履歴のdata-helpfulがhelpful (1.1s)
+  ✓   84 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_no_timeを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない (1.3s)
+  ✓   85 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_too_hardを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない (1.2s)
+  ✓   88 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:92:1 › AC9_立たなかったを選ぶと履歴のdata-helpfulがnot_helpful (683ms)
+  ✓   86 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:61:3 › AC7_too_easyを申告するとtask.skippedになり履歴に残り_再読み込みしても新しい課題は出ない (1.1s)
+  ✓   89 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:103:1 › AC9_選ばずに再読み込みするとtask.doneになり_履歴のdata-helpfulがunanswered (728ms)
+  ✓   90 [webkit] › tests/ac05-ac06-ac07-ac09-report.spec.mjs:116:1 › AC9_今回は答えないを押すとtask.doneになり_履歴のdata-helpfulがunanswered (750ms)
+  ✓   91 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_1通り目_中で難しすぎ難しすぎ→初 (707ms)
+  ✓   92 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_2通り目_中で簡単すぎ簡単すぎ→上 (643ms)
+  ✓   93 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_3通り目_中で難しすぎ1回だけ→中のまま (692ms)
+  ✓   94 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_4通り目_中で簡単すぎ1回だけ→中のまま (624ms)
+  ✓   95 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_5a通り目_中で難しすぎ完了難しすぎ→中のまま (737ms)
+  ✓   96 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_5b通り目_中で難しすぎ今日はできない難しすぎ→中のまま (789ms)
+  ✓   97 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_6通り目_初で難しすぎ2回連続→初のまま (797ms)
+  ✓   98 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_7通り目_上で簡単すぎ2回連続→上のまま (757ms)
+  ✓   99 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_8通り目_中で難しすぎ_none_難しすぎ→初（noneは数えず流れも切らない） (648ms)
+  ✓  100 [webkit] › tests/ac08-level-rule.spec.mjs:25:3 › AC8_9通り目_上で2回難しすぎで中になった翌日に中で難しすぎ1回→中のまま (707ms)
+  ✓  103 [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:77:1 › AC30_in_appの課題を出した日はdata-task-modeがin_appで印が0件 (538ms)
+  ✓  102 [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:33:1 › AC30_in_appを出し終えた翌日はexternalの課題が出て_印と要る道具が題名と同じ画面に見える (614ms)
+  ✓  101 [webkit] › tests/ac10-ac30-exhausted-external.spec.mjs:12:1 › AC10_課題が尽きるとtask.exhaustedと文言とやり直しの操作が出て_同じ領域と段階でやり直すと同じ日に再びtask.exhausted (874ms)
+  ✓  104 [webkit] › tests/ac11-ac13-storage.spec.mjs:8:1 › AC11_2問目の保存が失敗してもerror.storage.messageと選択が残り_やり直すと3問目に進み課題が回答と一致する (867ms)
+  ✓  107 [webkit] › tests/ac12-ac23-offline.spec.mjs:47:1 › AC12_オフラインでもAC-7の申告が動き_送信は0件 (877ms)
+  ✘  105 [webkit] › tests/ac11-ac13-storage.spec.mjs:44:1 › AC13_persistを断られても完了と再読み込みでtask.done_履歴1件_設定にnotPersistedと書き出しがある (851ms)
+  ✓  106 [webkit] › tests/ac12-ac23-offline.spec.mjs:12:1 › AC12_オフラインでもAC-1_AC-2_AC-5_AC-9の操作が動き_送信は0件 (1.0s)
+  ✓  108 [webkit] › tests/ac12-ac23-offline.spec.mjs:112:1 › AC23_task.todayを表示した後にオフラインで再読み込みと新しいタブ_3秒以内に同じdata-task-id_送信0件 (969ms)
+  ✓  109 [webkit] › tests/ac12-ac23-offline.spec.mjs:120:1 › AC23_task.doneを表示した後にオフラインで再読み込みと新しいタブ_3秒以内にtask.done_送信0件 (815ms)
+  ✓  112 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:72:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_diagnosis.start_横スクロール0_切り詰め0_操作できる要素がすべて押せる (592ms)
+  ✓  110 [webkit] › tests/ac14-ac16-redo-delete.spec.mjs:6:1 › AC14_今日の課題を出していない日に設定からやり直して別の領域を選ぶと_新しい領域の課題が出て完了の履歴は3件のまま (1.1s)
+  ✓  111 [webkit] › tests/ac14-ac16-redo-delete.spec.mjs:100:1 › AC16_すべてのデータを削除すると再読み込みでdiagnosis.startになり_やり直した後の履歴は0件 (1.1s)
+  ✓  113 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:72:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.today_横スクロール0_切り詰め0_操作できる要素がすべて押せる (941ms)
+  ✓  115 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:72:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.done_横スクロール0_切り詰め0_操作できる要素がすべて押せる (635ms)
+  ✓  116 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:72:5 › AC-17 幅 320 CSS px（deviceScaleFactor 2） › AC17_task.exhausted_横スクロール0_切り詰め0_操作できる要素がすべて押せる (619ms)
+  ✓  117 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:115:1 › AC18_移動キー(Tab系)とEnter_Spaceだけで診断から完了まで進み_操作した要素がfocus-visibleで枠が3px以上 (718ms)
+  ✓  114 [webkit] › tests/ac14-ac16-redo-delete.spec.mjs:44:1 › AC14_今日の課題が出ている日に設定からやり直して別の領域を選んでも_その日は同じdata-task-idのtask.todayのままで完了の履歴は3件_翌日は新しい領域の課題が出る (1.5s)
+  ✓  118 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:174:3 › AC27_diagnosis.start_axe-coreでserious以上の違反が0件 (1.2s)
+  ✓  119 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:174:3 › AC27_diagnosis.question_axe-coreでserious以上の違反が0件 (1.3s)
+  ✓  120 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:174:3 › AC27_task.today_axe-coreでserious以上の違反が0件 (1.3s)
+  ✓  121 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:174:3 › AC27_task.done_axe-coreでserious以上の違反が0件 (1.2s)
+  ✓  122 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:174:3 › AC27_task.exhausted_axe-coreでserious以上の違反が0件 (1.2s)
+  ✓  123 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:174:3 › AC27_settings_axe-coreでserious以上の違反が0件 (1.3s)
+  ✓  125 [webkit] › tests/ac19-ac20-ac25-export-import.spec.mjs:12:1 › AC19_書き出すとJSONが1つダウンロードされ_診断_段階_履歴3件（50文字のanswer）_初めて開いた日_版番号を含む (904ms)
+  ✓  127 [webkit] › tests/ac19-ac20-ac25-export-import.spec.mjs:91:1 › AC25_版番号が新しいファイルはerror.import.messageで拒み_履歴1件と診断と状態は変わらない (707ms)
+  ✓  126 [webkit] › tests/ac19-ac20-ac25-export-import.spec.mjs:48:1 › AC20_保存データのないブラウザで読み込むと_診断と段階が同じで履歴3件（answerも同じ）_状態はtask.todayかtask.done (1.2s)
+  ✓  129 [webkit] › tests/ac21-ac22-home-screen.spec.mjs:47:3 › AC-21 iPadOS の Safari の偽装（Mac の UA と maxTouchPoints > 1） › AC21_iPadOS_Safari（MacのUAとmaxTouchPoints5）でも診断の前に案内が出る (386ms)
+  ✓  128 [webkit] › tests/ac21-ac22-home-screen.spec.mjs:21:3 › AC-21 iPhone の Safari の偽装 › AC21_iOS_Safariでは診断の前に案内が出て_閉じると再読み込みしても出ず_設定から再び開ける (721ms)
+  ✓  130 [webkit] › tests/ac21-ac22-home-screen.spec.mjs:58:1 › AC21_UAを偽装しないChromiumとWebKitでは案内が0回出る (449ms)
+  ✓  132 [webkit] › tests/ac24-stats.spec.mjs:18:1 › AC24_統計の9つの値が期待どおりで_数値7つと日付1つは同じ文字が見え_真偽値はfirstDayCompleted.yesの文言が見える (631ms)
+  ✘  133 [webkit] › tests/ac26-language.spec.mjs:40:3 › AC-26 locale en-US › AC26_en-USではdiagnosis.startの文言が英語の文言ファイルと一致し_キーの差が0件 (353ms)
+  ✓  131 [webkit] › tests/ac21-ac22-home-screen.spec.mjs:70:1 › AC22_スタンドアロンで初めて開くと読み込みの案内が出て_再読み込みでも出て_ファイルを読み込むとAC-20の状態になる (801ms)
+  ✘  134 [webkit] › tests/ac26-language.spec.mjs:47:3 › AC-26 locale ja-JP › AC26_ja-JPではdiagnosis.startの文言が日本語の文言ファイルと一致する (368ms)
+  ✓  136 [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:51:1 › AC31_今日の課題を完了済みなら操作0回でtask.doneが見え_重なる要素0件 (366ms)
+  ✓  137 [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:31:1 › AC31_診断済みで開くと操作0回でtask.todayが見え_題名と4要素と答えの欄と4つの申告が同じ画面にあり_重なる要素0件 (741ms)
+  ✓  139 [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:88:1 › AC32_200文字を入力してタブを閉じ新しいタブで開くと_同じdata-task-idで答えがそのまま入っている (992ms)
+  ✓  138 [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:79:1 › AC32_200文字を入力して再読み込みすると_同じdata-task-idで答えがそのまま入っている (1.1s)
+  ✘  142 [webkit] › tests/design-d30-day-changed.spec.mjs:34:1 › DESIGN_D30_画面を開いたまま翌日になった後に完了を押すと_翌日のS3の先頭にtask.dayChangedが1件でフォーカスがあり_入力では消えず_次の操作と再読み込みで消える (264ms)
+  ✓  140 [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:98:1 › AC32_翌日に開くと新しい課題の答えの欄は空で_前日の200文字は書き出しのnoneの行のanswerに残る (807ms)
+  ✓  141 [webkit] › tests/ac31-ac32-zero-ops-answer.spec.mjs:117:1 › AC32_画面を開いたまま翌日になった後に読み込まずに完了を押すと_完了は記録されず翌日の課題の答えの欄は空で_前日の200文字は書き出しのnoneの行のanswerに残る (986ms)
+  ✘  124 [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:174:3 › AC27_task.today.dayChanged_axe-coreでserious以上の違反が0件 (5.5s)
+  ✓  135 [webkit] › tests/ac28-update.spec.mjs:17:1 › AC28_差し替え後2秒おきの再読み込み3回以内でdata-build-versionが新版になり_旧版に戻らず_履歴3件と診断と段階は同じ (6.9s)
+  ✘  143 [webkit] › tests/design-d30-day-changed.spec.mjs:95:1 › DESIGN_D30_最後の課題を開いたまま翌日になった後に完了を押すと_task.exhaustedの先頭にtask.dayChangedが1件でフォーカスがあり_前の課題はnoneの行に移る (5.4s)
+  ✘  145 [webkit] › tests/design-d30-day-changed.spec.mjs:129:1 › DESIGN_U15_初回の診断の2問目を23時59分に出して0時1分に確定すると_そのまま3問目に進み_firstOpenDateは1問目の日でcompletedOnと課題の日付は確定した日 (5.5s)
+  ✘  144 [webkit] › tests/design-d30-day-changed.spec.mjs:70:1 › DESIGN_D30_task.rateのまま翌日になった後に役に立ったを押すと_評価は記録されずhelpfulはunansweredのままで_翌日のS3にtask.dayChangedが1件 (5.6s)
+
+
+  1) [chromium] › tests/ac11-ac13-storage.spec.mjs:44:1 › AC13_persistを断られても完了と再読み込みでtask.done_履歴1件_設定にnotPersistedと書き出しがある 
+
+    Error: device.persistGranted は書かれない
+
+    expect(received).not.toHaveProperty(path)
+
+    Expected path: not "persistGranted"
+
+    Received value: false
+
+      55 |   const stored = await readStoredData(page);
+      56 |   expect(stored?.device?.persistRequested, 'device.persistRequested').toBe(true);
+    > 57 |   expect(stored?.device ?? {}, 'device.persistGranted は書かれない').not.toHaveProperty('persistGranted');
+         |                                                                    ^
+      58 |   testInfo.annotations.push({ type: 'persist() の呼び出し', description: `診断を終えた読み込みで 1 回（拒否を返した）。device: ${JSON.stringify(stored?.device)}` });
+      59 |
+      60 |   await app.tid(page, 'task.report.done').click();
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac11-ac13-storage.spec.mjs:57:68
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac11-ac13-storage-AC13-per-6148e-歴1件-設定にnotPersistedと書き出しがある-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac11-ac13-storage-AC13-per-6148e-歴1件-設定にnotPersistedと書き出しがある-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac11-ac13-storage-AC13-per-6148e-歴1件-設定にnotPersistedと書き出しがある-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac11-ac13-storage-AC13-per-6148e-歴1件-設定にnotPersistedと書き出しがある-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:174:3 › AC27_task.today.dayChanged_axe-coreでserious以上の違反が0件 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('task.dayChanged')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByTestId('task.dayChanged') with timeout 5000ms
+      - waiting for getByTestId('task.dayChanged')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      61 |     await app.tid(page, 'task.report.done').click();
+      62 |     await app.expectState(page, 'task.today');
+    > 63 |     await expect(app.tid(page, 'task.dayChanged')).toHaveCount(1);
+         |                                                    ^
+      64 |   },
+      65 | };
+      66 |
+        at Object.task.today.dayChanged (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac17-ac18-ac27-a11y.spec.mjs:63:52)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac17-ac18-ac27-a11y.spec.mjs:175:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac17-ac18-ac27-a11y-AC27-t-d4ccc-ed-axe-coreでserious以上の違反が0件-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac17-ac18-ac27-a11y-AC27-t-d4ccc-ed-axe-coreでserious以上の違反が0件-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac17-ac18-ac27-a11y-AC27-t-d4ccc-ed-axe-coreでserious以上の違反が0件-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac17-ac18-ac27-a11y-AC27-t-d4ccc-ed-axe-coreでserious以上の違反が0件-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium] › tests/ac26-language.spec.mjs:40:3 › AC-26 locale en-US › AC26_en-USではdiagnosis.startの文言が英語の文言ファイルと一致し_キーの差が0件 
+
+    Error: i18n/ja.json が strings.schema.json に通る：data must have required property 'task.dayChanged'
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      19 |   for (const [name, doc] of [['ja', ja], ['en', en]]) {
+      20 |     const { ok, errors } = validate('strings', doc);
+    > 21 |     expect(ok, `i18n/${name}.json が strings.schema.json に通る：${errors}`).toBe(true);
+         |                                                                         ^
+      22 |   }
+      23 |
+      24 |   const strings = lang === 'ja' ? ja : en;
+        at checkStart (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac26-language.spec.mjs:21:73)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac26-language.spec.mjs:41:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac26-language-AC-26-locale-45d1a-rtの文言が英語の文言ファイルと一致し-キーの差が0件-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac26-language-AC-26-locale-45d1a-rtの文言が英語の文言ファイルと一致し-キーの差が0件-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac26-language-AC-26-locale-45d1a-rtの文言が英語の文言ファイルと一致し-キーの差が0件-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac26-language-AC-26-locale-45d1a-rtの文言が英語の文言ファイルと一致し-キーの差が0件-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [chromium] › tests/ac26-language.spec.mjs:47:3 › AC-26 locale ja-JP › AC26_ja-JPではdiagnosis.startの文言が日本語の文言ファイルと一致する 
+
+    Error: i18n/ja.json が strings.schema.json に通る：data must have required property 'task.dayChanged'
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      19 |   for (const [name, doc] of [['ja', ja], ['en', en]]) {
+      20 |     const { ok, errors } = validate('strings', doc);
+    > 21 |     expect(ok, `i18n/${name}.json が strings.schema.json に通る：${errors}`).toBe(true);
+         |                                                                         ^
+      22 |   }
+      23 |
+      24 |   const strings = lang === 'ja' ? ja : en;
+        at checkStart (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac26-language.spec.mjs:21:73)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac26-language.spec.mjs:48:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac26-language-AC-26-locale-7adf2-is-startの文言が日本語の文言ファイルと一致する-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac26-language-AC-26-locale-7adf2-is-startの文言が日本語の文言ファイルと一致する-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac26-language-AC-26-locale-7adf2-is-startの文言が日本語の文言ファイルと一致する-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac26-language-AC-26-locale-7adf2-is-startの文言が日本語の文言ファイルと一致する-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [chromium] › tests/design-d30-day-changed.spec.mjs:34:1 › DESIGN_D30_画面を開いたまま翌日になった後に完了を押すと_翌日のS3の先頭にtask.dayChangedが1件でフォーカスがあり_入力では消えず_次の操作と再読み込みで消える 
+
+    Error: expect(received).toHaveProperty(path)
+
+    Expected path: ["task.dayChanged"]
+    Received path: []
+
+    Received value: {"app.loading": "読み込んでいます", "app.name": "今日の一手", "app.noscript": "このページは JavaScript が必要です。ブラウザの設定で JavaScript を有効にしてください。", "area.backend": "バックエンド設計", "area.database": "データベース", "area.frontend": "フロントエンド", "area.git": "Git とチーム開発", "area.infra": "インフラとクラウド", "area.testing": "テストと品質", "diagnosis.back": "前の質問へ", "diagnosis.cancel": "やめる", "diagnosis.finish": "診断を終える", "diagnosis.next": "次へ", "diagnosis.progress": "質問 {n} / {total}", "diagnosis.q1.legend": "伸ばしたい領域を 1 つ選んでください", "diagnosis.q2.legend": "{area}の今の段階に近いものを選んでください", "diagnosis.q3.legend": "実務でコードを書いてきた年数を選んでください", "diagnosis.start.begin": "診断を始める", "diagnosis.start.lead.1": "すでにコードを書いているエンジニア向けです。1 日 1 つ、15 分で終わる課題を出します。", "diagnosis.start.lead.2": "登録はありません。入力したデータはこのブラウザの中だけに保存され、外には送りません。", "diagnosis.start.lead.3": "難しすぎ・簡単すぎの申告が 2 回続くと、次の日から段階が変わります。", "diagnosis.start.title": "3 問に答えると、今日の学習が 1 つ出ます", "error.app.delete": "すべてのデータを削除", "error.app.detail": "このブラウザに保存された「今日の一手」のデータが、壊れているか、この版では読めない形です。再読み込みしても直らない場合は、データをファイルに保存してから削除し、最初からやり直してください。", "error.app.exportRaw": "壊れたデータをファイルに保存", "error.app.message": "保存データを読めませんでした。", "error.app.reload": "再読み込み", "error.app.storageUnavailable.detail": "ブラウザの設定で、このサイトのデータの保存（Cookie とサイトデータ）が止められています。保存を許可してから再読み込みしてください。プライベートブラウズでも起きることがあります。", "error.app.storageUnavailable.message": "このブラウザでは保存を使えません。", "error.diagnosis.required": "選択肢を 1 つ選んでください。", "error.import.message": "このファイルは読み込めませんでした。このブラウザのデータは変わっていません。", "error.import.reason.schema": "「今日の一手」が書き出したファイルではないか、内容が壊れています。「ファイルに書き出す」で作った .json ファイルを選んでください。", "error.import.reason.version": "ファイルの形式がこの版より新しいです。「今日の一手」を再読み込みして最新の版にしてから、もう一度読み込んでください。", "error.storage.message": "保存できませんでした。入力はそのまま残っています。", "error.storage.retry": "もう一度保存する", "helpful.no": "立たなかった", "helpful.unanswered": "未回答", "helpful.yes": "役に立った", "history.empty": "まだ履歴はありません。課題を申告すると、ここに残ります。", "history.empty.action": "今日の課題へ", "history.row.answer": "答えを見る", "history.title": "履歴", "home.addToHomeScreen.close": "閉じる", "home.addToHomeScreen.steps.1": "画面の下（iPad では上）の共有ボタンを押します。", "home.addToHomeScreen.steps.2": "「ホーム画面に追加」を選び、「追加」を押します。", "home.addToHomeScreen.steps.3": "ホーム画面の「今日の一手」を開いて、診断を始めます。", "home.addToHomeScreen.steps.4": "すでに Safari で診断した場合：Safari のデータは引き継がれません。Safari の「設定」で「ファイルに書き出す」を押し、ホーム画面の「今日の一手」の「設定」で「ファイルを読み込む」を押してください。", "home.addToHomeScreen.title": "ホーム画面に追加してから始めることをおすすめします", "home.addToHomeScreen.why": "Safari は 7 日間使わないと、このサイトの保存データを消すことがあります。ホーム画面に追加した「今日の一手」は、この対象になりません。", "home.standalone.import": "別のブラウザで入力したデータは、自動では引き継がれません。書き出したファイルがあれば、ここで読み込めます。", "home.standalone.importButton": "ファイルを読み込む", "level.advanced": "上級", "level.advanced.desc": "設計を決め、人に教えている", "level.beginner": "初級", "level.beginner.desc": "基本は知っているが、実務では人に聞きながら進める", "level.intermediate": "中級", "level.intermediate.desc": "実務の大半を 1 人で進められる", "nav.history": "履歴", "nav.settings": "設定", "report.done": "完了", "report.noTime": "今日はできない", "report.none": "申告なし", "report.tooEasy": "簡単すぎ", "report.tooHard": "難しすぎ", "settings.data.note": "入力したデータはこのブラウザの中だけに保存され、外には送りません。別のブラウザや端末に移すには、ファイルに書き出して読み込みます。", "settings.data.title": "データ", "settings.delete": "すべてのデータを削除", "settings.delete.confirm.body": "診断の回答、履歴、答えがこのブラウザから消え、最初の画面に戻ります。この操作は元に戻せません。先に「ファイルに書き出す」で残しておくこともできます。", "settings.delete.confirm.cancel": "やめる", "settings.delete.confirm.ok": "削除する", "settings.delete.confirm.title": "すべてのデータを削除しますか", "settings.delete.title": "削除", "settings.diagnosis.current": "いまの領域：{area}、段階：{level}", "settings.diagnosis.title": "診断", "settings.export": "ファイルに書き出す", "settings.export.done": "書き出しました", "settings.history.open": "履歴を見る", "settings.homeScreen.open": "ホーム画面に追加する手順を見る", "settings.homeScreen.title": "ホーム画面", "settings.import": "ファイルを読み込む", "settings.import.confirm.body": "このブラウザの診断の回答、履歴、答えは、ファイルの内容に置き換わります（結合はしません）。この操作は元に戻せません。", "settings.import.confirm.cancel": "やめる", "settings.import.confirm.ok": "置き換える", "settings.import.confirm.summary": "ファイルの中身：履歴 {count} 件、初めて開いた日 {date}", "settings.import.confirm.title": "ファイルの内容で置き換えますか", "settings.import.note": "書き出したファイル（.json）を選びます。このブラウザのデータは、ファイルの内容に置き換わります。", "settings.privacy": "プライバシーについて", "settings.records.title": "記録", "settings.redo": "診断をやり直す", "settings.redo.note": "今日の課題を出した後にやり直した場合、新しい診断は明日の課題から効きます。履歴は残ります。", "settings.stats.back": "設定に戻る", "settings.stats.completed": "完了した件数", "settings.stats.daysCompleted7d": "直近 7 日に完了した日数", "settings.stats.firstDayCompleted": "初めて開いた日に完了したか", "settings.stats.firstDayCompleted.no": "完了していない", "settings.stats.firstDayCompleted.yes": "完了した", "settings.stats.firstOpenDate": "初めて開いた日", "settings.stats.helpful": "「役に立った」の件数", "settings.stats.issued": "出した課題の件数", "settings.stats.noTime": "「今日はできない」の件数", "settings.stats.note": "この値は、このブラウザの記録から計算しています。外には送りません。報告するときは、この画面のスクリーンショットを送ってください。", "settings.stats.open": "統計を見る", "settings.stats.rated": "「役に立ったか」に答えた件数", "settings.stats.title": "統計", "settings.stats.today": "今日 {date}", "settings.stats.tooHard": "「難しすぎ」の件数", "settings.storage.notPersisted": "このブラウザは保存の永続化を許可しませんでした。しばらく使わないとデータが消えることがあります。ファイルに書き出しておいてください。", "settings.title": "設定", "settings.version": "版 {version}", "task.answer.help": "採点はしません。入力は自動で保存され、今日中なら開き直しても残ります。", "task.answer.label": "答え（任意）", "task.answer.limit": "上限の {max} 文字に達しました。", "task.answer.saved": "保存しました", "task.done.history": "履歴を見る", "task.done.message": "今日も前に進みました。次の課題は明日出ます。", "task.done.task": "完了した課題：{title}", "task.done.title": "今日の一手は終わりです", "task.exhausted.detail": "新しい課題は次の版で足します。それまでは、診断をやり直して別の領域か段階を選べます。", "task.exhausted.message": "この領域と段階の課題は、すべて出しました", "task.exhausted.redo": "診断をやり直す", "task.external.badge": "外で行う", "task.external.tools.label": "要る道具", "task.goal": "完了の目安", "task.how": "やり方", "task.meta": "{area} / {level} / 所要時間 {minutes} 分", "task.rate.close": "今回は答えない", "task.rate.helpful": "役に立った", "task.rate.notHelpful": "立たなかった", "task.rate.question": "この課題は役に立ちましたか", "task.rate.title": "完了しました", "task.report.done": "完了", "task.report.noTime": "今日はできない", "task.report.note": "申告すると、今日はもう課題が出ません。", "task.report.tooEasy": "簡単すぎ", "task.report.tooHard": "難しすぎ", "task.skipped.history": "履歴を見る", "task.skipped.levelHint": "同じ申告が 2 回続くと、次の日から段階が変わります。", "task.skipped.message": "次の課題は明日出ます。", "task.skipped.title": "今日はここまでです", "task.today.label": "今日の課題 {date}", "task.why": "なぜ今これか", "years.1to3": "1〜3 年", "years.3to5": "3〜5 年", "years.gte5": "5 年以上", "years.lt1": "1 年未満"}
+
+      34 | test('DESIGN_D30_画面を開いたまま翌日になった後に完了を押すと_翌日のS3の先頭にtask.dayChangedが1件でフォーカスがあり_入力では消えず_次の操作と再読み込みで消える', async ({ context, page, baseURL, request }, testInfo) => {
+      35 |   const ja = await app.loadStrings(request, 'ja');
+    > 36 |   expect(ja).toHaveProperty(['task.dayChanged']);
+         |              ^
+      37 |   await injectSeed(context, loadContractFixture(SEED));
+      38 |   await app.fixDate(page, DAY, '23:55:00');
+      39 |   await app.open(page, baseURL);
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/design-d30-day-changed.spec.mjs:36:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/design-d30-day-changed-DES-be671-スがあり-入力では消えず-次の操作と再読み込みで消える-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/design-d30-day-changed-DES-be671-スがあり-入力では消えず-次の操作と再読み込みで消える-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/design-d30-day-changed-DES-be671-スがあり-入力では消えず-次の操作と再読み込みで消える-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/design-d30-day-changed-DES-be671-スがあり-入力では消えず-次の操作と再読み込みで消える-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [chromium] › tests/design-d30-day-changed.spec.mjs:70:1 › DESIGN_D30_task.rateのまま翌日になった後に役に立ったを押すと_評価は記録されずhelpfulはunansweredのままで_翌日のS3にtask.dayChangedが1件 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('task.dayChanged')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByTestId('task.dayChanged') with timeout 5000ms
+      - waiting for getByTestId('task.dayChanged')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      15 | async function expectDayChangedNotice(page, firstTestIdOfScreen, ja) {
+      16 |   const notice = app.tid(page, 'task.dayChanged');
+    > 17 |   await expect(notice).toHaveCount(1);
+         |                        ^
+      18 |   await expect(notice).toBeVisible();
+      19 |   await expect(notice).toHaveAttribute('role', 'status');
+      20 |   await expect(notice).toHaveText(ja['task.dayChanged']);
+        at expectDayChangedNotice (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/design-d30-day-changed.spec.mjs:17:24)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/design-d30-day-changed.spec.mjs:86:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/design-d30-day-changed-DES-f9323-まで-翌日のS3にtask-dayChangedが1件-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/design-d30-day-changed-DES-f9323-まで-翌日のS3にtask-dayChangedが1件-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/design-d30-day-changed-DES-f9323-まで-翌日のS3にtask-dayChangedが1件-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/design-d30-day-changed-DES-f9323-まで-翌日のS3にtask-dayChangedが1件-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  7) [chromium] › tests/design-d30-day-changed.spec.mjs:95:1 › DESIGN_D30_最後の課題を開いたまま翌日になった後に完了を押すと_task.exhaustedの先頭にtask.dayChangedが1件でフォーカスがあり_前の課題はnoneの行に移る 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('task.dayChanged')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByTestId('task.dayChanged') with timeout 5000ms
+      - waiting for getByTestId('task.dayChanged')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      15 | async function expectDayChangedNotice(page, firstTestIdOfScreen, ja) {
+      16 |   const notice = app.tid(page, 'task.dayChanged');
+    > 17 |   await expect(notice).toHaveCount(1);
+         |                        ^
+      18 |   await expect(notice).toBeVisible();
+      19 |   await expect(notice).toHaveAttribute('role', 'status');
+      20 |   await expect(notice).toHaveText(ja['task.dayChanged']);
+        at expectDayChangedNotice (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/design-d30-day-changed.spec.mjs:17:24)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/design-d30-day-changed.spec.mjs:119:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/design-d30-day-changed-DES-d825e-が1件でフォーカスがあり-前の課題はnoneの行に移る-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/design-d30-day-changed-DES-d825e-が1件でフォーカスがあり-前の課題はnoneの行に移る-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/design-d30-day-changed-DES-d825e-が1件でフォーカスがあり-前の課題はnoneの行に移る-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/design-d30-day-changed-DES-d825e-が1件でフォーカスがあり-前の課題はnoneの行に移る-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  8) [chromium] › tests/design-d30-day-changed.spec.mjs:129:1 › DESIGN_U15_初回の診断の2問目を23時59分に出して0時1分に確定すると_そのまま3問目に進み_firstOpenDateは1問目の日でcompletedOnと課題の日付は確定した日 
+
+    Error: expect(locator).toHaveAttribute(expected) failed
+
+    Locator:  getByTestId('diagnosis.progress')
+    Expected: "3"
+    Received: "2"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveAttribute" getByTestId('diagnosis.progress') with timeout 5000ms
+      - waiting for getByTestId('diagnosis.progress')
+        14 × locator resolved to <p tabindex="-1" class="small secondary" data-question-index="2" data-question-total="3" data-testid="diagnosis.progress">質問 2 / 3</p>
+           - unexpected value "2"
+
+
+      143 |   await app.fixDate(page, '2026-11-04', '00:01:00');
+      144 |   await app.tid(page, 'diagnosis.next').click();
+    > 145 |   await expect(progress).toHaveAttribute('data-question-index', '3');
+          |                          ^
+      146 |   await expect(app.tid(page, 'task.dayChanged')).toHaveCount(0);
+      147 |   await app.tid(page, 'years.lt1').check();
+      148 |   await app.tid(page, 'diagnosis.finish').click();
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/design-d30-day-changed.spec.mjs:145:26
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/design-d30-day-changed-DES-1a83a-目の日でcompletedOnと課題の日付は確定した日-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/design-d30-day-changed-DES-1a83a-目の日でcompletedOnと課題の日付は確定した日-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/design-d30-day-changed-DES-1a83a-目の日でcompletedOnと課題の日付は確定した日-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/design-d30-day-changed-DES-1a83a-目の日でcompletedOnと課題の日付は確定した日-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  9) [webkit] › tests/ac11-ac13-storage.spec.mjs:44:1 › AC13_persistを断られても完了と再読み込みでtask.done_履歴1件_設定にnotPersistedと書き出しがある 
+
+    Error: device.persistGranted は書かれない
+
+    expect(received).not.toHaveProperty(path)
+
+    Expected path: not "persistGranted"
+
+    Received value: false
+
+      55 |   const stored = await readStoredData(page);
+      56 |   expect(stored?.device?.persistRequested, 'device.persistRequested').toBe(true);
+    > 57 |   expect(stored?.device ?? {}, 'device.persistGranted は書かれない').not.toHaveProperty('persistGranted');
+         |                                                                    ^
+      58 |   testInfo.annotations.push({ type: 'persist() の呼び出し', description: `診断を終えた読み込みで 1 回（拒否を返した）。device: ${JSON.stringify(stored?.device)}` });
+      59 |
+      60 |   await app.tid(page, 'task.report.done').click();
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac11-ac13-storage.spec.mjs:57:68
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac11-ac13-storage-AC13-per-6148e-歴1件-設定にnotPersistedと書き出しがある-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac11-ac13-storage-AC13-per-6148e-歴1件-設定にnotPersistedと書き出しがある-webkit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac11-ac13-storage-AC13-per-6148e-歴1件-設定にnotPersistedと書き出しがある-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac11-ac13-storage-AC13-per-6148e-歴1件-設定にnotPersistedと書き出しがある-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  10) [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:174:3 › AC27_task.today.dayChanged_axe-coreでserious以上の違反が0件 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('task.dayChanged')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByTestId('task.dayChanged') with timeout 5000ms
+      - waiting for getByTestId('task.dayChanged')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      61 |     await app.tid(page, 'task.report.done').click();
+      62 |     await app.expectState(page, 'task.today');
+    > 63 |     await expect(app.tid(page, 'task.dayChanged')).toHaveCount(1);
+         |                                                    ^
+      64 |   },
+      65 | };
+      66 |
+        at Object.task.today.dayChanged (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac17-ac18-ac27-a11y.spec.mjs:63:52)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac17-ac18-ac27-a11y.spec.mjs:175:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac17-ac18-ac27-a11y-AC27-t-d4ccc-ed-axe-coreでserious以上の違反が0件-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac17-ac18-ac27-a11y-AC27-t-d4ccc-ed-axe-coreでserious以上の違反が0件-webkit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac17-ac18-ac27-a11y-AC27-t-d4ccc-ed-axe-coreでserious以上の違反が0件-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac17-ac18-ac27-a11y-AC27-t-d4ccc-ed-axe-coreでserious以上の違反が0件-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  11) [webkit] › tests/ac26-language.spec.mjs:40:3 › AC-26 locale en-US › AC26_en-USではdiagnosis.startの文言が英語の文言ファイルと一致し_キーの差が0件 
+
+    Error: i18n/ja.json が strings.schema.json に通る：data must have required property 'task.dayChanged'
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      19 |   for (const [name, doc] of [['ja', ja], ['en', en]]) {
+      20 |     const { ok, errors } = validate('strings', doc);
+    > 21 |     expect(ok, `i18n/${name}.json が strings.schema.json に通る：${errors}`).toBe(true);
+         |                                                                         ^
+      22 |   }
+      23 |
+      24 |   const strings = lang === 'ja' ? ja : en;
+        at checkStart (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac26-language.spec.mjs:21:73)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac26-language.spec.mjs:41:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac26-language-AC-26-locale-45d1a-rtの文言が英語の文言ファイルと一致し-キーの差が0件-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac26-language-AC-26-locale-45d1a-rtの文言が英語の文言ファイルと一致し-キーの差が0件-webkit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac26-language-AC-26-locale-45d1a-rtの文言が英語の文言ファイルと一致し-キーの差が0件-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac26-language-AC-26-locale-45d1a-rtの文言が英語の文言ファイルと一致し-キーの差が0件-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  12) [webkit] › tests/ac26-language.spec.mjs:47:3 › AC-26 locale ja-JP › AC26_ja-JPではdiagnosis.startの文言が日本語の文言ファイルと一致する 
+
+    Error: i18n/ja.json が strings.schema.json に通る：data must have required property 'task.dayChanged'
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      19 |   for (const [name, doc] of [['ja', ja], ['en', en]]) {
+      20 |     const { ok, errors } = validate('strings', doc);
+    > 21 |     expect(ok, `i18n/${name}.json が strings.schema.json に通る：${errors}`).toBe(true);
+         |                                                                         ^
+      22 |   }
+      23 |
+      24 |   const strings = lang === 'ja' ? ja : en;
+        at checkStart (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac26-language.spec.mjs:21:73)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/ac26-language.spec.mjs:48:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ac26-language-AC-26-locale-7adf2-is-startの文言が日本語の文言ファイルと一致する-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ac26-language-AC-26-locale-7adf2-is-startの文言が日本語の文言ファイルと一致する-webkit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ac26-language-AC-26-locale-7adf2-is-startの文言が日本語の文言ファイルと一致する-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ac26-language-AC-26-locale-7adf2-is-startの文言が日本語の文言ファイルと一致する-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  13) [webkit] › tests/design-d30-day-changed.spec.mjs:34:1 › DESIGN_D30_画面を開いたまま翌日になった後に完了を押すと_翌日のS3の先頭にtask.dayChangedが1件でフォーカスがあり_入力では消えず_次の操作と再読み込みで消える 
+
+    Error: expect(received).toHaveProperty(path)
+
+    Expected path: ["task.dayChanged"]
+    Received path: []
+
+    Received value: {"app.loading": "読み込んでいます", "app.name": "今日の一手", "app.noscript": "このページは JavaScript が必要です。ブラウザの設定で JavaScript を有効にしてください。", "area.backend": "バックエンド設計", "area.database": "データベース", "area.frontend": "フロントエンド", "area.git": "Git とチーム開発", "area.infra": "インフラとクラウド", "area.testing": "テストと品質", "diagnosis.back": "前の質問へ", "diagnosis.cancel": "やめる", "diagnosis.finish": "診断を終える", "diagnosis.next": "次へ", "diagnosis.progress": "質問 {n} / {total}", "diagnosis.q1.legend": "伸ばしたい領域を 1 つ選んでください", "diagnosis.q2.legend": "{area}の今の段階に近いものを選んでください", "diagnosis.q3.legend": "実務でコードを書いてきた年数を選んでください", "diagnosis.start.begin": "診断を始める", "diagnosis.start.lead.1": "すでにコードを書いているエンジニア向けです。1 日 1 つ、15 分で終わる課題を出します。", "diagnosis.start.lead.2": "登録はありません。入力したデータはこのブラウザの中だけに保存され、外には送りません。", "diagnosis.start.lead.3": "難しすぎ・簡単すぎの申告が 2 回続くと、次の日から段階が変わります。", "diagnosis.start.title": "3 問に答えると、今日の学習が 1 つ出ます", "error.app.delete": "すべてのデータを削除", "error.app.detail": "このブラウザに保存された「今日の一手」のデータが、壊れているか、この版では読めない形です。再読み込みしても直らない場合は、データをファイルに保存してから削除し、最初からやり直してください。", "error.app.exportRaw": "壊れたデータをファイルに保存", "error.app.message": "保存データを読めませんでした。", "error.app.reload": "再読み込み", "error.app.storageUnavailable.detail": "ブラウザの設定で、このサイトのデータの保存（Cookie とサイトデータ）が止められています。保存を許可してから再読み込みしてください。プライベートブラウズでも起きることがあります。", "error.app.storageUnavailable.message": "このブラウザでは保存を使えません。", "error.diagnosis.required": "選択肢を 1 つ選んでください。", "error.import.message": "このファイルは読み込めませんでした。このブラウザのデータは変わっていません。", "error.import.reason.schema": "「今日の一手」が書き出したファイルではないか、内容が壊れています。「ファイルに書き出す」で作った .json ファイルを選んでください。", "error.import.reason.version": "ファイルの形式がこの版より新しいです。「今日の一手」を再読み込みして最新の版にしてから、もう一度読み込んでください。", "error.storage.message": "保存できませんでした。入力はそのまま残っています。", "error.storage.retry": "もう一度保存する", "helpful.no": "立たなかった", "helpful.unanswered": "未回答", "helpful.yes": "役に立った", "history.empty": "まだ履歴はありません。課題を申告すると、ここに残ります。", "history.empty.action": "今日の課題へ", "history.row.answer": "答えを見る", "history.title": "履歴", "home.addToHomeScreen.close": "閉じる", "home.addToHomeScreen.steps.1": "画面の下（iPad では上）の共有ボタンを押します。", "home.addToHomeScreen.steps.2": "「ホーム画面に追加」を選び、「追加」を押します。", "home.addToHomeScreen.steps.3": "ホーム画面の「今日の一手」を開いて、診断を始めます。", "home.addToHomeScreen.steps.4": "すでに Safari で診断した場合：Safari のデータは引き継がれません。Safari の「設定」で「ファイルに書き出す」を押し、ホーム画面の「今日の一手」の「設定」で「ファイルを読み込む」を押してください。", "home.addToHomeScreen.title": "ホーム画面に追加してから始めることをおすすめします", "home.addToHomeScreen.why": "Safari は 7 日間使わないと、このサイトの保存データを消すことがあります。ホーム画面に追加した「今日の一手」は、この対象になりません。", "home.standalone.import": "別のブラウザで入力したデータは、自動では引き継がれません。書き出したファイルがあれば、ここで読み込めます。", "home.standalone.importButton": "ファイルを読み込む", "level.advanced": "上級", "level.advanced.desc": "設計を決め、人に教えている", "level.beginner": "初級", "level.beginner.desc": "基本は知っているが、実務では人に聞きながら進める", "level.intermediate": "中級", "level.intermediate.desc": "実務の大半を 1 人で進められる", "nav.history": "履歴", "nav.settings": "設定", "report.done": "完了", "report.noTime": "今日はできない", "report.none": "申告なし", "report.tooEasy": "簡単すぎ", "report.tooHard": "難しすぎ", "settings.data.note": "入力したデータはこのブラウザの中だけに保存され、外には送りません。別のブラウザや端末に移すには、ファイルに書き出して読み込みます。", "settings.data.title": "データ", "settings.delete": "すべてのデータを削除", "settings.delete.confirm.body": "診断の回答、履歴、答えがこのブラウザから消え、最初の画面に戻ります。この操作は元に戻せません。先に「ファイルに書き出す」で残しておくこともできます。", "settings.delete.confirm.cancel": "やめる", "settings.delete.confirm.ok": "削除する", "settings.delete.confirm.title": "すべてのデータを削除しますか", "settings.delete.title": "削除", "settings.diagnosis.current": "いまの領域：{area}、段階：{level}", "settings.diagnosis.title": "診断", "settings.export": "ファイルに書き出す", "settings.export.done": "書き出しました", "settings.history.open": "履歴を見る", "settings.homeScreen.open": "ホーム画面に追加する手順を見る", "settings.homeScreen.title": "ホーム画面", "settings.import": "ファイルを読み込む", "settings.import.confirm.body": "このブラウザの診断の回答、履歴、答えは、ファイルの内容に置き換わります（結合はしません）。この操作は元に戻せません。", "settings.import.confirm.cancel": "やめる", "settings.import.confirm.ok": "置き換える", "settings.import.confirm.summary": "ファイルの中身：履歴 {count} 件、初めて開いた日 {date}", "settings.import.confirm.title": "ファイルの内容で置き換えますか", "settings.import.note": "書き出したファイル（.json）を選びます。このブラウザのデータは、ファイルの内容に置き換わります。", "settings.privacy": "プライバシーについて", "settings.records.title": "記録", "settings.redo": "診断をやり直す", "settings.redo.note": "今日の課題を出した後にやり直した場合、新しい診断は明日の課題から効きます。履歴は残ります。", "settings.stats.back": "設定に戻る", "settings.stats.completed": "完了した件数", "settings.stats.daysCompleted7d": "直近 7 日に完了した日数", "settings.stats.firstDayCompleted": "初めて開いた日に完了したか", "settings.stats.firstDayCompleted.no": "完了していない", "settings.stats.firstDayCompleted.yes": "完了した", "settings.stats.firstOpenDate": "初めて開いた日", "settings.stats.helpful": "「役に立った」の件数", "settings.stats.issued": "出した課題の件数", "settings.stats.noTime": "「今日はできない」の件数", "settings.stats.note": "この値は、このブラウザの記録から計算しています。外には送りません。報告するときは、この画面のスクリーンショットを送ってください。", "settings.stats.open": "統計を見る", "settings.stats.rated": "「役に立ったか」に答えた件数", "settings.stats.title": "統計", "settings.stats.today": "今日 {date}", "settings.stats.tooHard": "「難しすぎ」の件数", "settings.storage.notPersisted": "このブラウザは保存の永続化を許可しませんでした。しばらく使わないとデータが消えることがあります。ファイルに書き出しておいてください。", "settings.title": "設定", "settings.version": "版 {version}", "task.answer.help": "採点はしません。入力は自動で保存され、今日中なら開き直しても残ります。", "task.answer.label": "答え（任意）", "task.answer.limit": "上限の {max} 文字に達しました。", "task.answer.saved": "保存しました", "task.done.history": "履歴を見る", "task.done.message": "今日も前に進みました。次の課題は明日出ます。", "task.done.task": "完了した課題：{title}", "task.done.title": "今日の一手は終わりです", "task.exhausted.detail": "新しい課題は次の版で足します。それまでは、診断をやり直して別の領域か段階を選べます。", "task.exhausted.message": "この領域と段階の課題は、すべて出しました", "task.exhausted.redo": "診断をやり直す", "task.external.badge": "外で行う", "task.external.tools.label": "要る道具", "task.goal": "完了の目安", "task.how": "やり方", "task.meta": "{area} / {level} / 所要時間 {minutes} 分", "task.rate.close": "今回は答えない", "task.rate.helpful": "役に立った", "task.rate.notHelpful": "立たなかった", "task.rate.question": "この課題は役に立ちましたか", "task.rate.title": "完了しました", "task.report.done": "完了", "task.report.noTime": "今日はできない", "task.report.note": "申告すると、今日はもう課題が出ません。", "task.report.tooEasy": "簡単すぎ", "task.report.tooHard": "難しすぎ", "task.skipped.history": "履歴を見る", "task.skipped.levelHint": "同じ申告が 2 回続くと、次の日から段階が変わります。", "task.skipped.message": "次の課題は明日出ます。", "task.skipped.title": "今日はここまでです", "task.today.label": "今日の課題 {date}", "task.why": "なぜ今これか", "years.1to3": "1〜3 年", "years.3to5": "3〜5 年", "years.gte5": "5 年以上", "years.lt1": "1 年未満"}
+
+      34 | test('DESIGN_D30_画面を開いたまま翌日になった後に完了を押すと_翌日のS3の先頭にtask.dayChangedが1件でフォーカスがあり_入力では消えず_次の操作と再読み込みで消える', async ({ context, page, baseURL, request }, testInfo) => {
+      35 |   const ja = await app.loadStrings(request, 'ja');
+    > 36 |   expect(ja).toHaveProperty(['task.dayChanged']);
+         |              ^
+      37 |   await injectSeed(context, loadContractFixture(SEED));
+      38 |   await app.fixDate(page, DAY, '23:55:00');
+      39 |   await app.open(page, baseURL);
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/design-d30-day-changed.spec.mjs:36:14
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/design-d30-day-changed-DES-be671-スがあり-入力では消えず-次の操作と再読み込みで消える-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/design-d30-day-changed-DES-be671-スがあり-入力では消えず-次の操作と再読み込みで消える-webkit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/design-d30-day-changed-DES-be671-スがあり-入力では消えず-次の操作と再読み込みで消える-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/design-d30-day-changed-DES-be671-スがあり-入力では消えず-次の操作と再読み込みで消える-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  14) [webkit] › tests/design-d30-day-changed.spec.mjs:70:1 › DESIGN_D30_task.rateのまま翌日になった後に役に立ったを押すと_評価は記録されずhelpfulはunansweredのままで_翌日のS3にtask.dayChangedが1件 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('task.dayChanged')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByTestId('task.dayChanged') with timeout 5000ms
+      - waiting for getByTestId('task.dayChanged')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      15 | async function expectDayChangedNotice(page, firstTestIdOfScreen, ja) {
+      16 |   const notice = app.tid(page, 'task.dayChanged');
+    > 17 |   await expect(notice).toHaveCount(1);
+         |                        ^
+      18 |   await expect(notice).toBeVisible();
+      19 |   await expect(notice).toHaveAttribute('role', 'status');
+      20 |   await expect(notice).toHaveText(ja['task.dayChanged']);
+        at expectDayChangedNotice (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/design-d30-day-changed.spec.mjs:17:24)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/design-d30-day-changed.spec.mjs:86:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/design-d30-day-changed-DES-f9323-まで-翌日のS3にtask-dayChangedが1件-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/design-d30-day-changed-DES-f9323-まで-翌日のS3にtask-dayChangedが1件-webkit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/design-d30-day-changed-DES-f9323-まで-翌日のS3にtask-dayChangedが1件-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/design-d30-day-changed-DES-f9323-まで-翌日のS3にtask-dayChangedが1件-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  15) [webkit] › tests/design-d30-day-changed.spec.mjs:95:1 › DESIGN_D30_最後の課題を開いたまま翌日になった後に完了を押すと_task.exhaustedの先頭にtask.dayChangedが1件でフォーカスがあり_前の課題はnoneの行に移る 
+
+    Error: expect(locator).toHaveCount(expected) failed
+
+    Locator:  getByTestId('task.dayChanged')
+    Expected: 1
+    Received: 0
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveCount" getByTestId('task.dayChanged') with timeout 5000ms
+      - waiting for getByTestId('task.dayChanged')
+        14 × locator resolved to 0 elements
+           - unexpected value "0"
+
+
+      15 | async function expectDayChangedNotice(page, firstTestIdOfScreen, ja) {
+      16 |   const notice = app.tid(page, 'task.dayChanged');
+    > 17 |   await expect(notice).toHaveCount(1);
+         |                        ^
+      18 |   await expect(notice).toBeVisible();
+      19 |   await expect(notice).toHaveAttribute('role', 'status');
+      20 |   await expect(notice).toHaveText(ja['task.dayChanged']);
+        at expectDayChangedNotice (/Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/design-d30-day-changed.spec.mjs:17:24)
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/design-d30-day-changed.spec.mjs:119:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/design-d30-day-changed-DES-d825e-が1件でフォーカスがあり-前の課題はnoneの行に移る-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/design-d30-day-changed-DES-d825e-が1件でフォーカスがあり-前の課題はnoneの行に移る-webkit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/design-d30-day-changed-DES-d825e-が1件でフォーカスがあり-前の課題はnoneの行に移る-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/design-d30-day-changed-DES-d825e-が1件でフォーカスがあり-前の課題はnoneの行に移る-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  16) [webkit] › tests/design-d30-day-changed.spec.mjs:129:1 › DESIGN_U15_初回の診断の2問目を23時59分に出して0時1分に確定すると_そのまま3問目に進み_firstOpenDateは1問目の日でcompletedOnと課題の日付は確定した日 
+
+    Error: expect(locator).toHaveAttribute(expected) failed
+
+    Locator:  getByTestId('diagnosis.progress')
+    Expected: "3"
+    Received: "2"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveAttribute" getByTestId('diagnosis.progress') with timeout 5000ms
+      - waiting for getByTestId('diagnosis.progress')
+        14 × locator resolved to <p tabindex="-1" class="small secondary" data-question-index="2" data-question-total="3" data-testid="diagnosis.progress">質問 2 / 3</p>
+           - unexpected value "2"
+
+
+      143 |   await app.fixDate(page, '2026-11-04', '00:01:00');
+      144 |   await app.tid(page, 'diagnosis.next').click();
+    > 145 |   await expect(progress).toHaveAttribute('data-question-index', '3');
+          |                          ^
+      146 |   await expect(app.tid(page, 'task.dayChanged')).toHaveCount(0);
+      147 |   await app.tid(page, 'years.lt1').check();
+      148 |   await app.tid(page, 'diagnosis.finish').click();
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/design-d30-day-changed.spec.mjs:145:26
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/design-d30-day-changed-DES-1a83a-目の日でcompletedOnと課題の日付は確定した日-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/design-d30-day-changed-DES-1a83a-目の日でcompletedOnと課題の日付は確定した日-webkit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/design-d30-day-changed-DES-1a83a-目の日でcompletedOnと課題の日付は確定した日-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/design-d30-day-changed-DES-1a83a-目の日でcompletedOnと課題の日付は確定した日-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  16 failed
+    [chromium] › tests/ac11-ac13-storage.spec.mjs:44:1 › AC13_persistを断られても完了と再読み込みでtask.done_履歴1件_設定にnotPersistedと書き出しがある 
+    [chromium] › tests/ac17-ac18-ac27-a11y.spec.mjs:174:3 › AC27_task.today.dayChanged_axe-coreでserious以上の違反が0件 
+    [chromium] › tests/ac26-language.spec.mjs:40:3 › AC-26 locale en-US › AC26_en-USではdiagnosis.startの文言が英語の文言ファイルと一致し_キーの差が0件 
+    [chromium] › tests/ac26-language.spec.mjs:47:3 › AC-26 locale ja-JP › AC26_ja-JPではdiagnosis.startの文言が日本語の文言ファイルと一致する 
+    [chromium] › tests/design-d30-day-changed.spec.mjs:34:1 › DESIGN_D30_画面を開いたまま翌日になった後に完了を押すと_翌日のS3の先頭にtask.dayChangedが1件でフォーカスがあり_入力では消えず_次の操作と再読み込みで消える 
+    [chromium] › tests/design-d30-day-changed.spec.mjs:70:1 › DESIGN_D30_task.rateのまま翌日になった後に役に立ったを押すと_評価は記録されずhelpfulはunansweredのままで_翌日のS3にtask.dayChangedが1件 
+    [chromium] › tests/design-d30-day-changed.spec.mjs:95:1 › DESIGN_D30_最後の課題を開いたまま翌日になった後に完了を押すと_task.exhaustedの先頭にtask.dayChangedが1件でフォーカスがあり_前の課題はnoneの行に移る 
+    [chromium] › tests/design-d30-day-changed.spec.mjs:129:1 › DESIGN_U15_初回の診断の2問目を23時59分に出して0時1分に確定すると_そのまま3問目に進み_firstOpenDateは1問目の日でcompletedOnと課題の日付は確定した日 
+    [webkit] › tests/ac11-ac13-storage.spec.mjs:44:1 › AC13_persistを断られても完了と再読み込みでtask.done_履歴1件_設定にnotPersistedと書き出しがある 
+    [webkit] › tests/ac17-ac18-ac27-a11y.spec.mjs:174:3 › AC27_task.today.dayChanged_axe-coreでserious以上の違反が0件 
+    [webkit] › tests/ac26-language.spec.mjs:40:3 › AC-26 locale en-US › AC26_en-USではdiagnosis.startの文言が英語の文言ファイルと一致し_キーの差が0件 
+    [webkit] › tests/ac26-language.spec.mjs:47:3 › AC-26 locale ja-JP › AC26_ja-JPではdiagnosis.startの文言が日本語の文言ファイルと一致する 
+    [webkit] › tests/design-d30-day-changed.spec.mjs:34:1 › DESIGN_D30_画面を開いたまま翌日になった後に完了を押すと_翌日のS3の先頭にtask.dayChangedが1件でフォーカスがあり_入力では消えず_次の操作と再読み込みで消える 
+    [webkit] › tests/design-d30-day-changed.spec.mjs:70:1 › DESIGN_D30_task.rateのまま翌日になった後に役に立ったを押すと_評価は記録されずhelpfulはunansweredのままで_翌日のS3にtask.dayChangedが1件 
+    [webkit] › tests/design-d30-day-changed.spec.mjs:95:1 › DESIGN_D30_最後の課題を開いたまま翌日になった後に完了を押すと_task.exhaustedの先頭にtask.dayChangedが1件でフォーカスがあり_前の課題はnoneの行に移る 
+    [webkit] › tests/design-d30-day-changed.spec.mjs:129:1 › DESIGN_U15_初回の診断の2問目を23時59分に出して0時1分に確定すると_そのまま3問目に進み_firstOpenDateは1問目の日でcompletedOnと課題の日付は確定した日 
+  129 passed (36.7s)
+exit=1

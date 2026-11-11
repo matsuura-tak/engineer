@@ -1,0 +1,117 @@
+# date: 2026-11-05 21:05:29 +0900
+# commit: 32236ecd05051505c9bd26382d40e4a4a93eee0f
+# cmd: cd backend/tests/acceptance && PLAYWRIGHT_JSON_OUTPUT_NAME=evidence/exploration/g3r3-explore.json npx playwright test tests/explore-g3r3.spec.mjs --retries=0 --reporter=list,json  (使い捨ての探索。終わったら tests/ から消す)
+npm notice run npx
+npm notice run 'playwright' test tests/explore-g3r3.spec.mjs --retries=0 --reporter=list,json
+
+Running 8 tests using 5 workers
+
+  ✓  3 [chromium] › tests/explore-g3r3.spec.mjs:195:1 › EXPLORE_R1_書き出し→削除→読み込み→next→書き出しで行とcurrentとlevelsが欠けない (1.8s)
+  ✓  2 [chromium] › tests/explore-g3r3.spec.mjs:124:1 › EXPLORE_R3_U17_日付が変わった後のtask.nextと_保存の失敗からの再試行 (2.1s)
+  ✓  1 [chromium] › tests/explore-g3r3.spec.mjs:236:3 › EXPLORE 幅 320 と文字 200%（未経験の入口、節目、修了） › EXPLORE_R8_320_200_診断3問_S4節目_S5_S7 (4.2s)
+  ✓  6 [webkit] › tests/explore-g3r3.spec.mjs:195:1 › EXPLORE_R1_書き出し→削除→読み込み→next→書き出しで行とcurrentとlevelsが欠けない (1.9s)
+  ✓  7 [webkit] › tests/explore-g3r3.spec.mjs:124:1 › EXPLORE_R3_U17_日付が変わった後のtask.nextと_保存の失敗からの再試行 (2.0s)
+  ✓  8 [webkit] › tests/explore-g3r3.spec.mjs:236:3 › EXPLORE 幅 320 と文字 200%（未経験の入口、節目、修了） › EXPLORE_R8_320_200_診断3問_S4節目_S5_S7 (2.6s)
+  ✘  5 [chromium] › tests/explore-g3r3.spec.mjs:30:3 › EXPLORE R2+R3+R4 同じ日に初級→中級→上級→allDone まで 35 件 › EXPLORE_R2R3R4_35件 (10.7s)
+  ✘  4 [webkit] › tests/explore-g3r3.spec.mjs:30:3 › EXPLORE R2+R3+R4 同じ日に初級→中級→上級→allDone まで 35 件 › EXPLORE_R2R3R4_35件 (11.2s)
+
+
+  1) [chromium] › tests/explore-g3r3.spec.mjs:30:3 › EXPLORE R2+R3+R4 同じ日に初級→中級→上級→allDone まで 35 件 › EXPLORE_R2R3R4_35件 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByTestId('task.next.note')
+    Expected: "{area}の{level}の課題は、すべて出し終えています。次に進むと、修了の案内が出ます。"
+    Received: "バックエンド設計の初級の課題は、すべて出し終えています。次に進むと、修了の案内が出ます。"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" getByTestId('task.next.note') with timeout 5000ms
+      - waiting for getByTestId('task.next.note')
+        14 × locator resolved to <p class="small" data-testid="task.next.note">バックエンド設計の初級の課題は、すべて出し終えています。次に進むと、修了の案内が出ます。</p>
+           - unexpected value "バックエンド設計の初級の課題は、すべて出し終えています。次に進むと、修了の案内が出ます。"
+
+
+      65 |       await expect(app.tid(page, 'task.week')).toHaveAttribute('data-stat-days-completed-week', '1');
+      66 |       const unissued = tasksOf(tasks, t.area, t.level).filter((x) => !seen.some((s) => s.id === x.id)).length;
+    > 67 |       await expect(app.tid(page, 'task.next.note')).toHaveText(app.text(ja, unissued === 0 ? 'task.next.note.last' : 'task.next.note'));
+         |                                                     ^
+      68 |       await app.tid(page, 'task.next').click();
+      69 |       await expect(app.root(page)).toHaveAttribute('data-state', /^task\.(today|exhausted)$/, { timeout: app.WAIT_MS });
+      70 |       const state = await app.readState(page);
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3.spec.mjs:67:53
+
+    attachment #1: EXPLORE_S4_at7 (image/png) ──────────────────────────────────────────────────────
+    test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-chromium/attachments/EXPLORE-S4-at7-0da3aa7672c4c97a7cce484a22234bff4efd720f.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: EXPLORE_S3_nth12 (image/png) ────────────────────────────────────────────────────
+    test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-chromium/attachments/EXPLORE-S3-nth12-ed9845115429508aa57e450d5b989843fa6bb74c.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-chromium/error-context.md
+
+    attachment #5: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [webkit] › tests/explore-g3r3.spec.mjs:30:3 › EXPLORE R2+R3+R4 同じ日に初級→中級→上級→allDone まで 35 件 › EXPLORE_R2R3R4_35件 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  getByTestId('task.next.note')
+    Expected: "{area}の{level}の課題は、すべて出し終えています。次に進むと、修了の案内が出ます。"
+    Received: "バックエンド設計の初級の課題は、すべて出し終えています。次に進むと、修了の案内が出ます。"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" getByTestId('task.next.note') with timeout 5000ms
+      - waiting for getByTestId('task.next.note')
+        14 × locator resolved to <p class="small" data-testid="task.next.note">バックエンド設計の初級の課題は、すべて出し終えています。次に進むと、修了の案内が出ます。</p>
+           - unexpected value "バックエンド設計の初級の課題は、すべて出し終えています。次に進むと、修了の案内が出ます。"
+
+
+      65 |       await expect(app.tid(page, 'task.week')).toHaveAttribute('data-stat-days-completed-week', '1');
+      66 |       const unissued = tasksOf(tasks, t.area, t.level).filter((x) => !seen.some((s) => s.id === x.id)).length;
+    > 67 |       await expect(app.tid(page, 'task.next.note')).toHaveText(app.text(ja, unissued === 0 ? 'task.next.note.last' : 'task.next.note'));
+         |                                                     ^
+      68 |       await app.tid(page, 'task.next').click();
+      69 |       await expect(app.root(page)).toHaveAttribute('data-state', /^task\.(today|exhausted)$/, { timeout: app.WAIT_MS });
+      70 |       const state = await app.readState(page);
+        at /Users/takumamatsuura/src/engineer/backend/tests/acceptance/tests/explore-g3r3.spec.mjs:67:53
+
+    attachment #1: EXPLORE_S4_at7 (image/png) ──────────────────────────────────────────────────────
+    test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-webkit/attachments/EXPLORE-S4-at7-dc385512485c8724069b229415dd913c3a358c06.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: EXPLORE_S3_nth12 (image/png) ────────────────────────────────────────────────────
+    test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-webkit/attachments/EXPLORE-S3-nth12-91d6354d5932e35877ae7b80e4ace78adfeeff09.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-webkit/error-context.md
+
+    attachment #5: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/explore-g3r3-EXPLORE-R2-R3-46ca6--まで-35-件-EXPLORE-R2R3R4-35件-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [chromium] › tests/explore-g3r3.spec.mjs:30:3 › EXPLORE R2+R3+R4 同じ日に初級→中級→上級→allDone まで 35 件 › EXPLORE_R2R3R4_35件 
+    [webkit] › tests/explore-g3r3.spec.mjs:30:3 › EXPLORE R2+R3+R4 同じ日に初級→中級→上級→allDone まで 35 件 › EXPLORE_R2R3R4_35件 
+  6 passed (13.8s)
+# exit: 1

@@ -1,0 +1,14 @@
+# date: 2026-11-05 21:31:45 +0900
+# commit: 7a59e8415de426d9eb40f09e8f6397eb5ba090fa
+# why: design 5.1 との突き合わせで #34（S7 allDone。5.1 冒頭の「通常」= 4 通り）が道具になく、#27（S4 で答えて着く S5）の経路の場面もなかったので、2 場面を足して --only で撮り足す（index.tsv と axe-summary.tsv に合流）
+# cmd: cd backend/tests/acceptance && node tools/screenshots.mjs --out docs/verification/001-daily-learning/evidence/screenshots --browser both --only '^(S7_task.exhausted_allDone|S5_task.done_afterRate)$'
+ok             chromium light S5_task.done_afterRate 
+ok             chromium light S7_task.exhausted_allDone 
+ok             chromium dark  S7_task.exhausted_allDone 
+ok             chromium ax5   S7_task.exhausted_allDone 
+ok             chromium en    S7_task.exhausted_allDone 
+ok             webkit   light S5_task.done_afterRate 
+ok             webkit   light S7_task.exhausted_allDone 
+
+撮った：7 枚（問題 0）。axe：4 画面、違反のある画面 0、incomplete のノード 0
+# exit: 0

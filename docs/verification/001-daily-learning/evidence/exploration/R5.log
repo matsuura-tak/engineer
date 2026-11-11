@@ -1,0 +1,30 @@
+# セッション R5（chromium、2026-11-03T14:30:00.470Z、配布物 2026-11-30.1）
+1. 答えの自動保存で失敗 → error が textarea の直下、入力が残る、retry で 1 回だけ保存
+  位置：role=alert 前=undefined 後=error.storage.retry 親=DIV value=「失敗する答え」 saved 表示=false
+  retry 後の setItem=1 回、保存された answer=「失敗する答え」
+  R5_01_answer_error.png
+  data-state=task.today
+2. 申告（難しすぎ）で失敗 → S3 のまま、答えも保つ、retry で task.skipped
+  state=task.today 位置：role=alert 前=undefined 後=error.storage.retry 親=DIV value=「失敗する答え」
+  R5_02_report_error.png
+  retry 後 setItem=1 回 末尾=[["2026-11-04","too_hard","失敗する答え"]]
+  data-state=task.skipped
+3. （別のコンテキスト）「役に立った」で失敗 → S4 のまま、retry で task.done
+  state=task.rate 位置：role=alert 前=undefined 後=error.storage.retry 親=DIV
+  retry 後 末尾=[["2026-11-04","done","not_helpful"]]
+  data-state=task.skipped
+4. （別のコンテキスト）読み込みの置き換えで失敗 → ダイアログの中に error、データは前のまま、retry で置き換わる
+  state=settings dialog まだある=1 位置：role=alert 前=undefined 後=error.storage.retry 親=DIV データ変わらない=true
+  R5_04_import_error.png
+  retry → state=task.today history=5（ファイルは 5）
+  data-state=task.skipped
+5. （別のコンテキスト）削除で失敗（removeItem は包めないので setItem の失敗は起きないはず）→ 確かめるだけ
+  state=diagnosis.start error=0 raw=null 印が残る=true
+  data-state=task.skipped
+6. （別のコンテキスト）起動時の保存（今日の課題を出す）で失敗 → 課題が画面に残るか
+  state=task.today task=backend-intermediate-004 error=1 retry=1 current 保存済み={"date":"2026-11-04","taskId":"backend-intermediate-004","area":"backend","level":"intermediate","mode":"in_app","answer":""}
+  R5_06_startup_error.png
+  retry → current={"date":"2026-11-04","taskId":"backend-intermediate-004","area":"backend","level":"intermediate","mode":"in_app","answer":""}
+  再読み込み → state=task.today task=backend-intermediate-004
+  data-state=task.skipped
+# 操作 6 件、2 秒、疑問/不具合候補 0 件
