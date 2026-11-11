@@ -1,0 +1,46 @@
+# バックエンドのテスト。コマンドは .claude/org/app.json の commands.backend_test。
+# コマンドはリポジトリの直下で実行する（例: cd backend && npm ci && npm test）。
+# paths.backend のフォルダがまだないときだけ飛ばす。
+# フォルダがあるのにコマンドが空なら失敗にする（飛ばした CI は G2 の「緑」に数えない）。
+name: backend
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backend-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - name: テスト
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess, sys
+          with open(".claude/org/app.json", encoding="utf-8") as f:
+              app = json.load(f)
+          backend_dir = ((app.get("paths") or {}).get("backend") or "backend/").strip()
+          cmd = ((app.get("commands") or {}).get("backend_test") or "").strip()
+          if not os.path.isdir(backend_dir):
+              print("::notice::%s がまだないので、バックエンドのテストを飛ばしました" % backend_dir)
+              sys.exit(0)
+          if not cmd:
+              print("::error::.claude/org/app.json の commands.backend_test が空です。Takuma が書くまで、この CI は失敗し、G2 は通りません")
+              sys.exit(1)
+          print("::group::backend_test: %s" % cmd, flush=True)
+          code = subprocess.call(["bash", "-eo", "pipefail", "-c", cmd])
+          print("::endgroup::", flush=True)
+          if code != 0:
+              print("::error::commands.backend_test が失敗しました（終了コード %d）" % code)
+          sys.exit(code)
+          PY

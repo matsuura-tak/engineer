@@ -1,7 +1,8 @@
 {
   "org_version": "0.2.0",
   "profiles": [
-    "ios"
+    "ios",
+    "backend"
   ],
   "files": {
     ".claude/agents/backend-engineer.md": "a069e858da68c7064eda07f8f2d8d193031d8e697fd5fadb3a76d0bf4f88c26d",
@@ -32,6 +33,7 @@
     ".claude/skills/feature/SKILL.md": "3ce2f6a89378415c07ac3d12479a978d5a26d757b56dded0bd2b70a2f98b92f2",
     ".claude/skills/release/SKILL.md": "fb573c7e1e4f3b6facea279c6e178fef2756bba177d310c31db3cff57063cc3c",
     ".claude/skills/retro/SKILL.md": "caf77ff5185dda1ba6718e9ee843838c53c663631455d9effc9e056bb89dccea",
+    ".github/workflows/backend.yml": "101fe1dcdbef4413e47d528f1942dd17d1388e0df0422add902fe1792a110e0e",
     ".github/workflows/ios.yml": "864d826501df1ea0853cde0e33103d4ee5ee5f48b424fbc5a1cbcc212b8f33b4",
     ".github/workflows/org-check.yml": "f86b3986bd209bdfdfc6c739b5f84ee82d5ceb4c511d4a19d144d368ef54da42",
     ".github/workflows/org-guard.yml": "69641afec87216889dbf639de319cdeed687d5d4d8c8d4ff4d52eb7cbbdc35a9",
